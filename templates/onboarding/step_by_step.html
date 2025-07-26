@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>회원가입 - 필수 정보 입력</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .onboarding-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 600px;
+        overflow: hidden;
+      }
+
+      /* 진행률 표시바 */
+      .progress-header {
+        background: #f8f9fa;
+        padding: 30px;
+        text-align: center;
+        border-bottom: 1px solid #e9ecef;
+      }
+
+      .progress-title {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+
+      .progress-bar-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .progress-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        position: relative;
+      }
+
+      .progress-step:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 60%;
+        width: 80%;
+        height: 2px;
+        background: #e9ecef;
+        z-index: 1;
+      }
+
+      .progress-step.completed:not(:last-child)::after {
+        background: #28a745;
+      }
+
+      .step-circle {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #e9ecef;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+        margin-bottom: 8px;
+        position: relative;
+        z-index: 2;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 2px solid transparent;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .progress-step.completed .step-circle {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        border-color: #ffffff;
+      }
+
+      .progress-step.completed .step-circle::after {
+        content: "✓";
+        position: absolute;
+        font-size: 12px;
+        font-weight: bold;
+        animation: checkmark 0.6s ease-in-out;
+      }
+
+      .progress-step.active .step-circle {
+        background: linear-gradient(135deg, #007bff, #6610f2);
+        color: white;
+        transform: scale(1.2);
+        box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        border-color: #ffffff;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes checkmark {
+        0% {
+          opacity: 0;
+          transform: scale(0.3) rotate(-45deg);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.1) rotate(0deg);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1) rotate(0deg);
+        }
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+        50% {
+          box-shadow: 0 8px 25px rgba(0, 123, 255, 0.6);
+        }
+        100% {
+          box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+      }
+
+      .step-label {
+        font-size: 12px;
+        color: #6c757d;
+        text-align: center;
+        font-weight: 500;
+      }
+
+      .progress-step.completed .step-label,
+      .progress-step.active .step-label {
+        color: #333;
+        font-weight: 600;
+      }
+
+      /* 메인 콘텐츠 영역 */
+      .onboarding-content {
+        padding: 40px;
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      /* 단계별 입력 컨테이너 */
+      .step-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        opacity: 0;
+        transform: translateX(100px);
+        transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        pointer-events: none;
+      }
+
+      .step-container.active {
+        position: relative;
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: all;
+      }
+
+      .step-container.prev {
+        transform: translateX(-100px);
+        opacity: 0;
+      }
+
+      /* 진입 애니메이션 */
+      @keyframes slideInFromRight {
+        from {
+          opacity: 0;
+          transform: translateX(100px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes slideInFromLeft {
+        from {
+          opacity: 0;
+          transform: translateX(-100px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes slideOutToLeft {
+        from {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateX(-100px);
+        }
+      }
+
+      @keyframes slideOutToRight {
+        from {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateX(100px);
+        }
+      }
+
+      /* 콘텐츠 영역 상대 위치 설정 */
+      .onboarding-content form {
+        position: relative;
+        min-height: 350px;
+      }
+
+      .step-title {
+        font-size: 28px;
+        color: #333;
+        margin-bottom: 15px;
+        font-weight: 600;
+      }
+
+      .step-subtitle {
+        font-size: 16px;
+        color: #6c757d;
+        margin-bottom: 40px;
+        line-height: 1.5;
+      }
+
+      /* 입력 필드 스타일 */
+      .input-group {
+        margin-bottom: 30px;
+      }
+
+      .step-input {
+        width: 100%;
+        max-width: 400px;
+        padding: 15px 20px;
+        font-size: 18px;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        outline: none;
+        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        background: #f8f9fa;
+        position: relative;
+        transform: translateY(0);
+      }
+
+      .step-input:focus {
+        border-color: #007bff;
+        background: white;
+        box-shadow: 0 8px 25px rgba(0, 123, 255, 0.15);
+        transform: translateY(-2px);
+      }
+
+      .step-input.error {
+        border-color: #dc3545;
+        background: #fff5f5;
+        animation: shake 0.5s ease-in-out;
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.2);
+      }
+
+      .step-input.success {
+        border-color: #28a745;
+        background: #f8fff8;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.2);
+        animation: successGlow 0.6s ease-in-out;
+      }
+
+      @keyframes shake {
+        0%, 20%, 50%, 80%, 100% {
+          transform: translateX(0);
+        }
+        10%, 30%, 70%, 90% {
+          transform: translateX(-5px);
+        }
+        40%, 60% {
+          transform: translateX(5px);
+        }
+      }
+
+      @keyframes successGlow {
+        0% {
+          box-shadow: 0 4px 15px rgba(40, 167, 69, 0);
+        }
+        50% {
+          box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+        100% {
+          box-shadow: 0 4px 15px rgba(40, 167, 69, 0.2);
+        }
+      }
+
+      /* 성별 선택 버튼 */
+      .gender-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 30px;
+      }
+
+      .gender-btn {
+        padding: 15px 30px;
+        font-size: 18px;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        background: #f8f9fa;
+        color: #333;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 120px;
+      }
+
+      .gender-btn:hover {
+        border-color: #007bff;
+        background: #e3f2fd;
+      }
+
+      .gender-btn.selected {
+        border-color: #007bff;
+        background: #007bff;
+        color: white;
+      }
+
+      /* 검증 메시지 */
+      .validation-message {
+        margin-top: 10px;
+        font-size: 14px;
+        min-height: 20px;
+      }
+
+      .validation-message.error {
+        color: #dc3545;
+      }
+
+      .validation-message.success {
+        color: #28a745;
+      }
+
+      .input-help {
+        font-size: 14px;
+        color: #6c757d;
+        margin-top: 10px;
+      }
+
+      /* 네비게이션 버튼 */
+      .navigation-buttons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 40px;
+        padding-top: 30px;
+        border-top: 1px solid #e9ecef;
+      }
+
+      .nav-btn {
+        padding: 15px 35px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        min-width: 120px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(0);
+      }
+
+      .nav-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+      }
+
+      .nav-btn:hover::before {
+        left: 100%;
+      }
+
+      .nav-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      .nav-btn:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-prev {
+        background: linear-gradient(135deg, #6c757d, #5a6268);
+        color: white;
+      }
+
+      .btn-prev:hover {
+        background: linear-gradient(135deg, #5a6268, #495057);
+        box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+      }
+
+      .btn-prev:disabled {
+        background: #e9ecef;
+        color: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .btn-prev:disabled::before {
+        display: none;
+      }
+
+      .btn-next {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+      }
+
+      .btn-next:hover {
+        background: linear-gradient(135deg, #0056b3, #004085);
+        box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
+      }
+
+      .btn-next:disabled {
+        background: #e9ecef;
+        color: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .btn-next:disabled::before {
+        display: none;
+      }
+
+      .btn-submit {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        animation: submitPulse 2s infinite;
+      }
+
+      .btn-submit:hover {
+        background: linear-gradient(135deg, #218838, #1e7e34);
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+        animation: none;
+      }
+
+      @keyframes submitPulse {
+        0% {
+          box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        50% {
+          box-shadow: 0 6px 20px rgba(40, 167, 69, 0.5);
+        }
+        100% {
+          box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+      }
+
+      /* 로딩 상태 */
+      .loading {
+        opacity: 0.7;
+        pointer-events: none;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 8px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* 반응형 디자인 */
+      @media (max-width: 1024px) {
+        .onboarding-container {
+          max-width: 550px;
+        }
+        
+        .step-input {
+          max-width: 350px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .onboarding-container {
+          margin: 10px;
+          border-radius: 15px;
+          max-width: 95vw;
+        }
+
+        .progress-header {
+          padding: 20px 15px;
+        }
+
+        .progress-title {
+          font-size: 20px;
+        }
+
+        .progress-bar-container {
+          margin-bottom: 10px;
+        }
+
+        .step-circle {
+          width: 25px;
+          height: 25px;
+          font-size: 12px;
+        }
+
+        .step-label {
+          font-size: 11px;
+        }
+
+        .onboarding-content {
+          padding: 25px 15px;
+        }
+
+        .step-title {
+          font-size: 22px;
+          margin-bottom: 12px;
+        }
+
+        .step-subtitle {
+          font-size: 14px;
+          margin-bottom: 30px;
+        }
+
+        .step-input {
+          font-size: 16px;
+          padding: 12px 15px;
+          max-width: 100%;
+        }
+
+        .gender-buttons {
+          flex-direction: column;
+          align-items: center;
+          gap: 15px;
+        }
+
+        .gender-btn {
+          width: 100%;
+          max-width: 250px;
+          padding: 12px 20px;
+        }
+
+        .navigation-buttons {
+          flex-direction: column;
+          gap: 15px;
+          margin-top: 30px;
+          padding-top: 20px;
+        }
+
+        .nav-btn {
+          width: 100%;
+          padding: 12px 25px;
+          min-width: auto;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 10px;
+        }
+
+        .onboarding-container {
+          margin: 0;
+          border-radius: 12px;
+        }
+
+        .progress-header {
+          padding: 15px 10px;
+        }
+
+        .progress-title {
+          font-size: 18px;
+        }
+
+        .step-circle {
+          width: 22px;
+          height: 22px;
+          font-size: 11px;
+        }
+
+        .step-label {
+          font-size: 10px;
+        }
+
+        .onboarding-content {
+          padding: 20px 12px;
+        }
+
+        .step-title {
+          font-size: 20px;
+        }
+
+        .step-subtitle {
+          font-size: 13px;
+        }
+
+        .step-input {
+          padding: 10px 12px;
+          font-size: 15px;
+        }
+
+        .gender-btn {
+          padding: 10px 15px;
+          font-size: 15px;
+        }
+      }
+
+      /* 접근성 개선 */
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      /* 고대비 모드 지원 */
+      @media (prefers-contrast: high) {
+        .step-input {
+          border-width: 3px;
+        }
+
+        .step-circle {
+          border: 2px solid;
+        }
+
+        .nav-btn {
+          border: 2px solid transparent;
+        }
+
+        .nav-btn:focus {
+          border-color: currentColor;
+        }
+      }
+
+      /* 다크모드 지원 */
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        .onboarding-container {
+          background: #2d3748;
+          color: #e2e8f0;
+        }
+
+        .progress-header {
+          background: #4a5568;
+        }
+
+        .step-input {
+          background: #4a5568;
+          border-color: #718096;
+          color: #e2e8f0;
+        }
+
+        .step-input:focus {
+          background: #2d3748;
+          border-color: #63b3ed;
+        }
+
+        .progress-step:not(:last-child)::after {
+          background: #4a5568;
+        }
+      }
+
+      /* 포커스 개선 */
+      .nav-btn:focus,
+      .gender-btn:focus,
+      .step-input:focus {
+        outline: 3px solid #007bff;
+        outline-offset: 2px;
+      }
+
+      /* 터치 디바이스 최적화 */
+      @media (hover: none) and (pointer: coarse) {
+        .nav-btn,
+        .gender-btn {
+          min-height: 44px;
+        }
+
+        .step-input {
+          min-height: 44px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="onboarding-container">
+      <!-- 진행률 표시바 -->
+      <div class="progress-header">
+        <h1 class="progress-title">회원가입</h1>
+        <div class="progress-bar-container">
+          <div class="progress-step {% if current_step == 1 %}active{% elif current_step > 1 %}completed{% endif %}" data-step="1">
+            <div class="step-circle">1</div>
+            <div class="step-label">이름</div>
+          </div>
+          <div class="progress-step {% if current_step == 2 %}active{% elif current_step > 2 %}completed{% endif %}" data-step="2">
+            <div class="step-circle">2</div>
+            <div class="step-label">닉네임</div>
+          </div>
+          <div class="progress-step {% if current_step == 3 %}active{% elif current_step > 3 %}completed{% endif %}" data-step="3">
+            <div class="step-circle">3</div>
+            <div class="step-label">성별</div>
+          </div>
+          <div class="progress-step {% if current_step == 4 %}active{% elif current_step > 4 %}completed{% endif %}" data-step="4">
+            <div class="step-circle">4</div>
+            <div class="step-label">생년월일</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 메인 콘텐츠 -->
+      <div class="onboarding-content">
+        <form id="onboardingForm" method="POST">
+          <!-- 현재 단계 정보 전달 -->
+          <input
+            type="hidden"
+            id="current_step"
+            name="step"
+            value="{{ current_step if current_step else 1 }}"
+          />
+
+          <!-- 1단계: 이름 입력 -->
+          <div class="step-container {% if current_step == 1 %}active{% endif %}" data-step="1">
+            <h2 class="step-title">안녕하세요!</h2>
+            <p class="step-subtitle">서비스 이용을 위해 실명을 입력해주세요</p>
+
+            <div class="input-group">
+              <input
+                type="text"
+                id="name"
+                name="name"
+                class="step-input"
+                placeholder="실명을 입력해주세요"
+                maxlength="50"
+                value="{% if saved_data and saved_data.name %}{{ saved_data.name }}{% endif %}"
+                required
+              />
+              <div class="validation-message" id="name-validation"></div>
+              <div class="input-help">한글 또는 영문으로 2-50자 이내</div>
+            </div>
+          </div>
+
+          <!-- 2단계: 닉네임 입력 -->
+          <div class="step-container {% if current_step == 2 %}active{% endif %}" data-step="2">
+            <h2 class="step-title">닉네임을 정해주세요</h2>
+            <p class="step-subtitle">다른 사용자에게 보여질 이름입니다</p>
+
+            <div class="input-group">
+              <input
+                type="text"
+                id="nickname"
+                name="nickname"
+                class="step-input"
+                placeholder="사용하실 닉네임"
+                maxlength="20"
+                value="{% if saved_data and saved_data.nickname %}{{ saved_data.nickname }}{% endif %}"
+                required
+              />
+              <div class="validation-message" id="nickname-validation"></div>
+              <div class="input-help">2-20자 이내, 중복 불가</div>
+            </div>
+          </div>
+
+          <!-- 3단계: 성별 선택 -->
+          <div class="step-container {% if current_step == 3 %}active{% endif %}" data-step="3">
+            <h2 class="step-title">성별을 선택해주세요</h2>
+            <p class="step-subtitle">서비스 개인화를 위해 필요합니다</p>
+
+            <div class="input-group">
+              <div class="gender-buttons">
+                <button
+                  type="button"
+                  class="gender-btn {% if saved_data and saved_data.gender == 'male' %}selected{% endif %}"
+                  data-value="male"
+                >
+                  남성
+                </button>
+                <button
+                  type="button"
+                  class="gender-btn {% if saved_data and saved_data.gender == 'female' %}selected{% endif %}"
+                  data-value="female"
+                >
+                  여성
+                </button>
+              </div>
+              <input
+                type="hidden"
+                id="gender"
+                name="gender"
+                value="{% if saved_data and saved_data.gender %}{{ saved_data.gender }}{% endif %}"
+                required
+              />
+              <div class="validation-message" id="gender-validation"></div>
+            </div>
+          </div>
+
+          <!-- 4단계: 생년월일 입력 -->
+          <div class="step-container {% if current_step == 4 %}active{% endif %}" data-step="4">
+            <h2 class="step-title">생년월일을 알려주세요</h2>
+            <p class="step-subtitle">만 14세 이상만 가입 가능합니다</p>
+
+            <div class="input-group">
+              <input
+                type="date"
+                id="birth_date"
+                name="birth_date"
+                class="step-input"
+                value="{% if saved_data and saved_data.birth_date %}{{ saved_data.birth_date }}{% endif %}"
+                required
+              />
+              <div class="validation-message" id="birth_date-validation"></div>
+              <div class="input-help">YYYY-MM-DD 형식으로 입력</div>
+            </div>
+          </div>
+
+          <!-- 네비게이션 버튼 -->
+          <div class="navigation-buttons">
+            <button
+              type="button"
+              id="prevBtn"
+              class="nav-btn btn-prev"
+              {% if current_step == 1 %}disabled{% endif %}
+            >
+              이전
+            </button>
+            <button type="button" id="nextBtn" class="nav-btn btn-next" {% if current_step == 4 %}style="display: none"{% endif %}>
+              다음
+            </button>
+            <button
+              type="submit"
+              id="submitBtn"
+              class="nav-btn btn-submit"
+              {% if current_step != 4 %}style="display: none"{% endif %}
+            >
+              <span class="submit-text">회원가입 완료</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 서버에서 전달된 초기 데이터 -->
+    <script>
+      window.onboardingConfig = {
+        currentStep: {{ current_step | default(1) }},
+        savedData: {% if saved_data %}{{ saved_data | tojson | safe }}{% else %}{}{% endif %}
+      };
+    </script>
+
+    <script>
+      // 온보딩 플로우 관리
+      document.addEventListener('DOMContentLoaded', function() {
+        let currentStep = window.onboardingConfig.currentStep;
+        const savedData = window.onboardingConfig.savedData;
+        
+        // 성별 버튼 이벤트
+        document.querySelectorAll('.gender-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
+            this.classList.add('selected');
+            document.getElementById('gender').value = this.dataset.value;
+            validateGender();
+          });
+        });
+
+        // 네비게이션 버튼 이벤트
+        document.getElementById('prevBtn').addEventListener('click', function() {
+          if (currentStep > 1) {
+            currentStep--;
+            updateUI();
+          }
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', function() {
+          if (validateCurrentStep() && currentStep < 4) {
+            currentStep++;
+            updateUI();
+            saveProgress();
+          }
+        });
+
+        // 입력 필드 검증 이벤트
+        document.getElementById('name').addEventListener('input', validateName);
+        document.getElementById('nickname').addEventListener('input', validateNickname);
+        document.getElementById('birth_date').addEventListener('change', validateBirthDate);
+
+        // 폼 제출 이벤트
+        document.getElementById('onboardingForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          if (validateCurrentStep()) {
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.querySelector('.submit-text').innerHTML = '<span class="spinner"></span>처리 중...';
+            this.submit();
+          }
+        });
+
+        // UI 업데이트 함수
+        function updateUI() {
+          // 단계 컨테이너 표시/숨김
+          document.querySelectorAll('.step-container').forEach((container, index) => {
+            container.classList.toggle('active', index + 1 === currentStep);
+          });
+
+          // 진행률 표시바 업데이트
+          document.querySelectorAll('.progress-step').forEach((step, index) => {
+            const stepNum = index + 1;
+            step.classList.remove('completed', 'active');
+            if (stepNum < currentStep) step.classList.add('completed');
+            else if (stepNum === currentStep) step.classList.add('active');
+          });
+
+          // 버튼 상태 업데이트
+          document.getElementById('prevBtn').disabled = currentStep === 1;
+          document.getElementById('nextBtn').style.display = currentStep === 4 ? 'none' : 'block';
+          document.getElementById('submitBtn').style.display = currentStep === 4 ? 'block' : 'none';
+          document.getElementById('current_step').value = currentStep;
+
+          // 현재 단계 입력 필드에 포커스
+          setTimeout(() => {
+            const activeContainer = document.querySelector('.step-container.active');
+            const input = activeContainer.querySelector('input:not([type="hidden"]), button');
+            if (input) input.focus();
+          }, 100);
+        }
+
+        // 검증 함수들
+        function validateCurrentStep() {
+          switch (currentStep) {
+            case 1: return validateName();
+            case 2: return validateNickname();
+            case 3: return validateGender();
+            case 4: return validateBirthDate();
+            default: return true;
+          }
+        }
+
+        function validateName() {
+          const input = document.getElementById('name');
+          const name = input.value.trim();
+          
+          if (!name) {
+            showValidation('name', '이름을 입력해주세요', 'error');
+            return false;
+          }
+          if (name.length < 2 || name.length > 50) {
+            showValidation('name', '이름은 2-50자 이내로 입력해주세요', 'error');
+            return false;
+          }
+          if (!/^[가-힣a-zA-Z\s]+$/.test(name)) {
+            showValidation('name', '한글 또는 영문만 입력 가능합니다', 'error');
+            return false;
+          }
+          
+          showValidation('name', '올바른 이름입니다', 'success');
+          return true;
+        }
+
+        function validateNickname() {
+          const input = document.getElementById('nickname');
+          const nickname = input.value.trim();
+          
+          if (!nickname) {
+            showValidation('nickname', '닉네임을 입력해주세요', 'error');
+            return false;
+          }
+          if (nickname.length < 2 || nickname.length > 20) {
+            showValidation('nickname', '닉네임은 2-20자 이내로 입력해주세요', 'error');
+            return false;
+          }
+          
+          showValidation('nickname', '사용 가능한 닉네임입니다', 'success');
+          return true;
+        }
+
+        function validateGender() {
+          const gender = document.getElementById('gender').value;
+          if (!gender) {
+            showValidation('gender', '성별을 선택해주세요', 'error');
+            return false;
+          }
+          showValidation('gender', '', 'success');
+          return true;
+        }
+
+        function validateBirthDate() {
+          const input = document.getElementById('birth_date');
+          const birthDate = input.value;
+          
+          if (!birthDate) {
+            showValidation('birth_date', '생년월일을 입력해주세요', 'error');
+            return false;
+          }
+          
+          // 간단한 검증: 날짜 형식이 맞는지만 확인
+          const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+          if (!dateRegex.test(birthDate)) {
+            showValidation('birth_date', '올바른 날짜 형식으로 입력해주세요', 'error');
+            return false;
+          }
+          
+          // 년도 기반 간단한 나이 체크
+          const birthYear = parseInt(birthDate.substring(0, 4));
+          const currentYear = new Date().getFullYear();
+          const age = currentYear - birthYear;
+          
+          if (age < 14) {
+            showValidation('birth_date', '만 14세 이상만 가입 가능합니다', 'error');
+            return false;
+          }
+          
+          if (age > 100) {
+            showValidation('birth_date', '올바른 생년월일을 입력해주세요', 'error');
+            return false;
+          }
+          
+          showValidation('birth_date', '올바른 생년월일입니다', 'success');
+          return true;
+        }
+
+        function showValidation(field, message, type) {
+          const validation = document.getElementById(field + '-validation');
+          const input = document.getElementById(field);
+          
+          validation.textContent = message;
+          validation.className = 'validation-message ' + type;
+          
+          if (input) {
+            input.classList.remove('error', 'success');
+            if (type) input.classList.add(type);
+          }
+        }
+
+        function saveProgress() {
+          const formData = new FormData(document.getElementById('onboardingForm'));
+          const data = Object.fromEntries(formData.entries());
+          
+          console.log('Sending data to server:', data);
+          console.log('Current step:', currentStep);
+          
+          fetch('/onboarding/save-progress', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: data, step: currentStep })
+          })
+          .then(response => response.json())
+          .then(result => {
+            console.log('Server response:', result);
+            if (!result.success) {
+              console.error('Server validation errors:', result.validation_errors);
+            }
+          })
+          .catch(error => console.error('Progress save failed:', error));
+        }
+
+        // 초기화
+        updateUI();
+      });
+    </script>
+  </body>
+</html>

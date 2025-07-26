@@ -16,6 +16,31 @@ CREATE TABLE `user` (
 
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
+    -- 온보딩 상태 관리 필드들
+    onboarding_status VARCHAR(20) DEFAULT 'pending',
+    onboarding_data TEXT,
+    onboarding_step INT DEFAULT 0,
+    is_profile_complete BOOLEAN DEFAULT FALSE,
+
     UNIQUE KEY uq_social_login (social_type, social_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 기존 테이블에 컬럼 추가를 위한 ALTER 명령어들
+-- (기존 테이블이 있는 경우 사용)
+ALTER TABLE user ADD COLUMN onboarding_status VARCHAR(20) DEFAULT 'pending';
+ALTER TABLE user ADD COLUMN onboarding_data TEXT;
+ALTER TABLE user ADD COLUMN onboarding_step INT DEFAULT 0;
+ALTER TABLE user ADD COLUMN is_profile_complete BOOLEAN DEFAULT FALSE;
+
+-- 기존 사용자들의 온보딩 상태 업데이트
+UPDATE user 
+SET onboarding_status = 'completed', 
+    is_profile_complete = TRUE 
+WHERE name IS NOT NULL 
+    AND name != '' 
+    AND nickname IS NOT NULL 
+    AND nickname != '' 
+    AND gender IS NOT NULL 
+    AND gender != '' 
+    AND birth_date IS NOT NULL;
 

@@ -18,5 +18,5 @@ google_bp = make_google_blueprint(
         "https://www.googleapis.com/auth/userinfo.email",
         "openid"
     ],
-    redirect_to="auth.google_login_callback"  # auth.py의 콜백 라우트
+            redirect_to="social_oauth.google_login_callback"  # social_oauth.py의 콜백 라우트
 )

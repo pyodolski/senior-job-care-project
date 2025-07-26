@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>로그인 완료 - 환영합니다!</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .success-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 600px;
+        overflow: hidden;
+        animation: celebration 0.8s ease-out;
+      }
+
+      @keyframes celebration {
+        0% {
+          opacity: 0;
+          transform: scale(0.8) translateY(30px);
+        }
+        50% {
+          transform: scale(1.05) translateY(-10px);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      /* 헤더 영역 */
+      .success-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 50px 40px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .success-header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.1) 0%,
+          transparent 70%
+        );
+        animation: shimmer 3s infinite;
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .success-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+        animation: bounce 2s infinite;
+        position: relative;
+        z-index: 2;
+      }
+
+      @keyframes bounce {
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateY(-10px);
+        }
+        60% {
+          transform: translateY(-5px);
+        }
+      }
+
+      .success-title {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .success-subtitle {
+        font-size: 18px;
+        opacity: 0.9;
+        line-height: 1.5;
+        position: relative;
+        z-index: 2;
+      }
+
+      /* 메인 콘텐츠 */
+      .success-content {
+        padding: 50px 40px;
+      }
+
+      /* 사용자 정보 카드 */
+      .user-info {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 40px;
+        text-align: center;
+        border: 2px solid #dee2e6;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .user-info::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.4),
+          transparent
+        );
+        animation: slideGlow 3s infinite;
+      }
+
+      @keyframes slideGlow {
+        0% {
+          left: -100%;
+        }
+        50% {
+          left: 100%;
+        }
+        100% {
+          left: 100%;
+        }
+      }
+
+      .user-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #007bff, #6610f2);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        font-weight: bold;
+        margin: 0 auto 20px;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+      }
+
+      .user-details {
+        position: relative;
+        z-index: 2;
+      }
+
+      .user-name {
+        font-size: 24px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+      }
+
+      .user-nickname {
+        font-size: 18px;
+        color: #6c757d;
+        margin-bottom: 15px;
+      }
+
+      .user-social {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        color: #495057;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .social-icon {
+        font-size: 16px;
+      }
+
+      /* 액션 버튼들 */
+      .action-section {
+        text-align: center;
+      }
+
+      .action-title {
+        font-size: 20px;
+        color: #333;
+        margin-bottom: 30px;
+        font-weight: 600;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+      }
+
+      .action-btn {
+        padding: 15px 30px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 160px;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        transform: translateY(0);
+      }
+
+      .action-btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+
+      .action-btn:hover::before {
+        left: 100%;
+      }
+
+      .action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .action-btn:active {
+        transform: translateY(1px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        animation: primaryPulse 3s infinite;
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #0056b3, #004085);
+        box-shadow: 0 10px 30px rgba(0, 123, 255, 0.4);
+        animation: none;
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, #6c757d, #5a6268);
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background: linear-gradient(135deg, #5a6268, #495057);
+        box-shadow: 0 10px 30px rgba(108, 117, 125, 0.3);
+      }
+
+      .btn-logout {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+      }
+
+      .btn-logout:hover {
+        background: linear-gradient(135deg, #c82333, #a02622);
+        box-shadow: 0 10px 30px rgba(220, 53, 69, 0.3);
+      }
+
+      .btn-icon {
+        font-size: 18px;
+      }
+
+      @keyframes primaryPulse {
+        0% {
+          box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+        }
+        50% {
+          box-shadow: 0 8px 25px rgba(0, 123, 255, 0.5);
+        }
+        100% {
+          box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+        }
+      }
+
+      /* 추가 정보 */
+      .additional-info {
+        background: #e3f2fd;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .additional-info-title {
+        font-size: 16px;
+        color: #1976d2;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+
+      .additional-info-text {
+        font-size: 14px;
+        color: #1565c0;
+        line-height: 1.6;
+      }
+
+      /* 반응형 디자인 */
+      @media (max-width: 768px) {
+        .success-container {
+          margin: 10px;
+          border-radius: 15px;
+          max-width: 95vw;
+        }
+
+        .success-header {
+          padding: 40px 20px;
+        }
+
+        .success-title {
+          font-size: 28px;
+        }
+
+        .success-subtitle {
+          font-size: 16px;
+        }
+
+        .success-content {
+          padding: 40px 20px;
+        }
+
+        .user-info {
+          padding: 25px;
+          margin-bottom: 30px;
+        }
+
+        .user-avatar {
+          width: 70px;
+          height: 70px;
+          font-size: 28px;
+        }
+
+        .user-name {
+          font-size: 22px;
+        }
+
+        .user-nickname {
+          font-size: 16px;
+        }
+
+        .action-buttons {
+          flex-direction: column;
+          align-items: center;
+          gap: 15px;
+        }
+
+        .action-btn {
+          width: 100%;
+          max-width: 280px;
+          padding: 12px 25px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 10px;
+        }
+
+        .success-container {
+          margin: 0;
+          border-radius: 12px;
+        }
+
+        .success-header {
+          padding: 30px 15px;
+        }
+
+        .success-icon {
+          font-size: 60px;
+        }
+
+        .success-title {
+          font-size: 24px;
+        }
+
+        .success-subtitle {
+          font-size: 14px;
+        }
+
+        .success-content {
+          padding: 30px 15px;
+        }
+
+        .user-info {
+          padding: 20px;
+        }
+
+        .user-avatar {
+          width: 60px;
+          height: 60px;
+          font-size: 24px;
+        }
+
+        .user-name {
+          font-size: 20px;
+        }
+
+        .action-btn {
+          padding: 10px 20px;
+          font-size: 15px;
+        }
+      }
+
+      /* 접근성 개선 */
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      /* 다크모드 지원 */
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        .success-container {
+          background: #2d3748;
+          color: #e2e8f0;
+        }
+
+        .user-info {
+          background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+          border-color: #4a5568;
+        }
+
+        .user-name {
+          color: #e2e8f0;
+        }
+
+        .user-nickname {
+          color: #a0aec0;
+        }
+
+        .user-social {
+          background: #4a5568;
+          color: #e2e8f0;
+        }
+
+        .action-title {
+          color: #e2e8f0;
+        }
+
+        .additional-info {
+          background: #2a4365;
+        }
+
+        .additional-info-title {
+          color: #63b3ed;
+        }
+
+        .additional-info-text {
+          color: #90cdf4;
+        }
+      }
+
+      /* 포커스 개선 */
+      .action-btn:focus {
+        outline: 3px solid #007bff;
+        outline-offset: 2px;
+      }
+
+      /* 터치 디바이스 최적화 */
+      @media (hover: none) and (pointer: coarse) {
+        .action-btn {
+          min-height: 44px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="success-container">
+      <!-- 성공 헤더 -->
+      <div class="success-header">
+        <div class="success-icon">🎉</div>
+        <h1 class="success-title">로그인 완료!</h1>
+        <p class="success-subtitle">환영합니다! 성공적으로 로그인되었습니다.</p>
+      </div>
+
+      <!-- 메인 콘텐츠 -->
+      <div class="success-content">
+        <!-- 사용자 정보 -->
+        <div class="user-info">
+          <div class="user-avatar">
+            {% if user.name %} {{ user.name[0].upper() }} {% else %} 👤 {% endif
+            %}
+          </div>
+          <div class="user-details">
+            <div class="user-name">
+              {% if user.name %}{{ user.name }}{% else %}사용자{% endif %}님
+            </div>
+            {% if user.nickname %}
+            <div class="user-nickname">@{{ user.nickname }}</div>
+            {% endif %}
+            <div class="user-social">
+              <span class="social-icon">
+                {% if user.social_type == 'google' %} 🔍 {% elif
+                user.social_type == 'naver' %} 🟢 {% elif user.social_type ==
+                'kakao' %} 💬 {% else %} 🔐 {% endif %}
+              </span>
+              {% if user.social_type == 'google' %} Google 계정으로 로그인 {%
+              elif user.social_type == 'naver' %} 네이버 계정으로 로그인 {% elif
+              user.social_type == 'kakao' %} 카카오 계정으로 로그인 {% elif
+              user.social_type %} {{ user.social_type.title() }} 계정으로 로그인
+              {% else %} 일반 로그인 {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- 액션 버튼들 -->
+        <div class="action-section">
+          <h3 class="action-title">이제 어디로 가시겠습니까?</h3>
+
+          <div class="action-buttons">
+            <a
+              href="{{ url_for('profile.profile') }}"
+              class="action-btn btn-primary"
+            >
+              <span class="btn-icon">👤</span>
+              프로필 페이지
+            </a>
+
+            <a
+              href="{{ url_for('auth.home') }}"
+              class="action-btn btn-secondary"
+            >
+              <span class="btn-icon">🏠</span>
+              홈페이지
+            </a>
+
+            <a
+              href="{{ url_for('user_session.logout') }}"
+              class="action-btn btn-logout"
+              onclick="return confirm('정말 로그아웃하시겠습니까?')"
+            >
+              <span class="btn-icon">🚪</span>
+              로그아웃
+            </a>
+          </div>
+
+          <div class="additional-info">
+            <div class="additional-info-title">💡 팁</div>
+            <div class="additional-info-text">
+              프로필 페이지에서 추가 정보를 설정하거나,<br />
+              언제든지 다시 로그인할 수 있습니다.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 페이지 로드 시 축하 효과
+      document.addEventListener("DOMContentLoaded", function () {
+        // 성공 아이콘 클릭 시 추가 애니메이션
+        const successIcon = document.querySelector(".success-icon");
+        successIcon.addEventListener("click", function () {
+          this.style.animation = "none";
+          setTimeout(() => {
+            this.style.animation = "bounce 0.6s ease-in-out";
+          }, 10);
+        });
+
+        // 버튼 호버 효과 개선
+        document.querySelectorAll(".action-btn").forEach((btn) => {
+          btn.addEventListener("mouseenter", function () {
+            this.style.transform = "translateY(-3px)";
+          });
+
+          btn.addEventListener("mouseleave", function () {
+            this.style.transform = "translateY(0)";
+          });
+        });
+
+        // 키보드 네비게이션
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") {
+            const primaryBtn = document.querySelector(".btn-primary");
+            if (document.activeElement === primaryBtn) {
+              e.preventDefault();
+              primaryBtn.click();
+            }
+          }
+        });
+
+        // 첫 번째 버튼에 포커스
+        const firstBtn = document.querySelector(".btn-primary");
+        if (firstBtn) {
+          firstBtn.focus();
+        }
+      });
+
+      // 자동 리다이렉트 (선택사항)
+      // setTimeout(() => {
+      //   if (confirm('5초 후 프로필 페이지로 이동합니다. 지금 이동하시겠습니까?')) {
+      //     window.location.href = "{{ url_for('profile.profile') }}";
+      //   }
+      // }, 5000);
+    </script>
+  </body>
+</html>
