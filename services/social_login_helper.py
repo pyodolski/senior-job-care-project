@@ -82,14 +82,23 @@ class SocialLoginHelper:
                 basic_info=basic_info
             )
             
+            logger.info(f"Created/Retrieved user {new_user.id}, onboarding_status: {new_user.onboarding_status}")
+            
             # 로그인 처리
             login_user(new_user)
+            logger.info(f"User {new_user.id} logged in successfully")
             
-            # 온보딩 페이지로 리다이렉트
-            return redirect(url_for("onboarding.onboarding"))
+            # 온보딩 상태에 따른 리디렉트 (create_temp_user가 기존 사용자를 반환할 수 있음)
+            if new_user.onboarding_status == 'completed':
+                logger.info(f"User {new_user.id} already completed onboarding, redirecting to login_complete")
+                return redirect(url_for("user_session.login_complete"))
+            else:
+                logger.info(f"User {new_user.id} needs onboarding, redirecting to onboarding page")
+                return redirect(url_for("onboarding.onboarding"))
             
         except Exception as e:
             db.session.rollback()
+            logger.error(f"Error in _handle_new_user: {str(e)}")
             raise DatabaseError(f"신규 사용자 생성 실패: {str(e)}", "create", "user")
     
     @staticmethod

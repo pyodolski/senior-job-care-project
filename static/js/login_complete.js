@@ -562,23 +562,120 @@ function initializeLogo() {
   logoImage.src = "/static/images/sample-logo.svg";
 }
 
-// Initialize region display (placeholder for future implementation)
+// Initialize region display with API integration
 function initializeRegionDisplay() {
   const regionDisplay = document.getElementById("region-display");
   const regionPlaceholder = document.getElementById("region-placeholder");
   const regionStatus = document.getElementById("region-status");
 
-  // Simulate loading region data
-  setTimeout(() => {
-    // For now, just show placeholder text
-    if (regionPlaceholder) {
-      regionPlaceholder.textContent = "지역 정보 준비 중...";
-    }
-    if (regionStatus) {
-      regionStatus.classList.remove("loading");
-      regionStatus.classList.add("error");
-    }
-  }, 2000);
+  // Early return if elements don't exist
+  if (!regionPlaceholder) {
+    console.log("Region placeholder element not found");
+    return;
+  }
+
+  // Set initial loading state
+  regionPlaceholder.textContent = "지역 정보를 불러오는 중...";
+  if (regionStatus) {
+    regionStatus.classList.add("loading");
+    regionStatus.classList.remove("error", "success");
+  }
+
+  // Call the API to get user region information
+  fetch("/api/user/region", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "same-origin",
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Region API response:", data);
+
+      if (data.success && data.data) {
+        // Successfully loaded region information
+        const regionName = data.data.display_name || data.data.dong;
+        regionPlaceholder.textContent = regionName;
+
+        // Update status to success
+        if (regionStatus) {
+          regionStatus.classList.remove("loading", "error");
+          regionStatus.classList.add("success");
+        }
+
+        // Add region info to region display if it exists
+        if (regionDisplay) {
+          regionDisplay.setAttribute("title", data.data.full_address);
+          regionDisplay.setAttribute(
+            "aria-label",
+            `현재 지역: ${data.data.full_address}`
+          );
+        }
+
+        console.log(`Successfully loaded region: ${regionName}`);
+      } else {
+        throw new Error(data.error || "알 수 없는 오류가 발생했습니다.");
+      }
+    })
+    .catch((error) => {
+      console.error("Region API error:", error);
+
+      // Handle different error scenarios
+      let errorMessage = "지역 정보 없음";
+      let shouldRetry = false;
+
+      if (
+        error.message.includes("404") ||
+        error.message.includes("REGION_NOT_SET")
+      ) {
+        errorMessage = "지역 미설정";
+      } else if (
+        error.message.includes("401") ||
+        error.message.includes("AUTH_REQUIRED")
+      ) {
+        errorMessage = "로그인 필요";
+      } else if (
+        error.message.includes("500") ||
+        error.message.includes("INTERNAL_ERROR")
+      ) {
+        errorMessage = "서버 오류";
+        shouldRetry = true;
+      } else if (
+        error.name === "TypeError" ||
+        error.message.includes("Failed to fetch")
+      ) {
+        errorMessage = "네트워크 오류";
+        shouldRetry = true;
+      }
+
+      regionPlaceholder.textContent = errorMessage;
+
+      // Update status to error
+      if (regionStatus) {
+        regionStatus.classList.remove("loading", "success");
+        regionStatus.classList.add("error");
+      }
+
+      // Add retry functionality for certain errors
+      if (shouldRetry) {
+        setTimeout(() => {
+          console.log("Retrying region display initialization...");
+          initializeRegionDisplay();
+        }, 5000); // Retry after 5 seconds
+      }
+
+      // Announce error to screen readers
+      const liveRegion = document.getElementById("live-region");
+      if (liveRegion) {
+        liveRegion.textContent = `지역 정보 로딩 실패: ${errorMessage}`;
+      }
+    });
 }
 
 // Set up keyboard shortcuts

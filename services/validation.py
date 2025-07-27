@@ -58,6 +58,36 @@ REQUIRED_FIELDS = {
             'max_age': '올바른 생년월일을 입력해주세요.',
             'future_date': '미래 날짜는 입력할 수 없습니다.'
         }
+    },
+    'sido': {
+        'required': True,
+        'min_length': 2,
+        'max_length': 30,
+        'error_messages': {
+            'required': '시/도를 선택해주세요.',
+            'min_length': '올바른 시/도를 선택해주세요.',
+            'max_length': '시/도 이름이 너무 깁니다.'
+        }
+    },
+    'sigungu': {
+        'required': True,
+        'min_length': 2,
+        'max_length': 30,
+        'error_messages': {
+            'required': '시/군/구를 선택해주세요.',
+            'min_length': '올바른 시/군/구를 선택해주세요.',
+            'max_length': '시/군/구 이름이 너무 깁니다.'
+        }
+    },
+    'dong': {
+        'required': True,
+        'min_length': 2,
+        'max_length': 40,
+        'error_messages': {
+            'required': '읍/면/동을 선택해주세요.',
+            'min_length': '올바른 읍/면/동을 선택해주세요.',
+            'max_length': '읍/면/동 이름이 너무 깁니다.'
+        }
     }
 }
 
@@ -213,7 +243,8 @@ def validate_step_data(step: int, data: Dict[str, Any], exclude_user_id: Optiona
         1: ['name'],
         2: ['nickname'],
         3: ['gender'],
-        4: ['birth_date']
+        4: ['birth_date'],
+        5: ['sido', 'sigungu', 'dong']
     }
     
     # 해당 단계의 필수 필드만 검증

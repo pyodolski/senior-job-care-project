@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, session, flash
+from flask import Blueprint, render_template, redirect, url_for, session, flash, jsonify
 from flask_login import login_required, logout_user, current_user
 from datetime import datetime
 import logging
@@ -78,3 +78,54 @@ def logout():
         logger.error(f"Error during logout: {str(e)}")
         flash("로그아웃 중 오류가 발생했습니다.", "error")
         return redirect(url_for("auth.home"))
+
+# 사용자 지역 정보 조회 API
+@user_session_bp.route("/api/user/region", methods=["GET"])
+@login_required
+def get_user_region():
+    """현재 로그인한 사용자의 지역 정보 조회 API"""
+    try:
+        # 사용자 인증 확인
+        if not current_user.is_authenticated:
+            return jsonify({
+                'success': False,
+                'error': '로그인이 필요합니다.',
+                'error_code': 'AUTH_REQUIRED'
+            }), 401
+        
+        # 지역 정보 확인
+        if not all([current_user.sido, current_user.sigungu, current_user.dong]):
+            return jsonify({
+                'success': False,
+                'error': '지역 정보가 설정되지 않았습니다.',
+                'error_code': 'REGION_NOT_SET',
+                'missing_fields': {
+                    'sido': not bool(current_user.sido),
+                    'sigungu': not bool(current_user.sigungu),
+                    'dong': not bool(current_user.dong)
+                }
+            }), 404
+        
+        # 성공적인 응답
+        logger.info(f"Region info requested for user {current_user.id}: {current_user.dong}")
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'user_id': current_user.id,
+                'sido': current_user.sido,
+                'sigungu': current_user.sigungu,
+                'dong': current_user.dong,
+                'full_address': f"{current_user.sido} {current_user.sigungu} {current_user.dong}",
+                'display_name': current_user.dong  # 동 이름만 표시용
+            },
+            'timestamp': datetime.now().isoformat()
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error in get_user_region API for user {current_user.id if current_user.is_authenticated else 'anonymous'}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': '서버 오류가 발생했습니다.',
+            'error_code': 'INTERNAL_ERROR'
+        }), 500

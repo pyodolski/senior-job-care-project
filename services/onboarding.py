@@ -160,6 +160,14 @@ class OnboardingService:
                     logger.error(f"Error saving birth_date: {str(e)} - value was: {birth_date_value}")
                     # 생년월일 저장 실패해도 다른 데이터는 저장되도록 함
             
+            # 주소 정보 저장
+            if 'sido' in form_data and form_data['sido']:
+                user.sido = form_data['sido']
+            if 'sigungu' in form_data and form_data['sigungu']:
+                user.sigungu = form_data['sigungu']
+            if 'dong' in form_data and form_data['dong']:
+                user.dong = form_data['dong']
+            
             # 프로필 완성 상태 업데이트
             user.update_profile_complete_status()
             
@@ -210,14 +218,25 @@ class OnboardingService:
                     logger.error(f"Error completing birth_date: {str(e)} - value was: {birth_date_value}")
                     # 생년월일 저장 실패해도 다른 데이터는 저장되도록 함
             
+            # 주소 정보 저장
+            if 'sido' in final_data and final_data['sido']:
+                user.sido = final_data['sido']
+                logger.info(f"Updated sido: {user.sido}")
+            if 'sigungu' in final_data and final_data['sigungu']:
+                user.sigungu = final_data['sigungu']
+                logger.info(f"Updated sigungu: {user.sigungu}")
+            if 'dong' in final_data and final_data['dong']:
+                user.dong = final_data['dong']
+                logger.info(f"Updated dong: {user.dong}")
+            
             # 온보딩 상태를 완료로 변경
             user.onboarding_status = 'completed'
-            user.onboarding_step = 4  # 최종 단계
+            user.onboarding_step = 5  # 최종 단계 (주소 선택 포함)
             user.update_profile_complete_status()
             
             # 최종 온보딩 데이터 저장
             final_onboarding_data = {
-                'step': 4,
+                'step': 5,
                 'progress': final_data,
                 'timestamp': datetime.now().isoformat(),
                 'source': user.social_type or 'unknown',
@@ -246,8 +265,8 @@ class OnboardingService:
             bool: 필수 정보 완성 여부
         """
         try:
-            # 필수 필드 체크
-            required_fields = [user.name, user.nickname, user.gender, user.birth_date]
+            # 필수 필드 체크 (주소 정보 포함)
+            required_fields = [user.name, user.nickname, user.gender, user.birth_date, user.sido, user.sigungu, user.dong]
             basic_complete = all(field is not None and str(field).strip() != '' for field in required_fields)
             
             if not basic_complete:
@@ -283,7 +302,7 @@ class OnboardingService:
         
         Args:
             data: 검증할 데이터
-            step: 현재 단계 (1-4)
+            step: 현재 단계 (1-5)
             exclude_user_id: 중복 검사 시 제외할 사용자 ID (본인 제외)
         
         Returns:
@@ -295,8 +314,8 @@ class OnboardingService:
             # 데이터 정제
             sanitized_data = sanitize_data(data)
             
-            # 완전한 프로필 검증 (4단계인 경우)
-            if step >= 4:
+            # 완전한 프로필 검증 (5단계인 경우)
+            if step >= 5:
                 is_complete, errors = validate_complete_profile(sanitized_data, exclude_user_id)
                 if not is_complete:
                     logger.warning(f"Complete profile validation failed: {errors}")

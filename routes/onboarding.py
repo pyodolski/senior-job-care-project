@@ -65,10 +65,21 @@ def onboarding():
                 form_data['birth_date'] = request.form.get('birth_date')
                 logger.info(f"Collected birth_date: {form_data['birth_date']} (type: {type(form_data['birth_date'])})")
             
+            # 주소 정보 수집
+            if request.form.get('sido'):
+                form_data['sido'] = request.form.get('sido').strip()
+                logger.info(f"Collected sido: {form_data['sido']}")
+            if request.form.get('sigungu'):
+                form_data['sigungu'] = request.form.get('sigungu').strip()
+                logger.info(f"Collected sigungu: {form_data['sigungu']}")
+            if request.form.get('dong'):
+                form_data['dong'] = request.form.get('dong').strip()
+                logger.info(f"Collected dong: {form_data['dong']}")
+            
             # 현재 단계 확인
             current_step = int(request.form.get('step', current_user.onboarding_step or 1))
             
-            # 4단계에서 모든 필수 정보가 있으면 완료 처리
+            # 5단계에서 모든 필수 정보가 있으면 완료 처리
             # 현재 폼 데이터와 이전에 저장된 데이터를 합쳐서 확인
             onboarding_data = OnboardingService.get_onboarding_data(current_user)
             saved_progress = onboarding_data.get('progress', {})
@@ -77,8 +88,8 @@ def onboarding():
             combined_data = saved_progress.copy()
             combined_data.update(form_data)
             
-            all_required_fields = ['name', 'nickname', 'gender', 'birth_date']
-            is_complete = current_step == 4 and all(field in combined_data and combined_data[field] for field in all_required_fields)
+            all_required_fields = ['name', 'nickname', 'gender', 'birth_date', 'sido', 'sigungu', 'dong']
+            is_complete = current_step == 5 and all(field in combined_data and combined_data[field] for field in all_required_fields)
             
             # 데이터 검증 - 병합된 데이터로 검증 (본인 제외)
             validation_errors = OnboardingService.validate_onboarding_data(combined_data, current_step, current_user.id)
@@ -121,7 +132,7 @@ def onboarding():
                 
                 if success:
                     # 다음 단계로 진행하거나 현재 단계 유지
-                    next_step = min(current_step + 1, 4)
+                    next_step = min(current_step + 1, 5)
                     
                     onboarding_data = OnboardingService.get_onboarding_data(current_user)
                     template_data = {
@@ -176,7 +187,7 @@ def save_onboarding_progress():
         # 단계 유효성 검사
         try:
             step = int(step)
-            if step < 0 or step > 4:
+            if step < 0 or step > 5:
                 return {"success": False, "error": "유효하지 않은 단계입니다."}, 400
         except (ValueError, TypeError):
             return {"success": False, "error": "단계는 숫자여야 합니다."}, 400

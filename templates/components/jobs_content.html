@@ -1,199 +1,1124 @@
-<div class="page-header">
-  <h1 class="page-title">구인구직</h1>
-  <p class="page-subtitle">다양한 일자리 정보를 확인하세요</p>
-</div>
-<div id="jobs-content">
-  <div class="jobs-grid">
-    <div class="job-card">
-      <div class="job-header">
-        <div>
-          <h3 class="job-title">프론트엔드 개발자</h3>
-          <p class="job-company">테크스타트업</p>
-        </div>
-        <span class="job-badge new">신규</span>
+<!-- 통합 구인구직 페이지 컴포넌트 -->
+<div class="jobs-page-container">
+  <!-- 페이지 헤더 -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">구인구직</h1>
+      <p class="page-subtitle">다양한 일자리 정보를 확인하고 지원하세요</p>
+    </div>
+    <div class="header-actions">
+      <button
+        id="refresh-jobs-btn"
+        class="action-btn secondary"
+        title="새로고침"
+      >
+        <span class="icon">🔄</span>
+        <span class="label">새로고침</span>
+      </button>
+      <button
+        id="create-job-btn"
+        class="action-btn primary"
+        title="공고 등록"
+        style="display: none"
+      >
+        <span class="icon">✍️</span>
+        <span class="label">공고 등록</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 필터 및 검색 영역 -->
+  <div class="filter-section">
+    <div class="search-container">
+      <div class="search-input-group">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="job-search-input"
+          placeholder="키워드로 검색 (제목, 내용, 회사명)"
+          maxlength="100"
+        />
+        <button id="clear-search-btn" class="clear-btn" title="검색어 지우기">
+          ✕
+        </button>
       </div>
-      <div class="job-details">
-        <div class="job-detail">
-          <span class="icon">📍</span>
-          <span>서울 강남구</span>
-        </div>
-        <div class="job-detail">
-          <span class="icon">⏰</span>
-          <span>정규직</span>
-        </div>
-        <div class="job-detail">
-          <span class="icon">🎓</span>
-          <span>경력 2-5년</span>
-        </div>
+      <button id="search-jobs-btn" class="search-btn">검색</button>
+    </div>
+
+    <div class="filter-controls">
+      <div class="filter-group">
+        <label for="region-filter">지역</label>
+        <select id="region-filter">
+          <option value="">전체 지역</option>
+          <option value="서울">서울</option>
+          <option value="경기">경기</option>
+          <option value="인천">인천</option>
+          <option value="부산">부산</option>
+          <option value="대구">대구</option>
+          <option value="광주">광주</option>
+          <option value="대전">대전</option>
+          <option value="울산">울산</option>
+        </select>
       </div>
-      <p class="job-description">
-        React, TypeScript를 활용한 웹 애플리케이션 개발 업무를 담당하실 분을
-        모집합니다. 사용자 경험을 중시하는 팀에서 함께 성장해요.
-      </p>
-      <div class="job-footer">
-        <span class="job-salary">연봉 4,000-6,000만원</span>
-        <span class="job-posted">2일 전</span>
+
+      <div class="filter-group">
+        <label>
+          <input type="checkbox" id="senior-only-filter" />
+          <span class="checkmark"></span>
+          시니어 우대
+        </label>
+      </div>
+
+      <div class="filter-group">
+        <label for="age-filter">나이</label>
+        <input
+          type="number"
+          id="age-filter"
+          min="14"
+          max="100"
+          placeholder="나이"
+        />
+      </div>
+
+      <button id="reset-filters-btn" class="reset-btn">필터 초기화</button>
+    </div>
+  </div>
+
+  <!-- 현재 상태 표시 -->
+  <div class="status-section">
+    <div class="view-mode-indicators">
+      <span id="list-mode-indicator" class="mode-indicator active"
+        >목록 보기</span
+      >
+      <span id="form-mode-indicator" class="mode-indicator">공고 등록</span>
+      <span id="detail-mode-indicator" class="mode-indicator">상세 보기</span>
+    </div>
+    <div class="result-summary">
+      <span id="job-count-display">로딩 중...</span>
+    </div>
+  </div>
+
+  <!-- 메인 콘텐츠 영역 -->
+  <div class="main-content">
+    <!-- 공고 목록 뷰 -->
+    <div id="jobs-list-view" class="content-view active">
+      <div class="loading-placeholder" id="jobs-loading">
+        <div class="loading-spinner"></div>
+        <p>공고 목록을 불러오는 중...</p>
+      </div>
+
+      <div class="jobs-grid" id="jobs-grid" style="display: none">
+        <!-- 동적으로 생성되는 공고 카드들 -->
+      </div>
+
+      <div class="empty-state" id="jobs-empty" style="display: none">
+        <div class="empty-icon">📋</div>
+        <h3>등록된 공고가 없습니다</h3>
+        <p>조건에 맞는 공고를 찾을 수 없습니다. 필터를 조정해보세요.</p>
+      </div>
+
+      <!-- 페이지네이션 -->
+      <div
+        class="pagination-container"
+        id="pagination-container"
+        style="display: none"
+      >
+        <button id="prev-page-btn" class="page-btn" disabled>이전</button>
+        <span id="page-info">1 / 1</span>
+        <button id="next-page-btn" class="page-btn" disabled>다음</button>
       </div>
     </div>
 
-    <div class="job-card">
-      <div class="job-header">
-        <div>
-          <h3 class="job-title">카페 매니저</h3>
-          <p class="job-company">로컬카페</p>
-        </div>
-        <span class="job-badge urgent">급구</span>
+    <!-- 공고 등록/수정 폼 뷰 -->
+    <div id="jobs-form-view" class="content-view">
+      <div class="form-header">
+        <h2 id="form-title">새 공고 등록</h2>
+        <button id="cancel-form-btn" class="action-btn secondary">
+          <span class="icon">✕</span>
+          <span class="label">취소</span>
+        </button>
       </div>
-      <div class="job-details">
-        <div class="job-detail">
-          <span class="icon">📍</span>
-          <span>서울 홍대</span>
+
+      <form id="job-form" class="job-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="job-title">제목 <span class="required">*</span></label>
+            <input
+              type="text"
+              id="job-title"
+              name="title"
+              required
+              maxlength="200"
+              placeholder="공고 제목을 입력하세요"
+            />
+            <div class="field-error" id="title-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="job-company"
+              >회사명 <span class="required">*</span></label
+            >
+            <input
+              type="text"
+              id="job-company"
+              name="company"
+              required
+              maxlength="100"
+              placeholder="회사명을 입력하세요"
+            />
+            <div class="field-error" id="company-error"></div>
+          </div>
         </div>
-        <div class="job-detail">
-          <span class="icon">⏰</span>
-          <span>정규직</span>
+
+        <div class="form-group">
+          <label for="job-description"
+            >상세 내용 <span class="required">*</span></label
+          >
+          <textarea
+            id="job-description"
+            name="description"
+            required
+            maxlength="2000"
+            rows="6"
+            placeholder="업무 내용, 자격 요건, 근무 조건 등을 상세히 입력하세요"
+          ></textarea>
+          <div class="field-error" id="description-error"></div>
+          <div class="char-count">
+            <span id="description-count">0</span> / 2000
+          </div>
         </div>
-        <div class="job-detail">
-          <span class="icon">🎓</span>
-          <span>경력무관</span>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="job-age-min">최소 연령</label>
+            <input
+              type="number"
+              id="job-age-min"
+              name="preferred_age_min"
+              min="14"
+              max="100"
+              placeholder="최소 연령"
+            />
+            <div class="field-error" id="age-min-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="job-age-max">최대 연령</label>
+            <input
+              type="number"
+              id="job-age-max"
+              name="preferred_age_max"
+              min="14"
+              max="100"
+              placeholder="최대 연령"
+            />
+            <div class="field-error" id="age-max-error"></div>
+          </div>
         </div>
-      </div>
-      <p class="job-description">
-        친근하고 활기찬 카페에서 매장 운영과 직원 관리를 담당하실 매니저를
-        찾습니다. 커피에 대한 열정이 있으신 분 환영합니다.
-      </p>
-      <div class="job-footer">
-        <span class="job-salary">월급 280-320만원</span>
-        <span class="job-posted">1일 전</span>
-      </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="job-region">근무 지역</label>
+            <input
+              type="text"
+              id="job-region"
+              name="region"
+              maxlength="50"
+              placeholder="예: 서울 강남구"
+            />
+            <div class="field-error" id="region-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="job-work-hours">근무 시간</label>
+            <input
+              type="text"
+              id="job-work-hours"
+              name="work_hours"
+              maxlength="100"
+              placeholder="예: 오전 9시 ~ 오후 6시"
+            />
+            <div class="field-error" id="work-hours-error"></div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="job-contact-phone">연락처</label>
+            <input
+              type="tel"
+              id="job-contact-phone"
+              name="contact_phone"
+              maxlength="20"
+              placeholder="010-XXXX-XXXX"
+              pattern="[0-9]{3}-[0-9]{4}-[0-9]{4}"
+            />
+            <div class="field-error" id="contact-phone-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                id="job-senior-friendly"
+                name="is_senior_friendly"
+              />
+              <span class="checkmark"></span>
+              시니어 친화적 공고
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="button"
+            id="save-draft-btn"
+            class="action-btn secondary"
+          >
+            <span class="icon">💾</span>
+            <span class="label">임시저장</span>
+          </button>
+          <button type="submit" id="submit-job-btn" class="action-btn primary">
+            <span class="icon">✅</span>
+            <span class="label">등록하기</span>
+          </button>
+        </div>
+      </form>
     </div>
 
-    <div class="job-card">
-      <div class="job-header">
-        <div>
-          <h3 class="job-title">마케팅 담당자</h3>
-          <p class="job-company">중소기업</p>
+    <!-- 공고 상세 보기 뷰 -->
+    <div id="jobs-detail-view" class="content-view">
+      <div class="detail-header">
+        <button id="back-to-list-btn" class="action-btn secondary">
+          <span class="icon">←</span>
+          <span class="label">목록으로</span>
+        </button>
+        <div class="detail-actions">
+          <button
+            id="edit-job-btn"
+            class="action-btn primary"
+            style="display: none"
+          >
+            <span class="icon">✏️</span>
+            <span class="label">수정</span>
+          </button>
+          <button
+            id="delete-job-btn"
+            class="action-btn danger"
+            style="display: none"
+          >
+            <span class="icon">🗑️</span>
+            <span class="label">삭제</span>
+          </button>
         </div>
-        <span class="job-badge">일반</span>
       </div>
-      <div class="job-details">
-        <div class="job-detail">
-          <span class="icon">📍</span>
-          <span>서울 마포구</span>
-        </div>
-        <div class="job-detail">
-          <span class="icon">⏰</span>
-          <span>계약직</span>
-        </div>
-        <div class="job-detail">
-          <span class="icon">🎓</span>
-          <span>신입-경력3년</span>
-        </div>
-      </div>
-      <p class="job-description">
-        디지털 마케팅 전략 수립 및 실행, SNS 운영, 콘텐츠 제작 등의 업무를
-        담당하실 분을 모집합니다.
-      </p>
-      <div class="job-footer">
-        <span class="job-salary">연봉 3,000-4,500만원</span>
-        <span class="job-posted">3일 전</span>
-      </div>
-    </div>
 
-    <div class="job-card">
-      <div class="job-header">
-        <div>
-          <h3 class="job-title">배달 라이더</h3>
-          <p class="job-company">배달플랫폼</p>
-        </div>
-        <span class="job-badge new">신규</span>
-      </div>
-      <div class="job-details">
-        <div class="job-detail">
-          <span class="icon">📍</span>
-          <span>서울 전지역</span>
-        </div>
-        <div class="job-detail">
-          <span class="icon">⏰</span>
-          <span>시간제</span>
-        </div>
-        <div class="job-detail">
-          <span class="icon">🎓</span>
-          <span>경력무관</span>
-        </div>
-      </div>
-      <p class="job-description">
-        자유로운 시간에 일할 수 있는 배달 라이더를 모집합니다. 오토바이 또는
-        자전거 보유자 우대합니다.
-      </p>
-      <div class="job-footer">
-        <span class="job-salary">시급 12,000-15,000원</span>
-        <span class="job-posted">5시간 전</span>
-      </div>
-    </div>
-
-    <div class="job-card">
-      <div class="job-header">
-        <div>
-          <h3 class="job-title">웹 디자이너</h3>
-          <p class="job-company">디자인 에이전시</p>
-        </div>
-        <span class="job-badge">일반</span>
-      </div>
-      <div class="job-details">
-        <div class="job-detail">
-          <span class="icon">📍</span>
-          <span>서울 성수동</span>
-        </div>
-        <div class="job-detail">
-          <span class="icon">⏰</span>
-          <span>정규직</span>
-        </div>
-        <div class="job-detail">
-          <span class="icon">🎓</span>
-          <span>경력 1-3년</span>
-        </div>
-      </div>
-      <p class="job-description">
-        웹사이트 및 모바일 앱 UI/UX 디자인을 담당하실 분을 모집합니다.
-        창의적이고 트렌디한 디자인을 추구하는 팀입니다.
-      </p>
-      <div class="job-footer">
-        <span class="job-salary">연봉 3,500-4,500만원</span>
-        <span class="job-posted">1일 전</span>
-      </div>
-    </div>
-
-    <div class="job-card">
-      <div class="job-header">
-        <div>
-          <h3 class="job-title">영업 사원</h3>
-          <p class="job-company">중견기업</p>
-        </div>
-        <span class="job-badge urgent">급구</span>
-      </div>
-      <div class="job-details">
-        <div class="job-detail">
-          <span class="icon">📍</span>
-          <span>서울 종로구</span>
-        </div>
-        <div class="job-detail">
-          <span class="icon">⏰</span>
-          <span>정규직</span>
-        </div>
-        <div class="job-detail">
-          <span class="icon">🎓</span>
-          <span>신입 가능</span>
-        </div>
-      </div>
-      <p class="job-description">
-        B2B 영업 및 신규 고객 개발 업무를 담당하실 분을 모집합니다. 적극적이고
-        소통 능력이 뛰어난 분을 찾습니다.
-      </p>
-      <div class="job-footer">
-        <span class="job-salary">연봉 3,000-5,000만원</span>
-        <span class="job-posted">3시간 전</span>
+      <div class="job-detail-content" id="job-detail-content">
+        <!-- 동적으로 생성되는 상세 내용 -->
       </div>
     </div>
   </div>
 </div>
+
+<!-- 삭제 확인 모달 -->
+<div id="delete-confirmation-modal" class="modal" style="display: none">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>공고 삭제 확인</h3>
+      <button class="modal-close" id="delete-modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>정말로 이 공고를 삭제하시겠습니까?</p>
+      <p class="warning-text">삭제된 공고는 복구할 수 없습니다.</p>
+    </div>
+    <div class="modal-actions">
+      <button id="confirm-delete-btn" class="action-btn danger">삭제</button>
+      <button id="cancel-delete-btn" class="action-btn secondary">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- 로딩 오버레이 -->
+<div id="jobs-loading-overlay" class="loading-overlay" style="display: none">
+  <div class="loading-content">
+    <div class="loading-spinner large"></div>
+    <p>처리 중...</p>
+  </div>
+</div>
+
+<style>
+  /* 통합 구인구직 페이지 스타일 */
+  .jobs-page-container {
+    padding: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* 페이지 헤더 */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e9ecef;
+  }
+
+  .header-content .page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0 0 8px 0;
+  }
+
+  .header-content .page-subtitle {
+    font-size: 16px;
+    color: #6c757d;
+    margin: 0;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  /* 액션 버튼 */
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .action-btn.primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  }
+
+  .action-btn.primary:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+  }
+
+  .action-btn.secondary {
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+  }
+
+  .action-btn.secondary:hover {
+    background: #e9ecef;
+    color: #495057;
+  }
+
+  .action-btn.danger {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+  }
+
+  .action-btn.danger:hover {
+    background: linear-gradient(135deg, #c82333, #a71e2a);
+    transform: translateY(-2px);
+  }
+
+  .action-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* 필터 섹션 */
+  .filter-section {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .search-container {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+
+  .search-input-group {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 16px;
+  }
+
+  #job-search-input {
+    width: 100%;
+    padding: 12px 40px 12px 40px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+  }
+
+  #job-search-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  }
+
+  .clear-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px;
+    border-radius: 4px;
+  }
+
+  .clear-btn:hover {
+    background: #f8f9fa;
+  }
+
+  .search-btn {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .search-btn:hover {
+    background: linear-gradient(135deg, #218838, #1e7e34);
+    transform: translateY(-2px);
+  }
+
+  .filter-controls {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .filter-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+  }
+
+  .filter-group select,
+  .filter-group input[type="number"] {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 14px;
+    min-width: 120px;
+  }
+
+  /* 체크박스 스타일 */
+  .filter-group label:has(input[type="checkbox"]) {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .checkmark {
+    position: relative;
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border: 2px solid #dee2e6;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+
+  input[type="checkbox"]:checked + .checkmark {
+    background: #007bff;
+    border-color: #007bff;
+  }
+
+  input[type="checkbox"]:checked + .checkmark::after {
+    content: "✓";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .reset-btn {
+    padding: 8px 16px;
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+
+  .reset-btn:hover {
+    background: #e9ecef;
+  }
+
+  /* 상태 섹션 */
+  .status-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 4px;
+  }
+
+  .view-mode-indicators {
+    display: flex;
+    gap: 12px;
+  }
+
+  .mode-indicator {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+  }
+
+  .mode-indicator.active {
+    background: #007bff;
+    color: white;
+  }
+
+  .result-summary {
+    font-size: 14px;
+    color: #6c757d;
+    font-weight: 500;
+  }
+
+  /* 메인 콘텐츠 */
+  .main-content {
+    position: relative;
+  }
+
+  .content-view {
+    display: none;
+  }
+
+  .content-view.active {
+    display: block;
+  }
+
+  /* 공고 목록 스타일 */
+  .jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .job-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+
+  .job-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: #007bff;
+  }
+
+  .job-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .job-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0 0 4px 0;
+    line-height: 1.4;
+  }
+
+  .job-company {
+    font-size: 14px;
+    color: #6c757d;
+    margin: 0;
+    font-weight: 500;
+  }
+
+  .job-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .job-badge.new {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+  }
+
+  .job-badge.urgent {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+  }
+
+  .job-badge.senior {
+    background: linear-gradient(135deg, #ffc107, #e0a800);
+    color: #212529;
+  }
+
+  .job-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .job-detail {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #495057;
+  }
+
+  .job-detail .icon {
+    font-size: 16px;
+  }
+
+  .job-description {
+    color: #6c757d;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .job-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .job-salary {
+    font-weight: 600;
+    color: #28a745;
+  }
+
+  .job-posted {
+    font-size: 12px;
+    color: #6c757d;
+  }
+
+  /* 빈 상태 */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+  }
+
+  .empty-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+  }
+
+  .empty-state h3 {
+    font-size: 24px;
+    margin-bottom: 12px;
+    color: #495057;
+  }
+
+  /* 로딩 상태 */
+  .loading-placeholder {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+  }
+
+  .loading-spinner.large {
+    width: 60px;
+    height: 60px;
+    border-width: 6px;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* 페이지네이션 */
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 40px;
+  }
+
+  .page-btn {
+    padding: 10px 20px;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .page-btn:hover:not(:disabled) {
+    background: #f8f9fa;
+  }
+
+  .page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  #page-info {
+    font-weight: 600;
+    color: #495057;
+  }
+
+  /* 폼 스타일 */
+  .form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e9ecef;
+  }
+
+  .form-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+  }
+
+  .job-form {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+  }
+
+  .required {
+    color: #dc3545;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    padding: 12px 16px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+    background: white;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  }
+
+  .field-error {
+    color: #dc3545;
+    font-size: 12px;
+    min-height: 16px;
+    font-weight: 500;
+  }
+
+  .char-count {
+    text-align: right;
+    font-size: 12px;
+    color: #6c757d;
+  }
+
+  .checkbox-label {
+    flex-direction: row !important;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: flex-end;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+  }
+
+  /* 상세 보기 스타일 */
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e9ecef;
+  }
+
+  .detail-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .job-detail-content {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  /* 모달 스타일 */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 0;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #2c3e50;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .modal-body {
+    padding: 30px;
+  }
+
+  .warning-text {
+    color: #dc3545;
+    font-weight: 500;
+    margin-top: 10px;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding: 20px 30px;
+    border-top: 1px solid #e9ecef;
+  }
+
+  /* 로딩 오버레이 */
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+  }
+
+  .loading-content {
+    text-align: center;
+    color: #495057;
+  }
+
+  /* 반응형 디자인 */
+  @media (max-width: 768px) {
+    .page-header {
+      flex-direction: column;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .header-actions {
+      justify-content: center;
+    }
+
+    .search-container {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .filter-controls {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+    }
+
+    .jobs-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .detail-header {
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .detail-actions {
+      justify-content: center;
+    }
+
+    .form-actions {
+      flex-direction: column;
+    }
+
+    .modal-content {
+      margin: 20px;
+      width: calc(100% - 40px);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .page-header {
+      padding: 0 10px;
+    }
+
+    .filter-section {
+      padding: 16px;
+    }
+
+    .job-form {
+      padding: 20px;
+    }
+
+    .job-detail-content {
+      padding: 20px;
+    }
+
+    .action-btn {
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+
+    .action-btn .label {
+      display: none;
+    }
+  }
+</style>
