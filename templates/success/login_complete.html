@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>로그인 완료 - 메인 페이지</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/login_complete.css') }}"
+    />
+  </head>
+  <body>
+    <!-- Skip link for accessibility -->
+    <a href="#main-content" class="skip-link">메인 콘텐츠로 건너뛰기</a>
+
+    <!-- Logo Bar -->
+    <header class="logo-bar">
+      <div class="logo-container">
+        <img
+          src="/static/images/sample-logo.png"
+          alt="서비스 로고"
+          class="logo-image"
+          style="display: none"
+        />
+        <div class="logo-text" style="display: none">Sample Logo</div>
+        <div class="logo-fallback" style="display: none">
+          <span>
+            <span>🏢</span>
+            <span>로고 이미지</span>
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation Bar 1 - Region Display -->
+    <nav class="nav-bar-1" role="banner" aria-label="지역 정보">
+      <div class="region-container">
+        <span class="region-icon" aria-hidden="true">📍</span>
+        <span
+          class="region-text"
+          id="region-display"
+          style="display: none"
+          aria-live="polite"
+          >현재 지역</span
+        >
+        <span
+          class="region-placeholder"
+          id="region-placeholder"
+          aria-live="polite"
+          >지역 정보 로딩 중...</span
+        >
+        <span
+          class="region-status loading"
+          id="region-status"
+          aria-label="지역 정보 로딩 상태"
+          role="status"
+        ></span>
+      </div>
+    </nav>
+
+    <!-- Navigation Bar 2 - Icon Navigation -->
+    <nav class="nav-bar-2" role="navigation" aria-label="메인 네비게이션">
+      <div class="icon-navigation">
+        <button
+          class="nav-icon active"
+          data-page="jobs"
+          aria-label="구인구직 페이지 보기"
+          tabindex="0"
+        >
+          <span class="icon">💼</span>
+          <span class="label">구인구직</span>
+        </button>
+        <button
+          class="nav-icon"
+          data-page="community"
+          aria-label="커뮤니티 페이지 보기"
+          tabindex="0"
+        >
+          <span class="icon">💬</span>
+          <span class="label">커뮤니티</span>
+        </button>
+        <button
+          class="nav-icon"
+          data-page="profile"
+          aria-label="내 정보 페이지로 이동"
+          tabindex="0"
+        >
+          <span class="icon">👤</span>
+          <span class="label">내 정보</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="main-content" role="main">
+      <div class="content-container">
+        <div id="content-profile" class="content-page">
+          <div class="content-loading">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">프로필 페이지로 이동 중...</div>
+          </div>
+        </div>
+
+        <div id="content-jobs" class="content-page active">
+          <div class="content-loading">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">구인구직 정보를 불러오는 중...</div>
+          </div>
+        </div>
+
+        <div id="content-community" class="content-page">
+          <div class="content-loading">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">커뮤니티 정보를 불러오는 중...</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <p>© 2024 지역 커뮤니티 플랫폼</p>
+        <div class="footer-links">
+          <a href="#" class="footer-link">이용약관</a>
+          <span class="footer-divider">|</span>
+          <a href="#" class="footer-link">개인정보처리방침</a>
+          <span class="footer-divider">|</span>
+          <a href="#" class="footer-link">고객센터</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/login_complete.js') }}"></script>
+  </body>
+</html>

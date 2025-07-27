@@ -26,63 +26,8 @@ def naver_login():
     )
     return redirect(auth_url)
 
-# 네이버 로그인 콜백
+# 네이버 로그인 콜백 - auth.py의 통합 콜백으로 리다이렉트
 @naver_bp.route("/naver_login_callback")
 def naver_login_callback():
-    code = request.args.get("code")
-    state = request.args.get("state")
-    if not state or state != session.get("naver_auth_state"):
-        return "잘못된 접근입니다.", 400
-
-    # 토큰 요청
-    token_res = requests.get(
-        "https://nid.naver.com/oauth2.0/token",
-        params={
-            "grant_type": "authorization_code",
-            "client_id": NAVER_CLIENT_ID,
-            "client_secret": NAVER_CLIENT_SECRET,
-            "code": code,
-            "state": state,
-        }
-    )
-    token_json = token_res.json()
-    access_token = token_json.get("access_token")
-    if not access_token:
-        return "네이버 로그인 실패(토큰 없음)", 400
-
-    # 프로필 요청
-    profile_res = requests.get(
-        "https://openapi.naver.com/v1/nid/me",
-        headers={"Authorization": f"Bearer {access_token}"}
-    )
-    if not profile_res.ok:
-        return "네이버 프로필 정보 요청 실패", 400
-    profile = profile_res.json().get("response", {})
-
-    social_id = profile.get("id")
-    name = profile.get("name")
-    nickname = profile.get("nickname") or name
-    gender = profile.get("gender")
-    birthyear = profile.get("birthyear")
-    birthday = profile.get("birthday")
-    birth_date = None
-    if birthyear and birthday:
-        birth_date = f"{birthyear}-{birthday}"
-
-    user = User.query.filter_by(social_type="naver", social_id=social_id).first()
-    if not user:
-        user = User(
-            name=name,
-            nickname=nickname,
-            gender=gender,
-            birth_date=birth_date,
-            username=None,
-            password=None,
-            user_type=0,
-            social_type="naver",
-            social_id=social_id
-        )
-        db.session.add(user)
-        db.session.commit()
-    login_user(user)
-    return redirect(url_for("auth.profile"))# routes/naver_oauth.py
+    # auth.py의 네이버 콜백 함수로 리다이렉트
+    return redirect(url_for("social_oauth.naver_login_callback", **request.args))# routes/naver_oauth.py

@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>온보딩 재개 - 회원가입</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .resume-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 600px;
+        overflow: hidden;
+      }
+
+      .resume-header {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+      }
+
+      .resume-icon {
+        font-size: 60px;
+        margin-bottom: 20px;
+        opacity: 0.9;
+      }
+
+      .resume-title {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      .resume-subtitle {
+        font-size: 16px;
+        opacity: 0.9;
+        line-height: 1.5;
+      }
+
+      .resume-content {
+        padding: 40px;
+      }
+
+      .progress-summary {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        border-left: 4px solid #007bff;
+      }
+
+      .progress-title {
+        font-size: 20px;
+        color: #333;
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+
+      .progress-info {
+        display: grid;
+        gap: 15px;
+      }
+
+      .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #e9ecef;
+      }
+
+      .info-item:last-child {
+        border-bottom: none;
+      }
+
+      .info-label {
+        font-weight: 500;
+        color: #495057;
+      }
+
+      .info-value {
+        color: #333;
+        font-weight: 600;
+      }
+
+      .info-value.completed {
+        color: #28a745;
+      }
+
+      .info-value.pending {
+        color: #ffc107;
+      }
+
+      .info-value.empty {
+        color: #6c757d;
+        font-style: italic;
+      }
+
+      .progress-bar-container {
+        margin: 20px 0;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #007bff, #0056b3);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+      }
+
+      .progress-text {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 14px;
+        color: #6c757d;
+      }
+
+      .last-saved {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 30px;
+        text-align: center;
+      }
+
+      .last-saved-icon {
+        color: #856404;
+        margin-right: 8px;
+      }
+
+      .last-saved-text {
+        color: #856404;
+        font-size: 14px;
+      }
+
+      .action-section {
+        text-align: center;
+      }
+
+      .action-title {
+        font-size: 18px;
+        color: #333;
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+
+      .action-btn {
+        padding: 18px 35px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 180px;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        transform: translateY(0);
+      }
+
+      .action-btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+
+      .action-btn:hover::before {
+        left: 100%;
+      }
+
+      .action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .action-btn:active {
+        transform: translateY(1px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-resume {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        animation: resumePulse 3s infinite;
+      }
+
+      .btn-resume:hover {
+        background: linear-gradient(135deg, #0056b3, #004085);
+        box-shadow: 0 10px 30px rgba(0, 123, 255, 0.4);
+        animation: none;
+      }
+
+      .btn-restart {
+        background: linear-gradient(135deg, #6c757d, #5a6268);
+        color: white;
+      }
+
+      .btn-restart:hover {
+        background: linear-gradient(135deg, #5a6268, #495057);
+        box-shadow: 0 10px 30px rgba(108, 117, 125, 0.3);
+      }
+
+      @keyframes resumePulse {
+        0% {
+          box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+        }
+        50% {
+          box-shadow: 0 8px 25px rgba(0, 123, 255, 0.5);
+        }
+        100% {
+          box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+        }
+      }
+
+      .btn-icon {
+        font-size: 18px;
+      }
+
+      .additional-info {
+        background: #e3f2fd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+      }
+
+      .additional-info-title {
+        font-size: 16px;
+        color: #1976d2;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+
+      .additional-info-text {
+        font-size: 14px;
+        color: #1565c0;
+        line-height: 1.5;
+      }
+
+      .step-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+        color: #6c757d;
+      }
+
+      .step-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #e9ecef;
+      }
+
+      .step-dot.completed {
+        background: #28a745;
+      }
+
+      .step-dot.current {
+        background: #007bff;
+      }
+
+      /* 반응형 디자인 */
+      @media (max-width: 1024px) {
+        .resume-container {
+          max-width: 550px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .resume-container {
+          margin: 10px;
+          border-radius: 15px;
+          max-width: 95vw;
+        }
+
+        .resume-header {
+          padding: 25px 15px;
+        }
+
+        .resume-title {
+          font-size: 22px;
+        }
+
+        .resume-subtitle {
+          font-size: 14px;
+        }
+
+        .resume-content {
+          padding: 25px 15px;
+        }
+
+        .progress-title {
+          font-size: 18px;
+        }
+
+        .action-buttons {
+          flex-direction: column;
+          align-items: center;
+          gap: 15px;
+        }
+
+        .action-btn {
+          width: 100%;
+          max-width: 300px;
+          padding: 15px 25px;
+        }
+
+        .info-item {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+          padding: 10px 0;
+        }
+
+        .progress-summary {
+          padding: 20px;
+        }
+
+        .last-saved {
+          padding: 12px;
+        }
+
+        .additional-info {
+          padding: 15px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 10px;
+        }
+
+        .resume-container {
+          margin: 0;
+          border-radius: 12px;
+        }
+
+        .resume-header {
+          padding: 20px 12px;
+        }
+
+        .resume-icon {
+          font-size: 45px;
+          margin-bottom: 15px;
+        }
+
+        .resume-title {
+          font-size: 20px;
+        }
+
+        .resume-subtitle {
+          font-size: 13px;
+        }
+
+        .resume-content {
+          padding: 20px 12px;
+        }
+
+        .progress-title {
+          font-size: 16px;
+          margin-bottom: 15px;
+        }
+
+        .action-btn {
+          padding: 12px 20px;
+          font-size: 15px;
+        }
+
+        .btn-icon {
+          font-size: 16px;
+        }
+      }
+
+      /* 접근성 개선 */
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      /* 고대비 모드 지원 */
+      @media (prefers-contrast: high) {
+        .action-btn {
+          border: 2px solid transparent;
+        }
+
+        .action-btn:focus {
+          border-color: currentColor;
+        }
+
+        .progress-summary {
+          border-left-width: 6px;
+        }
+      }
+
+      /* 다크모드 지원 */
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        .resume-container {
+          background: #2d3748;
+          color: #e2e8f0;
+        }
+
+        .resume-header {
+          background: linear-gradient(135deg, #2b6cb7 0%, #1e4a73 100%);
+        }
+
+        .progress-summary {
+          background: #4a5568;
+          border-left-color: #63b3ed;
+        }
+
+        .last-saved {
+          background: #744d00;
+          border-color: #d69e2e;
+        }
+
+        .last-saved-text,
+        .last-saved-icon {
+          color: #f6e05e;
+        }
+
+        .additional-info {
+          background: #2a4365;
+        }
+
+        .additional-info-title {
+          color: #63b3ed;
+        }
+
+        .additional-info-text {
+          color: #90cdf4;
+        }
+      }
+
+      /* 포커스 개선 */
+      .action-btn:focus {
+        outline: 3px solid #007bff;
+        outline-offset: 2px;
+      }
+
+      /* 터치 디바이스 최적화 */
+      @media (hover: none) and (pointer: coarse) {
+        .action-btn {
+          min-height: 44px;
+        }
+      }
+
+      /* 애니메이션 */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .resume-container {
+        animation: fadeInUp 0.6s ease-out;
+      }
+
+      .progress-summary {
+        animation: fadeInUp 0.6s ease-out 0.2s both;
+      }
+
+      .action-section {
+        animation: fadeInUp 0.6s ease-out 0.4s both;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="resume-container">
+      <!-- 헤더 -->
+      <div class="resume-header">
+        <div class="resume-icon">🔄</div>
+        <h1 class="resume-title">회원가입을 이어서 진행하세요</h1>
+        <p class="resume-subtitle">이전에 입력하신 정보가 저장되어 있습니다</p>
+      </div>
+
+      <!-- 메인 콘텐츠 -->
+      <div class="resume-content">
+        <!-- 마지막 저장 시간 -->
+        {% if last_saved %}
+        <div class="last-saved">
+          <span class="last-saved-icon">💾</span>
+          <span class="last-saved-text">
+            마지막 저장: {{ last_saved.strftime('%Y년 %m월 %d일 %H:%M') }}
+          </span>
+        </div>
+        {% endif %}
+
+        <!-- 진행 상황 요약 -->
+        <div class="progress-summary">
+          <h2 class="progress-title">현재 진행 상황</h2>
+
+          <!-- 진행률 바 -->
+          <div class="progress-bar-container">
+            <div class="progress-bar">
+              <div
+                class="progress-fill"
+                style="width: {% if progress_percentage %}{{ progress_percentage }}{% else %}0{% endif %}%;"
+              ></div>
+            </div>
+            <div class="progress-text">
+              {% if completed_steps %}{{ completed_steps }}{% else %}0{% endif
+              %}/4 단계 완료 ({% if progress_percentage %}{{ progress_percentage
+              }}{% else %}0{% endif %}%)
+            </div>
+          </div>
+
+          <!-- 입력된 정보 표시 -->
+          <div class="progress-info">
+            <div class="info-item">
+              <span class="info-label">
+                <span
+                  class="step-dot {% if saved_data and saved_data.name %}completed{% elif current_step == 1 %}current{% endif %}"
+                ></span>
+                1단계 - 이름
+              </span>
+              <span
+                class="info-value {% if saved_data and saved_data.name %}completed{% else %}empty{% endif %}"
+              >
+                {% if saved_data and saved_data.name %}{{ saved_data.name }}{%
+                else %}미입력{% endif %}
+              </span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">
+                <span
+                  class="step-dot {% if saved_data and saved_data.nickname %}completed{% elif current_step == 2 %}current{% endif %}"
+                ></span>
+                2단계 - 닉네임
+              </span>
+              <span
+                class="info-value {% if saved_data and saved_data.nickname %}completed{% else %}empty{% endif %}"
+              >
+                {% if saved_data and saved_data.nickname %}{{
+                saved_data.nickname }}{% else %}미입력{% endif %}
+              </span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">
+                <span
+                  class="step-dot {% if saved_data and saved_data.gender %}completed{% elif current_step == 3 %}current{% endif %}"
+                ></span>
+                3단계 - 성별
+              </span>
+              <span
+                class="info-value {% if saved_data and saved_data.gender %}completed{% else %}empty{% endif %}"
+              >
+                {% if saved_data and saved_data.gender %} {% if
+                saved_data.gender == 'male' %}남성{% else %}여성{% endif %} {%
+                else %} 미선택 {% endif %}
+              </span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">
+                <span
+                  class="step-dot {% if saved_data and saved_data.birth_date %}completed{% elif current_step == 4 %}current{% endif %}"
+                ></span>
+                4단계 - 생년월일
+              </span>
+              <span
+                class="info-value {% if saved_data and saved_data.birth_date %}completed{% else %}empty{% endif %}"
+              >
+                {% if saved_data and saved_data.birth_date %}{{
+                saved_data.birth_date }}{% else %}미입력{% endif %}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 액션 선택 -->
+        <div class="action-section">
+          <h3 class="action-title">어떻게 진행하시겠습니까?</h3>
+
+          <div class="action-buttons">
+            <a
+              href="{{ url_for('onboarding.onboarding') }}?resume=true"
+              class="action-btn btn-resume"
+            >
+              <span class="btn-icon">▶️</span>
+              이어서 진행하기
+            </a>
+
+            <a
+              href="{{ url_for('onboarding.onboarding') }}?restart=true"
+              class="action-btn btn-restart"
+            >
+              <span class="btn-icon">🔄</span>
+              처음부터 다시
+            </a>
+          </div>
+
+          <div class="additional-info">
+            <div class="additional-info-title">💡 안내사항</div>
+            <div class="additional-info-text">
+              • <strong>이어서 진행하기:</strong> {% if current_step %}{{
+              current_step }}{% else %}1{% endif %}단계부터 계속 진행합니다<br />
+              • <strong>처음부터 다시:</strong> 모든 정보를 새로 입력합니다<br />
+              • 입력하신 정보는 안전하게 암호화되어 저장됩니다
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 페이지 로드 애니메이션
+      document.addEventListener("DOMContentLoaded", function () {
+        // 진행률 바 애니메이션
+        const progressFill = document.querySelector(".progress-fill");
+        if (progressFill) {
+          const targetWidth = progressFill.style.width;
+          progressFill.style.width = "0%";
+
+          setTimeout(() => {
+            progressFill.style.width = targetWidth;
+          }, 500);
+        }
+
+        // 버튼 호버 효과 개선
+        document.querySelectorAll(".action-btn").forEach((btn) => {
+          btn.addEventListener("mouseenter", function () {
+            this.style.transform = "translateY(-2px)";
+          });
+
+          btn.addEventListener("mouseleave", function () {
+            this.style.transform = "translateY(0)";
+          });
+        });
+
+        // 키보드 네비게이션
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") {
+            const resumeBtn = document.querySelector(".btn-resume");
+            if (document.activeElement === resumeBtn) {
+              e.preventDefault();
+              resumeBtn.click();
+            }
+          }
+
+          if (e.key === "Escape") {
+            const restartBtn = document.querySelector(".btn-restart");
+            restartBtn.focus();
+          }
+        });
+
+        // 접근성 개선: 포커스 관리
+        const firstBtn = document.querySelector(".btn-resume");
+        if (firstBtn) {
+          firstBtn.focus();
+        }
+      });
+
+      // 선택 확인 (처음부터 다시 시작하는 경우)
+      document
+        .querySelector(".btn-restart")
+        .addEventListener("click", function (e) {
+          const confirmed = confirm(
+            "정말로 처음부터 다시 시작하시겠습니까?\n입력하신 정보가 모두 삭제됩니다."
+          );
+          if (!confirmed) {
+            e.preventDefault();
+          }
+        });
+    </script>
+  </body>
+</html>

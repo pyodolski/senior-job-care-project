@@ -1,107 +1,111 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>소셜 로그인</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f6fa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f6fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
 
-        .login-container {
-            text-align: center;
-            background-color: #fff;
-            padding: 40px 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
+      .login-container {
+        text-align: center;
+        background-color: #fff;
+        padding: 40px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
 
-        .login-container h2 {
-            margin-bottom: 30px;
-            color: #333;
-        }
+      .login-container h2 {
+        margin-bottom: 30px;
+        color: #333;
+      }
 
-        .social-btn {
-            display: block;
-            width: 250px;
-            margin: 12px auto;
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-weight: bold;
-            text-decoration: none;
-            color: white;
-            transition: background-color 0.3s;
-        }
+      .social-btn {
+        display: block;
+        width: 250px;
+        margin: 12px auto;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-weight: bold;
+        text-decoration: none;
+        color: white;
+        transition: background-color 0.3s;
+      }
 
-        .google-btn {
-            background-color: #4285f4;
-        }
-        .google-btn:hover {
-            background-color: #357ae8;
-        }
+      .google-btn {
+        background-color: #4285f4;
+      }
+      .google-btn:hover {
+        background-color: #357ae8;
+      }
 
-        .naver-btn {
-            background-color: #1ec800;
-        }
-        .naver-btn:hover {
-            background-color: #17a800;
-        }
+      .naver-btn {
+        background-color: #1ec800;
+      }
+      .naver-btn:hover {
+        background-color: #17a800;
+      }
 
-        .kakao-btn {
-            background-color: #fee500;
-            color: #000;
-        }
-        .kakao-btn:hover {
-            background-color: #fdd835;
-        }
+      .kakao-btn {
+        background-color: #fee500;
+        color: #000;
+      }
+      .kakao-btn:hover {
+        background-color: #fdd835;
+      }
 
-        .divider {
-            margin: 30px 0 20px;
-            color: #aaa;
-            font-size: 14px;
-        }
+      .divider {
+        margin: 30px 0 20px;
+        color: #aaa;
+        font-size: 14px;
+      }
 
-        .basic-btn {
-            display: inline-block;
-            margin: 6px 10px;
-            padding: 10px 22px;
-            font-weight: bold;
-            border-radius: 6px;
-            text-decoration: none;
-            border: 1px solid #ccc;
-            background-color: #fff;
-            color: #333;
-            transition: background-color 0.2s, color 0.2s;
-        }
+      .basic-btn {
+        display: inline-block;
+        margin: 6px 10px;
+        padding: 10px 22px;
+        font-weight: bold;
+        border-radius: 6px;
+        text-decoration: none;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        color: #333;
+        transition: background-color 0.2s, color 0.2s;
+      }
 
-        .basic-btn:hover {
-            background-color: #f0f0f0;
-        }
+      .basic-btn:hover {
+        background-color: #f0f0f0;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="login-container">
-        <h2>소셜 계정으로 로그인</h2>
-        <a class="social-btn google-btn" href="{{ url_for('google.login') }}">
-            Google 계정으로 계속하기
-        </a>
-        <a class="social-btn naver-btn" href="{{ url_for('naver.naver_login') }}">
-            Naver 계정으로 계속하기
-        </a>
-        <a class="social-btn kakao-btn" href="{{ url_for('kakao.login') }}">
-            Kakao 계정으로 계속하기
-        </a>
+      <h2>소셜 계정으로 로그인</h2>
+      <a class="social-btn google-btn" href="{{ url_for('google.login') }}">
+        Google 계정으로 계속하기
+      </a>
+      <a class="social-btn naver-btn" href="{{ url_for('naver.naver_login') }}">
+        Naver 계정으로 계속하기
+      </a>
+      <a class="social-btn kakao-btn" href="{{ url_for('kakao.login') }}">
+        Kakao 계정으로 계속하기
+      </a>
 
-        <div class="divider">또는</div>
+      <div class="divider">또는</div>
 
-        <a class="basic-btn" href="{{ url_for('auth.login') }}">일반 로그인</a>
-        <a class="basic-btn" href="{{ url_for('auth.register') }}">회원가입</a>
+      <a class="basic-btn" href="{{ url_for('user_auth.login') }}"
+        >일반 로그인</a
+      >
+      <a class="basic-btn" href="{{ url_for('user_auth.register') }}"
+        >회원가입</a
+      >
     </div>
-</body>
+  </body>
 </html>
