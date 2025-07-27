@@ -1,66 +1,47 @@
 <!-- templates/profile.html -->
 <!DOCTYPE html>
 <html lang="ko">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <title>프로필</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            padding-top: 60px; /* 상단바 공간 확보 */
-        }
-
-        .navbar {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            height: 60px;
-            background-color: #2c3e50;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-        }
-
-        .navbar h2 {
-            color: white;
-            margin: 0;
-            font-size: 20px;
-        }
-
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            margin-left: 20px;
-            font-weight: bold;
-            transition: color 0.2s;
-        }
-
-        .navbar a:hover {
-            color: #f1c40f;
-        }
-
-        .profile-box {
-            background-color: #fff;
-            padding: 40px 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 320px;
-            margin: 0 auto;
-        }
       body {
         font-family: Arial, sans-serif;
         background-color: #f4f6f9;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
         margin: 0;
+        padding-top: 60px; /* 상단바 공간 확보 */
+      }
+
+      .navbar {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 60px;
+        background-color: #2c3e50;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
+
+      .navbar h2 {
+        color: white;
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .navbar a {
+        color: white;
+        text-decoration: none;
+        margin-left: 20px;
+        font-weight: bold;
+        transition: color 0.2s;
+      }
+
+      .navbar a:hover {
+        color: #f1c40f;
       }
 
       .profile-box {
@@ -70,6 +51,7 @@
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
         text-align: center;
         width: 320px;
+        margin: 0 auto;
       }
 
       h1 {
@@ -105,46 +87,15 @@
         background-color: #c0392b;
       }
     </style>
-</head>
-<body>
-    <div class="navbar">
-        <div style="display: flex; align-items: center;">
-            <h2 style="margin-right: 20px;">내 프로필</h2>
-            <a href="{{ url_for('community.job_list') }}">커뮤니티</a>
-        </div>
-    </div>
-
-
-    <div class="profile-box">
-        {% if user.profile_image %}
-            <img src="{{ user.profile_image }}" alt="프로필 이미지" class="profile-image" />
-        {% endif %}
-        <h1>{{ user.nickname or user.name }}님 환영합니다!</h1>
-        <p><strong>소셜 로그인 방식:</strong> {{ user.social_type }}</p>
-        <p><strong>가입 ID:</strong> {{ user.social_id }}</p>
-        {% if user.name %}
-            <p><strong>이름:</strong> {{ user.name }}</p>
-        {% endif %}
-        {% if user.email %}
-            <p><strong>이메일:</strong> {{ user.email }}</p>
-        {% endif %}
-        {% if user.gender %}
-            <p><strong>성별:</strong> {{ user.gender }}</p>
-        {% endif %}
-        {% if user.birth_date %}
-            <p><strong>생년월일:</strong> {{ user.birth_date }}</p>
-        {% endif %}
-        {% if user.mobile %}
-            <p><strong>전화번호:</strong> {{ user.mobile }}</p>
-        {% endif %}
-
-    <!-- 시/군/동 주소 출력 추가 -->
-        {% if user.sido %}
-            <p><strong>주소(시/군/동):</strong> {{ user.sido }} {{ user.sigungu }} {{ user.dong }}</p>
-        {% endif %}
-        <a class="logout-btn" href="{{ url_for('auth.logout') }}">로그아웃</a>
   </head>
   <body>
+    <div class="navbar">
+      <div style="display: flex; align-items: center">
+        <h2 style="margin-right: 20px">내 프로필</h2>
+        <a href="{{ url_for('community.job_list') }}">커뮤니티</a>
+      </div>
+    </div>
+
     <div class="profile-box">
       {% if user.profile_image %}
       <img
@@ -166,11 +117,13 @@
       <p><strong>생년월일:</strong> {{ user.birth_date }}</p>
       {% endif %} {% if user.mobile %}
       <p><strong>전화번호:</strong> {{ user.mobile }}</p>
+      {% endif %} {% if user.sido %}
+      <p>
+        <strong>주소(시/군/동):</strong> {{ user.sido }} {{ user.sigungu }} {{
+        user.dong }}
+      </p>
       {% endif %}
-      <a class="logout-btn" href="{{ url_for('user_auth.logout') }}"
-        >로그아웃</a
-      >
->>>>>>> after-login,-register-sample-page
+      <a class="logout-btn" href="{{ url_for('auth.logout') }}">로그아웃</a>
     </div>
   </body>
 </html>

@@ -1,4 +1,9 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask_login import login_required, current_user, login_user, logout_user
+from models import db, User
+from routes.google_oauth import google
+from config import Config
+import requests
 import logging
 
 logger = logging.getLogger(__name__)
@@ -180,5 +185,10 @@ def login():
 
     return render_template("login.html")
 
-
-
+# 로그아웃 라우트
+@auth_bp.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    flash("로그아웃되었습니다.")
+    return redirect(url_for("auth.home"))
