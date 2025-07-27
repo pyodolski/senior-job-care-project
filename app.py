@@ -12,6 +12,7 @@ from routes.user_session import user_session_bp
 from routes.google_oauth import google_bp
 from routes.naver_oauth import naver_bp
 from routes.kakao_oauth import kakao_bp
+from routes.components import components_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -37,6 +38,7 @@ app.register_blueprint(user_session_bp)  # 새로 생성한 사용자 세션 블
 app.register_blueprint(google_bp, url_prefix="/login")
 app.register_blueprint(naver_bp)
 app.register_blueprint(kakao_bp, url_prefix="/login")
+app.register_blueprint(components_bp)  # 컴포넌트 API 블루프린트
 
 # 초기 DB 설정
 with app.app_context():
