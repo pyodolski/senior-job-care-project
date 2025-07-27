@@ -19,6 +19,9 @@ CREATE TABLE `user` (
     social_id VARCHAR(255),
 
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    sido varchar(30),
+    sigungu varchar(30),
+    dong varchar(40),
 
     UNIQUE KEY uq_social_login (social_type, social_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
