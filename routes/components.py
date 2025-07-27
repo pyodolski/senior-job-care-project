@@ -9,6 +9,46 @@ logger = logging.getLogger(__name__)
 
 components_bp = Blueprint('components', __name__)
 
+@components_bp.route('/api/debug/db-status')
+@login_required
+def debug_db_status():
+    """데이터베이스 상태 확인 (디버깅용)"""
+    try:
+        from models import JobPost, db
+        
+        # 테이블 존재 확인
+        table_exists = db.engine.dialect.has_table(db.engine, 'job_post')
+        
+        # 공고 수 확인
+        job_count = 0
+        try:
+            job_count = JobPost.query.count()
+        except Exception as e:
+            job_count = f"Error: {str(e)}"
+        
+        # 사용자 정보 확인
+        user_info = {
+            'id': current_user.id,
+            'authenticated': current_user.is_authenticated,
+            'birth_date': str(current_user.birth_date) if current_user.birth_date else None
+        }
+        
+        return jsonify({
+            'success': True,
+            'db_status': {
+                'job_post_table_exists': table_exists,
+                'job_count': job_count,
+                'user_info': user_info
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in debug_db_status: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 @components_bp.route('/api/components/jobs')
 @login_required
 def get_jobs_content():
@@ -49,7 +89,16 @@ def get_jobs_list():
         per_page = request.args.get('per_page', 20, type=int)
         
         # JobService를 통해 공고 목록 조회
-        jobs, total_count = JobService.get_job_list(filters, page, per_page)
+        try:
+            jobs, total_count = JobService.get_job_list(filters, page, per_page)
+            logger.info(f"Successfully retrieved {len(jobs)} jobs from {total_count} total")
+        except Exception as e:
+            logger.error(f"Error in JobService.get_job_list: {str(e)}")
+            return jsonify({
+                'success': False,
+                'error': f'데이터베이스 오류: {str(e)}',
+                'details': 'JobService.get_job_list 실패'
+            }), 500
         
         # JSON 형태로 변환
         jobs_data = []
