@@ -107,7 +107,7 @@ def get_jobs_list():
             from datetime import datetime, timedelta
             days_since_created = (datetime.now() - job.created_at).days
             
-            badge = Noneㅊㅊ
+            badge = None
             if days_since_created <= 1:
                 badge = 'new'
             elif job.is_senior_friendly:
