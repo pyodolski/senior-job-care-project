@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+    <style>
+        :root {
+            --main-color: #1a73e8;
+            --bg-color: #f5f6fa;
+            --form-bg: #fff;
+            --border-color: #ccc;
+            --text-color: #333;
+            --radius: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        form {
+            background: var(--form-bg);
+            padding: 40px 35px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 420px;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            text-align: center;
+            color: var(--text-color);
+        }
+
+        input, select {
+            display: block;
+            width: 100%;
+            margin-bottom: 18px;
+            padding: 12px;
+            font-size: 15px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background-color: var(--main-color);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #135fce;
+        }
+
+        @media (max-width: 480px) {
+            form {
+                padding: 30px 25px;
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <form method="POST" action="{{ url_for('auth.register') }}">
+        <h2>회원가입</h2>
+        <input type="text" name="username" placeholder="아이디" required />
+        <input type="password" name="password" placeholder="비밀번호" required />
+        <input type="password" name="confirm_password" placeholder="비밀번호 확인" required />
+        <input type="text" name="name" placeholder="이름" />
+        <input type="text" name="nickname" placeholder="닉네임" required />
+        <select name="gender">
+            <option value="">성별 선택</option>
+            <option value="male">남성</option>
+            <option value="female">여성</option>
+        </select>
+        <input type="date" name="birth_date" placeholder="생년월일" />
+
+        <button type="submit">가입하기</button>
+        <a href="{{ url_for('auth.home') }}" style="
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #1a73e8;
+            text-decoration: none;
+            font-weight: bold;
+        ">← 뒤로가기</a>
+    </form>
+</body>
+</html>
