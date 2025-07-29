@@ -15,6 +15,10 @@ from routes.kakao_oauth import kakao_bp
 from routes.areas import areas_bp
 from routes.community import community_bp
 from routes.components import components_bp
+# from routes.auth import auth_bp
+# from routes.auth.social import social_bp
+
+
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -45,6 +49,9 @@ app.register_blueprint(community_bp)
 
 app.register_blueprint(areas_bp)
 app.register_blueprint(components_bp)  # 컴포넌트 API 블루프린트
+# 모듈화 진행 중
+# app.register_blueprint(auth_bp, url_prefix='/auth')
+# app.register_blueprint(social_bp, url_prefix='/auth/social')
 
 # 초기 DB 설정
 with app.app_context():
