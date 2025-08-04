@@ -63,6 +63,15 @@
       <div class="icon-navigation">
         <button
           class="nav-icon active"
+          data-page="home"
+          aria-label="홈 페이지 보기"
+          tabindex="0"
+        >
+          <span class="icon">🏠</span>
+          <span class="label">홈</span>
+        </button>
+        <button
+          class="nav-icon"
           data-page="jobs"
           aria-label="구인구직 페이지 보기"
           tabindex="0"
@@ -94,6 +103,64 @@
     <!-- Main Content Area -->
     <main id="main-content" class="main-content" role="main">
       <div class="content-container">
+        <div id="content-home" class="content-page active">
+          <!-- 구인구직 섹션 -->
+          <section class="home-section" aria-labelledby="jobs-section-title">
+            <div class="section-header">
+              <h2 id="jobs-section-title" class="section-title">구인구직</h2>
+              <button
+                class="more-link"
+                data-target="jobs"
+                aria-label="구인구직 전체 페이지로 이동"
+                tabindex="0"
+              >
+                더보기 >
+              </button>
+            </div>
+            <div class="section-content">
+              <div id="home-jobs-container" class="horizontal-scroll-container">
+                <!-- 동적으로 로드되는 구인구직 카드들 -->
+                <div class="content-loading">
+                  <div class="loading-spinner"></div>
+                  <div class="loading-text">구인구직 정보를 불러오는 중...</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 커뮤니티 섹션 -->
+          <section
+            class="home-section"
+            aria-labelledby="community-section-title"
+          >
+            <div class="section-header">
+              <h2 id="community-section-title" class="section-title">
+                커뮤니티
+              </h2>
+              <button
+                class="more-link"
+                data-target="community"
+                aria-label="커뮤니티 전체 페이지로 이동"
+                tabindex="0"
+              >
+                더보기 >
+              </button>
+            </div>
+            <div class="section-content">
+              <div
+                id="home-community-container"
+                class="horizontal-scroll-container"
+              >
+                <!-- 동적으로 로드되는 커뮤니티 포스트들 -->
+                <div class="content-loading">
+                  <div class="loading-spinner"></div>
+                  <div class="loading-text">커뮤니티 정보를 불러오는 중...</div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
         <div id="content-profile" class="content-page">
           <div class="content-loading">
             <div class="loading-spinner"></div>
@@ -101,7 +168,7 @@
           </div>
         </div>
 
-        <div id="content-jobs" class="content-page active">
+        <div id="content-jobs" class="content-page">
           <div class="content-loading">
             <div class="loading-spinner"></div>
             <div class="loading-text">구인구직 정보를 불러오는 중...</div>
@@ -120,7 +187,7 @@
     <!-- Footer -->
     <footer class="footer">
       <div class="footer-content">
-        <p>© 2024 지역 커뮤니티 플랫폼</p>
+        <p>© 뭐라고 적지</p>
         <div class="footer-links">
           <a href="#" class="footer-link">이용약관</a>
           <span class="footer-divider">|</span>

@@ -2,11 +2,18 @@
 
 // Enhanced page state management system
 const pageState = {
-  currentPage: "jobs",
+  currentPage: "home",
   previousPage: null,
   isTransitioning: false,
   transitionDuration: 300,
   pages: {
+    home: {
+      title: "홈",
+      active: true,
+      loaded: false,
+      requiresAuth: false,
+      icon: "🏠",
+    },
     profile: {
       title: "내 정보",
       active: false,
@@ -17,7 +24,7 @@ const pageState = {
     },
     jobs: {
       title: "구인구직",
-      active: true,
+      active: false,
       loaded: false,
       requiresAuth: false,
       icon: "💼",
@@ -30,7 +37,7 @@ const pageState = {
       icon: "💬",
     },
   },
-  history: ["jobs"],
+  history: ["home"],
   maxHistoryLength: 10,
 };
 
@@ -117,13 +124,13 @@ const stateManager = {
 
   // Reset state to initial
   reset() {
-    pageState.currentPage = "jobs";
+    pageState.currentPage = "home";
     pageState.previousPage = null;
     pageState.isTransitioning = false;
-    pageState.history = ["jobs"];
+    pageState.history = ["home"];
 
     Object.keys(pageState.pages).forEach((key) => {
-      pageState.pages[key].active = key === "jobs";
+      pageState.pages[key].active = key === "home";
     });
   },
 };
@@ -147,6 +154,16 @@ function handleNavigation(pageId) {
     // Prevent navigation during transition
     if (pageState.isTransitioning) {
       console.log("Navigation blocked: transition in progress");
+      return;
+    }
+
+    // Handle home page - load fresh content
+    if (pageId === "home") {
+      // Mark home page as loaded and refresh content
+      stateManager.updatePageState("home", { loaded: true });
+      switchPage(pageId);
+      // Refresh home page content when navigating to it
+      setTimeout(() => loadHomePageContent(), 100);
       return;
     }
 
@@ -441,7 +458,7 @@ function handleRedirectError(message) {
       redirectToProfile();
     } else {
       // Return to home page
-      handleNavigation("placeholder");
+      handleNavigation("home");
     }
   }, 1000);
 }
@@ -485,7 +502,7 @@ function hideLoadingMessage() {
 
 // Show default page on error
 function showDefaultPage() {
-  switchPage("jobs");
+  switchPage("home");
 }
 
 // Initialize logo display with enhanced fallback logic
@@ -694,10 +711,10 @@ function setupKeyboardShortcuts() {
       return;
     }
 
-    // Number keys 1-3 for quick navigation
-    if (e.key >= "1" && e.key <= "3") {
+    // Number keys 1-4 for quick navigation
+    if (e.key >= "1" && e.key <= "4") {
       e.preventDefault();
-      const pageIds = ["jobs", "community", "profile"];
+      const pageIds = ["home", "jobs", "community", "profile"];
       const pageId = pageIds[parseInt(e.key) - 1];
       if (pageId) {
         handleNavigation(pageId);
@@ -712,7 +729,13 @@ function setupKeyboardShortcuts() {
       }
     }
 
-    // Alt + J for jobs (default page)
+    // Alt + H for home (default page)
+    if (e.altKey && e.key === "h") {
+      e.preventDefault();
+      handleNavigation("home");
+    }
+
+    // Alt + J for jobs
     if (e.altKey && e.key === "j") {
       e.preventDefault();
       handleNavigation("jobs");
@@ -832,7 +855,7 @@ window.addEventListener("error", function (e) {
 
   // Reset to safe state
   setTimeout(() => {
-    if (pageState.currentPage !== "placeholder") {
+    if (pageState.currentPage !== "home") {
       showDefaultPage();
     }
   }, 3000);
@@ -944,6 +967,9 @@ function recoverFromError() {
 
       // Add fallback text as data attribute
       switch (pageId) {
+        case "home":
+          icon.setAttribute("data-fallback", "[홈]");
+          break;
         case "profile":
           icon.setAttribute("data-fallback", "[프로필]");
           break;
@@ -1016,11 +1042,11 @@ document.addEventListener("DOMContentLoaded", function () {
   // Enhance accessibility
   enhanceAccessibility();
 
-  // Ensure clean initial state
-  ensureSinglePageVisibility("jobs");
+  // Ensure clean initial state - start with home page
+  ensureSinglePageVisibility("home");
 
-  // Load initial page content (jobs page)
-  loadPageContent("jobs");
+  // Initialize home page as default
+  switchPage("home");
 });
 
 // Add CSS animations for error messages
@@ -2161,3 +2187,872 @@ function getCurrentUser() {
 }
 
 // ===== 구인구직 페이지 JavaScript 기능 끝 =====
+
+// ===== 홈 페이지 더보기 버튼 기능 =====
+
+// Home Page API for data loading
+const homePageAPI = {
+  // Get latest 3 job postings for home page
+  async getJobsSummary() {
+    try {
+      const response = await fetch("/api/jobs/list?limit=3&sort=latest", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "same-origin",
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      // Transform server data to home page card format
+      return data.jobs
+        ? data.jobs.map((job) => ({
+            id: job.id,
+            title: job.title,
+            company: job.company || "회사 정보 없음",
+            location: job.location || "위치 정보 없음",
+            type: job.employment_type || "정규직",
+            salary: job.salary || "급여 협의",
+            badge: this.getJobBadge(job),
+            badgeType: this.getJobBadgeType(job),
+            postedDate: this.formatDate(job.created_at),
+            url: `#job-${job.id}`,
+          }))
+        : [];
+    } catch (error) {
+      console.error("Error fetching jobs summary:", error);
+      // Return sample data as fallback
+      return this.getSampleJobs();
+    }
+  },
+
+  // Get latest 3 community posts for home page
+  async getCommunityPosts() {
+    try {
+      const response = await fetch("/api/community/posts?limit=3&sort=latest", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "same-origin",
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      // Transform server data to home page card format
+      return data.posts
+        ? data.posts.map((post) => ({
+            id: post.id,
+            title: post.title,
+            author: post.author || "익명",
+            category: post.category || "일반",
+            categoryType: this.getCategoryType(post.category),
+            likes: post.likes_count || 0,
+            comments: post.comments_count || 0,
+            postedDate: this.formatDate(post.created_at),
+            url: `#post-${post.id}`,
+          }))
+        : [];
+    } catch (error) {
+      console.error("Error fetching community posts:", error);
+      // Return sample data as fallback
+      return this.getSampleCommunity();
+    }
+  },
+
+  // Helper function to determine job badge
+  getJobBadge(job) {
+    const createdDate = new Date(job.created_at);
+    const now = new Date();
+    const daysDiff = Math.floor((now - createdDate) / (1000 * 60 * 60 * 24));
+
+    if (daysDiff <= 1) return "신규";
+    if (job.is_senior) return "시니어";
+    if (job.is_urgent) return "급구";
+    return null;
+  },
+
+  // Helper function to determine job badge type
+  getJobBadgeType(job) {
+    const createdDate = new Date(job.created_at);
+    const now = new Date();
+    const daysDiff = Math.floor((now - createdDate) / (1000 * 60 * 60 * 24));
+
+    if (daysDiff <= 1) return "new";
+    if (job.is_senior) return "senior";
+    if (job.is_urgent) return "urgent";
+    return "new";
+  },
+
+  // Helper function to determine category type
+  getCategoryType(category) {
+    const categoryMap = {
+      공지: "notice",
+      질문: "question",
+      정보: "info",
+      자유: "general",
+    };
+    return categoryMap[category] || "general";
+  },
+
+  // Helper function to format date
+  formatDate(dateString) {
+    if (!dateString) return "방금 전";
+
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffMins < 60) return `${diffMins}분 전`;
+    if (diffHours < 24) return `${diffHours}시간 전`;
+    if (diffDays < 7) return `${diffDays}일 전`;
+
+    return date.toLocaleDateString("ko-KR", {
+      month: "long",
+      day: "numeric",
+    });
+  },
+
+  // Sample data as fallback
+  getSampleJobs() {
+    return homePageData.sampleJobs;
+  },
+
+  getSampleCommunity() {
+    return homePageData.sampleCommunity;
+  },
+};
+
+// Sample data for home page cards (fallback)
+const homePageData = {
+  sampleJobs: [
+    {
+      id: 1,
+      title: "프론트엔드 개발자",
+      company: "테크스타트업",
+      location: "서울시 강남구",
+      type: "정규직",
+      salary: "연봉 4,000~5,000만원",
+      badge: "신규",
+      badgeType: "new",
+      postedDate: "2일 전",
+      url: "#job-1",
+    },
+    {
+      id: 2,
+      title: "시니어 백엔드 개발자",
+      company: "글로벌IT",
+      location: "서울시 서초구",
+      type: "정규직",
+      salary: "연봉 6,000~8,000만원",
+      badge: "시니어",
+      badgeType: "senior",
+      postedDate: "1일 전",
+      url: "#job-2",
+    },
+    {
+      id: 3,
+      title: "데이터 분석가",
+      company: "핀테크코리아",
+      location: "서울시 여의도",
+      type: "계약직",
+      salary: "연봉 4,500~5,500만원",
+      badge: "신규",
+      badgeType: "new",
+      postedDate: "3시간 전",
+      url: "#job-3",
+    },
+  ],
+  sampleCommunity: [
+    {
+      id: 1,
+      title: "신입 개발자 면접 준비 팁 공유",
+      author: "개발러버",
+      category: "질문",
+      categoryType: "question",
+      likes: 24,
+      comments: 8,
+      postedDate: "2시간 전",
+      url: "#post-1",
+    },
+    {
+      id: 2,
+      title: "2024년 IT 트렌드 정리",
+      author: "테크인사이더",
+      category: "정보",
+      categoryType: "info",
+      likes: 45,
+      comments: 12,
+      postedDate: "5시간 전",
+      url: "#post-2",
+    },
+    {
+      id: 3,
+      title: "서울 지역 개발자 네트워킹 모임 안내",
+      author: "운영자",
+      category: "공지",
+      categoryType: "notice",
+      likes: 18,
+      comments: 5,
+      postedDate: "1일 전",
+      url: "#post-3",
+    },
+  ],
+};
+
+// Render job cards for home page
+function renderJobCards(container, jobs = homePageData.sampleJobs) {
+  try {
+    if (!container) {
+      throw new Error("Job cards container not found");
+    }
+
+    // Clear existing content
+    container.innerHTML = "";
+
+    if (!jobs || jobs.length === 0) {
+      container.innerHTML = `
+        <div class="section-error">
+          <div class="error-icon">📝</div>
+          <div class="error-message">구인구직 정보가 없습니다</div>
+        </div>
+      `;
+      return;
+    }
+
+    // Create cards
+    jobs.forEach((job) => {
+      const cardElement = document.createElement("div");
+      cardElement.className = "home-job-card";
+      cardElement.setAttribute("role", "button");
+      cardElement.setAttribute("tabindex", "0");
+      cardElement.setAttribute("aria-label", `${job.title} - ${job.company}`);
+      cardElement.setAttribute("data-job-id", job.id);
+
+      cardElement.innerHTML = `
+        ${
+          job.badge
+            ? `<div class="job-badge ${job.badgeType}">${job.badge}</div>`
+            : ""
+        }
+        <div class="job-title">${job.title}</div>
+        <div class="job-company">${job.company}</div>
+        <div class="job-location">${job.location}</div>
+        <div class="job-date">${job.postedDate}</div>
+      `;
+
+      // Add click event handler
+      cardElement.addEventListener("click", () => handleJobCardClick(job));
+      cardElement.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleJobCardClick(job);
+        }
+      });
+
+      container.appendChild(cardElement);
+    });
+
+    console.log(`Rendered ${jobs.length} job cards`);
+  } catch (error) {
+    console.error("Error rendering job cards:", error);
+    container.innerHTML = `
+      <div class="section-error">
+        <div class="error-icon">⚠️</div>
+        <div class="error-message">카드를 불러올 수 없습니다</div>
+        <button class="retry-button" onclick="renderJobCards(document.getElementById('home-jobs-container'))">다시 시도</button>
+      </div>
+    `;
+  }
+}
+
+// Render community cards for home page
+function renderCommunityCards(container, posts = homePageData.sampleCommunity) {
+  try {
+    if (!container) {
+      throw new Error("Community cards container not found");
+    }
+
+    // Clear existing content
+    container.innerHTML = "";
+
+    if (!posts || posts.length === 0) {
+      container.innerHTML = `
+        <div class="section-error">
+          <div class="error-icon">💬</div>
+          <div class="error-message">커뮤니티 정보가 없습니다</div>
+        </div>
+      `;
+      return;
+    }
+
+    // Create cards
+    posts.forEach((post) => {
+      const cardElement = document.createElement("div");
+      cardElement.className = "home-community-card";
+      cardElement.setAttribute("role", "button");
+      cardElement.setAttribute("tabindex", "0");
+      cardElement.setAttribute("aria-label", `${post.title} - ${post.author}`);
+      cardElement.setAttribute("data-post-id", post.id);
+
+      cardElement.innerHTML = `
+        <div class="post-category ${post.categoryType}">${post.category}</div>
+        <div class="post-title">${post.title}</div>
+        <div class="post-author">${post.author}</div>
+        <div class="post-stats">
+          <div class="post-stat">
+            <span class="icon">👍</span>
+            <span>${post.likes}</span>
+          </div>
+          <div class="post-stat">
+            <span class="icon">💬</span>
+            <span>${post.comments}</span>
+          </div>
+        </div>
+        <div class="post-date">${post.postedDate}</div>
+      `;
+
+      // Add click event handler
+      cardElement.addEventListener("click", () =>
+        handleCommunityCardClick(post)
+      );
+      cardElement.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleCommunityCardClick(post);
+        }
+      });
+
+      container.appendChild(cardElement);
+    });
+
+    console.log(`Rendered ${posts.length} community cards`);
+  } catch (error) {
+    console.error("Error rendering community cards:", error);
+    container.innerHTML = `
+      <div class="section-error">
+        <div class="error-icon">⚠️</div>
+        <div class="error-message">카드를 불러올 수 없습니다</div>
+        <button class="retry-button" onclick="renderCommunityCards(document.getElementById('home-community-container'))">다시 시도</button>
+      </div>
+    `;
+  }
+}
+
+// Handle job card click events
+function handleJobCardClick(job) {
+  try {
+    console.log("Job card clicked:", job);
+
+    // For now, show a simple message
+    // In the future, this could navigate to job detail page
+    showCardMessage(`"${job.title}" 상세 정보로 이동합니다.`);
+
+    // Optional: Track analytics
+    if (typeof gtag !== "undefined") {
+      gtag("event", "job_card_click", {
+        job_id: job.id,
+        job_title: job.title,
+        company: job.company,
+      });
+    }
+  } catch (error) {
+    console.error("Error handling job card click:", error);
+    showCardMessage("상세 정보를 불러올 수 없습니다.");
+  }
+}
+
+// Handle community card click events
+function handleCommunityCardClick(post) {
+  try {
+    console.log("Community card clicked:", post);
+
+    // For now, show a simple message
+    // In the future, this could navigate to post detail page
+    showCardMessage(`"${post.title}" 게시글로 이동합니다.`);
+
+    // Optional: Track analytics
+    if (typeof gtag !== "undefined") {
+      gtag("event", "community_card_click", {
+        post_id: post.id,
+        post_title: post.title,
+        category: post.category,
+      });
+    }
+  } catch (error) {
+    console.error("Error handling community card click:", error);
+    showCardMessage("게시글을 불러올 수 없습니다.");
+  }
+}
+
+// Show temporary message for card clicks
+function showCardMessage(message) {
+  // Create temporary message element
+  const messageDiv = document.createElement("div");
+  messageDiv.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #007bff;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    animation: fadeIn 0.3s ease;
+  `;
+  messageDiv.textContent = message;
+
+  document.body.appendChild(messageDiv);
+
+  // Remove after 2 seconds
+  setTimeout(() => {
+    messageDiv.style.animation = "fadeOut 0.3s ease";
+    setTimeout(() => {
+      if (messageDiv.parentNode) {
+        messageDiv.parentNode.removeChild(messageDiv);
+      }
+    }, 300);
+  }, 2000);
+}
+
+// Load home page content from APIs
+async function loadHomePageContent() {
+  try {
+    // Get containers
+    const jobsContainer = document.getElementById("home-jobs-container");
+    const communityContainer = document.getElementById(
+      "home-community-container"
+    );
+
+    // Show loading states using dedicated function
+    if (jobsContainer) {
+      showSectionLoading(jobsContainer, "구인구직");
+      sectionStateManager.setState("jobs", "loading");
+    }
+
+    if (communityContainer) {
+      showSectionLoading(communityContainer, "커뮤니티");
+      sectionStateManager.setState("community", "loading");
+    }
+
+    // Load data from APIs in parallel
+    const [jobsData, communityData] = await Promise.allSettled([
+      homePageAPI.getJobsSummary(),
+      homePageAPI.getCommunityPosts(),
+    ]);
+
+    // Render jobs section
+    if (jobsContainer) {
+      if (jobsData.status === "fulfilled") {
+        renderJobCards(jobsContainer, jobsData.value);
+        sectionStateManager.setState("jobs", "loaded", jobsData.value);
+        sectionStateManager.resetRetry("jobs");
+
+        // Show success notification if this was a retry
+        const retryCount = sectionStateManager.getState("jobs").retryCount;
+        if (retryCount > 0) {
+          showSectionNotification(
+            jobsContainer,
+            "구인구직 정보를 성공적으로 불러왔습니다",
+            "success"
+          );
+        }
+      } else {
+        console.error("Failed to load jobs data:", jobsData.reason);
+        const errorMessage =
+          jobsData.reason?.message ||
+          jobsData.reason?.toString() ||
+          "Unknown error";
+        showSectionError(jobsContainer, "구인구직", "jobs", errorMessage);
+        sectionStateManager.setState("jobs", "error", {
+          error: jobsData.reason,
+        });
+        sectionStateManager.incrementRetry("jobs");
+      }
+    }
+
+    // Render community section
+    if (communityContainer) {
+      if (communityData.status === "fulfilled") {
+        renderCommunityCards(communityContainer, communityData.value);
+        sectionStateManager.setState(
+          "community",
+          "loaded",
+          communityData.value
+        );
+        sectionStateManager.resetRetry("community");
+
+        // Show success notification if this was a retry
+        const retryCount = sectionStateManager.getState("community").retryCount;
+        if (retryCount > 0) {
+          showSectionNotification(
+            communityContainer,
+            "커뮤니티 정보를 성공적으로 불러왔습니다",
+            "success"
+          );
+        }
+      } else {
+        console.error("Failed to load community data:", communityData.reason);
+        const errorMessage =
+          communityData.reason?.message ||
+          communityData.reason?.toString() ||
+          "Unknown error";
+        showSectionError(
+          communityContainer,
+          "커뮤니티",
+          "community",
+          errorMessage
+        );
+        sectionStateManager.setState("community", "error", {
+          error: communityData.reason,
+        });
+        sectionStateManager.incrementRetry("community");
+      }
+    }
+
+    console.log("Home page content loaded successfully");
+  } catch (error) {
+    console.error("Error loading home page content:", error);
+    // Fallback to sample data
+    initializeHomePageContentFallback();
+  }
+}
+
+// Show section loading state
+function showSectionLoading(container, sectionName) {
+  if (!container) {
+    console.warn("Container not found for loading state");
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="section-loading">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">${sectionName} 정보를 불러오는 중...</div>
+    </div>
+  `;
+
+  // Add loading accessibility attributes
+  container.setAttribute("aria-busy", "true");
+  container.setAttribute("aria-live", "polite");
+
+  console.log(`Loading state shown for ${sectionName} section`);
+}
+
+// Show section error with retry button
+function showSectionError(
+  container,
+  sectionName,
+  sectionType,
+  errorDetails = null
+) {
+  if (!container) {
+    console.warn("Container not found for error state");
+    return;
+  }
+
+  // Clear loading state attributes
+  container.removeAttribute("aria-busy");
+
+  // Determine error message based on error type
+  let errorMessage = `${sectionName} 정보를 불러올 수 없습니다`;
+  let errorIcon = "⚠️";
+
+  if (errorDetails) {
+    if (errorDetails.includes("404")) {
+      errorMessage = `${sectionName} 데이터를 찾을 수 없습니다`;
+      errorIcon = "🔍";
+    } else if (errorDetails.includes("timeout")) {
+      errorMessage = `${sectionName} 로딩 시간이 초과되었습니다`;
+      errorIcon = "⏱️";
+    } else if (errorDetails.includes("network")) {
+      errorMessage = "네트워크 연결을 확인해주세요";
+      errorIcon = "🌐";
+    }
+  }
+
+  container.innerHTML = `
+    <div class="section-error">
+      <div class="error-icon">${errorIcon}</div>
+      <div class="error-message">${errorMessage}</div>
+      <div class="error-actions">
+        <button class="retry-button" onclick="reloadSection('${sectionType}')" aria-label="${sectionName} 다시 시도">
+          다시 시도
+        </button>
+        <button class="fallback-button" onclick="showSectionFallback('${sectionType}')" aria-label="${sectionName} 샘플 데이터 보기">
+          샘플 보기
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Add error accessibility attributes
+  container.setAttribute("role", "alert");
+  container.setAttribute("aria-live", "assertive");
+
+  console.log(
+    `Error state shown for ${sectionName} section:`,
+    errorDetails || "Unknown error"
+  );
+}
+
+// Show section with fallback (sample) data
+function showSectionFallback(sectionType) {
+  try {
+    const container = document.getElementById(`home-${sectionType}-container`);
+    if (!container) return;
+
+    console.log(`Loading fallback data for ${sectionType} section`);
+
+    if (sectionType === "jobs") {
+      renderJobCards(container, homePageData.sampleJobs);
+    } else if (sectionType === "community") {
+      renderCommunityCards(container, homePageData.sampleCommunity);
+    }
+
+    // Show fallback notification
+    showSectionNotification(container, "샘플 데이터를 표시합니다", "info");
+  } catch (error) {
+    console.error(`Error showing fallback for ${sectionType}:`, error);
+  }
+}
+
+// Show temporary notification in section
+function showSectionNotification(container, message, type = "info") {
+  const notification = document.createElement("div");
+  notification.className = `section-notification ${type}`;
+  notification.innerHTML = `
+    <div class="notification-content">
+      <span class="notification-icon">${
+        type === "info" ? "ℹ️" : type === "success" ? "✅" : "⚠️"
+      }</span>
+      <span class="notification-message">${message}</span>
+    </div>
+  `;
+
+  // Insert at the beginning of container
+  container.insertBefore(notification, container.firstChild);
+
+  // Auto-remove after 3 seconds
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.remove();
+    }
+  }, 3000);
+}
+
+// Enhanced section state management
+const sectionStateManager = {
+  states: new Map(),
+
+  // Set section state
+  setState(sectionType, state, data = null) {
+    this.states.set(sectionType, {
+      state: state, // 'loading', 'loaded', 'error', 'fallback'
+      timestamp: Date.now(),
+      data: data,
+      retryCount: this.states.get(sectionType)?.retryCount || 0,
+    });
+
+    console.log(`Section ${sectionType} state changed to: ${state}`);
+  },
+
+  // Get section state
+  getState(sectionType) {
+    return (
+      this.states.get(sectionType) || {
+        state: "idle",
+        timestamp: 0,
+        data: null,
+        retryCount: 0,
+      }
+    );
+  },
+
+  // Increment retry count
+  incrementRetry(sectionType) {
+    const currentState = this.getState(sectionType);
+    currentState.retryCount++;
+    this.states.set(sectionType, currentState);
+    return currentState.retryCount;
+  },
+
+  // Reset retry count
+  resetRetry(sectionType) {
+    const currentState = this.getState(sectionType);
+    currentState.retryCount = 0;
+    this.states.set(sectionType, currentState);
+  },
+
+  // Check if section needs refresh (older than 5 minutes)
+  needsRefresh(sectionType) {
+    const state = this.getState(sectionType);
+    const fiveMinutes = 5 * 60 * 1000;
+    return Date.now() - state.timestamp > fiveMinutes;
+  },
+};
+
+// Reload specific section with enhanced error handling
+async function reloadSection(sectionType) {
+  try {
+    const container = document.getElementById(`home-${sectionType}-container`);
+    if (!container) {
+      console.warn(`Container not found for section: ${sectionType}`);
+      return;
+    }
+
+    const sectionName = sectionType === "jobs" ? "구인구직" : "커뮤니티";
+
+    // Check retry limit
+    const currentState = sectionStateManager.getState(sectionType);
+    if (currentState.retryCount >= 3) {
+      showSectionError(
+        container,
+        sectionName,
+        sectionType,
+        "최대 재시도 횟수에 도달했습니다. 샘플 데이터를 확인해보세요."
+      );
+      return;
+    }
+
+    // Show loading state
+    showSectionLoading(container, sectionName);
+    sectionStateManager.setState(sectionType, "loading");
+
+    console.log(
+      `Reloading ${sectionType} section (attempt ${
+        currentState.retryCount + 1
+      })`
+    );
+
+    // Load data based on section type
+    let data;
+    if (sectionType === "jobs") {
+      data = await homePageAPI.getJobsSummary();
+      renderJobCards(container, data);
+    } else if (sectionType === "community") {
+      data = await homePageAPI.getCommunityPosts();
+      renderCommunityCards(container, data);
+    }
+
+    // Update state on success
+    sectionStateManager.setState(sectionType, "loaded", data);
+    sectionStateManager.resetRetry(sectionType);
+
+    // Show success notification
+    showSectionNotification(
+      container,
+      `${sectionName} 정보를 성공적으로 불러왔습니다`,
+      "success"
+    );
+
+    console.log(`${sectionType} section reloaded successfully`);
+  } catch (error) {
+    console.error(`Error reloading ${sectionType} section:`, error);
+
+    const container = document.getElementById(`home-${sectionType}-container`);
+    const sectionName = sectionType === "jobs" ? "구인구직" : "커뮤니티";
+
+    if (container) {
+      const errorMessage = error.message || error.toString() || "Unknown error";
+      showSectionError(container, sectionName, sectionType, errorMessage);
+      sectionStateManager.setState(sectionType, "error", { error });
+      sectionStateManager.incrementRetry(sectionType);
+    }
+  }
+}
+
+// Initialize home page content with sample data (fallback)
+function initializeHomePageContentFallback() {
+  try {
+    // Get containers
+    const jobsContainer = document.getElementById("home-jobs-container");
+    const communityContainer = document.getElementById(
+      "home-community-container"
+    );
+
+    if (jobsContainer) {
+      renderJobCards(jobsContainer);
+    }
+
+    if (communityContainer) {
+      renderCommunityCards(communityContainer);
+    }
+
+    console.log("Home page content initialized with sample data");
+  } catch (error) {
+    console.error("Error initializing home page content fallback:", error);
+  }
+}
+
+// 더보기 버튼 클릭 이벤트 처리
+function setupMoreButtonHandlers() {
+  document.querySelectorAll(".more-link").forEach((button) => {
+    button.addEventListener("click", function (e) {
+      e.preventDefault();
+      const targetPage = this.getAttribute("data-target");
+      if (targetPage) {
+        handleNavigation(targetPage);
+      }
+    });
+
+    // 키보드 지원
+    button.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        const targetPage = this.getAttribute("data-target");
+        if (targetPage) {
+          handleNavigation(targetPage);
+        }
+      }
+    });
+  });
+}
+
+// 페이지 초기화
+document.addEventListener("DOMContentLoaded", function () {
+  console.log("Initializing login complete page...");
+
+  try {
+    // Initialize logo display
+    initializeLogo();
+
+    // Initialize region display
+    initializeRegionDisplay();
+
+    // Set up keyboard shortcuts
+    setupKeyboardShortcuts();
+
+    // Enhance accessibility
+    enhanceAccessibility();
+
+    // Set up more button handlers for home page
+    setupMoreButtonHandlers();
+
+    // Load home page content from APIs
+    loadHomePageContent();
+
+    // Ensure home page is shown by default
+    ensureSinglePageVisibility("home");
+
+    console.log("Page initialization completed successfully");
+  } catch (error) {
+    console.error("Error during page initialization:", error);
+    recoverFromError();
+  }
+});
