@@ -25,7 +25,8 @@ def jobs_all():
     ).all()
 
     job_locations = [
-        {'title': job.title, 'lat': job.latitude, 'lng': job.longitude}
+        {'title': job.title, 'lat': job.latitude, 'company': job.company,
+         'salary': job.salary, 'lng': job.longitude}
         for job in jobs
     ]
 

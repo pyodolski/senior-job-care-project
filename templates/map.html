@@ -2,137 +2,155 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>기본 마커 + 커스텀 오버레이로 위치 구분</title>
+  <title>일자리 지도</title>
   <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_key }}"></script>
   <style>
-    html, body, #map {
-      height: 100%; margin: 0; padding: 0; box-sizing: border-box;
-    }
+    html, body, #map { height: 100%; margin: 0; padding: 0; box-sizing: border-box; }
     #map { width: 100vw; height: 100vh; }
-    .custom-label {
-      color: white;
-      background-color: rgba(0,0,0,0.7);
-      padding: 2px 6px;
-      font-size: 12px;
-      border-radius: 3px;
-      white-space: nowrap;
-      user-select: none;
+    .info-window { padding: 10px; width: 220px; text-align: left; line-height: 1.5; }
+    .info-window .title { font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+    .info-window .details { font-size: 12px; color: #555; }
+    .info-window button {
+      display: block; width: 100%; margin-top: 8px; padding: 6px 0;
+      background-color: #FFD600; color: #3C1E1E; border: none; border-radius: 4px;
+      font-size: 12px; font-weight: 700; cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div id="map"></div>
+  <div id="map" aria-label="일자리 지도"></div>
+
   <script>
-    var container = document.getElementById('map');
-    var map;
-    var markers = [];
-    var overlays = [];
+    // DOM
+    const container = document.getElementById('map');
 
-    function clearMarkersAndOverlays() {
-      markers.forEach(marker => marker.setMap(null));
-      markers = [];
-      overlays.forEach(overlay => overlay.setMap(null));
-      overlays = [];
+    // 상태
+    let map = null;
+    const markers = [];
+    const infoWindow = new kakao.maps.InfoWindow({ removable: true }); // 단일 재사용 [1][2]
+
+    // 유틸: 안전 숫자 변환
+    const toNumber = (v) => {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : NaN;
+    };
+
+    // 유틸: 인포윈도우 내부 onclick 파라미터에 넣을 문자열 이스케이프
+    const escapeForAttr = (s) => String(s ?? '').replace(/'/g, "\\'");
+
+    // 마커 생성
+    function createMarker(position, title) {
+      return new kakao.maps.Marker({ position, map, title: title ?? '' });
     }
 
-    // 기본 빨간 마커 생성
-    function createDefaultMarker(position, title) {
-      return new kakao.maps.Marker({
-        position: position,
-        map: map,
-        title: title
-      });
-    }
+    // 네비게이션 호출(모바일: 카카오내비, PC: 카카오맵 길찾기)
+    function navigateTo(lat, lng, name) {
+      const safeName = encodeURIComponent(name ?? '');
+      const isMobile = /Mobi/i.test(navigator.userAgent);
 
-    // 마커 위에 텍스트 라벨(커스텀 오버레이) 생성
-    function createLabelOverlay(position, text) {
-      var content = document.createElement('div');
-      content.className = 'custom-label';
-      content.innerText = text;
-
-      return new kakao.maps.CustomOverlay({
-        position: position,
-        content: content,
-        yAnchor: 1  // 마커 위쪽에 붙도록
-      });
-    }
-
-    // 전체 일자리 마커 + 라벨 출력
-    function loadAllJobs() {
-      fetch('/jobs_all')
-        .then(res => res.json())
-        .then(data => {
-          clearMarkersAndOverlays();
-
-          if (!data.jobs || data.jobs.length === 0) {
-            console.log('표시할 일자리가 없습니다.');
-            return;
-          }
-
-          data.jobs.forEach(job => {
-            const lat = parseFloat(job.lat);
-            const lng = parseFloat(job.lng);
-            if (isNaN(lat) || isNaN(lng)) return;
-
-            var position = new kakao.maps.LatLng(lat, lng);
-            var marker = createDefaultMarker(position, job.title);
-            var overlay = createLabelOverlay(position, '일자리');
-            overlay.setMap(map);
-
-            markers.push(marker);
-            overlays.push(overlay);
-
-            var infowindow = new kakao.maps.InfoWindow({
-              content: `<div style="padding:5px;">${job.title}</div>`
-            });
-            marker.addListener('click', () => infowindow.open(map, marker));
-          });
-        })
-        .catch(err => {
-          console.error('일자리 데이터 불러오기 실패:', err);
-          alert('일자리를 불러오는 중 오류가 발생했습니다.');
-        });
-    }
-
-    // 지도 초기화 및 내 위치 마커+라벨 표시
-    function initMap() {
-      var defaultPosition = new kakao.maps.LatLng(37.5665, 126.9780);
-
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-          var userPosition = new kakao.maps.LatLng(position.coords.latitude, position.coords.longitude);
-
-          map = new kakao.maps.Map(container, {
-            center: userPosition,
-            level: 7
-          });
-
-          var userMarker = createDefaultMarker(userPosition, '현재 위치');
-          var userLabel = createLabelOverlay(userPosition, '내 위치');
-          userLabel.setMap(map);
-
-          loadAllJobs();
-
-        }, function(error) {
-          console.error('위치 정보 오류:', error);
-
-          map = new kakao.maps.Map(container, {
-            center: defaultPosition,
-            level: 7
-          });
-
-          loadAllJobs();
-        });
+      if (isMobile) {
+        const url = `kakaonavi-sdk://navigate?destination=${safeName}&x=${lng}&y=${lat}&coord_type=wgs84`;
+        window.location.href = url;
       } else {
-        map = new kakao.maps.Map(container, {
-          center: defaultPosition,
-          level: 7
-        });
+        const url = `https://map.kakao.com/link/to/${safeName},${lat},${lng}`;
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
+    }
+    window.navigateTo = navigateTo; // 인포윈도우 버튼에서 호출
 
-        loadAllJobs();
+    // 기존 마커 제거
+    function clearMarkers() {
+      for (const m of markers) m.setMap(null);
+      markers.length = 0;
+    }
+
+    // 인포윈도우 템플릿
+    function buildInfoContent(job) {
+      const title = job.title ?? '';
+      const company = job.company || '정보 없음';
+      const salary = (typeof job.salary === 'number')
+        ? job.salary.toLocaleString('ko-KR') + '원'
+        : (job.salary || '협의');
+
+      const lat = toNumber(job.lat);
+      const lng = toNumber(job.lng);
+
+      return `
+        <div class="info-window">
+          <div class="title">${title}</div>
+          <div class="details">회사명: ${company}</div>
+          <div class="details">급여: ${salary}</div>
+          <button onclick="navigateTo(${lat}, ${lng}, '${escapeForAttr(title)}')">길찾기</button>
+        </div>
+      `;
+    }
+
+    // 데이터 로드 및 마커 렌더링
+    async function loadAllJobs() {
+      try {
+        const res = await fetch('/jobs_all', { credentials: 'same-origin' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        clearMarkers();
+        infoWindow.close();
+
+        const jobs = Array.isArray(data?.jobs) ? data.jobs : [];
+        if (jobs.length === 0) {
+          console.log('표시할 일자리가 없습니다.');
+          return;
+        }
+
+        for (const job of jobs) {
+          const lat = toNumber(job.lat);
+          const lng = toNumber(job.lng);
+          if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+
+          const pos = new kakao.maps.LatLng(lat, lng);
+          const marker = createMarker(pos, job.title);
+
+          kakao.maps.event.addListener(marker, 'click', () => {
+            infoWindow.setContent(buildInfoContent(job));
+            infoWindow.open(map, marker);
+          });
+
+          markers.push(marker);
+        }
+      } catch (err) {
+        console.error('일자리 데이터 불러오기 실패:', err);
+        alert('일자리를 불러오는 중 오류가 발생했습니다.');
       }
     }
 
+    // 지도 생성 공통
+    function createMapAndLoad(center) {
+      map = new kakao.maps.Map(container, { center, level: 7 });
+      loadAllJobs(); // 생성 직후 로드 [1]
+    }
+
+    // 초기화: 현재 위치 성공 시 그 좌표로, 실패 시 폴백
+    function initMap() {
+      const fallback = new kakao.maps.LatLng(37.5665, 126.9780); // 서울 시청
+
+      if (!navigator.geolocation) {
+        createMapAndLoad(fallback);
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const center = new kakao.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+          createMapAndLoad(center);
+        },
+        (err) => {
+          console.warn('위치 정보 오류:', err);
+          createMapAndLoad(fallback);
+        },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+      );
+    }
+
+    // 부트스트랩
     initMap();
   </script>
 </body>

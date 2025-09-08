@@ -15,7 +15,7 @@
 최종 수정일: 2025-01-09
 """
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify,  current_app
 from flask_login import login_required, current_user
 from models import db, JobPost
 from services.job_service import JobService
@@ -95,6 +95,7 @@ def job_list():
 @jobs_bp.route("/jobs/create", methods=["GET", "POST"])
 @login_required
 def create_job():
+    kakao_api_key = current_app.config.get('KAKAO_MAP_API_KEY')
     if request.method == "POST":
         try:
             # 폼 데이터 받기
@@ -177,7 +178,7 @@ def create_job():
             flash("공고 등록 중 오류가 발생했습니다. 다시 시도해주세요.", "error")
             return render_template("jobs/create_job.html")
     
-    return render_template("jobs/create_job.html")
+    return render_template("jobs/create_job.html", kakao_key=kakao_api_key)
 
 # 공고 상세보기
 @jobs_bp.route("/jobs/<int:job_id>")
