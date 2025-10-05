@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ other_user.nickname }}님과의 채팅 - 사람이음</title>
     <script src="https://cdn.tailwindcss.com"></script>
+     <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4/dist/socket.io.min.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
@@ -114,20 +115,12 @@
 
     <!-- 현재 사용자 ID를 JavaScript에서 사용할 수 있도록 설정 -->
     <script>
-      window.currentUserId = {{ current_user.id }};
+        window.currentUserId = {{ current_user.id }};
+        window.otherUserName = "{{ other_user.nickname|e }}";
+        window.currentUserName = "{{ current_user.nickname|e }}";
+        window.roomId = {{ room.id }};
     </script>
     <script src="{{ url_for('static', filename='js/common.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
-    <script>
-      // 페이지 로드 시 실시간 메시지 폴링 시작
-      document.addEventListener('DOMContentLoaded', function() {
-          startMessagePolling({{ room.id }});
-      });
-
-      // 페이지 언로드 시 폴링 중지
-      window.addEventListener('beforeunload', function() {
-          stopMessagePolling();
-      });
-    </script>
   </body>
 </html>

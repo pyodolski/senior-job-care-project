@@ -18,6 +18,9 @@ from cli import register_cli  # ⬅ cli.py에서 만든 함수 import
 from routes.admin.admin import admin_bp
 from routes.map import map_bp
 from routes.news import news_bp
+from flask_socketio import SocketIO
+
+socketio = SocketIO(cors_allowed_origins="*", manage_session=False)
 app = Flask(__name__)
 app.config.from_object(Config)
 
@@ -34,6 +37,10 @@ login_manager.login_view = "auth.home"
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+# SocketIO를 앱에 초기화 (Session 이후)
+socketio.init_app(app)  # 확장 시 message_queue='redis://localhost:6379/0' 가능[web:31]
 
 # 데이터베이스 초기화 상태 추적
 db_initialized = False
@@ -109,10 +116,11 @@ app.register_blueprint(job_assistant_bp)
 app.register_blueprint(news_bp)
 app.register_blueprint(map_bp)
 
+from routes.chat_events import init_chat_socketio
+init_chat_socketio(socketio)
 
-# 초기 DB 설정
 
 
 if __name__ == '__main__':
     # 로컬 개발 환경에서 데이터베이스 연결 테스트
-    app.run(port=5002, debug=True)
+    socketio.run(app, port=5002, debug=True)
