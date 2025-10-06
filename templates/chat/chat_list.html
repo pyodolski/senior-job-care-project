@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>채팅 - 사람이음</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4/dist/socket.io.min.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
@@ -103,11 +104,12 @@
           {% if chat_rooms %} {% for chat_data in chat_rooms %}
           <div
             class="chat-item {% if chat_data.unread_count > 0 %}unread{% endif %}"
+            data-room-id="{{ chat_data.room.id }}"
             onclick="goToChatRoom({{ chat_data.room.id }})"
           >
-            {% if chat_data.unread_count > 0 %}
-            <div class="chat-unread-badge">{{ chat_data.unread_count }}</div>
-            {% endif %}
+            <div class="chat-unread-badge {% if chat_data.unread_count == 0 %}hidden{% endif %}">
+                {% if chat_data.unread_count > 0 %}{{ chat_data.unread_count }}{% endif %}
+            </div>
 
             <div class="chat-header">
               <div class="chat-user-info">

@@ -228,6 +228,36 @@ document.addEventListener("DOMContentLoaded", function () {
     if (typeof updateReadState === "function") updateReadState();
   });
 
+  // 방별 미읽음 실시간 갱신
+  socket.on("room_unread_count", ({ room_id, count }) => {
+    const item = document.querySelector(`.chat-item[data-room-id="${room_id}"]`);
+    if (!item) return;
+    const badge = item.querySelector(".chat-unread-badge");
+    if (!badge) return;
+    const n = Number(count) || 0;
+    if (n > 0) {
+      badge.textContent = String(n);
+      badge.classList.remove("hidden");
+      item.classList.add("unread");
+    } else {
+      badge.textContent = "";
+      badge.classList.add("hidden");
+      item.classList.remove("unread");
+    }
+  });
+
+  socket.on("unread_total", (data) => {
+    const el = document.getElementById("chatBadgeCount");
+    if (!el) return;
+    const n = Number(data.count) || 0;
+    if (n > 0) {
+      el.textContent = String(n);
+      el.classList.remove("hidden");
+    } else {
+      el.textContent = "";
+      el.classList.add("hidden");
+    }
+  });
   // 초기 포커스/스크롤
   scrollToBottom();
   const messageInput = document.getElementById("messageInput");
@@ -236,4 +266,16 @@ document.addEventListener("DOMContentLoaded", function () {
 // 현재 사용자 ID 가져오기 (전역 변수나 데이터 속성에서)
 function getCurrentUserId() {
   return window.currentUserId || parseInt(document.body.dataset.userId) || 0;
+}
+
+function updateUnreadBadge(count) {
+  const el = document.getElementById("chatBadgeCount");
+  if (!el) return;
+  if (count > 0) {
+    el.textContent = String(count);
+    el.classList.remove("hidden");
+  } else {
+    el.textContent = "";
+    el.classList.add("hidden");
+  }
 }
