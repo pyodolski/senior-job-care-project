@@ -198,13 +198,12 @@ class ChatService:
             )
         ).first_or_404()
         
-        # 메시지 조회 (오래된 순)
-        messages = ChatMessage.query.filter_by(room_id=room_id)\
-                                  .order_by(ChatMessage.created_at)\
-                                  .paginate(page=page, per_page=per_page, error_out=False)
-        
-        return messages
-    
+        # 메시지 조회 (최신 순)
+        pagination = ChatMessage.query.filter_by(room_id=room_id)\
+            .order_by(desc(ChatMessage.created_at))\
+            .paginate(page=page, per_page=per_page, error_out=False)
+        return pagination
+
     @staticmethod
     def mark_messages_as_read(room_id, user_id):
         """

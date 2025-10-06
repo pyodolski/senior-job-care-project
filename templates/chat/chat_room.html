@@ -63,30 +63,29 @@
         </header>
       </div>
 
-      <!-- 메시지 목록 -->
-      <div class="flex-1 overflow-y-auto px-4 py-4 sm:px-6 chat-messages" id="chatMessages">
-        {% for message in messages %}
-        <div
-          class="message {% if message.sender_id == current_user.id %}own{% endif %} {% if message.message_type == 'system' %}system{% endif %}"
-          data-message-id="{{ message.id }}"
-        >
-          {% if message.message_type != 'system' %}
-          <div class="message-avatar">
-            {{ message.sender.nickname[0] if message.sender.nickname else '?' }}
-          </div>
-          {% endif %}
-
-          <div class="message-content">
-            <div class="message-bubble">{{ message.message }}</div>
-            <div class="message-time">
-              {{ message.created_at.strftime('%H:%M') }}
-            </div>
-          </div>
+        <!-- 메시지 목록 -->
+        <div class="flex-1 overflow-y-auto px-4 py-4 sm:px-6 chat-messages" id="chatMessages">
+            {% for message in messages_pagination.items|reverse %}
+                <div
+                        class="message {% if message.sender_id == current_user.id %}own{% endif %} {% if message.message_type == 'system' %}system{% endif %}"
+                        data-message-id="{{ message.id }}"
+                >
+                    {% if message.message_type != 'system' %}
+                        <div class="message-avatar">
+                            {{ message.sender.nickname[0] if message.sender.nickname else '?' }}
+                        </div>
+                    {% endif %}
+                    <div class="message-content">
+                        <div class="message-bubble">{{ message.message }}</div>
+                        <div class="message-time">
+                            {{ message.created_at.strftime('%H:%M') }}
+                        </div>
+                    </div>
+                </div>
+            {%endfor%}
         </div>
-        {% endfor %}
-      </div>
 
-      <!-- 메시지 입력 -->
+        <!-- 메시지 입력 -->
       <div class="bg-white border-t p-4 chat-input-container">
         <div class="flex items-end space-x-3 chat-input-form">
           <div class="flex-1 relative">
