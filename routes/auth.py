@@ -248,7 +248,8 @@ def onboarding():
             flash("정보 저장 중 오류가 발생했습니다.", "error")
             print("Onboarding update failed:", e)
     
-    return render_template("onboarding.html", user=current_user)
+    kakao_key = current_app.config.get("KAKAO_MAP_API_KEY")
+    return render_template("onboarding.html", user=current_user, kakao_key=kakao_key)
 
 # 회원가입 라우트
 @auth_bp.route("/register", methods=["GET", "POST"])
