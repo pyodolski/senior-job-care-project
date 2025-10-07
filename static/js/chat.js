@@ -193,19 +193,28 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener("DOMContentLoaded", function () {
   // 연결되면 방 참가 + 초기 읽음 처리
   socket.on("connect", () => {
-    socket.emit("join", { room_id: ROOM_ID });           // 방 참가[web:17]
-    socket.emit("read_messages", { room_id: ROOM_ID });   // 초기 읽음 처리[web:17]
+    socket.emit("join", { room_id: ROOM_ID });           // 방 참가
+    socket.emit("read_messages", { room_id: ROOM_ID });   // 초기 읽음 처리
   });
 
   socket.on("connect_error", (err) => console.error("socket connect_error", err));
   socket.on("error", (err) => console.error("socket error", err));
+
+  // 목록의 마지막 메시지/시간 갱신
+  socket.on("last_message_updated", (data) => {
+    updateChatListLastMessage(data.room_id, {
+      message: data.message,
+      created_at: data.created_at,
+      message_type: data.message_type
+    });
+  });
 
   // 서버가 방송하는 새 메시지 수신
   socket.on("new_message", (msg) => {
     if (msg.room_id !== ROOM_ID) return;
     const isOwn = msg.sender_id === CURRENT_USER_ID;
 
-    // 기존 addMessageToChat 인터페이스로 매핑
+    // addMessageToChat
     addMessageToChat({
       id: msg.id,
       message: msg.message,
@@ -217,7 +226,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!isOwn) {
       // 수신 즉시 읽음 처리
-      socket.emit("read_messages", { room_id: ROOM_ID }); // 읽음 브로드캐스트[web:17]
+      socket.emit("read_messages", { room_id: ROOM_ID }); // 읽음 브로드캐스트
     }
     scrollToBottom();
   });
@@ -278,4 +287,19 @@ function updateUnreadBadge(count) {
     el.textContent = "";
     el.classList.add("hidden");
   }
+}
+
+function updateChatListLastMessage(roomId, messageData) {
+  const chatItem = document.querySelector(`.chat-item[data-room-id="${roomId}"]`);
+  if (!chatItem) return;
+  const lastMessageElement = chatItem.querySelector('.chat-last-message');
+  const timeElement = chatItem.querySelector('.chat-time');
+  if (!lastMessageElement || !timeElement) return;
+
+  if (messageData.message_type === 'system') {
+    lastMessageElement.innerHTML = `<em>${messageData.message}</em>`;
+  } else {
+    lastMessageElement.textContent = messageData.message;
+  }
+  timeElement.textContent = formatMessageTime(messageData.created_at);
 }

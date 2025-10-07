@@ -87,10 +87,20 @@ def init_chat_socketio(socketio):
             }
             socketio.emit("new_message", payload, to=_room(room_id))
 
+            # 마지막 메시지 변경 수신자/발신자 개인룸에 전송 (목록 갱신용)
+            last_msg_event = {
+                "room_id": room_id,
+                "message": msg.message,
+                "message_type": msg.message_type,
+                "created_at": msg.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            }
+
             # 수신자 미읽음 방별/ 배지 미읽음 갱신
             room = ChatRoom.query.get(room_id)
             receiver_id = room.employer_id if msg.sender_id == room.applicant_id else room.applicant_id
-
+            # 개인 룸으로 송신: 수신자/발신자 모두에게 보내면 양쪽 목록이 갱신됨
+            socketio.emit("last_message_updated", last_msg_event,to=_user_room(receiver_id))  # 수신자 목록 갱신 [web:14][web:72]
+            socketio.emit("last_message_updated", last_msg_event,to=_user_room(msg.sender_id))  # 발신자 목록 갱신 [web:14][web:72]
             #전체 미읽음 합계
             unread_total = _calc_unread_total(receiver_id)
             socketio.emit("unread_total", {"count": unread_total}, to=_user_room(receiver_id))
