@@ -1,9 +1,16 @@
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from sqlalchemy import Float
 import enum
 
 db = SQLAlchemy()
+
+# 한국 시간대 (UTC+9)
+KST = timezone(timedelta(hours=9))
+
+def get_kst_now():
+    """한국 시간(KST)으로 현재 시간을 반환"""
+    return datetime.now(KST)
 
 class WorkType(enum.Enum):
     LONG_TERM = "장기"
@@ -75,8 +82,8 @@ class User(db.Model):
     profile_image = db.Column(db.String(255), nullable=True)  # 프로필 사진
 
     # 시간 정보
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 가입일
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # 수정일
+    created_at = db.Column(db.DateTime, default=get_kst_now)  # 가입일
+    updated_at = db.Column(db.DateTime, default=get_kst_now, onupdate=get_kst_now)  # 수정일
 
     # 유니크 제약: 동일 소셜 타입과 ID는 중복 불가
     __table_args__ = (
@@ -170,7 +177,7 @@ class JobPost(db.Model):
     bookmark_count = db.Column(db.Integer, default=0)          # 찜 횟수
 
     # 작성자 및 시간 정보
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # 공고 작성일
+    created_at = db.Column(db.DateTime, default=get_kst_now)  # 공고 작성일
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # 작성자 (User ID)
 
     author = db.relationship('User', backref=db.backref('job_posts', lazy=True))
@@ -184,7 +191,7 @@ class JobBookmark(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     job_id = db.Column(db.Integer, db.ForeignKey('job_post.id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=get_kst_now)
     
     # 관계 설정
     user = db.relationship('User', backref=db.backref('bookmarks', lazy=True))
@@ -207,8 +214,8 @@ class JobApplication(db.Model):
     job_id = db.Column(db.Integer, db.ForeignKey('job_post.id'), nullable=False)  # 지원한 공고
     status = db.Column(db.String(20), default='pending')  # 지원 상태: pending, accepted, rejected
     message = db.Column(db.Text, nullable=True)  # 지원 메시지
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=get_kst_now)
+    updated_at = db.Column(db.DateTime, default=get_kst_now, onupdate=get_kst_now)
     
     # 관계 설정
     user = db.relationship('User', backref=db.backref('applications', lazy=True))
@@ -233,8 +240,8 @@ class ChatRoom(db.Model):
     is_active = db.Column(db.Boolean, default=True)  # 채팅방 활성 상태
     applicant_left = db.Column(db.Boolean, default=False)  # 지원자가 나갔는지 여부
     employer_left = db.Column(db.Boolean, default=False)  # 고용주가 나갔는지 여부
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=get_kst_now)
+    updated_at = db.Column(db.DateTime, default=get_kst_now, onupdate=get_kst_now)
     
     # 관계 설정
     job = db.relationship('JobPost', backref=db.backref('chat_rooms', lazy=True))
@@ -259,7 +266,7 @@ class ChatMessage(db.Model):
     message = db.Column(db.Text, nullable=False)  # 메시지 내용
     message_type = db.Column(db.String(20), default='text')  # 메시지 타입: text, image, file
     is_read = db.Column(db.Boolean, default=False)  # 읽음 여부
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=get_kst_now)
     
     # 관계 설정
     room = db.relationship('ChatRoom', backref=db.backref('messages', lazy=True, order_by='ChatMessage.created_at'))
@@ -307,8 +314,8 @@ class Resume(db.Model):
     walkable_minutes = db.Column(db.Integer, nullable=True)  # 쉬지 않고 걸을 수 있는 시간 (분 단위)
     physical_notes = db.Column(db.Text, nullable=True)  # 신체적 특징
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=get_kst_now)
+    updated_at = db.Column(db.DateTime, default=get_kst_now, onupdate=get_kst_now)
 
     # --- 관계 설정 ---
     user = db.relationship('User', backref=db.backref('resume', uselist=False))
