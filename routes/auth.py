@@ -259,6 +259,12 @@ def register():
         confirm_password = request.form["confirm_password"]
         nickname = request.form["nickname"]
         name = request.form.get("name")
+        birth_date = request.form.get("birth_date")
+        gender = request.form.get("gender")
+        phone = request.form.get("phone")
+        sido = request.form.get("sido")
+        sigungu = request.form.get("sigungu")
+        dong = request.form.get("dong")
 
         if password != confirm_password:
             flash("비밀번호가 일치하지 않습니다.")
@@ -275,19 +281,28 @@ def register():
             password=hashed_pw.decode("utf-8"),
             nickname=nickname,
             name=name,
+            birth_date=birth_date if birth_date else None,
+            gender=gender,
+            phone=phone,
+            sido=sido,
+            sigungu=sigungu,
+            dong=dong,
             user_type=0,
             social_type=None,
             social_id=None
         )
         db.session.add(user)
         db.session.commit()
-        
-        # 자동 로그인 후 온보딩으로 이동
-        login_user(user)
-        flash("회원가입 완료! 추가 정보를 입력해주세요.", "success")
-        return redirect(url_for("auth.onboarding"))
 
-    return render_template("register.html")
+        # 자동 로그인
+        login_user(user)
+
+        # 회원가입 완료 후 메인으로 이동
+        flash("회원가입이 완료되었습니다!", "success")
+        return redirect(url_for("auth.main"))
+
+    kakao_key = current_app.config.get("KAKAO_MAP_API_KEY")
+    return render_template("register.html", kakao_key=kakao_key)
 
     # ----------- 기업 회원가입 (관리자 승인 대기) ----------------->
 
