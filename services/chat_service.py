@@ -15,8 +15,9 @@
 """
 
 from models import db, ChatRoom, ChatMessage, JobPost, User, JobApplication
-from sqlalchemy import or_, and_, desc
+from sqlalchemy import select,or_, and_, desc, func, case
 from datetime import datetime
+from sqlalchemy.orm import aliased
 
 class ChatService:
     
@@ -128,49 +129,105 @@ class ChatService:
         Returns:
             list: 채팅방 목록 (최근 활동순)
         """
-        rooms = ChatRoom.query.filter(
-            and_(
-                or_(
-                    and_(ChatRoom.applicant_id == user_id, ChatRoom.applicant_left == False),
-                    and_(ChatRoom.employer_id == user_id, ChatRoom.employer_left == False)
-                ),
-                ChatRoom.is_active == True,
-                ChatRoom.applicant_id.isnot(None),
-                ChatRoom.employer_id.isnot(None)
+        """
+                사용자의 채팅방 목록 조회 (N+1 문제 해결)
+                
+        """
+        # 별칭(alias) 설정: 채팅방의 상대방 정보를 가져오기 위함
+        other_user_alias = aliased(User)
+
+        # --- 💡 서브쿼리 1: 채팅방별 안 읽은 메시지 수 계산 ---
+        # 각 room_id 별로, 해당 user_id가 아닌 메시지 중 is_read=False인 것들의 개수를 셈
+        unread_counts_subquery = (
+            select(
+                ChatMessage.room_id,
+                func.count(ChatMessage.id).label("unread_count"),
             )
-        ).order_by(desc(ChatRoom.updated_at)).all()
-        
-        # 각 채팅방의 추가 정보 포함
+            .where(ChatMessage.sender_id != user_id, ChatMessage.is_read == False)
+            .group_by(ChatMessage.room_id)
+            .subquery("unread_counts")
+        )
+
+        # --- 💡 서브쿼리 2: 채팅방별 마지막 메시지 ID 계산 ---
+        # ROW_NUMBER() 윈도우 함수를 사용해 각 채팅방(room_id) 내에서 최신 메시지(created_at desc)에 1번 순위를 매김
+        last_message_subquery = (
+            select(
+                ChatMessage.id,
+                ChatMessage.room_id,
+                func.row_number()
+                .over(partition_by=ChatMessage.room_id, order_by=desc(ChatMessage.created_at))
+                .label("rn"),
+            )
+            .subquery("last_message_rn")
+        )
+
+        # 위에서 순위 1번을 받은, 즉 가장 최신 메시지의 ID만 선택
+        last_message_id_subquery = (
+            select(
+                last_message_subquery.c.id.label("message_id"),
+                last_message_subquery.c.room_id,
+            )
+            .where(last_message_subquery.c.rn == 1)
+            .subquery("last_message_ids")
+        )
+
+        # --- 🚀 메인 쿼리: 모든 정보를 JOIN하여 한 번에 가져오기 ---
+        results = (
+            db.session.query(
+                ChatRoom,
+                other_user_alias.nickname.label("other_user_nickname"),
+                other_user_alias.profile_image.label("other_user_profile_img"),
+                ChatMessage,  # 마지막 메시지 객체 자체를 가져옴
+                unread_counts_subquery.c.unread_count.label("unread_count"),
+            )
+            # 사용자가 참여한 채팅방 필터링
+            .filter(
+                or_(ChatRoom.applicant_id == user_id, ChatRoom.employer_id == user_id),
+                # ... (기존의 다른 필터 조건들) ...
+            )
+            # 💡 JOIN: 서브쿼리들을 외부 조인(LEFT OUTER JOIN)으로 연결
+            # 안 읽은 메시지가 없거나, 메시지가 아예 없는 방도 목록에 포함시키기 위함
+            .outerjoin(
+                unread_counts_subquery,
+                ChatRoom.id == unread_counts_subquery.c.room_id,
+            )
+            .outerjoin(
+                last_message_id_subquery,
+                ChatRoom.id == last_message_id_subquery.c.room_id,
+            )
+            # 마지막 메시지 객체 정보를 위해 ChatMessage 테이블 조인
+            .outerjoin(
+                ChatMessage, ChatMessage.id == last_message_id_subquery.c.message_id
+            )
+            # 상대방 유저 정보를 위해 User 테이블 조인
+            .join(
+                other_user_alias,
+                case(
+                    (ChatRoom.applicant_id == user_id, other_user_alias.id == ChatRoom.employer_id),
+                    (ChatRoom.employer_id == user_id, other_user_alias.id == ChatRoom.applicant_id),
+                ),
+            )
+            .order_by(desc(ChatRoom.updated_at))
+            .all()
+        )
+
+        # --- ✨ 결과 조립: Python에서 가져온 데이터를 최종 형태로 가공 ---
         room_data = []
-        for room in rooms:
-            # 상대방 정보 (None 체크 추가)
-            if room.applicant_id == user_id:
-                other_user = room.employer
-            else:
-                other_user = room.applicant
-            
-            # other_user가 None인 경우 건너뛰기
-            if other_user is None:
-                continue
-            
-            # 마지막 메시지
-            last_message = ChatMessage.query.filter_by(room_id=room.id)\
-                                          .order_by(desc(ChatMessage.created_at))\
-                                          .first()
-            
-            # 읽지 않은 메시지 수
-            unread_count = ChatMessage.query.filter_by(
-                room_id=room.id,
-                is_read=False
-            ).filter(ChatMessage.sender_id != user_id).count()
-            
+        for room, other_nickname, other_profile, last_message, unread_count in results:
+            # other_user 객체를 직접 만드는 대신, 필요한 정보만 결과로 사용
+            other_user_info = {
+                'nickname': other_nickname,
+                'profile_img': other_profile
+            }
+
             room_data.append({
-                'room': room,
-                'other_user': other_user,
-                'last_message': last_message,
-                'unread_count': unread_count
+                "room": room,
+                "other_user": other_user_info,  # 필요에 따라 객체로 만들어도 됨
+                "last_message": last_message,
+                # unread_count가 NULL(None)일 경우 0으로 처리
+                "unread_count": unread_count or 0,
             })
-        
+
         return room_data
     
     @staticmethod
