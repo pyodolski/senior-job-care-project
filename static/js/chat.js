@@ -302,4 +302,18 @@ function updateChatListLastMessage(roomId, messageData) {
     lastMessageElement.textContent = messageData.message;
   }
   timeElement.textContent = formatMessageTime(messageData.created_at);
+
+  // 새 메시지면 맨 위로 이동
+  moveChatItemToTop(roomId);
+}
+
+// 채팅 목록 젤 위로
+function moveChatItemToTop(roomId) {
+  const chatList = document.querySelector('.chat-list');
+  if (!chatList) return;
+  const item = document.querySelector(`.chat-item[data-room-id="${roomId}"]`);
+  if (!item) return;
+  if (item.parentNode === chatList && chatList.firstChild !== item) {
+    chatList.insertBefore(item, chatList.firstChild);
+  }
 }
