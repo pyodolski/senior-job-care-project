@@ -75,3 +75,19 @@ def delete_file(file_url):
         # 실패 시, 터미널에 정확한 오류 메시지를 출력
         print(f"S3 파일 삭제 실패: {e}")
         return False
+
+def generate_presigned_get_url(key, expires=900):
+    s3 = boto3.client(
+        "s3",
+        aws_access_key_id=current_app.config["AWS_ACCESS_KEY_ID"],
+        aws_secret_access_key=current_app.config["AWS_SECRET_ACCESS_KEY"],
+        region_name=current_app.config["AWS_S3_REGION"]
+    )
+    return s3.generate_presigned_url(
+        ClientMethod='get_object',
+        Params={
+            'Bucket': current_app.config["AWS_S3_BUCKET_NAME"],
+            'Key': key
+        },
+        ExpiresIn=expires
+    )

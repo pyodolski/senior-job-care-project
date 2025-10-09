@@ -13,6 +13,9 @@ from flask import request, flash
 from services.job_service import JobService
 from services.application_service import ApplicationService
 from services.naver_news_service import NaverNewsService
+import boto3
+from utils.files_handler import upload_file, generate_presigned_get_url
+from urllib.parse import urlparse
 
 # 인증 관련 라우트를 담당하는 블루프린트 생성
 auth_bp = Blueprint("auth", __name__)
@@ -218,7 +221,10 @@ def main():
 @login_required
 def profile():
     # /profile 경로에 접속하면 profile.html을 렌더링
-    return render_template("profile.html", user=current_user)
+    profile_url = None
+    if current_user.profile_image:
+        profile_url = generate_presigned_get_url(current_user.profile_image, expires=900)
+    return render_template("profile.html", user=current_user, profile_url=profile_url)
 
 @auth_bp.route("/profile/detail")
 @login_required
@@ -419,6 +425,12 @@ def edit_profile():
         user.sido = request.form.get('sido')
         user.sigungu = request.form.get('sigungu')
         user.dong = request.form.get('dong')
+        file = request.files.get('profile_image')
+        if file and file.filename:
+            url = upload_file(file, sub_path='profiles')  # URL 반환
+            if url:
+                key = urlparse(url).path.lstrip('/')       # 키 추출
+                user.profile_image = key                   # 키 저장
 
         try:
             db.session.commit()
@@ -427,8 +439,12 @@ def edit_profile():
             print("Profile update failed:", e)
 
         return redirect(url_for('auth.profile'))
+    profile_url = None
+    if user.profile_image:
+        profile_url = generate_presigned_get_url(user.profile_image, expires=900)
 
-    return render_template('edit_profile.html', user=user)
+    return render_template('edit_profile.html', user=user, profile_url=profile_url)
+
 
 # 로그아웃 처리
 @auth_bp.route("/logout")
