@@ -1,5 +1,14 @@
 // 채팅 관련 JavaScript 함수들
 
+// 다른 도메인이면: const socket = io("https://api.example.com", { withCredentials: true });
+const socket = io({ withCredentials: true }); // 세션 기반 인증 공유[web:17]
+
+// 템플릿에서 주입된 전역 값 사용
+const ROOM_ID = window.roomId;
+const CURRENT_USER_ID = window.currentUserId;
+const CURRENT_USER_NAME = window.currentUserName || "?";
+const OTHER_USER_NAME = window.otherUserName || "?";
+
 // 채팅방으로 이동
 function goToChatRoom(roomId) {
   navigateTo(`/chat/${roomId}`);
@@ -10,45 +19,44 @@ function goToChatList() {
   navigateTo("/chat");
 }
 
-// 메시지 전송
 async function sendMessage(roomId) {
   const messageInput = document.getElementById("messageInput");
-  const message = messageInput.value.trim();
-
-  if (!message) {
-    return;
-  }
+  const message = (messageInput.value || "").trim();
+  if (!message) return;
 
   const sendBtn = document.getElementById("sendBtn");
-  const originalText = sendBtn.innerHTML;
+  const originalText = sendBtn ? sendBtn.innerHTML : null;
 
   try {
-    showLoading(sendBtn);
+    if (typeof showLoading === "function" && sendBtn) showLoading(sendBtn);
 
-    const response = await apiRequest(`/chat/${roomId}/send`, {
-      method: "POST",
-      body: JSON.stringify({
-        message: message,
-        message_type: "text",
-      }),
+    // 서버로 소켓 이벤트 전송
+    socket.emit("send_message", {
+      room_id: roomId,
+      message: message,
+      message_type: "text",
     });
 
-    if (response.success) {
-      // 메시지 입력창 초기화
-      messageInput.value = "";
+    // 낙관적 렌더를 원하면 아래 주석 해제(서버 수신 시 실제 id로 중복 방지됨)
+    /*
+    addMessageToChat({
+      id: undefined,
+      message,
+      sender_id: CURRENT_USER_ID,
+      sender_name: CURRENT_USER_NAME,
+      created_at: new Date().toISOString().slice(0,19).replace('T',' '),
+      message_type: "text"
+    }, true);
+    */
 
-      // 새 메시지를 채팅창에 추가
-      addMessageToChat(response.message_data, true);
-
-      // 채팅창 스크롤을 맨 아래로
-      scrollToBottom();
-    } else {
-      showAlert(response.message || "메시지 전송에 실패했습니다.");
-    }
+    // 입력창 비우고 스크롤
+    messageInput.value = "";
+    scrollToBottom();
   } catch (error) {
-    showAlert("메시지 전송 중 오류가 발생했습니다.");
+    if (typeof showAlert === "function") showAlert("메시지 전송 중 오류가 발생했습니다.");
+    console.error(error);
   } finally {
-    hideLoading(sendBtn, originalText);
+    if (typeof hideLoading === "function" && sendBtn) hideLoading(sendBtn, originalText);
     messageInput.focus();
   }
 }
@@ -181,58 +189,131 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-// 실시간 메시지 업데이트 (폴링 방식)
-let messagePollingInterval;
+// 소켓 초기화: join, 초기 읽음, 수신 이벤트
+document.addEventListener("DOMContentLoaded", function () {
+  // 연결되면 방 참가 + 초기 읽음 처리
+  socket.on("connect", () => {
+    socket.emit("join", { room_id: ROOM_ID });           // 방 참가
+    socket.emit("read_messages", { room_id: ROOM_ID });   // 초기 읽음 처리
+  });
 
-function startMessagePolling(roomId) {
-  // 기존 폴링 중지
-  if (messagePollingInterval) {
-    clearInterval(messagePollingInterval);
-  }
+  socket.on("connect_error", (err) => console.error("socket connect_error", err));
+  socket.on("error", (err) => console.error("socket error", err));
 
-  // 5초마다 새 메시지 확인
-  messagePollingInterval = setInterval(async () => {
-    try {
-      const response = await apiRequest(
-        `/chat/${roomId}/messages?page=1&per_page=10`
-      );
-      if (response.success) {
-        updateChatMessages(response.messages);
-      }
-    } catch (error) {
-      console.error("메시지 폴링 오류:", error);
+  // 목록의 마지막 메시지/시간 갱신
+  socket.on("last_message_updated", (data) => {
+    updateChatListLastMessage(data.room_id, {
+      message: data.message,
+      created_at: data.created_at,
+      message_type: data.message_type
+    });
+  });
+
+  // 서버가 방송하는 새 메시지 수신
+  socket.on("new_message", (msg) => {
+    if (msg.room_id !== ROOM_ID) return;
+    const isOwn = msg.sender_id === CURRENT_USER_ID;
+
+    // addMessageToChat
+    addMessageToChat({
+      id: msg.id,
+      message: msg.message,
+      sender_id: msg.sender_id,
+      sender_name: isOwn ? CURRENT_USER_NAME : OTHER_USER_NAME,
+      created_at: msg.created_at,
+      message_type: msg.message_type,
+    }, isOwn);
+
+    if (!isOwn) {
+      // 수신 즉시 읽음 처리
+      socket.emit("read_messages", { room_id: ROOM_ID }); // 읽음 브로드캐스트
     }
-  }, 5000);
-}
+    scrollToBottom();
+  });
 
-function stopMessagePolling() {
-  if (messagePollingInterval) {
-    clearInterval(messagePollingInterval);
-    messagePollingInterval = null;
-  }
-}
+  // 읽음 처리 방송 수신(배지/UI 훅이 있으면 갱신)
+  socket.on("messages_read", (data) => {
+    if (data.room_id !== ROOM_ID) return;
+    if (typeof updateReadState === "function") updateReadState();
+  });
 
-// 채팅 메시지 업데이트
-function updateChatMessages(newMessages) {
-  const messagesContainer = document.getElementById("chatMessages");
-  if (!messagesContainer) return;
-
-  const existingMessages = messagesContainer.querySelectorAll(".message");
-  const existingMessageIds = Array.from(existingMessages)
-    .map((msg) => parseInt(msg.dataset.messageId))
-    .filter((id) => !isNaN(id));
-
-  newMessages.forEach((messageData) => {
-    if (!existingMessageIds.includes(messageData.id)) {
-      const isOwn = messageData.sender_id === getCurrentUserId();
-      addMessageToChat(messageData, isOwn);
+  // 방별 미읽음 실시간 갱신
+  socket.on("room_unread_count", ({ room_id, count }) => {
+    const item = document.querySelector(`.chat-item[data-room-id="${room_id}"]`);
+    if (!item) return;
+    const badge = item.querySelector(".chat-unread-badge");
+    if (!badge) return;
+    const n = Number(count) || 0;
+    if (n > 0) {
+      badge.textContent = String(n);
+      badge.classList.remove("hidden");
+      item.classList.add("unread");
+    } else {
+      badge.textContent = "";
+      badge.classList.add("hidden");
+      item.classList.remove("unread");
     }
   });
 
+  socket.on("unread_total", (data) => {
+    const el = document.getElementById("chatBadgeCount");
+    if (!el) return;
+    const n = Number(data.count) || 0;
+    if (n > 0) {
+      el.textContent = String(n);
+      el.classList.remove("hidden");
+    } else {
+      el.textContent = "";
+      el.classList.add("hidden");
+    }
+  });
+  // 초기 포커스/스크롤
   scrollToBottom();
-}
-
+  const messageInput = document.getElementById("messageInput");
+  if (messageInput) messageInput.focus();
+});
 // 현재 사용자 ID 가져오기 (전역 변수나 데이터 속성에서)
 function getCurrentUserId() {
   return window.currentUserId || parseInt(document.body.dataset.userId) || 0;
+}
+
+function updateUnreadBadge(count) {
+  const el = document.getElementById("chatBadgeCount");
+  if (!el) return;
+  if (count > 0) {
+    el.textContent = String(count);
+    el.classList.remove("hidden");
+  } else {
+    el.textContent = "";
+    el.classList.add("hidden");
+  }
+}
+
+function updateChatListLastMessage(roomId, messageData) {
+  const chatItem = document.querySelector(`.chat-item[data-room-id="${roomId}"]`);
+  if (!chatItem) return;
+  const lastMessageElement = chatItem.querySelector('.chat-last-message');
+  const timeElement = chatItem.querySelector('.chat-time');
+  if (!lastMessageElement || !timeElement) return;
+
+  if (messageData.message_type === 'system') {
+    lastMessageElement.innerHTML = `<em>${messageData.message}</em>`;
+  } else {
+    lastMessageElement.textContent = messageData.message;
+  }
+  timeElement.textContent = formatMessageTime(messageData.created_at);
+
+  // 새 메시지면 맨 위로 이동
+  moveChatItemToTop(roomId);
+}
+
+// 채팅 목록 젤 위로
+function moveChatItemToTop(roomId) {
+  const chatList = document.querySelector('.chat-list');
+  if (!chatList) return;
+  const item = document.querySelector(`.chat-item[data-room-id="${roomId}"]`);
+  if (!item) return;
+  if (item.parentNode === chatList && chatList.firstChild !== item) {
+    chatList.insertBefore(item, chatList.firstChild);
+  }
 }

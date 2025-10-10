@@ -80,7 +80,6 @@ def chat_room(room_id):
     
     # 메시지 목록 조회 (권한 확인 포함)
     messages_pagination = ChatService.get_chat_messages(room_id, current_user.id)
-    messages = messages_pagination.items
     
     # 채팅방 정보 조회
     from models import ChatRoom
@@ -94,7 +93,7 @@ def chat_room(room_id):
     
     return render_template("chat/chat_room.html", 
                          room=room, 
-                         messages=messages,
+                         messages_pagination=messages_pagination,
                          other_user=other_user,
                          job=room.job)
 
