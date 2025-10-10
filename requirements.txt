@@ -1,8 +1,8 @@
 bcrypt==4.3.0
 blinker==1.9.0
-boto3
+boto3==1.35.36
 cachelib==0.13.0
-certifi==2025.7.14
+certifi==2024.8.30
 charset-normalizer==3.4.2
 click==8.2.1
 Flask==2.3.3
@@ -25,7 +25,7 @@ typing_extensions==4.14.1
 urllib3==2.5.0
 URLObject==3.0.0
 Werkzeug==3.1.3
-gunicorn
-cryptography>=42.0.0
-huggingface_hub
+gunicorn==23.0.0
+cryptography==43.0.3
+huggingface_hub==0.26.2
 beautifulsoup4==4.12.3
