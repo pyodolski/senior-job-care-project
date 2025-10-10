@@ -1,7 +1,8 @@
 from flask import Flask, render_template
 from config import Config
 from models import db, User
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
+from utils.files_handler import generate_presigned_get_url
 from flask_session import Session
 from routes.auth import auth_bp
 from routes.google_oauth import google_bp
@@ -100,6 +101,17 @@ app.jinja_env.filters['format_datetime'] = format_datetime
 app.jinja_env.filters['format_salary'] = format_salary
 app.jinja_env.filters['get_work_days'] = get_work_days
 app.jinja_env.filters['time_ago'] = calculate_time_ago
+
+# 공통으로 사용할 프로필 이미지 ( 채팅 목록, 프로필 이미지, 채팅방 등등)
+@app.context_processor
+def inject_profile_url():
+    url = None
+    try:
+        if current_user.is_authenticated and getattr(current_user, 'profile_image', None):
+            url = generate_presigned_get_url(current_user.profile_image, expires=900)
+    except Exception:
+        url = None
+    return dict(profile_url=url)
 
 # 블루프린트 등록
 app.register_blueprint(auth_bp, url_prefix="/auth")

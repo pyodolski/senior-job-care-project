@@ -72,6 +72,15 @@
         <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6 my-6">
           <h1 class="text-2xl font-bold mb-6 text-gray-900">프로필 상세정보</h1>
 
+          <div class="w-full flex justify-center mb-4">
+              {% if profile_url %}
+                  <img src="{{ profile_url }}" alt="profile"
+                       class="w-24 h-24 rounded-full object-cover object-center ring-2 ring-indigo-200"/>
+              {% else %}
+                  <div class="w-24 h-24 rounded-full bg-gray-200 ring-2 ring-gray-100"></div>
+              {% endif %}
+          </div>
+
           <div class="mb-4">
             <span class="block font-semibold text-indigo-600 mb-1">닉네임</span>
             <span class="text-gray-700 text-lg">{{ user.nickname }}</span>

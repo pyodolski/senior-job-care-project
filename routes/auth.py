@@ -13,6 +13,9 @@ from flask import request, flash
 from services.job_service import JobService
 from services.application_service import ApplicationService
 from services.naver_news_service import NaverNewsService
+import boto3
+from utils.files_handler import upload_file, generate_presigned_get_url
+from urllib.parse import urlparse
 
 # 인증 관련 라우트를 담당하는 블루프린트 생성
 auth_bp = Blueprint("auth", __name__)
@@ -218,7 +221,10 @@ def main():
 @login_required
 def profile():
     # /profile 경로에 접속하면 profile.html을 렌더링
-    return render_template("profile.html", user=current_user)
+    profile_url = None
+    if current_user.profile_image:
+        profile_url = generate_presigned_get_url(current_user.profile_image, expires=900)
+    return render_template("profile.html", user=current_user, profile_url=profile_url)
 
 @auth_bp.route("/profile/detail")
 @login_required
@@ -248,7 +254,8 @@ def onboarding():
             flash("정보 저장 중 오류가 발생했습니다.", "error")
             print("Onboarding update failed:", e)
     
-    return render_template("onboarding.html", user=current_user)
+    kakao_key = current_app.config.get("KAKAO_MAP_API_KEY")
+    return render_template("onboarding.html", user=current_user, kakao_key=kakao_key)
 
 # 회원가입 라우트
 @auth_bp.route("/register", methods=["GET", "POST"])
@@ -259,6 +266,12 @@ def register():
         confirm_password = request.form["confirm_password"]
         nickname = request.form["nickname"]
         name = request.form.get("name")
+        birth_date = request.form.get("birth_date")
+        gender = request.form.get("gender")
+        phone = request.form.get("phone")
+        sido = request.form.get("sido")
+        sigungu = request.form.get("sigungu")
+        dong = request.form.get("dong")
 
         if password != confirm_password:
             flash("비밀번호가 일치하지 않습니다.")
@@ -275,19 +288,28 @@ def register():
             password=hashed_pw.decode("utf-8"),
             nickname=nickname,
             name=name,
+            birth_date=birth_date if birth_date else None,
+            gender=gender,
+            phone=phone,
+            sido=sido,
+            sigungu=sigungu,
+            dong=dong,
             user_type=0,
             social_type=None,
             social_id=None
         )
         db.session.add(user)
         db.session.commit()
-        
-        # 자동 로그인 후 온보딩으로 이동
-        login_user(user)
-        flash("회원가입 완료! 추가 정보를 입력해주세요.", "success")
-        return redirect(url_for("auth.onboarding"))
 
-    return render_template("register.html")
+        # 자동 로그인
+        login_user(user)
+
+        # 회원가입 완료 후 메인으로 이동
+        flash("회원가입이 완료되었습니다!", "success")
+        return redirect(url_for("auth.main"))
+
+    kakao_key = current_app.config.get("KAKAO_MAP_API_KEY")
+    return render_template("register.html", kakao_key=kakao_key)
 
     # ----------- 기업 회원가입 (관리자 승인 대기) ----------------->
 
@@ -403,6 +425,12 @@ def edit_profile():
         user.sido = request.form.get('sido')
         user.sigungu = request.form.get('sigungu')
         user.dong = request.form.get('dong')
+        file = request.files.get('profile_image')
+        if file and file.filename:
+            url = upload_file(file, sub_path='profiles')  # URL 반환
+            if url:
+                key = urlparse(url).path.lstrip('/')       # 키 추출
+                user.profile_image = key                   # 키 저장
 
         try:
             db.session.commit()
@@ -411,8 +439,12 @@ def edit_profile():
             print("Profile update failed:", e)
 
         return redirect(url_for('auth.profile'))
+    profile_url = None
+    if user.profile_image:
+        profile_url = generate_presigned_get_url(user.profile_image, expires=900)
 
-    return render_template('edit_profile.html', user=user)
+    return render_template('edit_profile.html', user=user, profile_url=profile_url)
+
 
 # 로그아웃 처리
 @auth_bp.route("/logout")

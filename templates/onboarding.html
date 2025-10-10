@@ -5,236 +5,691 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>추가 정보 입력 - 사람이음</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_key }}&libraries=services"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
     <style>
-      /* 사용자 정의 폰트 및 스타일 */
       body {
         font-family: "Noto Sans KR", sans-serif;
       }
-      .step-label {
-        font-weight: 600;
-        margin-bottom: 0.5rem;
+      .step-content {
+        display: none;
       }
-      #selected-address {
-        font-weight: 700;
-        color: #1e40af;
-        min-height: 1.5rem;
-        margin-top: 0.5rem;
-        padding: 0.5rem;
-        background-color: #eff6ff;
-        border-radius: 0.375rem;
-        font-size: 0.875rem;
+      .step-content.active {
+        display: block;
+        animation: fadeIn 0.3s ease-in;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .progress-bar {
+        transition: width 0.3s ease;
+      }
+      .gender-button {
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .gender-button.selected {
+        background-color: #1e3a8a;
+        color: white;
+        border-color: #1e3a8a;
       }
     </style>
   </head>
   <body class="bg-gray-100">
-    <div class="w-full max-w-md mx-auto px-4 bg-white shadow-lg min-h-screen flex items-center justify-center">
-      <div class="w-full p-6 sm:p-8">
-        <!-- 로고 및 타이틀 -->
-        <div class="text-center mb-8">
-          <div class="flex items-center justify-center mb-4">
-            <div class="w-12 h-12 mr-3 flex items-center justify-center">
-              <img
-                src="{{ url_for('static', filename='images/header/logo.png') }}"
-                alt="로고"
-                class="max-w-full max-h-full object-contain"
-              />
+    <div class="w-full max-w-md mx-auto px-4 bg-white shadow-lg min-h-screen">
+      <!-- 상단 헤더 -->
+      <div class="pt-6 pb-4">
+        <div class="flex items-center justify-between mb-4">
+          <button type="button" onclick="goBack()" class="text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <h2 class="text-xl font-semibold text-gray-800">추가 정보 입력</h2>
+          <div class="w-6"></div>
+        </div>
+        <!-- 진행바 -->
+        <div class="w-full bg-gray-200 h-1 rounded-full">
+          <div id="progress-bar" class="progress-bar bg-blue-900 h-1 rounded-full" style="width: 20%"></div>
+        </div>
+      </div>
+
+      <!-- 폼 -->
+      <form method="POST" action="{{ url_for('auth.onboarding') }}" id="onboarding-form" class="px-4 py-8">
+        <!-- Hidden inputs for form data -->
+        <input type="hidden" name="birth_date" id="final-birth-date" />
+        <input type="hidden" name="gender" id="final-gender" />
+        <input type="hidden" name="phone" id="final-phone" />
+        <input type="hidden" name="sido" id="final-sido" />
+        <input type="hidden" name="sigungu" id="final-sigungu" />
+        <input type="hidden" name="dong" id="final-dong" />
+
+        <!-- Step 1: 생년월일 -->
+        <div class="step-content active" data-step="1">
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">
+            서비스 이용을 위해
+          </h3>
+          <h3 class="text-lg font-semibold text-gray-800 mb-8">
+            생년월일을 입력해주세요
+          </h3>
+
+          <!-- 년도 선택 -->
+          <div class="relative mb-3">
+            <div
+              id="year-display"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg cursor-pointer bg-white"
+              onclick="togglePicker('year')"
+            >
+              <span id="year-text" class="text-gray-400">19**년</span>
             </div>
-            <span class="text-3xl font-bold text-blue-900">이음</span>
+            <div
+              id="year-picker"
+              class="hidden absolute z-50 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1"
+              style="max-height: 200px; overflow-y: auto"
+            >
+            </div>
           </div>
-          <h2 class="text-xl font-semibold text-gray-700 mb-2">
-            추가 정보 입력
-          </h2>
-          <p class="text-sm text-gray-500">
-            서비스 이용을 위해 몇 가지 추가 정보가 필요합니다.
-          </p>
+
+          <!-- 월 선택 -->
+          <div class="relative mb-3">
+            <div
+              id="month-display"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg cursor-pointer bg-white"
+              onclick="togglePicker('month')"
+            >
+              <span id="month-text" class="text-gray-400">**월</span>
+            </div>
+            <div
+              id="month-picker"
+              class="hidden absolute z-50 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1"
+              style="max-height: 200px; overflow-y: auto"
+            >
+            </div>
+          </div>
+
+          <!-- 일 선택 -->
+          <div class="relative">
+            <div
+              id="day-display"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg cursor-pointer bg-white"
+              onclick="togglePicker('day')"
+            >
+              <span id="day-text" class="text-gray-400">**일</span>
+            </div>
+            <div
+              id="day-picker"
+              class="hidden absolute z-50 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1"
+              style="max-height: 200px; overflow-y: auto"
+            >
+            </div>
+          </div>
+
+          <input type="hidden" id="birth-year" />
+          <input type="hidden" id="birth-month" />
+          <input type="hidden" id="birth-day" />
         </div>
 
-        <!-- 추가 정보 입력 폼 -->
-        <form method="POST" action="{{ url_for('auth.onboarding') }}" class="space-y-4">
-          <!-- 성별 선택 -->
-          <div>
-            <select 
-              name="gender" 
-              required 
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            >
-              <option value="">성별 선택</option>
-              <option value="male" {{ "selected" if user.gender == "male" else "" }}>남성</option>
-              <option value="female" {{ "selected" if user.gender == "female" else "" }}>여성</option>
-            </select>
+        <!-- Step 2: 성별 -->
+        <div class="step-content" data-step="2">
+          <h3 class="text-lg font-semibold text-gray-800 mb-8">
+            성별을 입력해주세요
+          </h3>
+          <div class="flex gap-4">
+            <div class="gender-button flex-1 py-8 border-2 border-gray-300 rounded-lg text-center" onclick="selectGender('여자', this)">
+              <svg class="w-12 h-12 mx-auto mb-2 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C8.134 2 5 5.134 5 9c0 3.5 2.577 6.422 5.962 6.925V18.5H8.5v2h2.462V23h2v-2.5H15.5v-2h-2.462v-2.575C16.423 15.422 19 12.5 19 9c0-3.866-3.134-7-7-7zm0 12c-2.761 0-5-2.239-5-5s2.239-5 5-5 5 2.239 5 5-2.239 5-5 5z"/>
+              </svg>
+              <p class="text-gray-700 font-medium">여자</p>
+            </div>
+            <div class="gender-button flex-1 py-8 border-2 border-gray-300 rounded-lg text-center" onclick="selectGender('남자', this)">
+              <svg class="w-12 h-12 mx-auto mb-2 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M15.5 2h6v6h-2V4.914l-4.793 4.793c.578.945.793 2.024.793 3.143C15.5 16.094 12.594 19 9.25 19S3 16.094 3 12.75 5.906 6.5 9.25 6.5c1.119 0 2.198.215 3.143.793l4.793-4.793H14V2h1.5zM9.25 17c2.481 0 4.5-2.019 4.5-4.5S11.731 8 9.25 8 4.75 10.019 4.75 12.5 6.769 17 9.25 17z"/>
+              </svg>
+              <p class="text-gray-700 font-medium">남자</p>
+            </div>
           </div>
+        </div>
 
-          <!-- 생년월일 -->
-          <div>
-            <input 
-              type="date" 
-              name="birth_date" 
-              value="{{ user.birth_date }}" 
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
-              required 
+        <!-- Step 3: 전화번호 -->
+        <div class="step-content" data-step="3">
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">
+            서비스 이용을 위해
+          </h3>
+          <h3 class="text-lg font-semibold text-gray-800 mb-8">
+            전화번호를 입력해주세요
+          </h3>
+          <input
+            type="tel"
+            id="phone"
+            placeholder="010-0000-0000"
+            maxlength="13"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <!-- Step 4: 거주지 -->
+        <div class="step-content" data-step="4">
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">
+            근처 정보를 전달하기 위해
+          </h3>
+          <h3 class="text-lg font-semibold text-gray-800 mb-8">
+            거주지를 입력해주세요
+          </h3>
+          <div class="relative">
+            <input
+              type="text"
+              id="address-search"
+              placeholder="찾아보기"
+              readonly
+              onclick="openMapModal()"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 cursor-pointer bg-white"
             />
-          </div>
-
-          <!-- 휴대폰 번호 -->
-          <div>
-            <input 
-              type="tel" 
-              name="phone" 
-              placeholder="휴대폰 번호 (010-1234-5678)" 
-              value="{{ user.phone }}" 
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              pattern="^\d{2,3}-\d{3,4}-\d{4}$"
-              title="010-1234-5678 형식으로 입력해주세요" 
-              required 
-            />
-          </div>
-
-          <!-- 주소 선택 -->
-          <div class="space-y-3">
-            <label class="step-label block text-sm font-medium text-gray-700">주소 (시/군/동)</label>
-            
-            <select 
-              id="sido-select" 
-              name="sido" 
-              required
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            <svg
+              class="w-5 h-5 absolute right-3 top-3.5 text-gray-400 pointer-events-none"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <option value="">시/도 선택</option>
-            </select>
-            
-            <select 
-              id="sigungu-select" 
-              name="sigungu" 
-              required 
-              disabled
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100"
-            >
-              <option value="">시/군/구 선택</option>
-            </select>
-            
-            <select 
-              id="dong-select" 
-              name="dong" 
-              required 
-              disabled
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100"
-            >
-              <option value="">읍/면/동 선택</option>
-            </select>
-            
-            <div id="selected-address"></div>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
           </div>
+          <div id="address-display" class="mt-3 text-sm text-gray-600 hidden">
+            <p id="full-address" class="font-medium"></p>
+          </div>
+          <input type="hidden" id="sido" />
+          <input type="hidden" id="sigungu" />
+          <input type="hidden" id="dong" />
+        </div>
 
-          <!-- 완료 버튼 -->
-          <button 
-            type="submit" 
-            class="w-full bg-blue-900 hover:bg-blue-800 text-white font-medium py-3 px-4 rounded-lg transition-colors"
-          >
-            정보 입력 완료
-          </button>
-        </form>
+        <!-- Step 5: 완료 -->
+        <div class="step-content" data-step="5">
+          <div class="text-center py-12">
+            <div class="text-6xl mb-6">🤝</div>
+            <h2 class="text-3xl font-bold text-blue-900 mb-4">이음</h2>
+            <p class="text-xl font-semibold text-gray-800 mb-2">환영합니다!</p>
+            <p class="text-gray-600">이음으로 다시 사회활동을</p>
+            <p class="text-gray-600">시작해보세요!</p>
+            <div class="mt-8">
+              <div class="inline-block w-12 h-12 border-4 border-blue-900 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- 하단 버튼 -->
+      <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white p-4 shadow-lg" id="next-button-container">
+        <button
+          type="button"
+          id="next-button"
+          onclick="nextStep()"
+          class="w-full bg-gray-300 text-gray-500 font-medium py-4 px-4 rounded-lg transition-colors"
+          disabled
+        >
+          다음
+        </button>
       </div>
     </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const sidoSelect = document.getElementById('sido-select');
-      const sigunguSelect = document.getElementById('sigungu-select');
-      const dongSelect = document.getElementById('dong-select');
-      const addrText = document.getElementById('selected-address');
+    <!-- 지도 모달 -->
+    <div
+      id="map-modal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+    >
+      <div class="bg-white rounded-lg overflow-hidden" style="width: 80%; max-width: 400px; height: 45vh">
+        <!-- 모달 헤더 -->
+        <div class="p-4 border-b flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-gray-800">거주지 선택</h3>
+          <button
+            type="button"
+            onclick="closeMapModal()"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
 
-      const selectedSido = "{{ user.sido|default('') }}";
-      const selectedSigungu = "{{ user.sigungu|default('') }}";
-      const selectedDong = "{{ user.dong|default('') }}";
+        <!-- 지도 영역 -->
+        <div id="map" style="width: 100%; height: calc(100% - 180px)"></div>
 
-      function updateAddrText() {
-        const sido = sidoSelect.value;
-        const sigungu = sigunguSelect.value;
-        const dong = dongSelect.value;
-        if(sido && sigungu && dong) {
-          addrText.textContent = `선택된 주소: ${sido} ${sigungu} ${dong}`;
-        } else if(sido && sigungu) {
-          addrText.textContent = `선택 중: ${sido} ${sigungu}`;
-        } else if(sido) {
-          addrText.textContent = `선택 중: ${sido}`;
-        } else {
-          addrText.textContent = '';
+        <!-- 주소 표시 및 확인 버튼 -->
+        <div class="p-4 border-t">
+          <p id="selected-address" class="text-sm text-gray-600 mb-3">
+            지도를 클릭하여 위치를 선택해주세요
+          </p>
+          <button
+            type="button"
+            id="confirm-location-btn"
+            onclick="confirmLocation()"
+            class="w-full bg-gray-300 text-gray-500 font-medium py-3 px-4 rounded-lg transition-colors"
+            disabled
+          >
+            확인
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      let currentStep = 1;
+      const totalSteps = 5;
+      const formData = {};
+      let birthData = { year: "", month: "", day: "" };
+
+      // 지도 관련 변수
+      let map = null;
+      let marker = null;
+      let geocoder = null;
+      let selectedLocation = null;
+
+      // 생년월일 선택기 초기화
+      function initBirthPickers() {
+        const currentYear = new Date().getFullYear();
+        const yearPicker = document.getElementById("year-picker");
+        for (let year = currentYear; year >= 1940; year--) {
+          const option = document.createElement("div");
+          option.className = "px-4 py-2 hover:bg-blue-100 cursor-pointer text-center";
+          option.textContent = year + "년";
+          option.onclick = () => selectYear(year);
+          yearPicker.appendChild(option);
+        }
+
+        const monthPicker = document.getElementById("month-picker");
+        for (let month = 1; month <= 12; month++) {
+          const option = document.createElement("div");
+          option.className = "px-4 py-2 hover:bg-blue-100 cursor-pointer text-center";
+          option.textContent = month + "월";
+          option.onclick = () => selectMonth(month);
+          monthPicker.appendChild(option);
+        }
+
+        updateDayPicker();
+      }
+
+      function updateDayPicker() {
+        const dayPicker = document.getElementById("day-picker");
+        dayPicker.innerHTML = "";
+
+        let maxDays = 31;
+        if (birthData.year && birthData.month) {
+          maxDays = new Date(birthData.year, birthData.month, 0).getDate();
+        } else if (birthData.month) {
+          const tempYear = 2024;
+          maxDays = new Date(tempYear, birthData.month, 0).getDate();
+        }
+
+        for (let day = 1; day <= maxDays; day++) {
+          const option = document.createElement("div");
+          option.className = "px-4 py-2 hover:bg-blue-100 cursor-pointer text-center";
+          option.textContent = day + "일";
+          option.onclick = () => selectDay(day);
+          dayPicker.appendChild(option);
         }
       }
 
-      fetch('/api/areas/sido')
-        .then(res => res.json())
-        .then(data => {
-          data.forEach(area => {
-            const opt = document.createElement('option');
-            opt.value = area.name;
-            opt.textContent = area.name;
-            sidoSelect.appendChild(opt);
-          });
-          if(selectedSido) {
-            sidoSelect.value = selectedSido;
-            sidoSelect.dispatchEvent(new Event('change'));
+      function selectYear(year) {
+        birthData.year = year;
+        document.getElementById("year-text").textContent = year + "년";
+        document.getElementById("year-text").classList.remove("text-gray-400");
+        document.getElementById("year-text").classList.add("text-gray-800");
+        document.getElementById("birth-year").value = year;
+        document.getElementById("year-picker").classList.add("hidden");
+        updateDayPicker();
+        updateNextButton();
+      }
+
+      function selectMonth(month) {
+        birthData.month = month;
+        document.getElementById("month-text").textContent = month + "월";
+        document.getElementById("month-text").classList.remove("text-gray-400");
+        document.getElementById("month-text").classList.add("text-gray-800");
+        document.getElementById("birth-month").value = month;
+        document.getElementById("month-picker").classList.add("hidden");
+        updateDayPicker();
+        updateNextButton();
+      }
+
+      function selectDay(day) {
+        birthData.day = day;
+        document.getElementById("day-text").textContent = day + "일";
+        document.getElementById("day-text").classList.remove("text-gray-400");
+        document.getElementById("day-text").classList.add("text-gray-800");
+        document.getElementById("birth-day").value = day;
+        document.getElementById("day-picker").classList.add("hidden");
+        updateNextButton();
+      }
+
+      function togglePicker(type) {
+        ["year", "month", "day"].forEach((t) => {
+          if (t !== type) {
+            document.getElementById(t + "-picker").classList.add("hidden");
           }
         });
 
-      sidoSelect.addEventListener('change', () => {
-        const sido = sidoSelect.value;
-        sigunguSelect.innerHTML = '<option value="">시/군/구 선택</option>';
-        dongSelect.innerHTML = '<option value="">읍/면/동 선택</option>';
-        sigunguSelect.disabled = !sido;
-        dongSelect.disabled = true;
-        updateAddrText();
+        const picker = document.getElementById(type + "-picker");
+        picker.classList.toggle("hidden");
+      }
 
-        if(sido) {
-          fetch(`/api/areas/sigungu_by_name/${encodeURIComponent(sido)}`)
-            .then(res => res.json())
-            .then(data => {
-              data.forEach(sgg => {
-                const opt = document.createElement('option');
-                opt.value = sgg.name;
-                opt.textContent = sgg.name;
-                sigunguSelect.appendChild(opt);
-              });
-              if(selectedSigungu) {
-                sigunguSelect.value = selectedSigungu;
-                sigunguSelect.disabled = false;
-                sigunguSelect.dispatchEvent(new Event('change'));
-              }
-            });
+      document.addEventListener("click", function (e) {
+        if (
+          !e.target.closest("#year-display") &&
+          !e.target.closest("#year-picker")
+        ) {
+          document.getElementById("year-picker").classList.add("hidden");
+        }
+        if (
+          !e.target.closest("#month-display") &&
+          !e.target.closest("#month-picker")
+        ) {
+          document.getElementById("month-picker").classList.add("hidden");
+        }
+        if (
+          !e.target.closest("#day-display") &&
+          !e.target.closest("#day-picker")
+        ) {
+          document.getElementById("day-picker").classList.add("hidden");
         }
       });
 
-      sigunguSelect.addEventListener('change', () => {
-        const sido = sidoSelect.value;
-        const sigungu = sigunguSelect.value;
-        dongSelect.innerHTML = '<option value="">읍/면/동 선택</option>';
-        dongSelect.disabled = !sigungu;
-        updateAddrText();
-
-        if(sido && sigungu) {
-          fetch(`/api/areas/dong_by_name/${encodeURIComponent(sido)}/${encodeURIComponent(sigungu)}`)
-            .then(res => res.json())
-            .then(data => {
-              data.forEach(dong => {
-                const opt = document.createElement('option');
-                opt.value = dong.name;
-                opt.textContent = dong.name;
-                dongSelect.appendChild(opt);
-              });
-              if(selectedDong) {
-                dongSelect.value = selectedDong;
-                dongSelect.disabled = false;
-              }
-            });
-        }
+      document.addEventListener("DOMContentLoaded", function () {
+        initBirthPickers();
       });
 
-      dongSelect.addEventListener('change', updateAddrText);
-    });
-  </script>
-</body>
+      // ===== 지도 관련 함수들 =====
+
+      function openMapModal() {
+        document.getElementById("map-modal").classList.remove("hidden");
+
+        if (!map) {
+          initMap();
+        } else {
+          setTimeout(function() {
+            map.relayout();
+          }, 100);
+        }
+      }
+
+      function closeMapModal() {
+        document.getElementById("map-modal").classList.add("hidden");
+      }
+
+      function initMap() {
+        const container = document.getElementById("map");
+
+        const defaultPosition = new kakao.maps.LatLng(37.5665, 126.978);
+        const options = {
+          center: defaultPosition,
+          level: 3
+        };
+
+        map = new kakao.maps.Map(container, options);
+        geocoder = new kakao.maps.services.Geocoder();
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+              const locPosition = new kakao.maps.LatLng(lat, lng);
+
+              map.setCenter(locPosition);
+
+              setTimeout(function() {
+                map.relayout();
+              }, 100);
+
+              if (!marker) {
+                marker = new kakao.maps.Marker({
+                  position: locPosition,
+                  map: map
+                });
+              } else {
+                marker.setPosition(locPosition);
+              }
+
+              getAddressFromCoords(lat, lng);
+            },
+            function (error) {
+              console.log("현재 위치를 가져올 수 없습니다:", error);
+              marker = new kakao.maps.Marker({
+                position: defaultPosition,
+                map: map
+              });
+              getAddressFromCoords(37.5665, 126.978);
+            }
+          );
+        } else {
+          marker = new kakao.maps.Marker({
+            position: defaultPosition,
+            map: map
+          });
+          getAddressFromCoords(37.5665, 126.978);
+        }
+
+        kakao.maps.event.addListener(map, "click", function (mouseEvent) {
+          const latlng = mouseEvent.latLng;
+          const lat = latlng.getLat();
+          const lng = latlng.getLng();
+
+          if (!marker) {
+            marker = new kakao.maps.Marker({
+              position: latlng,
+              map: map
+            });
+          } else {
+            marker.setPosition(latlng);
+          }
+
+          getAddressFromCoords(lat, lng);
+        });
+      }
+
+      function getAddressFromCoords(lat, lng) {
+        geocoder.coord2Address(lng, lat, function (result, status) {
+          if (status === kakao.maps.services.Status.OK) {
+            const address = result[0].address;
+            const roadAddress = result[0].road_address;
+
+            const sido = address.region_1depth_name;
+            const sigungu = address.region_2depth_name;
+            let dong = address.region_3depth_name;
+
+            if (!dong || dong === '') {
+              dong = address.region_3depth_h_name || sigungu;
+            }
+
+            let displayAddress = sido + ' ' + sigungu;
+            if (dong && dong !== sigungu) {
+              displayAddress += ' ' + dong;
+            }
+
+            const fullAddress = address.address_name;
+
+            selectedLocation = {
+              lat: lat,
+              lng: lng,
+              fullAddress: fullAddress,
+              displayAddress: displayAddress,
+              sido: sido,
+              sigungu: sigungu,
+              dong: dong
+            };
+
+            document.getElementById("selected-address").textContent = displayAddress;
+
+            const confirmBtn = document.getElementById("confirm-location-btn");
+            confirmBtn.disabled = false;
+            confirmBtn.classList.remove("bg-gray-300", "text-gray-500");
+            confirmBtn.classList.add("bg-blue-900", "text-white", "hover:bg-blue-800");
+          }
+        });
+      }
+
+      function confirmLocation() {
+        if (selectedLocation) {
+          document.getElementById("sido").value = selectedLocation.sido;
+          document.getElementById("sigungu").value = selectedLocation.sigungu;
+          document.getElementById("dong").value = selectedLocation.dong;
+
+          document.getElementById("address-search").value = selectedLocation.displayAddress;
+          document.getElementById("full-address").textContent = selectedLocation.displayAddress;
+          document.getElementById("address-display").classList.remove("hidden");
+
+          closeMapModal();
+
+          updateNextButton();
+        }
+      }
+
+      // 뒤로가기
+      function goBack() {
+        if (currentStep === 1) {
+          window.location.href = "{{ url_for('auth.main') }}";
+        } else {
+          currentStep--;
+          showStep(currentStep);
+        }
+      }
+
+      function showStep(step) {
+        document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+        document.querySelector(`.step-content[data-step="${step}"]`).classList.add('active');
+
+        const progress = (step / totalSteps) * 100;
+        document.getElementById('progress-bar').style.width = progress + '%';
+
+        updateNextButton();
+      }
+
+      function updateNextButton() {
+        const button = document.getElementById("next-button");
+        let isValid = false;
+
+        switch(currentStep) {
+          case 1:
+            isValid = document.getElementById("birth-year").value.trim() !== "" &&
+                     document.getElementById("birth-month").value.trim() !== "" &&
+                     document.getElementById("birth-day").value.trim() !== "";
+            break;
+          case 2:
+            isValid = formData.gender !== undefined;
+            break;
+          case 3:
+            const phone = document.getElementById("phone").value.trim();
+            isValid = phone !== "" && phone.replace(/[^0-9]/g, "").length >= 10;
+            break;
+          case 4:
+            isValid = selectedLocation !== null &&
+              document.getElementById("sido").value !== "" &&
+              document.getElementById("sigungu").value !== "" &&
+              document.getElementById("dong").value !== "";
+            break;
+        }
+
+        if (isValid) {
+          button.disabled = false;
+          button.classList.remove("bg-gray-300", "text-gray-500");
+          button.classList.add("bg-blue-900", "text-white", "hover:bg-blue-800");
+        } else {
+          button.disabled = true;
+          button.classList.add("bg-gray-300", "text-gray-500");
+          button.classList.remove("bg-blue-900", "text-white", "hover:bg-blue-800");
+        }
+      }
+
+      function selectGender(gender, element) {
+        document.querySelectorAll('.gender-button').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+        formData.gender = gender;
+        updateNextButton();
+      }
+
+      function nextStep() {
+        switch(currentStep) {
+          case 1:
+            const year = document.getElementById("birth-year").value;
+            const month = document.getElementById("birth-month").value.padStart(2, "0");
+            const day = document.getElementById("birth-day").value.padStart(2, "0");
+            formData.birthDate = `${year}-${month}-${day}`;
+            break;
+          case 3:
+            formData.phone = document.getElementById("phone").value;
+            break;
+          case 4:
+            formData.sido = document.getElementById("sido").value;
+            formData.sigungu = document.getElementById("sigungu").value;
+            formData.dong = document.getElementById("dong").value;
+
+            document.getElementById("final-birth-date").value = formData.birthDate;
+            document.getElementById("final-gender").value = formData.gender;
+            document.getElementById("final-phone").value = formData.phone;
+            document.getElementById("final-sido").value = formData.sido;
+            document.getElementById("final-sigungu").value = formData.sigungu;
+            document.getElementById("final-dong").value = formData.dong;
+
+            currentStep++;
+            showStep(currentStep);
+            document.getElementById("next-button-container").style.display = "none";
+
+            setTimeout(() => {
+              document.getElementById("onboarding-form").submit();
+            }, 2000);
+            return;
+        }
+
+        if (currentStep < totalSteps) {
+          currentStep++;
+          showStep(currentStep);
+        }
+      }
+
+      // 전화번호 자동 포맷팅
+      document.getElementById("phone").addEventListener("input", function(e) {
+        let value = e.target.value.replace(/[^0-9]/g, "");
+        let formattedValue = "";
+
+        if (value.length <= 3) {
+          formattedValue = value;
+        } else if (value.length <= 7) {
+          formattedValue = value.slice(0, 3) + "-" + value.slice(3);
+        } else {
+          formattedValue = value.slice(0, 3) + "-" + value.slice(3, 7) + "-" + value.slice(7, 11);
+        }
+
+        e.target.value = formattedValue;
+        updateNextButton();
+      });
+
+      document.querySelectorAll("input").forEach(input => {
+        input.addEventListener("keypress", function (e) {
+          if (e.key === "Enter" && !document.getElementById("next-button").disabled) {
+            e.preventDefault();
+            nextStep();
+          }
+        });
+      });
+    </script>
+  </body>
 </html>

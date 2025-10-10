@@ -73,7 +73,11 @@
           <!-- 프로필 상단 -->
           <div class="flex items-center mb-4">
             <!-- 프로필 이미지(없으면 회색 원) -->
-            <div class="w-14 h-14 rounded-full bg-gray-200 mr-4"></div>
+              {% if profile_url %}
+                  <img src="{{ profile_url }}" alt="profile" class="w-14 h-14 rounded-full object-cover mr-4"/>
+              {% else %}
+                  <div class="w-14 h-14 rounded-full bg-gray-200 mr-4"></div>
+              {% endif %}
             <div class="flex-1">
               <div class="text-lg font-bold text-gray-800">
                 {{ user.nickname }}
