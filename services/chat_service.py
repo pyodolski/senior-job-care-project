@@ -18,6 +18,7 @@ from models import db, ChatRoom, ChatMessage, JobPost, User, JobApplication
 from sqlalchemy import select,or_, and_, desc, func, case
 from datetime import datetime
 from sqlalchemy.orm import aliased
+from utils.files_handler import generate_presigned_get_url
 
 class ChatService:
     
@@ -136,8 +137,7 @@ class ChatService:
         # 별칭(alias) 설정: 채팅방의 상대방 정보를 가져오기 위함
         other_user_alias = aliased(User)
 
-        # --- 💡 서브쿼리 1: 채팅방별 안 읽은 메시지 수 계산 ---
-        # 각 room_id 별로, 해당 user_id가 아닌 메시지 중 is_read=False인 것들의 개수를 셈
+        # --- 채팅방별 안 읽은 메시지 수 계산 ---
         unread_counts_subquery = (
             select(
                 ChatMessage.room_id,
@@ -148,8 +148,7 @@ class ChatService:
             .subquery("unread_counts")
         )
 
-        # --- 💡 서브쿼리 2: 채팅방별 마지막 메시지 ID 계산 ---
-        # ROW_NUMBER() 윈도우 함수를 사용해 각 채팅방(room_id) 내에서 최신 메시지(created_at desc)에 1번 순위를 매김
+        # --- 채팅방별 마지막 메시지 ID 계산 ---
         last_message_subquery = (
             select(
                 ChatMessage.id,
@@ -171,7 +170,7 @@ class ChatService:
             .subquery("last_message_ids")
         )
 
-        # --- 🚀 메인 쿼리: 모든 정보를 JOIN하여 한 번에 가져오기 ---
+        # --- 모든 정보를 JOIN하여 한 번에 가져오기 ---
         results = (
             db.session.query(
                 ChatRoom,
@@ -211,20 +210,22 @@ class ChatService:
             .all()
         )
 
-        # --- ✨ 결과 조립: Python에서 가져온 데이터를 최종 형태로 가공 ---
         room_data = []
         for room, other_nickname, other_profile, last_message, unread_count in results:
-            # other_user 객체를 직접 만드는 대신, 필요한 정보만 결과로 사용
+
+            profile_image_url = None
+            if other_profile:
+                profile_image_url = generate_presigned_get_url(other_profile)
+
             other_user_info = {
                 'nickname': other_nickname,
-                'profile_img': other_profile
+                'profile_image_url': profile_image_url
             }
 
             room_data.append({
                 "room": room,
-                "other_user": other_user_info,  # 필요에 따라 객체로 만들어도 됨
+                "other_user": other_user_info,
                 "last_message": last_message,
-                # unread_count가 NULL(None)일 경우 0으로 처리
                 "unread_count": unread_count or 0,
             })
 
