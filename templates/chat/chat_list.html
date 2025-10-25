@@ -114,8 +114,12 @@
             <div class="chat-header">
               <div class="chat-user-info">
                 <div class="chat-avatar">
-                  {{ chat_data.other_user.nickname[0] if
-                  chat_data.other_user.nickname else '?' }}
+                  {% if chat_data.other_user.profile_image_url %}
+                  <img src="{{ chat_data.other_user.profile_image_url }}" alt="profile"
+                       class="w-full h-full rounded-full object-cover"/>
+                  {% else %}
+                  {{ chat_data.other_user.nickname[0] if chat_data.other_user.nickname else '?' }}
+                  {% endif %}
                 </div>
                 <div>
                   <div class="chat-user-name">

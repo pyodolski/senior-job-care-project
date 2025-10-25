@@ -33,19 +33,6 @@
       <main class="flex-grow px-4 py-4 pb-24">
         {% if resume %}
 
-        <!-- 상단 액션 버튼들 -->
-        <div class="flex gap-2 mb-4">
-          <a href="{{ url_for('resumes.edit_resume', resume_id=resume.id) }}"
-             class="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-semibold py-3 rounded-lg transition-colors text-center">
-            수정하기
-          </a>
-          <button
-            onclick="deleteResume('{{ url_for('resumes.delete_resume', resume_id=resume.id) }}')"
-            class="px-6 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition-colors">
-            삭제
-          </button>
-        </div>
-
         <!-- 공개 여부 상태 -->
         <div class="bg-white rounded-lg shadow p-4 mb-4 flex items-center justify-between">
           <div>
@@ -186,6 +173,18 @@
             <h3 class="text-sm font-semibold text-gray-700 mb-2">신체적 특징</h3>
             <p class="text-sm text-gray-800 whitespace-pre-wrap">{{ resume.physical_notes if resume.physical_notes else '미등록' }}</p>
           </div>
+        </div>
+
+        <div class="flex gap-2 mb-4">
+          <a href="{{ url_for('resumes.edit_resume', resume_id=resume.id) }}"
+             class="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-semibold py-3 rounded-lg transition-colors text-center">
+            수정하기
+          </a>
+          <button
+            onclick="deleteResume('{{ url_for('resumes.delete_resume', resume_id=resume.id) }}')"
+            class="px-6 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition-colors">
+            삭제
+          </button>
         </div>
 
         {% else %}
