@@ -1,5 +1,5 @@
 {% for resume in resumes %}
-<div class="bg-white rounded-2xl p-4 shadow-md border border-gray-200 cursor-pointer" onclick="location.href='{{ url_for('resumes.view_resume', user_id=resume.user.id) }}'">
+<div class="bg-white rounded-2xl p-4 shadow-md border border-gray-200 cursor-pointer" onclick="location.href='{{ url_for('resumes.view_resume', resume_id=resume.id) }}'">
     <div class="flex justify-between items-start mb-2">
         <div class="flex items-center">
             <div class="w-10 h-10 bg-gray-200 rounded-full mr-3 flex-shrink-0 flex items-center justify-center font-bold text-gray-500">

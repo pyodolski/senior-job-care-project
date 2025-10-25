@@ -280,7 +280,7 @@ class Resume(db.Model):
     __tablename__ = 'resume'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     # --- 공개 여부 ---
     is_public = db.Column(db.Boolean, default=False, nullable=False)
@@ -318,7 +318,7 @@ class Resume(db.Model):
     updated_at = db.Column(db.DateTime, default=get_kst_now, onupdate=get_kst_now)
 
     # --- 관계 설정 ---
-    user = db.relationship('User', backref=db.backref('resume', uselist=False))
+    user = db.relationship('User', backref=db.backref('resume', lazy=True))
 
     # Certificate 모델과의 1:N 관계 설정
     certificates = db.relationship('Certificate', backref='resume', lazy=True, cascade="all, delete-orphan")

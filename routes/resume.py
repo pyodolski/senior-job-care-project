@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash,  jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from services.resume_service import ResumeService
 from models import Category, WorkType, Strength
@@ -7,38 +7,56 @@ from datetime import time
 resumes_bp = Blueprint("resumes", __name__)
 
 
-# "내 이력서" 페이지: 이력서가 있으면 보여주고, 없으면 작성 페이지로 이동
-@resumes_bp.route("/my-resume")
+# ==================== 내 이력서 목록 ====================
+@resumes_bp.route("/my-resumes")
 @login_required
-def my_resume():
+def my_view_resume():
     """
-    사용자의 이력서가 있으면 보여주고, 없으면 작성 페이지로 안내합니다.
+    현재 로그인한 사용자의 모든 이력서 목록을 보여주는 페이지
     """
-    resume = ResumeService.get_resume_by_user(current_user.id)
-    if resume:
-        # 이력서가 존재하면, 이력서 조회 전용 템플릿을 렌더링
-        return render_template("resume/my_resume.html", resume=resume)
-    else:
-        # 이력서가 없으면, 작성 페이지로 리다이렉트
-        return redirect(url_for('resumes.create_resume'))
+    resumes = ResumeService.get_resumes_by_user(current_user.id)
+
+    return render_template(
+        "resume/my_view_resume.html",
+        resumes=resumes
+    )
 
 
-# 1. 이력서 작성 페이지
+# ==================== 내 이력서 상세보기 ====================
+@resumes_bp.route("/my-resume/<int:resume_id>")
+@login_required
+def my_resume_detail(resume_id):
+    """
+    현재 로그인한 사용자 본인의 이력서 상세보기
+    """
+    resume, is_owner = ResumeService.get_resume_permission_check(
+        resume_id,
+        current_user.id
+    )
+
+    if not resume:
+        flash("이력서를 찾을 수 없습니다.", "error")
+        return redirect(url_for('resumes.my_view_resume'))
+
+    if not is_owner:
+        flash("접근 권한이 없습니다.", "error")
+        return redirect(url_for('resumes.my_view_resume'))
+
+    return render_template('resume/my_resume_detail.html', resume=resume)
+
+
+# ==================== 이력서 작성 ====================
 @resumes_bp.route("/resume/create", methods=["GET", "POST"])
 @login_required
 def create_resume():
     """
-    새로운 이력서를 작성하는 페이지.
+    새로운 이력서를 작성하는 페이지 (여러 개 작성 가능)
     """
-    # 이미 이력서가 있다면 수정 페이지로 강제 이동
-    if ResumeService.get_resume_by_user(current_user.id):
-        flash("이미 작성된 이력서가 있습니다. 수정 페이지로 이동합니다.", "info")
-        return redirect(url_for('resumes.edit_resume'))
-
     if request.method == "POST":
-        # 시간 파싱을 위한 헬퍼 함수
+        # 시간 파싱 헬퍼 함수
         def parse_time(time_str):
-            if not time_str: return None
+            if not time_str:
+                return None
             try:
                 hour, minute = map(int, time_str.split(':'))
                 return time(hour, minute)
@@ -67,52 +85,63 @@ def create_resume():
             'walkable_minutes': request.form.get('walkable_minutes', type=int),
             'physical_notes': request.form.get('physical_notes'),
         }
+
         certificate_names = request.form.getlist('certificate_names')
         certificate_images = request.files.getlist('certificate_images')
 
-        ResumeService.create_resume(
+        resume = ResumeService.create_resume(
             user_id=current_user.id,
             resume_data=resume_data,
             certificate_names=certificate_names,
             certificate_images=certificate_images
         )
-        flash("이력서가 성공적으로 작성되었습니다.", "success")
-        return redirect(url_for('resumes.my_resume'))
 
-    # GET 요청: 빈 폼 템플릿을 렌더링
+        if resume:
+            flash("이력서가 성공적으로 작성되었습니다.", "success")
+            return redirect(url_for('resumes.my_view_resume'))
+        else:
+            flash("이력서 작성 중 오류가 발생했습니다.", "error")
+
+    # GET 요청: 빈 폼 렌더링
     return render_template(
-        "resume/edit_resume.html",  # 작성과 수정이 같은 템플릿 사용
-        resume=None,  # 작성 시에는 데이터가 없으므로 None 전달
+        "resume/edit_resume.html",
+        resume=None,
         all_categories=list(Category),
         all_work_types=list(WorkType),
         all_strengths=list(Strength)
     )
 
 
-# 2. 이력서 수정 페이지
-@resumes_bp.route("/resume/edit", methods=["GET", "POST"])
+# ==================== 이력서 수정 ====================
+@resumes_bp.route("/resume/<int:resume_id>/edit", methods=["GET", "POST"])
 @login_required
-def edit_resume():
+def edit_resume(resume_id):
     """
-    기존 이력서를 수정하는 페이지.
+    기존 이력서를 수정하는 페이지 (특정 resume_id 기준)
     """
-    resume = ResumeService.get_resume_by_user(current_user.id)
+    # 본인의 이력서인지 확인
+    resume, is_owner = ResumeService.get_resume_permission_check(resume_id, current_user.id)
+
     if not resume:
-        # 수정할 이력서가 없으면 작성 페이지로 보냄
-        flash("작성된 이력서가 없습니다. 먼저 이력서를 작성해주세요.", "info")
-        return redirect(url_for('resumes.create_resume'))
+        flash("이력서를 찾을 수 없습니다.", "error")
+        return redirect(url_for('resumes.my_view_resume'))
+
+    if not is_owner:
+        flash("수정 권한이 없습니다.", "error")
+        return redirect(url_for('resumes.my_view_resume'))
 
     if request.method == "POST":
-        # 시간 파싱을 위한 헬퍼 함수
+        # 시간 파싱 헬퍼 함수
         def parse_time(time_str):
-            if not time_str: return None
+            if not time_str:
+                return None
             try:
                 hour, minute = map(int, time_str.split(':'))
                 return time(hour, minute)
             except ValueError:
                 return None
 
-        # 폼 데이터 수집 (작성 페이지와 동일)
+        # 폼 데이터 수집
         resume_data = {
             'is_public': 'is_public' in request.form,
             'desired_categories': ",".join(request.form.getlist('categories')),
@@ -134,97 +163,151 @@ def edit_resume():
             'walkable_minutes': request.form.get('walkable_minutes', type=int),
             'physical_notes': request.form.get('physical_notes'),
         }
+
         certificate_names = request.form.getlist('certificate_names')
         certificate_images = request.files.getlist('certificate_images')
 
-
-
-        ResumeService.update_resume(
+        updated_resume = ResumeService.update_resume(
+            resume_id=resume_id,
             user_id=current_user.id,
             resume_data=resume_data,
             certificate_names=certificate_names,
-            certificate_images=certificate_images,
+            certificate_images=certificate_images
         )
-        flash("이력서가 성공적으로 수정되었습니다.", "success")
-        return redirect(url_for('resumes.my_resume'))
 
-    # GET 요청: 데이터가 채워진 폼 템플릿을 렌더링
+        if updated_resume:
+            flash("이력서가 성공적으로 수정되었습니다.", "success")
+            return redirect(url_for('resumes.my_resume_detail', resume_id=resume_id))
+        else:
+            flash("이력서 수정 중 오류가 발생했습니다.", "error")
+
+    # GET 요청: 데이터가 채워진 폼 렌더링
     return render_template(
         "resume/edit_resume.html",
-        resume=resume,  # 수정 시에는 데이터가 있는 resume 객체 전달
+        resume=resume,
         all_categories=list(Category),
         all_work_types=list(WorkType),
         all_strengths=list(Strength)
     )
 
 
-# 3. 다른 사용자의 공개 이력서 조회 페이지
-@resumes_bp.route("/resumes/<int:user_id>")
-@login_required
-def view_resume(user_id):
-    """
-    기업 회원이 특정 사용자의 공개 이력서를 조회하는 페이지.
-    """
-    resume = ResumeService.get_public_resume_by_user(user_id)
-    if not resume:
-        flash("비공개 이력서이거나 존재하지 않는 이력서입니다.", "error")
-        return redirect(url_for('main.home'))  # 적절한 홈 URL로 변경 필요
-    return render_template("resume/view_resume.html", resume=resume)
-
+# ==================== 자격증 삭제 (AJAX) ====================
 @resumes_bp.route("/resume/certificate/delete/<int:cert_id>", methods=['DELETE'])
 @login_required
 def delete_certificate(cert_id):
     """
-    특정 자격증 하나를 실시간으로 삭제하는 API 엔드포인트.
+    특정 자격증 하나를 실시간으로 삭제하는 API
     """
     success = ResumeService.delete_certificate(
         user_id=current_user.id,
         cert_id=cert_id
     )
+
     if success:
         return jsonify({'success': True, 'message': '자격증이 삭제되었습니다.'})
     else:
         return jsonify({'success': False, 'message': '삭제에 실패했거나 권한이 없습니다.'}), 403
 
 
-# 4. 공개 이력서 목록 페이지 (첫 페이지 로딩)
+# ==================== 이력서 삭제 (AJAX) ====================
+@resumes_bp.route("/resume/<int:resume_id>/delete", methods=["POST"])
+@login_required
+def delete_resume(resume_id):
+    """
+    이력서 삭제 API
+    - S3에서 자격증 이미지 먼저 삭제
+    - DB에서 이력서 삭제
+    """
+    success = ResumeService.delete_resume(resume_id, current_user.id)
+
+    if success:
+        return jsonify({"success": True, "message": "이력서가 삭제되었습니다."})
+    else:
+        return jsonify({"success": False, "message": "이력서 삭제에 실패했습니다."}), 400
+
+
+# ==================== 공개/비공개 토글 (AJAX) ====================
+@resumes_bp.route("/resume/<int:resume_id>/toggle-public", methods=["POST"])
+@login_required
+def toggle_public(resume_id):
+    """
+    이력서 공개/비공개 토글 API
+    """
+    data = request.get_json()
+    is_public = data.get("ispublic", False)
+
+    success = ResumeService.toggle_resume_public(resume_id, current_user.id, is_public)
+
+    if success:
+        return jsonify({"success": True, "message": "공개 상태가 변경되었습니다."})
+    else:
+        return jsonify({"success": False, "message": "상태 변경에 실패했습니다."}), 400
+
+
+# ==================== 공개 이력서 목록 (기업회원용) ====================
 @resumes_bp.route("/list")
 @login_required
 def resume_list():
-    if current_user.user_type != 1:  # 기업회원(user_type == 1)만 접근 가능
+    """
+    공개된 이력서 목록 (기업회원만 접근 가능)
+    """
+    if current_user.user_type != 1:
         flash("기업회원만 접근 가능한 페이지입니다.", "error")
         return redirect(url_for('auth.main'))
 
     page = request.args.get('page', 1, type=int)
-    per_page = 5  # 한 페이지에 5개씩 보여주기
+    per_page = 5
 
     pagination = ResumeService.get_public_resumes_paginated(page=page, per_page=per_page)
 
     return render_template(
-        "resume/resume_list.html",  # templates/resume/resume_list.html 파일을 렌더링
+        "resume/resume_list.html",
         resumes=pagination.items,
         pagination=pagination
     )
 
 
-# 5. '더 보기'를 위한 데이터 API (JSON 응답)
+# ==================== 공개 이력서 더보기 API (AJAX) ====================
 @resumes_bp.route("/api/resumes")
 @login_required
 def api_resumes():
+    """
+    공개 이력서 더보기 API (AJAX)
+    """
     if current_user.user_type != 1:
         return jsonify({'success': False, 'message': '권한 없음'}), 403
 
     page = request.args.get('page', 1, type=int)
     per_page = 5
+
     pagination = ResumeService.get_public_resumes_paginated(page=page, per_page=per_page)
 
-    # HTML 조각을 렌더링
     resumes_html = render_template(
-        "resume/_resume_cards.html",  # templates/resume/_resume_cards.html 파일을 렌더링
+        "resume/_resume_cards.html",
         resumes=pagination.items
     )
 
     return jsonify({
         'html': resumes_html,
-        'has_next': pagination.has_next  # 다음 페이지 존재 여부 전달
+        'has_next': pagination.has_next
     })
+
+
+# ==================== 기업회원의 이력서 상세보기 ====================
+@resumes_bp.route("/resume/<int:resume_id>/view")
+@login_required
+def view_resume(resume_id):
+    """
+    기업 회원이 특정 공개 이력서를 조회하는 페이지
+    """
+    if current_user.user_type != 1:
+        flash("기업회원만 접근 가능합니다.", "error")
+        return redirect(url_for('auth.main'))
+
+    resume = ResumeService.get_resume_by_id(resume_id)
+
+    if not resume or not resume.is_public:
+        flash("비공개 이력서이거나 존재하지 않는 이력서입니다.", "error")
+        return redirect(url_for('resumes.resume_list'))
+
+    return render_template("resume/view_resume.html", resume=resume)
