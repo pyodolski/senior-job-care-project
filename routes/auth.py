@@ -16,6 +16,7 @@ from services.naver_news_service import NaverNewsService
 import boto3
 from utils.files_handler import upload_file, generate_presigned_get_url
 from urllib.parse import urlparse
+from services.resume_service import ResumeService
 
 # 인증 관련 라우트를 담당하는 블루프린트 생성
 auth_bp = Blueprint("auth", __name__)
@@ -220,11 +221,13 @@ def main():
 @auth_bp.route("/profile")
 @login_required
 def profile():
+    resume_count = ResumeService.get_resume_count_by_user(current_user.id)
+
     # /profile 경로에 접속하면 profile.html을 렌더링
     profile_url = None
     if current_user.profile_image:
         profile_url = generate_presigned_get_url(current_user.profile_image, expires=900)
-    return render_template("profile.html", user=current_user, profile_url=profile_url)
+    return render_template("profile.html", user=current_user, profile_url=profile_url, resume_count=resume_count)
 
 @auth_bp.route("/profile/detail")
 @login_required
