@@ -72,8 +72,9 @@
         <!-- 이력서 목록 -->
         {% if resumes %} {% for resume in resumes %}
         <div
-          class="bg-white rounded-xl p-5 mb-3 shadow-sm border border-gray-100"
+          class="bg-white rounded-xl p-5 mb-3 shadow-sm border border-gray-100 cursor-pointer hover:shadow-md transition-shadow"
           data-resume-id="{{ resume.id }}"
+          onclick="location.href='{{ url_for('resumes.my_resume_detail', resume_id=resume.id) }}'"
         >
           <!-- 상단: 최근 수정일 및 토글 -->
           <div class="flex items-start justify-between mb-3">

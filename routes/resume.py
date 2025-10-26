@@ -42,7 +42,15 @@ def my_resume_detail(resume_id):
         flash("접근 권한이 없습니다.", "error")
         return redirect(url_for('resumes.my_view_resume'))
 
-    return render_template('resume/my_resume_detail.html', resume=resume)
+    from datetime import datetime
+    from utils.files_handler import generate_presigned_get_url
+
+    # 프로필 이미지 URL 생성
+    profile_url = None
+    if resume.user.profile_image:
+        profile_url = generate_presigned_get_url(resume.user.profile_image, expires=900)
+
+    return render_template('resume/my_resume_detail.html', resume=resume, now=datetime.now(), profile_url=profile_url)
 
 
 # ==================== 이력서 작성 전 정보 확인 ====================
