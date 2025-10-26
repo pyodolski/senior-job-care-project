@@ -227,6 +227,11 @@ def profile():
     profile_url = None
     if current_user.profile_image:
         profile_url = generate_presigned_get_url(current_user.profile_image, expires=900)
+        print(f"프로필 페이지 - 이미지 키: {current_user.profile_image}")  # 디버깅
+        print(f"프로필 페이지 - 생성된 URL: {profile_url}")  # 디버깅
+    else:
+        print("프로필 페이지 - 프로필 이미지가 설정되지 않음")  # 디버깅
+    
     return render_template("profile.html", user=current_user, profile_url=profile_url, resume_count=resume_count)
 
 @auth_bp.route("/profile/detail")
@@ -428,12 +433,6 @@ def edit_profile():
         user.sido = request.form.get('sido')
         user.sigungu = request.form.get('sigungu')
         user.dong = request.form.get('dong')
-        file = request.files.get('profile_image')
-        if file and file.filename:
-            url = upload_file(file, sub_path='profiles')  # URL 반환
-            if url:
-                key = urlparse(url).path.lstrip('/')       # 키 추출
-                user.profile_image = key                   # 키 저장
 
         try:
             db.session.commit()
@@ -442,11 +441,57 @@ def edit_profile():
             print("Profile update failed:", e)
 
         return redirect(url_for('auth.profile'))
+
+    kakao_key = current_app.config.get("KAKAO_MAP_API_KEY")
+    return render_template('edit_profile.html', user=user, kakao_key=kakao_key)
+
+
+@auth_bp.route('/edit_profile_image', methods=['GET', 'POST'])
+@login_required
+def edit_profile_image():
+    user = current_user
+
+    if request.method == 'POST':
+        file = request.files.get('profile_image')
+        print(f"=== 프로필 이미지 업로드 시작 ===")
+        print(f"파일 객체: {file}")
+        print(f"파일 이름: {file.filename if file else None}")
+        print(f"파일 타입: {file.content_type if file else None}")
+        
+        if file and file.filename:
+            print(f"S3 업로드 시도 중...")
+            url = upload_file(file, sub_path='profiles')  # URL 반환
+            print(f"S3 업로드 결과 URL: {url}")
+            
+            if url:
+                key = urlparse(url).path.lstrip('/')       # 키 추출
+                print(f"추출된 S3 키: {key}")
+                user.profile_image = key                   # 키 저장
+                
+                try:
+                    db.session.commit()
+                    print(f"✅ 프로필 이미지 업데이트 성공: {key}")
+                except Exception as e:
+                    db.session.rollback()
+                    print(f"❌ DB 저장 실패:", e)
+            else:
+                print("❌ S3 업로드 실패: upload_file()이 None을 반환함")
+                print("AWS 설정 확인 필요:")
+                print(f"  - AWS_ACCESS_KEY_ID 설정됨: {bool(current_app.config.get('AWS_ACCESS_KEY_ID'))}")
+                print(f"  - AWS_SECRET_ACCESS_KEY 설정됨: {bool(current_app.config.get('AWS_SECRET_ACCESS_KEY'))}")
+                print(f"  - AWS_S3_BUCKET_NAME: {current_app.config.get('AWS_S3_BUCKET_NAME')}")
+                print(f"  - AWS_S3_REGION: {current_app.config.get('AWS_S3_REGION')}")
+        else:
+            print("❌ 파일이 선택되지 않음")
+
+        return redirect(url_for('auth.profile'))
+
     profile_url = None
     if user.profile_image:
         profile_url = generate_presigned_get_url(user.profile_image, expires=900)
+        print(f"현재 프로필 URL 생성: {profile_url}")  # 디버깅
 
-    return render_template('edit_profile.html', user=user, profile_url=profile_url)
+    return render_template('edit_profile_image.html', user=user, profile_url=profile_url)
 
 
 # 로그아웃 처리

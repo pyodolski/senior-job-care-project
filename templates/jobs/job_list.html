@@ -88,8 +88,17 @@
             </svg>
             <!-- 현재 선택된 지역을 동적으로 표시 -->
             <span>
-              {% set region_display = [current_filters.region_1depth_name, current_filters.region_2depth_name, current_filters.region_3depth_name] | select('ne', none) | join(' ') %}
-              {{ region_display or '전체 지역' }}
+              {% set region_parts = [] %}
+              {% if current_filters.region_1depth_name %}{% set _ = region_parts.append(current_filters.region_1depth_name) %}{% endif %}
+              {% if current_filters.region_2depth_name %}{% set _ = region_parts.append(current_filters.region_2depth_name) %}{% endif %}
+              {% if current_filters.region_3depth_name %}{% set _ = region_parts.append(current_filters.region_3depth_name) %}{% endif %}
+              {% if region_parts %}
+                {{ region_parts | join(' ') }}
+              {% elif current_user.is_authenticated and current_user.sido %}
+                {{ current_user.sido }} {{ current_user.sigungu }} {{ current_user.dong }}
+              {% else %}
+                전체 지역
+              {% endif %}
             </span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />

@@ -10,6 +10,14 @@
       rel="stylesheet"
     />
     <style>
+      /* 폰트 로드 */
+      @font-face {
+        font-family: 'LotteriaChwapttaenggyeo';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/LOTTERIACHAB.woff2') format('woff2');
+        font-weight: normal;
+        font-display: swap;
+      }
+
       /* 사용자 정의 폰트 및 스타일 */
       body {
         font-family: "Noto Sans KR", sans-serif;
@@ -35,6 +43,7 @@
       }
 
       .toggle-text {
+        font-family: 'LotteriaChwapttaenggyeo', "Noto Sans KR", sans-serif;
         font-size: 1.5rem;
         font-weight: bold;
         color: #1e3a8a;
@@ -244,7 +253,13 @@
                   clip-rule="evenodd"
                 />
               </svg>
-              <span class="text-lg font-medium">경상북도 경산시 조영동</span>
+              <span class="text-lg font-medium">
+                {% if user and user.sido %}
+                  {{ user.sido }} {{ user.sigungu }} {{ user.dong }}
+                {% else %}
+                  주소를 설정해주세요
+                {% endif %}
+              </span>
             </div>
             <svg
               class="w-4 h-4 text-gray-400"
