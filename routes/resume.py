@@ -45,6 +45,16 @@ def my_resume_detail(resume_id):
     return render_template('resume/my_resume_detail.html', resume=resume)
 
 
+# ==================== 이력서 작성 전 정보 확인 ====================
+@resumes_bp.route("/resume/before", methods=["GET"])
+@login_required
+def before_resume():
+    """
+    이력서 작성 전 사용자 기본 정보를 확인하는 페이지
+    """
+    return render_template("resume/before_resume.html", user=current_user)
+
+
 # ==================== 이력서 작성 ====================
 @resumes_bp.route("/resume/create", methods=["GET", "POST"])
 @login_required

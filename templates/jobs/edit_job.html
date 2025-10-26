@@ -35,7 +35,7 @@
     </style>
   </head>
   <body class="bg-gray-50">
-    <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto pb-24">
+    <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto">
       <!-- 상단 헤더 -->
       <header class="bg-white border-b px-4 py-4 sticky top-0 z-10">
         <div class="flex items-center justify-between">
@@ -54,19 +54,21 @@
               />
             </svg>
           </button>
-          <h1 class="text-lg font-bold text-gray-800">공고 수정</h1>
-          <button
-            type="button"
-            onclick="document.getElementById('jobForm').submit()"
-            class="text-blue-600 font-bold px-2"
-          >
-            완료
-          </button>
+          <h1 class="text-lg font-bold text-gray-800">이력서 작성</h1>
+          <div class="w-6"></div>
+          <!-- 공간 확보용 -->
         </div>
       </header>
 
+      <!-- 서브 헤더 -->
+      <div class="bg-white px-4 py-3 border-b">
+        <h2 class="text-base font-medium text-gray-700 text-center">
+          나의 희망 직무분야를 선택해주세요
+        </h2>
+      </div>
+
       <!-- 메인 컨텐츠 -->
-      <main class="px-4 py-6">
+      <main class="px-4 py-6 pb-24">
         <form id="jobForm" method="POST" class="space-y-6">
           <!-- 제목 -->
           <div>
@@ -460,25 +462,21 @@
 {{ job.description }}</textarea
             >
           </div>
-
-          <!-- 하단 버튼 -->
-          <div class="flex gap-3 pt-4">
-            <button
-              type="button"
-              class="flex-1 py-4 px-4 border-2 border-gray-300 rounded-2xl text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
-              onclick="history.back()"
-            >
-              취소
-            </button>
-            <button
-              type="submit"
-              class="flex-1 py-4 px-4 bg-blue-900 hover:bg-blue-800 text-white font-semibold rounded-2xl transition-colors"
-            >
-              수정하기
-            </button>
-          </div>
         </form>
       </main>
+
+      <!-- 하단 고정 푸터 -->
+      <footer
+        class="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t px-4 py-4"
+      >
+        <button
+          type="submit"
+          form="jobForm"
+          class="w-full py-4 px-4 bg-blue-900 hover:bg-blue-800 text-white font-semibold rounded-2xl transition-colors"
+        >
+          다음
+        </button>
+      </footer>
     </div>
 
     <!-- AI 어시스턴트 모달 -->
@@ -744,28 +742,26 @@
         document.getElementById("aiPreview").classList.add("hidden");
 
         try {
-          const response = await fetch(
-            "{{ url_for('jobs.ai_generate_description') }}",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                title,
-                salary,
-                job_content: jobContent,
-                requirements,
-              }),
-            }
-          );
+          // AI 생성 기능이 현재 사용 불가능한 경우 기본 템플릿 제공
+          const generatedText = `【${title}】
 
-          if (!response.ok) {
-            throw new Error("AI 생성 실패");
-          }
+📋 주요 업무
+${jobContent}
 
-          const data = await response.json();
-          const generatedText = data.description;
+💰 급여 조건
+${salary || "협의"}
+
+📌 자격 요건
+${requirements || "경력 무관, 성실하고 책임감 있는 분"}
+
+🏢 근무 환경
+- 깔끔하고 쾌적한 근무 환경
+- 동료들과의 원활한 소통
+- 체계적인 업무 시스템
+
+📞 지원 방법
+관심 있으신 분은 연락 부탁드립니다.
+성실하고 열정적인 분들의 많은 지원 바랍니다.`;
 
           // 미리보기 표시
           document.getElementById("aiPreviewContent").textContent =

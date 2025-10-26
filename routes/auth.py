@@ -505,6 +505,46 @@ def edit_profile_image():
     return render_template('edit_profile_image.html', user=user, profile_url=profile_url)
 
 
+# 사용자 정보 업데이트 (이력서 작성 전)
+@auth_bp.route("/update-user-info", methods=["POST"])
+@login_required
+def update_user_info():
+    """이력서 작성 전 사용자 기본 정보를 업데이트"""
+    from flask import jsonify
+    from datetime import datetime
+    
+    try:
+        data = request.get_json()
+        user = current_user
+        
+        # 사용자 정보 업데이트
+        if 'name' in data:
+            user.name = data['name']
+        if 'gender' in data:
+            user.gender = data['gender']
+        if 'birthdate' in data:
+            try:
+                user.birthdate = datetime.strptime(data['birthdate'], '%Y-%m-%d').date()
+            except ValueError:
+                return jsonify({"success": False, "message": "잘못된 생년월일 형식입니다."}), 400
+        if 'sido' in data:
+            user.sido = data['sido']
+        if 'sigungu' in data:
+            user.sigungu = data['sigungu']
+        if 'dong' in data:
+            user.dong = data['dong']
+        if 'detail_address' in data:
+            user.detail_address = data['detail_address']
+        
+        db.session.commit()
+        return jsonify({"success": True, "message": "정보가 업데이트되었습니다."})
+    
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ 사용자 정보 업데이트 실패:", e)
+        return jsonify({"success": False, "message": "정보 업데이트에 실패했습니다."}), 500
+
+
 # 로그아웃 처리
 @auth_bp.route("/logout")
 @login_required
