@@ -238,7 +238,7 @@
           <!-- 내가 올린 글 -->
           <div
             class="menu-item border-b border-gray-100"
-            onclick="window.location.href='#';"
+            onclick="window.location.href='{{ url_for('jobs.my_posts') }}';"
           >
             <span class="text-gray-800 font-medium">내가 올린 글</span>
             <svg
@@ -263,6 +263,28 @@
             onclick="window.location.href='{{ url_for('jobs.bookmark_list') }}';"
           >
             <span class="text-gray-800 font-medium">찜한 글</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-5 h-5 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </div>
+
+          <!-- 내 이력서 -->
+          <div
+            class="menu-item border-b border-gray-100"
+            onclick="window.location.href='{{ url_for('resumes.my_view_resume') }}';"
+          >
+            <span class="text-gray-800 font-medium">내 이력서</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="w-5 h-5 text-gray-400"
