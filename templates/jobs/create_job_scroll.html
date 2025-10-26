@@ -892,9 +892,7 @@
       // 2단계: 제목 입력
       document
         .getElementById("jobTitle")
-        .addEventListener("input", function () {
-          const count = this.value.length;
-          document.getElementById("titleCount").textContent = count;
+        ?.addEventListener("input", function () {
           selectedData.title = this.value;
           updateNextButton();
         });
