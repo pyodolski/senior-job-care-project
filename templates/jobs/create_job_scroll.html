@@ -78,7 +78,7 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
+                d="M15 19l-7-7 7-7"
               />
             </svg>
           </button>
@@ -246,63 +246,60 @@
               class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none"
               maxlength="50"
             />
-            <p class="text-sm text-gray-500 mt-2 text-right">
-              <span id="titleCount">0</span>/50
-            </p>
           </div>
 
-          <!-- 카테고리 선택 -->
-          <div class="grid grid-cols-3 gap-3">
+          <!-- 카테고리 선택 (다중 선택 가능) -->
+          <div class="flex flex-wrap gap-2">
             <button
-              class="category-btn px-4 py-3 rounded-full border-2 font-medium text-sm"
-              data-category="주방보조"
+              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+              data-category="주방보조/설거지"
             >
               주방 보조 / 설거지
             </button>
             <button
-              class="category-btn px-4 py-3 rounded-full border-2 font-medium text-sm"
+              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
               data-category="편의점"
             >
               편의점
             </button>
             <button
-              class="category-btn px-4 py-3 rounded-full border-2 font-medium text-sm"
+              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
               data-category="서빙"
             >
               서빙
             </button>
             <button
-              class="category-btn px-4 py-3 rounded-full border-2 font-medium text-sm"
-              data-category="카페"
+              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+              data-category="카페/베이커리"
             >
               카페 / 베이커리
             </button>
             <button
-              class="category-btn px-4 py-3 rounded-full border-2 font-medium text-sm"
+              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
               data-category="아이돌봄"
             >
               아이돌봄
             </button>
             <button
-              class="category-btn px-4 py-3 rounded-full border-2 font-medium text-sm"
-              data-category="학원"
+              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+              data-category="학원/과외"
             >
               학원/과외
             </button>
             <button
-              class="category-btn px-4 py-3 rounded-full border-2 font-medium text-sm"
-              data-category="집정리"
+              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+              data-category="집청소"
             >
-              집 정리기
+              집 청소
             </button>
             <button
-              class="category-btn px-4 py-3 rounded-full border-2 font-medium text-sm"
-              data-category="진단지"
+              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+              data-category="전단지/홍보"
             >
-              진단지 / 홍보
+              전단지 / 홍보
             </button>
             <button
-              class="category-btn px-4 py-3 rounded-full border-2 font-medium text-sm"
+              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
               data-category="기타"
             >
               기타
@@ -318,138 +315,178 @@
             원하는 근무 조건이 무엇인가요?
           </h2>
 
-          <div class="flex gap-3 mb-8">
+          <div class="flex gap-2 mb-8 flex-wrap">
             <button
-              class="period-btn px-4 py-3 rounded-full border-2 font-medium text-sm"
+              class="period-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
               data-period="단기"
             >
               단기
             </button>
             <button
-              class="period-btn px-4 py-3 rounded-full border-2 font-medium text-sm"
+              class="period-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
               data-period="1개월이상"
             >
               1개월 이상
             </button>
             <button
-              class="period-btn px-4 py-3 rounded-full border-2 font-medium text-sm"
+              class="period-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
               data-period="3개월이상"
             >
               3개월 이상
             </button>
             <button
-              class="period-btn px-4 py-3 rounded-full border-2 font-medium text-sm"
+              class="period-btn px-4 py-2 rounded-full border-2 border-gray-300 text-sm font-medium"
               data-period="1년이상"
             >
               1년이상
             </button>
           </div>
 
-          <!-- 요일 선택 -->
-          <div class="mb-8">
+          <!-- 단기 선택 시 캘린더 표시 -->
+          <div id="shortTermCalendar" class="hidden mb-8">
             <h3 class="text-lg font-medium text-gray-800 mb-4">
-              일하는 요일을 선택해 주세요
+              일하는 날짜를 선택해 주세요
             </h3>
-            <div class="flex gap-2 mb-4">
-              <button
-                class="day-btn w-12 h-12 rounded-full border-2 text-sm"
-                data-day="월"
-              >
-                월
-              </button>
-              <button
-                class="day-btn w-12 h-12 rounded-full border-2 text-sm"
-                data-day="화"
-              >
-                화
-              </button>
-              <button
-                class="day-btn w-12 h-12 rounded-full border-2 text-sm"
-                data-day="수"
-              >
-                수
-              </button>
-              <button
-                class="day-btn w-12 h-12 rounded-full border-2 text-sm"
-                data-day="목"
-              >
-                목
-              </button>
-              <button
-                class="day-btn w-12 h-12 rounded-full border-2 text-sm"
-                data-day="금"
-              >
-                금
-              </button>
-              <button
-                class="day-btn w-12 h-12 rounded-full border-2 text-sm"
-                data-day="토"
-              >
-                토
-              </button>
-              <button
-                class="day-btn w-12 h-12 rounded-full border-2 text-sm"
-                data-day="일"
-              >
-                일
-              </button>
+            <div class="text-center mb-4">
+              <p class="text-sm font-medium text-gray-700">
+                <span id="dateRangeDisplay">2025.10.01 ~ 2025.11.1</span>
+              </p>
             </div>
-            <div class="flex items-center">
-              <input type="checkbox" id="flexibleDays" class="mr-2" />
-              <label for="flexibleDays" class="text-sm text-gray-600"
-                >요일 협의 후 결정</label
-              >
+            <div class="bg-white rounded-2xl p-4 border-2 border-gray-200">
+              <input
+                type="date"
+                id="startDate"
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl mb-3 focus:border-blue-500 focus:outline-none"
+                placeholder="시작일"
+              />
+              <input
+                type="date"
+                id="endDate"
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
+                placeholder="종료일"
+              />
+              <p class="text-xs text-red-500 mt-3 text-center">
+                *요일을 하루이상 선택해 주세요*
+              </p>
             </div>
           </div>
 
-          <!-- 시간 선택 -->
-          <div class="mb-8">
-            <h3 class="text-lg font-medium text-gray-800 mb-4">
-              일하는 시간을 선택해 주세요
-            </h3>
-            <div class="flex gap-4 mb-4">
-              <select
-                id="startTimeSelect"
-                class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500"
-              >
-                <option value="">시작 시간</option>
-                <option value="06:00">오전 06:00</option>
-                <option value="07:00">오전 07:00</option>
-                <option value="08:00">오전 08:00</option>
-                <option value="09:00">오전 09:00</option>
-                <option value="10:00">오전 10:00</option>
-                <option value="11:00">오전 11:00</option>
-                <option value="12:00">오후 12:00</option>
-                <option value="13:00">오후 01:00</option>
-                <option value="14:00">오후 02:00</option>
-                <option value="15:00">오후 03:00</option>
-                <option value="16:00">오후 04:00</option>
-                <option value="17:00">오후 05:00</option>
-                <option value="18:00">오후 06:00</option>
-              </select>
-              <select
-                id="endTimeSelect"
-                class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500"
-              >
-                <option value="">종료 시간</option>
-                <option value="12:00">오후 12:00</option>
-                <option value="13:00">오후 01:00</option>
-                <option value="14:00">오후 02:00</option>
-                <option value="15:00">오후 03:00</option>
-                <option value="16:00">오후 04:00</option>
-                <option value="17:00">오후 05:00</option>
-                <option value="18:00">오후 06:00</option>
-                <option value="19:00">오후 07:00</option>
-                <option value="20:00">오후 08:00</option>
-                <option value="21:00">오후 09:00</option>
-                <option value="22:00">오후 10:00</option>
-              </select>
+          <!-- 장기 선택 시 요일/시간 선택 표시 -->
+          <div id="longTermSchedule" class="hidden">
+            <!-- 요일 선택 -->
+            <div class="mb-8">
+              <h3 class="text-lg font-medium text-gray-800 mb-4">
+                일하는 요일을 선택해 주세요
+              </h3>
+              <div class="flex gap-2 mb-4">
+                <button
+                  class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                  data-day="월"
+                >
+                  월
+                </button>
+                <button
+                  class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                  data-day="화"
+                >
+                  화
+                </button>
+                <button
+                  class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                  data-day="수"
+                >
+                  수
+                </button>
+                <button
+                  class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                  data-day="목"
+                >
+                  목
+                </button>
+                <button
+                  class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                  data-day="금"
+                >
+                  금
+                </button>
+                <button
+                  class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                  data-day="토"
+                >
+                  토
+                </button>
+                <button
+                  class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                  data-day="일"
+                >
+                  일
+                </button>
+              </div>
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="flexibleDays"
+                  class="w-5 h-5 mr-2 rounded border-gray-300"
+                />
+                <label for="flexibleDays" class="text-sm text-gray-600"
+                  >요일 협의 후 결정</label
+                >
+              </div>
             </div>
-            <div class="flex items-center">
-              <input type="checkbox" id="flexibleTime" class="mr-2" />
-              <label for="flexibleTime" class="text-sm text-gray-600"
-                >시간 협의 가능</label
-              >
+
+            <!-- 시간 선택 -->
+            <div class="mb-8">
+              <h3 class="text-lg font-medium text-gray-800 mb-4">
+                일하는 시간을 선택해 주세요
+              </h3>
+              <div class="flex gap-3 mb-4">
+                <select
+                  id="startTimeSelect"
+                  class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-gray-700"
+                >
+                  <option value="">오전 09:00</option>
+                  <option value="06:00">오전 06:00</option>
+                  <option value="07:00">오전 07:00</option>
+                  <option value="08:00">오전 08:00</option>
+                  <option value="09:00">오전 09:00</option>
+                  <option value="10:00">오전 10:00</option>
+                  <option value="11:00">오전 11:00</option>
+                  <option value="12:00">오후 12:00</option>
+                  <option value="13:00">오후 01:00</option>
+                  <option value="14:00">오후 02:00</option>
+                  <option value="15:00">오후 03:00</option>
+                  <option value="16:00">오후 04:00</option>
+                  <option value="17:00">오후 05:00</option>
+                  <option value="18:00">오후 06:00</option>
+                </select>
+                <select
+                  id="endTimeSelect"
+                  class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-gray-700"
+                >
+                  <option value="">오후 06:00</option>
+                  <option value="12:00">오후 12:00</option>
+                  <option value="13:00">오후 01:00</option>
+                  <option value="14:00">오후 02:00</option>
+                  <option value="15:00">오후 03:00</option>
+                  <option value="16:00">오후 04:00</option>
+                  <option value="17:00">오후 05:00</option>
+                  <option value="18:00">오후 06:00</option>
+                  <option value="19:00">오후 07:00</option>
+                  <option value="20:00">오후 08:00</option>
+                  <option value="21:00">오후 09:00</option>
+                  <option value="22:00">오후 10:00</option>
+                </select>
+              </div>
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="flexibleTime"
+                  class="w-5 h-5 mr-2 rounded border-gray-300"
+                />
+                <label for="flexibleTime" class="text-sm text-gray-600"
+                  >시간 협의 가능</label
+                >
+              </div>
             </div>
           </div>
         </div>
@@ -476,27 +513,27 @@
             급여를 적어주세요
           </h2>
 
-          <div class="flex gap-3 mb-4">
+          <div class="flex gap-2 mb-6 flex-wrap">
             <button
-              class="salary-type-btn px-4 py-2 rounded-full border-2 text-sm"
+              class="salary-type-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
               data-type="시급"
             >
               시급
             </button>
             <button
-              class="salary-type-btn px-4 py-2 rounded-full border-2 text-sm"
+              class="salary-type-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
               data-type="일급"
             >
               일급
             </button>
             <button
-              class="salary-type-btn px-4 py-2 rounded-full border-2 text-sm"
+              class="salary-type-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
               data-type="건당"
             >
               건당
             </button>
             <button
-              class="salary-type-btn px-4 py-2 rounded-full border-2 text-sm"
+              class="salary-type-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
               data-type="월급"
             >
               월급
@@ -508,20 +545,42 @@
               type="number"
               id="salaryAmount"
               placeholder="0"
-              class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none pr-12"
+              class="w-full px-4 py-4 text-2xl font-bold border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none pr-12 text-right"
             />
             <span
-              class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500"
+              class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg"
               >원</span
             >
           </div>
 
-          <div class="text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
-            <p>2025년 최저시급은 <strong>10,030원</strong>이에요</p>
-            <p>
-              이 조건으로 근무할 경우 최소 일급은
-              <strong>70,210원</strong>이에요
+          <div class="bg-gray-100 rounded-2xl p-4 mb-6">
+            <p class="text-sm text-gray-700 mb-2">
+              2025년 최저시급은 <strong>10,030원</strong>이에요
             </p>
+            <p class="text-sm text-gray-700" id="minimumWageInfo">
+              이 조건으로 근무할 경우 최소 일급은
+              <strong id="calculatedMinWage">70,210원</strong>이에요
+            </p>
+          </div>
+
+          <div class="mb-6">
+            <h3 class="text-lg font-medium text-gray-800 mb-3">
+              일에 대하여 참고할 사항을 적어주세요
+            </h3>
+            <div class="bg-gray-50 rounded-2xl p-4 mb-3">
+              <p class="text-sm text-gray-600 mb-2">이런 내용을 적어보세요</p>
+              <ul class="space-y-1 text-sm text-gray-600">
+                <li>• 어떤 도움이 필요한가요?</li>
+                <li>• 일을 위해 필요한 준비물이 있을까요?</li>
+                <li>• 미리 협의해야 할 사항이 있나요?</li>
+              </ul>
+            </div>
+            <textarea
+              id="jobDescription"
+              rows="6"
+              placeholder="나중에 AI로 정리하여 보여드리니 구체적이고 자유롭게 작성해 주세요."
+              class="w-full px-4 py-4 text-base border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none resize-none"
+            ></textarea>
           </div>
         </div>
       </section>
@@ -540,8 +599,11 @@
                 id="workLocation"
                 placeholder="울산 광역시 동구 서부동"
                 class="w-full px-4 py-4 text-lg border-2 border-blue-500 rounded-2xl focus:border-blue-600 focus:outline-none pr-12"
+                readonly
+                onclick="openAddressSearch()"
               />
               <button
+                onclick="openAddressSearch()"
                 class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"
               >
                 <svg
@@ -570,41 +632,59 @@
         </div>
       </section>
 
-      <!-- 7단계: 연락처를 알려주세요 -->
+      <!-- 7단계: 연락처와 동의 -->
       <section id="step7" class="scroll-section">
         <div class="mb-8">
           <h2 class="text-xl font-bold text-gray-900 mb-6">
             연락처를 알려주세요
           </h2>
 
-          <div class="space-y-4">
+          <div class="space-y-4 mb-8">
             <input
               type="tel"
               id="contactPhone"
               placeholder="010 - **** - ****"
               class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none"
             />
+          </div>
 
-            <!-- 상세 설명 -->
-            <div class="mt-8">
-              <h3 class="text-lg font-medium text-gray-800 mb-4">
-                일에 대하여 참고할 사항을 적어주세요
-              </h3>
-              <div class="mb-4">
-                <p class="text-sm text-gray-600 mb-2">이런 내용을 적어보세요</p>
-                <ul class="space-y-1 text-sm text-gray-600">
-                  <li>• 어떤 도움이 필요한가요?</li>
-                  <li>• 일을 위해 필요한 준비물이 있을까요?</li>
-                  <li>• 미리 협의해야 할 사항이 있나요?</li>
-                </ul>
-              </div>
+          <!-- 동의 체크박스 -->
+          <div class="bg-gray-50 rounded-2xl p-4 mb-6">
+            <div class="flex items-start mb-3">
+              <input
+                type="checkbox"
+                id="agreeTerms"
+                class="w-5 h-5 mt-1 mr-3 rounded border-gray-300"
+              />
+              <label for="agreeTerms" class="text-sm text-gray-700 flex-1">
+                <span class="font-bold">사람 이음 준수사항 동의</span>
+              </label>
+              <button onclick="toggleTerms()" class="text-gray-400">
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+            </div>
 
-              <textarea
-                id="jobDescription"
-                rows="6"
-                placeholder="나중에 AI로 정리하여 보여드리니 구체적이고 자유롭게 작성해 주세요."
-                class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none resize-none"
-              ></textarea>
+            <div
+              id="termsContent"
+              class="hidden text-sm text-gray-600 space-y-1 pl-8"
+            >
+              <p>사람 이음 서비스 이용약관</p>
+              <p>최저임금을 지켜주세요.</p>
+              <p>근로 기준법을 지켜주세요.</p>
+              <p>고용차별을 하지 않아요.</p>
+              <p>주의사항 자세히 보기.</p>
             </div>
           </div>
         </div>
@@ -621,6 +701,36 @@
           다음
         </button>
       </div>
+
+      <!-- 주소 검색 모달 (숨김) -->
+      <div
+        id="addressModal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+      >
+        <div class="bg-white rounded-2xl p-6 w-11/12 max-w-md">
+          <h3 class="text-lg font-bold mb-4">주소 검색</h3>
+          <input
+            type="text"
+            id="addressSearch"
+            placeholder="주소를 입력하세요"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl mb-4 focus:border-blue-500 focus:outline-none"
+          />
+          <div class="flex gap-2">
+            <button
+              onclick="closeAddressModal()"
+              class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-medium"
+            >
+              취소
+            </button>
+            <button
+              onclick="selectAddress()"
+              class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium"
+            >
+              선택
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -631,6 +741,8 @@
         title: "",
         categories: [],
         workPeriod: "",
+        startDate: "",
+        endDate: "",
         days: [],
         startTime: "",
         endTime: "",
@@ -700,8 +812,9 @@
             isValid = selectedData.location.length > 0;
             break;
           case 7:
-            isValid = selectedData.phone.length > 0;
-            nextBtn.textContent = "작성 완료";
+            const agreeTerms = document.getElementById("agreeTerms")?.checked;
+            isValid = selectedData.phone.length > 0 && agreeTerms;
+            nextBtn.textContent = "AI가 작성한 공고 보기";
             break;
         }
 
@@ -759,9 +872,49 @@
             .forEach((b) => b.classList.remove("option-selected"));
           this.classList.add("option-selected");
           selectedData.workPeriod = this.dataset.period;
+
+          // 단기 선택 시 캘린더 표시, 장기 선택 시 요일/시간 표시
+          const calendar = document.getElementById("shortTermCalendar");
+          const schedule = document.getElementById("longTermSchedule");
+
+          if (this.dataset.period === "단기") {
+            calendar.classList.remove("hidden");
+            schedule.classList.add("hidden");
+          } else {
+            calendar.classList.add("hidden");
+            schedule.classList.remove("hidden");
+          }
+
           updateNextButton();
         });
       });
+
+      // 날짜 선택 이벤트
+      document
+        .getElementById("startDate")
+        ?.addEventListener("change", function () {
+          selectedData.startDate = this.value;
+          updateDateRangeDisplay();
+        });
+
+      document
+        .getElementById("endDate")
+        ?.addEventListener("change", function () {
+          selectedData.endDate = this.value;
+          updateDateRangeDisplay();
+        });
+
+      function updateDateRangeDisplay() {
+        const start = selectedData.startDate;
+        const end = selectedData.endDate;
+        if (start && end) {
+          const startFormatted = start.replace(/-/g, ".");
+          const endFormatted = end.replace(/-/g, ".");
+          document.getElementById(
+            "dateRangeDisplay"
+          ).textContent = `${startFormatted} ~ ${endFormatted}`;
+        }
+      }
 
       // 3단계: 요일 선택
       document.querySelectorAll(".day-btn").forEach((btn) => {
@@ -784,6 +937,7 @@
             .forEach((b) => b.classList.remove("option-selected"));
           this.classList.add("option-selected");
           selectedData.salaryType = this.dataset.type;
+          calculateMinimumWage();
           updateNextButton();
         });
       });
@@ -795,6 +949,39 @@
           selectedData.salaryAmount = this.value;
           updateNextButton();
         });
+
+      // 최저임금 계산 함수
+      function calculateMinimumWage() {
+        const minHourlyWage = 10030; // 2025년 최저시급
+        const salaryType = selectedData.salaryType;
+        const startTime = document.getElementById("startTimeSelect")?.value;
+        const endTime = document.getElementById("endTimeSelect")?.value;
+
+        let minWageText = "";
+
+        if (salaryType === "시급") {
+          // 시급 선택 시
+          if (startTime && endTime) {
+            const start = parseInt(startTime.split(":")[0]);
+            const end = parseInt(endTime.split(":")[0]);
+            const hours = end > start ? end - start : 24 - start + end;
+            const dailyWage = minHourlyWage * hours;
+            minWageText = `이 조건으로 근무할 경우 최소 일급은 <strong>${dailyWage.toLocaleString()}원</strong>이에요`;
+          } else {
+            minWageText = `이 조건으로 근무할 경우 최소 일급은 <strong>70,210원</strong>이에요 (7시간 기준)`;
+          }
+        } else if (salaryType === "일급") {
+          minWageText = `최저시급 기준 7시간 근무 시 최소 일급은 <strong>70,210원</strong>이에요`;
+        } else if (salaryType === "월급") {
+          const daysCount = selectedData.days.length || 5; // 선택된 요일 수 (기본 5일)
+          const monthlyWage = minHourlyWage * 7 * daysCount * 4; // 7시간 * 요일수 * 4주
+          minWageText = `주 ${daysCount}일 근무 시 최소 월급은 <strong>${monthlyWage.toLocaleString()}원</strong>이에요`;
+        } else if (salaryType === "건당") {
+          minWageText = `건당 급여는 작업 내용에 따라 협의하여 결정해주세요`;
+        }
+
+        document.getElementById("minimumWageInfo").innerHTML = minWageText;
+      }
 
       // 6단계: 근무 장소 입력
       document
@@ -818,6 +1005,44 @@
           updateNextButton();
         });
 
+      // 동의 체크박스
+      document
+        .getElementById("agreeTerms")
+        ?.addEventListener("change", function () {
+          updateNextButton();
+        });
+
+      // 주소 검색 모달 열기
+      function openAddressSearch() {
+        document.getElementById("addressModal").classList.remove("hidden");
+      }
+      window.openAddressSearch = openAddressSearch;
+
+      // 주소 검색 모달 닫기
+      function closeAddressModal() {
+        document.getElementById("addressModal").classList.add("hidden");
+      }
+      window.closeAddressModal = closeAddressModal;
+
+      // 주소 선택
+      function selectAddress() {
+        const address = document.getElementById("addressSearch").value;
+        if (address) {
+          document.getElementById("workLocation").value = address;
+          selectedData.location = address;
+          updateNextButton();
+          closeAddressModal();
+        }
+      }
+      window.selectAddress = selectAddress;
+
+      // 약관 토글
+      function toggleTerms() {
+        const termsContent = document.getElementById("termsContent");
+        termsContent.classList.toggle("hidden");
+      }
+      window.toggleTerms = toggleTerms;
+
       document
         .getElementById("jobDescription")
         .addEventListener("input", function () {
@@ -828,90 +1053,116 @@
       async function submitJob() {
         console.log("제출 데이터:", selectedData);
 
-        // 폼 데이터 생성
-        const formData = new FormData();
-
-        // 필수 필드
-        formData.append("title", selectedData.title);
-        formData.append("company", selectedData.category); // 분야를 회사명으로 사용
-        formData.append(
-          "description",
-          selectedData.description || "상세 설명 없음"
-        );
-
-        // 모집 형태 (카테고리들을 모집형태로)
-        formData.append("recruitment_type", selectedData.categories.join(", "));
-
-        // 근무 기간
-        formData.append("work_period", selectedData.workPeriod);
-
-        // 급여 정보
-        formData.append(
-          "salary",
-          `${selectedData.salaryType} ${selectedData.salaryAmount}원`
-        );
-
-        // 지역 정보
-        formData.append("region", selectedData.location);
-        if (selectedData.detailAddress) {
-          formData.append(
-            "region",
-            `${selectedData.location} ${selectedData.detailAddress}`
-          );
-        }
-
-        // 연락처
-        formData.append("contact_phone", selectedData.phone);
-
-        // 근무 요일 (Boolean 값으로 전송)
-        formData.append(
-          "work_monday",
-          selectedData.days.includes("월") ? "true" : "false"
-        );
-        formData.append(
-          "work_tuesday",
-          selectedData.days.includes("화") ? "true" : "false"
-        );
-        formData.append(
-          "work_wednesday",
-          selectedData.days.includes("수") ? "true" : "false"
-        );
-        formData.append(
-          "work_thursday",
-          selectedData.days.includes("목") ? "true" : "false"
-        );
-        formData.append(
-          "work_friday",
-          selectedData.days.includes("금") ? "true" : "false"
-        );
-        formData.append(
-          "work_saturday",
-          selectedData.days.includes("토") ? "true" : "false"
-        );
-        formData.append(
-          "work_sunday",
-          selectedData.days.includes("일") ? "true" : "false"
-        );
-
-        // 근무 시간 설정 (select에서 가져오기)
-        const startTimeSelect = document.getElementById("startTimeSelect");
-        const endTimeSelect = document.getElementById("endTimeSelect");
-
-        if (startTimeSelect && startTimeSelect.value) {
-          formData.append("work_start_time", startTimeSelect.value);
-        }
-        if (endTimeSelect && endTimeSelect.value) {
-          formData.append("work_end_time", endTimeSelect.value);
-        }
-
         try {
+          // 주소를 좌표로 변환
+          const geocodeResult = await geocodeAddress(selectedData.location);
+
+          // 폼 데이터 생성
+          const formData = new FormData();
+
+          // 필수 필드
+          formData.append("title", selectedData.title);
+          formData.append("company", "{{ current_user.nickname }}"); // 작성자 닉네임
+          formData.append("people_category", selectedData.category); // 사람이음 카테고리 (업무, 이웃, 과외, 제능, 문화)
+          formData.append(
+            "description",
+            selectedData.description || "상세 설명 없음"
+          );
+
+          // 모집 형태 (카테고리들을 모집형태로)
+          formData.append(
+            "recruitment_type",
+            selectedData.categories.join(", ")
+          );
+
+          // 근무 기간
+          formData.append("work_period", selectedData.workPeriod);
+
+          // 단기 선택 시 날짜 정보
+          if (
+            selectedData.workPeriod === "단기" &&
+            selectedData.startDate &&
+            selectedData.endDate
+          ) {
+            formData.append("recruitment_start_date", selectedData.startDate);
+            formData.append("recruitment_end_date", selectedData.endDate);
+          }
+
+          // 급여 정보
+          formData.append(
+            "salary",
+            `${selectedData.salaryType} ${selectedData.salaryAmount}원`
+          );
+
+          // 지역 정보
+          let fullAddress = selectedData.location;
+          if (selectedData.detailAddress) {
+            fullAddress = `${selectedData.location} ${selectedData.detailAddress}`;
+          }
+          formData.append("region", fullAddress);
+
+          // 좌표 정보 (지도 표시용)
+          if (geocodeResult) {
+            formData.append("latitude", geocodeResult.lat);
+            formData.append("longitude", geocodeResult.lng);
+            formData.append("region_1depth_name", geocodeResult.region1 || "");
+            formData.append("region_2depth_name", geocodeResult.region2 || "");
+            formData.append("region_3depth_name", geocodeResult.region3 || "");
+          }
+
+          // 연락처
+          formData.append("contact_phone", selectedData.phone);
+
+          // 근무 요일 (Boolean 값으로 전송)
+          formData.append(
+            "work_monday",
+            selectedData.days.includes("월") ? "true" : "false"
+          );
+          formData.append(
+            "work_tuesday",
+            selectedData.days.includes("화") ? "true" : "false"
+          );
+          formData.append(
+            "work_wednesday",
+            selectedData.days.includes("수") ? "true" : "false"
+          );
+          formData.append(
+            "work_thursday",
+            selectedData.days.includes("목") ? "true" : "false"
+          );
+          formData.append(
+            "work_friday",
+            selectedData.days.includes("금") ? "true" : "false"
+          );
+          formData.append(
+            "work_saturday",
+            selectedData.days.includes("토") ? "true" : "false"
+          );
+          formData.append(
+            "work_sunday",
+            selectedData.days.includes("일") ? "true" : "false"
+          );
+
+          // 근무 시간 설정 (select에서 가져오기)
+          const startTimeSelect = document.getElementById("startTimeSelect");
+          const endTimeSelect = document.getElementById("endTimeSelect");
+
+          if (startTimeSelect && startTimeSelect.value) {
+            formData.append("work_start_time", startTimeSelect.value);
+          }
+          if (endTimeSelect && endTimeSelect.value) {
+            formData.append("work_end_time", endTimeSelect.value);
+          }
+
           const response = await fetch("{{ url_for('jobs.create_job') }}", {
             method: "POST",
             body: formData,
           });
 
           if (response.ok) {
-            alert("공고가 성공적으로 작성되었습니다!");
+            alert(
+              "공고가 성공적으로 작성되었습니다! 지도에서 확인할 수 있습니다."
+            );
             window.location.href = "{{ url_for('jobs.job_list') }}";
           } else {
             const text = await response.text();
@@ -920,7 +1171,32 @@
           }
         } catch (error) {
           console.error("Error:", error);
-          alert("공고 작성 중 오류가 발생했습니다.");
+          alert("공고 작성 중 오류가 발생했습니다: " + error.message);
+        }
+      }
+
+      // 주소를 좌표로 변환하는 함수 (카카오 지오코딩 API 사용)
+      async function geocodeAddress(address) {
+        try {
+          const response = await fetch(
+            `/api/address_search?query=${encodeURIComponent(address)}`
+          );
+          const data = await response.json();
+
+          if (data.documents && data.documents.length > 0) {
+            const result = data.documents[0];
+            return {
+              lat: parseFloat(result.y),
+              lng: parseFloat(result.x),
+              region1: result.address?.region_1depth_name || "",
+              region2: result.address?.region_2depth_name || "",
+              region3: result.address?.region_3depth_name || "",
+            };
+          }
+          return null;
+        } catch (error) {
+          console.error("주소 변환 오류:", error);
+          return null;
         }
       }
 

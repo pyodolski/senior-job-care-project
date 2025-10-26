@@ -146,6 +146,9 @@ class JobPost(db.Model):
     # 연락처
     contact_phone = db.Column(db.String(20), nullable=True)    # 연락처 전화번호
 
+    # 사람 이음 전용 필드
+    people_category = db.Column(db.String(20), nullable=True)  # 사람이음 카테고리 (업무, 이웃, 과외, 제능, 문화)
+
     # 기업 이음 전용 필드들
     job_category = db.Column(db.String(50), nullable=True)     # 직무 내용 (사무직, 생산/기술직, 서비스직, 기타)
     job_category_custom = db.Column(db.String(100), nullable=True)  # 직무 내용 직접입력
