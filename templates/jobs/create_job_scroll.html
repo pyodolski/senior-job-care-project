@@ -349,24 +349,74 @@
             </h3>
             <div class="text-center mb-4">
               <p class="text-sm font-medium text-gray-700">
-                <span id="dateRangeDisplay">2025.10.01 ~ 2025.11.1</span>
+                <span id="selectedDatesDisplay">날짜를 선택해주세요</span>
               </p>
             </div>
             <div class="bg-white rounded-2xl p-4 border-2 border-gray-200">
-              <input
-                type="date"
-                id="startDate"
-                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl mb-3 focus:border-blue-500 focus:outline-none"
-                placeholder="시작일"
-              />
-              <input
-                type="date"
-                id="endDate"
-                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
-                placeholder="종료일"
-              />
-              <p class="text-xs text-red-500 mt-3 text-center">
-                *요일을 하루이상 선택해 주세요*
+              <!-- 월 선택 -->
+              <div class="flex justify-between items-center mb-4">
+                <button
+                  onclick="changeMonth(-1)"
+                  class="p-2 hover:bg-gray-100 rounded"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                </button>
+                <span id="currentMonth" class="font-bold text-lg"
+                  >2025년 10월</span
+                >
+                <button
+                  onclick="changeMonth(1)"
+                  class="p-2 hover:bg-gray-100 rounded"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- 요일 헤더 -->
+              <div class="grid grid-cols-7 gap-1 mb-2">
+                <div class="text-center text-xs text-gray-500 py-2">일</div>
+                <div class="text-center text-xs text-gray-500 py-2">월</div>
+                <div class="text-center text-xs text-gray-500 py-2">화</div>
+                <div class="text-center text-xs text-gray-500 py-2">수</div>
+                <div class="text-center text-xs text-gray-500 py-2">목</div>
+                <div class="text-center text-xs text-gray-500 py-2">금</div>
+                <div class="text-center text-xs text-gray-500 py-2">토</div>
+              </div>
+
+              <!-- 날짜 그리드 -->
+              <div id="calendarGrid" class="grid grid-cols-7 gap-1">
+                <!-- JavaScript로 동적 생성 -->
+              </div>
+
+              <p class="text-xs text-gray-500 mt-3 text-center">
+                총
+                <span id="selectedDatesCount" class="font-bold text-blue-600"
+                  >0</span
+                >일 동안 일해요
               </p>
             </div>
           </div>
@@ -741,8 +791,7 @@
         title: "",
         categories: [],
         workPeriod: "",
-        startDate: "",
-        endDate: "",
+        selectedDates: [], // 단기 선택 시 선택된 날짜들
         days: [],
         startTime: "",
         endTime: "",
@@ -753,6 +802,10 @@
         phone: "",
         description: "",
       };
+
+      // 캘린더 관련 변수
+      let currentCalendarDate = new Date();
+      const today = new Date();
 
       // 다음 단계로 이동
       function goToNextStep() {
@@ -793,9 +846,7 @@
             isValid = selectedData.category !== "";
             break;
           case 2:
-            isValid =
-              selectedData.title.length > 0 &&
-              selectedData.categories.length > 0;
+            isValid = selectedData.title.length > 0;
             break;
           case 3:
             isValid = selectedData.workPeriod !== "";
@@ -880,6 +931,7 @@
           if (this.dataset.period === "단기") {
             calendar.classList.remove("hidden");
             schedule.classList.add("hidden");
+            generateCalendar(); // 캘린더 생성
           } else {
             calendar.classList.add("hidden");
             schedule.classList.remove("hidden");
@@ -889,32 +941,101 @@
         });
       });
 
-      // 날짜 선택 이벤트
-      document
-        .getElementById("startDate")
-        ?.addEventListener("change", function () {
-          selectedData.startDate = this.value;
-          updateDateRangeDisplay();
-        });
+      // 캘린더 생성 함수
+      function generateCalendar() {
+        const year = currentCalendarDate.getFullYear();
+        const month = currentCalendarDate.getMonth();
 
-      document
-        .getElementById("endDate")
-        ?.addEventListener("change", function () {
-          selectedData.endDate = this.value;
-          updateDateRangeDisplay();
-        });
+        document.getElementById("currentMonth").textContent = `${year}년 ${
+          month + 1
+        }월`;
 
-      function updateDateRangeDisplay() {
-        const start = selectedData.startDate;
-        const end = selectedData.endDate;
-        if (start && end) {
-          const startFormatted = start.replace(/-/g, ".");
-          const endFormatted = end.replace(/-/g, ".");
-          document.getElementById(
-            "dateRangeDisplay"
-          ).textContent = `${startFormatted} ~ ${endFormatted}`;
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const startDayOfWeek = firstDay.getDay();
+
+        const calendarGrid = document.getElementById("calendarGrid");
+        calendarGrid.innerHTML = "";
+
+        for (let i = 0; i < startDayOfWeek; i++) {
+          const emptyCell = document.createElement("div");
+          emptyCell.className = "text-center py-2";
+          calendarGrid.appendChild(emptyCell);
+        }
+
+        for (let day = 1; day <= lastDay.getDate(); day++) {
+          const dateCell = document.createElement("button");
+          const currentDate = new Date(year, month, day);
+          const dateString = `${year}-${String(month + 1).padStart(
+            2,
+            "0"
+          )}-${String(day).padStart(2, "0")}`;
+
+          dateCell.className =
+            "text-center py-2 rounded-lg hover:bg-gray-100 transition-colors text-sm";
+          dateCell.textContent = day;
+          dateCell.type = "button";
+          dateCell.onclick = () => toggleDateSelection(dateString, dateCell);
+
+          if (currentDate.toDateString() === today.toDateString()) {
+            dateCell.classList.add("font-bold");
+          }
+
+          if (selectedData.selectedDates.includes(dateString)) {
+            dateCell.classList.add("bg-blue-600", "text-white", "font-bold");
+            dateCell.classList.remove("hover:bg-gray-100");
+          }
+
+          if ((startDayOfWeek + day - 1) % 7 === 0) {
+            dateCell.classList.add("text-red-500");
+          }
+
+          calendarGrid.appendChild(dateCell);
+        }
+
+        updateSelectedDatesDisplay();
+      }
+
+      function toggleDateSelection(dateString, element) {
+        const index = selectedData.selectedDates.indexOf(dateString);
+
+        if (index > -1) {
+          selectedData.selectedDates.splice(index, 1);
+          element.classList.remove("bg-blue-600", "text-white", "font-bold");
+          element.classList.add("hover:bg-gray-100");
+        } else {
+          selectedData.selectedDates.push(dateString);
+          element.classList.add("bg-blue-600", "text-white", "font-bold");
+          element.classList.remove("hover:bg-gray-100");
+        }
+
+        updateSelectedDatesDisplay();
+      }
+
+      function updateSelectedDatesDisplay() {
+        const count = selectedData.selectedDates.length;
+        document.getElementById("selectedDatesCount").textContent = count;
+
+        if (count > 0) {
+          const sortedDates = selectedData.selectedDates.sort();
+          const firstDate = sortedDates[0].replace(/-/g, ".");
+          const lastDate = sortedDates[sortedDates.length - 1].replace(
+            /-/g,
+            "."
+          );
+          document.getElementById("selectedDatesDisplay").textContent =
+            count === 1 ? firstDate : `${firstDate} 외 ${count - 1}일`;
+        } else {
+          document.getElementById("selectedDatesDisplay").textContent =
+            "날짜를 선택해주세요";
         }
       }
+
+      function changeMonth(delta) {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
+        generateCalendar();
+      }
+      window.changeMonth = changeMonth;
 
       // 3단계: 요일 선택
       document.querySelectorAll(".day-btn").forEach((btn) => {
