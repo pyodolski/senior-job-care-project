@@ -52,10 +52,40 @@ def ensure_db_initialized():
         try:
             # 데이터베이스 연결 테스트
             with app.app_context():
+                from sqlalchemy import text
                 # 간단한 쿼리로 연결 테스트
-                db.engine.execute('SELECT 1')
+                db.session.execute(text('SELECT 1'))
                 # 테이블 생성 (이미 존재하면 무시됨)
                 db.create_all()
+                
+                # region 컬럼 마이그레이션 자동 실행
+                try:
+                    check_query = text("""
+                        SELECT COUNT(*) as count
+                        FROM information_schema.COLUMNS 
+                        WHERE TABLE_SCHEMA = DATABASE()
+                        AND TABLE_NAME = 'job_post' 
+                        AND COLUMN_NAME = 'region_1depth_name'
+                    """)
+                    result = db.session.execute(check_query).fetchone()
+                    
+                    if result[0] == 0:
+                        print("🔧 region 컬럼 마이그레이션 시작...")
+                        alter_queries = [
+                            "ALTER TABLE job_post ADD COLUMN region_1depth_name VARCHAR(50) AFTER salary",
+                            "ALTER TABLE job_post ADD COLUMN region_2depth_name VARCHAR(50) AFTER region_1depth_name",
+                            "ALTER TABLE job_post ADD COLUMN region_3depth_name VARCHAR(50) AFTER region_2depth_name"
+                        ]
+                        for query in alter_queries:
+                            db.session.execute(text(query))
+                        db.session.commit()
+                        print("✅ region 컬럼 마이그레이션 완료")
+                    else:
+                        print("ℹ️ region 컬럼이 이미 존재합니다")
+                except Exception as migration_error:
+                    print(f"⚠️ 마이그레이션 오류: {migration_error}")
+                    db.session.rollback()
+                
                 db_initialized = True
                 print("✅ 데이터베이스 연결 및 테이블 초기화 완료")
         except Exception as e:
