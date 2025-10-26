@@ -42,7 +42,7 @@ def my_resume_detail(resume_id):
         flash("접근 권한이 없습니다.", "error")
         return redirect(url_for('resumes.my_view_resume'))
 
-    return render_template('resume/my_resume_detail.html', resume=resume)
+    return render_template('resume/my_resume_detail.html', resume=resume, WorkType=WorkType)
 
 
 # ==================== 이력서 작성 ====================
@@ -97,7 +97,6 @@ def create_resume():
         )
 
         if resume:
-            flash("이력서가 성공적으로 작성되었습니다.", "success")
             return redirect(url_for('resumes.my_view_resume'))
         else:
             flash("이력서 작성 중 오류가 발생했습니다.", "error")
@@ -176,7 +175,6 @@ def edit_resume(resume_id):
         )
 
         if updated_resume:
-            flash("이력서가 성공적으로 수정되었습니다.", "success")
             return redirect(url_for('resumes.my_resume_detail', resume_id=resume_id))
         else:
             flash("이력서 수정 중 오류가 발생했습니다.", "error")

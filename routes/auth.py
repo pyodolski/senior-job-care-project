@@ -250,7 +250,6 @@ def onboarding():
         
         try:
             db.session.commit()
-            flash("프로필 정보가 완성되었습니다!", "success")
             return redirect(url_for("auth.main"))
         except Exception as e:
             db.session.rollback()
@@ -308,7 +307,6 @@ def register():
         login_user(user)
 
         # 회원가입 완료 후 메인으로 이동
-        flash("회원가입이 완료되었습니다!", "success")
         return redirect(url_for("auth.main"))
 
     kakao_key = current_app.config.get("KAKAO_MAP_API_KEY")
@@ -380,7 +378,6 @@ def register_company():
         db.session.add(user)
         db.session.commit()
 
-        flash("기업 회원가입 신청이 완료되었습니다. 관리자의 승인을 기다려 주세요.")
         return redirect(url_for("auth.home"))
 
     return render_template("register_company.html")
