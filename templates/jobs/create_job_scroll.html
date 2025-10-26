@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>사람이음 글쓰기</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_key }}&libraries=services"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
@@ -542,22 +543,8 @@
         </div>
       </section>
 
-      <!-- 4단계: 날짜/요일 선택 (조건부) -->
+      <!-- 4단계: 급여를 적어주세요 -->
       <section id="step4" class="scroll-section">
-        <div class="mb-8">
-          <h2 class="text-xl font-bold text-gray-900 mb-6">
-            일하는 날짜를 선택해 주세요
-          </h2>
-
-          <!-- 단기용 달력 또는 장기용 요일 선택이 여기에 표시됩니다 -->
-          <div id="dateSelection">
-            <!-- JavaScript로 동적 생성 -->
-          </div>
-        </div>
-      </section>
-
-      <!-- 5단계: 급여를 적어주세요 -->
-      <section id="step5" class="scroll-section">
         <div class="mb-8">
           <h2 class="text-xl font-bold text-gray-900 mb-6">
             급여를 적어주세요
@@ -635,8 +622,8 @@
         </div>
       </section>
 
-      <!-- 6단계: 일할 장소를 알려주세요 -->
-      <section id="step6" class="scroll-section">
+      <!-- 5단계: 일할 장소를 알려주세요 -->
+      <section id="step5" class="scroll-section">
         <div class="mb-8">
           <h2 class="text-xl font-bold text-gray-900 mb-6">
             일할 장소를 알려주세요
@@ -682,8 +669,8 @@
         </div>
       </section>
 
-      <!-- 7단계: 연락처와 동의 -->
-      <section id="step7" class="scroll-section">
+      <!-- 6단계: 연락처와 동의 -->
+      <section id="step6" class="scroll-section">
         <div class="mb-8">
           <h2 class="text-xl font-bold text-gray-900 mb-6">
             연락처를 알려주세요
@@ -752,32 +739,68 @@
         </button>
       </div>
 
-      <!-- 주소 검색 모달 (숨김) -->
+      <!-- 주소 검색 모달 (지도 포함) -->
       <div
         id="addressModal"
-        class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
       >
-        <div class="bg-white rounded-2xl p-6 w-11/12 max-w-md">
-          <h3 class="text-lg font-bold mb-4">주소 검색</h3>
-          <input
-            type="text"
-            id="addressSearch"
-            placeholder="주소를 입력하세요"
-            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl mb-4 focus:border-blue-500 focus:outline-none"
-          />
-          <div class="flex gap-2">
-            <button
-              onclick="closeAddressModal()"
-              class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-medium"
+        <div
+          class="bg-white rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col"
+        >
+          <!-- 헤더 -->
+          <div class="p-4 border-b">
+            <h3 class="text-lg font-bold">주소 검색</h3>
+          </div>
+
+          <!-- 검색 입력 -->
+          <div class="p-4 border-b">
+            <div class="flex gap-2">
+              <input
+                type="text"
+                id="addressSearch"
+                placeholder="주소를 입력하세요 (예: 경산시 조영동)"
+                class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
+                onkeypress="if(event.key === 'Enter') searchAddress()"
+              />
+              <button
+                onclick="searchAddress()"
+                class="px-4 py-3 bg-blue-600 text-white rounded-xl font-medium"
+              >
+                검색
+              </button>
+            </div>
+          </div>
+
+          <!-- 지도 영역 -->
+          <div class="flex-1 overflow-hidden">
+            <div id="addressMap" class="w-full h-80"></div>
+          </div>
+
+          <!-- 선택된 주소 표시 -->
+          <div class="p-4 border-t">
+            <p class="text-sm text-gray-600 mb-2">선택된 주소</p>
+            <p
+              id="selectedAddressText"
+              class="text-base font-medium text-gray-900 mb-4"
             >
-              취소
-            </button>
-            <button
-              onclick="selectAddress()"
-              class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium"
-            >
-              선택
-            </button>
+              지도에서 위치를 클릭하거나 검색해주세요
+            </p>
+            <div class="flex gap-2">
+              <button
+                onclick="closeAddressModal()"
+                class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-medium"
+              >
+                취소
+              </button>
+              <button
+                id="confirmAddressBtn"
+                onclick="confirmAddress()"
+                class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
+                disabled
+              >
+                선택
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -785,7 +808,7 @@
 
     <script>
       let currentStep = 1;
-      let maxStep = 7;
+      let maxStep = 6;
       let selectedData = {
         category: "",
         title: "",
@@ -852,17 +875,14 @@
             isValid = selectedData.workPeriod !== "";
             break;
           case 4:
-            isValid = true; // 날짜 선택은 선택사항
-            break;
-          case 5:
             isValid =
               selectedData.salaryType !== "" &&
               selectedData.salaryAmount !== "";
             break;
-          case 6:
+          case 5:
             isValid = selectedData.location.length > 0;
             break;
-          case 7:
+          case 6:
             const agreeTerms = document.getElementById("agreeTerms")?.checked;
             isValid = selectedData.phone.length > 0 && agreeTerms;
             nextBtn.textContent = "AI가 작성한 공고 보기";
@@ -1132,29 +1152,148 @@
           updateNextButton();
         });
 
+      // 지도 관련 변수
+      let addressMap = null;
+      let addressMarker = null;
+      let selectedAddress = null;
+
       // 주소 검색 모달 열기
       function openAddressSearch() {
         document.getElementById("addressModal").classList.remove("hidden");
+
+        // 지도 초기화 (처음 열 때만)
+        if (!addressMap) {
+          setTimeout(() => {
+            initAddressMap();
+          }, 100);
+        }
       }
       window.openAddressSearch = openAddressSearch;
+
+      // 지도 초기화
+      function initAddressMap() {
+        const container = document.getElementById("addressMap");
+        const options = {
+          center: new kakao.maps.LatLng(35.8242, 128.7569), // 경산시 중심
+          level: 5,
+        };
+
+        addressMap = new kakao.maps.Map(container, options);
+
+        // 지도 클릭 이벤트
+        kakao.maps.event.addListener(
+          addressMap,
+          "click",
+          function (mouseEvent) {
+            const latlng = mouseEvent.latLng;
+
+            // 마커 표시
+            if (addressMarker) {
+              addressMarker.setMap(null);
+            }
+
+            addressMarker = new kakao.maps.Marker({
+              position: latlng,
+              map: addressMap,
+            });
+
+            // 좌표로 주소 검색
+            const geocoder = new kakao.maps.services.Geocoder();
+            geocoder.coord2Address(
+              latlng.getLng(),
+              latlng.getLat(),
+              function (result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                  const address = result[0].address;
+                  const roadAddress = result[0].road_address;
+
+                  selectedAddress = {
+                    address: roadAddress
+                      ? roadAddress.address_name
+                      : address.address_name,
+                    lat: latlng.getLat(),
+                    lng: latlng.getLng(),
+                  };
+
+                  document.getElementById("selectedAddressText").textContent =
+                    selectedAddress.address;
+                  document.getElementById("confirmAddressBtn").disabled = false;
+                }
+              }
+            );
+          }
+        );
+      }
+
+      // 주소 검색
+      function searchAddress() {
+        const query = document.getElementById("addressSearch").value.trim();
+        if (!query) {
+          alert("주소를 입력해주세요");
+          return;
+        }
+
+        const geocoder = new kakao.maps.services.Geocoder();
+
+        geocoder.addressSearch(query, function (result, status) {
+          if (status === kakao.maps.services.Status.OK) {
+            const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+            // 지도 중심 이동
+            addressMap.setCenter(coords);
+            addressMap.setLevel(3);
+
+            // 마커 표시
+            if (addressMarker) {
+              addressMarker.setMap(null);
+            }
+
+            addressMarker = new kakao.maps.Marker({
+              position: coords,
+              map: addressMap,
+            });
+
+            selectedAddress = {
+              address:
+                result[0].address_name || result[0].road_address?.address_name,
+              lat: parseFloat(result[0].y),
+              lng: parseFloat(result[0].x),
+            };
+
+            document.getElementById("selectedAddressText").textContent =
+              selectedAddress.address;
+            document.getElementById("confirmAddressBtn").disabled = false;
+          } else {
+            alert("주소를 찾을 수 없습니다. 다시 시도해주세요.");
+          }
+        });
+      }
+      window.searchAddress = searchAddress;
 
       // 주소 검색 모달 닫기
       function closeAddressModal() {
         document.getElementById("addressModal").classList.add("hidden");
+        selectedAddress = null;
+        document.getElementById("selectedAddressText").textContent =
+          "지도에서 위치를 클릭하거나 검색해주세요";
+        document.getElementById("confirmAddressBtn").disabled = true;
+        document.getElementById("addressSearch").value = "";
       }
       window.closeAddressModal = closeAddressModal;
 
-      // 주소 선택
-      function selectAddress() {
-        const address = document.getElementById("addressSearch").value;
-        if (address) {
-          document.getElementById("workLocation").value = address;
-          selectedData.location = address;
+      // 주소 확정
+      function confirmAddress() {
+        if (selectedAddress) {
+          document.getElementById("workLocation").value =
+            selectedAddress.address;
+          selectedData.location = selectedAddress.address;
+          selectedData.latitude = selectedAddress.lat;
+          selectedData.longitude = selectedAddress.lng;
           updateNextButton();
           closeAddressModal();
         }
       }
-      window.selectAddress = selectAddress;
+      window.confirmAddress = confirmAddress;
 
       // 약관 토글
       function toggleTerms() {
@@ -1174,8 +1313,16 @@
         console.log("제출 데이터:", selectedData);
 
         try {
-          // 주소를 좌표로 변환
-          const geocodeResult = await geocodeAddress(selectedData.location);
+          // 좌표가 없으면 주소로 변환 시도
+          let geocodeResult = null;
+          if (selectedData.latitude && selectedData.longitude) {
+            geocodeResult = {
+              lat: selectedData.latitude,
+              lng: selectedData.longitude,
+            };
+          } else {
+            geocodeResult = await geocodeAddress(selectedData.location);
+          }
 
           // 폼 데이터 생성
           const formData = new FormData();
