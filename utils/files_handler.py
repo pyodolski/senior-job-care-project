@@ -28,7 +28,7 @@ def upload_file(file, sub_path):
         )
         bucket = current_app.config["AWS_S3_BUCKET_NAME"]
         region = current_app.config["AWS_S3_REGION"]
-        return f"https://{bucket}.s3.{region}.amazonaws.com/{unique_filename}"
+        return f"https://{bucket}.s3-{region}.amazonaws.com/{unique_filename}"
     except Exception as e:
         print(f"S3 파일 업로드 실패: {e}")
         return None
