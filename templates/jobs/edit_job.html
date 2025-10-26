@@ -11,135 +11,104 @@
       rel="stylesheet"
     />
     <style>
-      /* 사용자 정의 폰트 및 스타일 */
       body {
         font-family: "Noto Sans KR", sans-serif;
       }
+
+      /* 선택된 옵션 스타일 */
+      .option-selected {
+        background-color: #1d4ed8 !important;
+        color: white !important;
+        border-color: #1d4ed8 !important;
+      }
+
       .btn-option.active {
-        border-color: #2563eb;
-        background-color: #2563eb;
+        background-color: #1d4ed8;
         color: white;
+        border-color: #1d4ed8;
       }
-      /* --- 모달 및 지도 스타일 --- */
-      #addressModal {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background-color: rgba(0, 0, 0, 0.6);
-        z-index: 1000;
-        justify-content: center;
-        align-items: center;
-      }
-      #addressModal .modal-card {
-        width: 90vw;
-        max-width: 500px;
-        background: #fff;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      }
-      #addressMap {
-        width: 100%;
-        height: 400px;
+
+      /* 부드러운 스크롤 */
+      html {
+        scroll-behavior: smooth;
       }
     </style>
   </head>
-  <body class="bg-gray-100">
-    <div class="w-full bg-white shadow-lg min-h-screen">
-      <!-- 상단 바 -->
-      <header
-        class="sticky top-0 z-10 p-4 flex justify-between items-center bg-white shadow-sm"
-      >
-        <button class="p-2" onclick="history.back()">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
-        <h1 class="text-xl font-bold text-gray-800">공고 수정</h1>
-        <div class="flex items-center gap-2">
-          <button
-            type="button"
-            onclick="openAIAssistant()"
-            class="p-2 text-green-600 hover:text-green-800"
-            title="AI 도우미"
-          >
+  <body class="bg-gray-50">
+    <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto pb-24">
+      <!-- 상단 헤더 -->
+      <header class="bg-white border-b px-4 py-4 sticky top-0 z-10">
+        <div class="flex items-center justify-between">
+          <button onclick="history.back()" class="text-gray-600">
             <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6"
+              class="w-6 h-6"
               fill="none"
-              viewBox="0 0 24 24"
               stroke="currentColor"
+              viewBox="0 0 24 24"
             >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                d="M15 19l-7-7 7-7"
               />
             </svg>
           </button>
+          <h1 class="text-lg font-bold text-gray-800">공고 수정</h1>
           <button
-            class="text-blue-600 font-bold p-2"
+            type="button"
             onclick="document.getElementById('jobForm').submit()"
+            class="text-blue-600 font-bold px-2"
           >
-            수정
+            완료
           </button>
         </div>
       </header>
 
       <!-- 메인 컨텐츠 -->
-      <main class="px-4 py-4 sm:px-6 bg-white pb-24">
+      <main class="px-4 py-6">
         <form id="jobForm" method="POST" class="space-y-6">
-          <!-- 기본 정보 -->
+          <!-- 제목 -->
           <div>
-            <label for="title" class="block text-sm font-medium text-gray-700"
-              >제목 <span class="text-red-500">*</span></label
-            >
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              제목 <span class="text-red-500">*</span>
+            </label>
             <input
               type="text"
               name="title"
               id="title"
               value="{{ job.title }}"
-              class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none"
               placeholder="공고 제목을 입력하세요"
               required
             />
           </div>
 
+          <!-- 담당자명 -->
           <div>
-            <label for="company" class="block text-sm font-medium text-gray-700"
-              >담당자명 <span class="text-red-500">*</span></label
-            >
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              담당자명 <span class="text-red-500">*</span>
+            </label>
             <input
               type="text"
               name="company"
               id="company"
               value="{{ job.company }}"
-              class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none"
               placeholder="담당자명을 입력하세요"
               required
             />
           </div>
 
+          <!-- 모집 형태 -->
           <div>
-            <label class="block text-sm font-medium text-gray-700"
-              >모집 형태 <span class="text-red-500">*</span></label
-            >
-            <div class="mt-2 grid grid-cols-2 gap-3">
+            <label class="block text-sm font-semibold text-gray-700 mb-3">
+              모집 형태 <span class="text-red-500">*</span>
+            </label>
+            <div class="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                class="btn-option w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 {% if job.recruitment_type == '정규직' %}active{% endif %}"
+                class="btn-option px-4 py-3 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium {% if job.recruitment_type == '정규직' %}active{% endif %}"
                 data-value="정규직"
                 onclick="selectRecruitmentType(this, '정규직')"
               >
@@ -147,7 +116,7 @@
               </button>
               <button
                 type="button"
-                class="btn-option w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 {% if job.recruitment_type == '일용직' %}active{% endif %}"
+                class="btn-option px-4 py-3 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium {% if job.recruitment_type == '일용직' %}active{% endif %}"
                 data-value="일용직"
                 onclick="selectRecruitmentType(this, '일용직')"
               >
@@ -163,6 +132,7 @@
             />
           </div>
 
+          <!-- 근무 기간 (일용직 선택 시만 표시) -->
           <div
             id="work_period_group"
             {%
@@ -174,13 +144,13 @@
             endif
             %}
           >
-            <label class="block text-sm font-medium text-gray-700"
-              >근무 기간 <span class="text-red-500">*</span></label
-            >
-            <div class="mt-2 grid grid-cols-3 gap-3">
+            <label class="block text-sm font-semibold text-gray-700 mb-3">
+              근무 기간 <span class="text-red-500">*</span>
+            </label>
+            <div class="grid grid-cols-3 gap-3">
               <button
                 type="button"
-                class="btn-option w-full py-2 px-2 border border-gray-300 rounded-md shadow-sm text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 {% if job.work_period == '1개월 이상' %}active{% endif %}"
+                class="btn-option px-4 py-3 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium {% if job.work_period == '1개월 이상' %}active{% endif %}"
                 data-value="1개월 이상"
                 onclick="selectWorkPeriod(this, '1개월 이상')"
               >
@@ -188,7 +158,7 @@
               </button>
               <button
                 type="button"
-                class="btn-option w-full py-2 px-2 border border-gray-300 rounded-md shadow-sm text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 {% if job.work_period == '3개월 이상' %}active{% endif %}"
+                class="btn-option px-4 py-3 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium {% if job.work_period == '3개월 이상' %}active{% endif %}"
                 data-value="3개월 이상"
                 onclick="selectWorkPeriod(this, '3개월 이상')"
               >
@@ -196,7 +166,7 @@
               </button>
               <button
                 type="button"
-                class="btn-option w-full py-2 px-2 border border-gray-300 rounded-md shadow-sm text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 {% if job.work_period == '6개월 이상' %}active{% endif %}"
+                class="btn-option px-4 py-3 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium {% if job.work_period == '6개월 이상' %}active{% endif %}"
                 data-value="6개월 이상"
                 onclick="selectWorkPeriod(this, '6개월 이상')"
               >
@@ -211,440 +181,171 @@
             />
           </div>
 
+          <!-- 근무 요일 -->
           <div>
-            <label class="block text-sm font-medium text-gray-700"
-              >근무 요일</label
-            >
-            <div class="mt-2 flex flex-wrap gap-4">
-              <div class="flex items-center">
-                <input
-                  type="checkbox"
-                  id="monday"
-                  name="work_monday"
-                  {%
-                  if
-                  job.work_monday
-                  %}checked{%
-                  endif
-                  %}
-                  class="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                /><label for="monday" class="ml-2 block text-sm text-gray-900"
-                  >월</label
-                >
-              </div>
-              <div class="flex items-center">
-                <input
-                  type="checkbox"
-                  id="tuesday"
-                  name="work_tuesday"
-                  {%
-                  if
-                  job.work_tuesday
-                  %}checked{%
-                  endif
-                  %}
-                  class="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                /><label for="tuesday" class="ml-2 block text-sm text-gray-900"
-                  >화</label
-                >
-              </div>
-              <div class="flex items-center">
-                <input
-                  type="checkbox"
-                  id="wednesday"
-                  name="work_wednesday"
-                  {%
-                  if
-                  job.work_wednesday
-                  %}checked{%
-                  endif
-                  %}
-                  class="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                /><label
-                  for="wednesday"
-                  class="ml-2 block text-sm text-gray-900"
-                  >수</label
-                >
-              </div>
-              <div class="flex items-center">
-                <input
-                  type="checkbox"
-                  id="thursday"
-                  name="work_thursday"
-                  {%
-                  if
-                  job.work_thursday
-                  %}checked{%
-                  endif
-                  %}
-                  class="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                /><label for="thursday" class="ml-2 block text-sm text-gray-900"
-                  >목</label
-                >
-              </div>
-              <div class="flex items-center">
-                <input
-                  type="checkbox"
-                  id="friday"
-                  name="work_friday"
-                  {%
-                  if
-                  job.work_friday
-                  %}checked{%
-                  endif
-                  %}
-                  class="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                /><label for="friday" class="ml-2 block text-sm text-gray-900"
-                  >금</label
-                >
-              </div>
-              <div class="flex items-center">
-                <input
-                  type="checkbox"
-                  id="saturday"
-                  name="work_saturday"
-                  {%
-                  if
-                  job.work_saturday
-                  %}checked{%
-                  endif
-                  %}
-                  class="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                /><label for="saturday" class="ml-2 block text-sm text-gray-900"
-                  >토</label
-                >
-              </div>
-              <div class="flex items-center">
-                <input
-                  type="checkbox"
-                  id="sunday"
-                  name="work_sunday"
-                  {%
-                  if
-                  job.work_sunday
-                  %}checked{%
-                  endif
-                  %}
-                  class="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                /><label for="sunday" class="ml-2 block text-sm text-gray-900"
-                  >일</label
-                >
-              </div>
+            <label class="block text-sm font-semibold text-gray-700 mb-3">
+              근무 요일
+            </label>
+            <div class="flex gap-2">
+              <button
+                type="button"
+                class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium {% if job.work_monday %}option-selected{% endif %}"
+                data-day="monday"
+                onclick="toggleDay(this)"
+              >
+                월
+              </button>
+              <button
+                type="button"
+                class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium {% if job.work_tuesday %}option-selected{% endif %}"
+                data-day="tuesday"
+                onclick="toggleDay(this)"
+              >
+                화
+              </button>
+              <button
+                type="button"
+                class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium {% if job.work_wednesday %}option-selected{% endif %}"
+                data-day="wednesday"
+                onclick="toggleDay(this)"
+              >
+                수
+              </button>
+              <button
+                type="button"
+                class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium {% if job.work_thursday %}option-selected{% endif %}"
+                data-day="thursday"
+                onclick="toggleDay(this)"
+              >
+                목
+              </button>
+              <button
+                type="button"
+                class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium {% if job.work_friday %}option-selected{% endif %}"
+                data-day="friday"
+                onclick="toggleDay(this)"
+              >
+                금
+              </button>
+              <button
+                type="button"
+                class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium {% if job.work_saturday %}option-selected{% endif %}"
+                data-day="saturday"
+                onclick="toggleDay(this)"
+              >
+                토
+              </button>
+              <button
+                type="button"
+                class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium {% if job.work_sunday %}option-selected{% endif %}"
+                data-day="sunday"
+                onclick="toggleDay(this)"
+              >
+                일
+              </button>
             </div>
+            <input
+              type="hidden"
+              name="work_monday"
+              id="work_monday"
+              value="{% if job.work_monday %}true{% else %}false{% endif %}"
+            />
+            <input
+              type="hidden"
+              name="work_tuesday"
+              id="work_tuesday"
+              value="{% if job.work_tuesday %}true{% else %}false{% endif %}"
+            />
+            <input
+              type="hidden"
+              name="work_wednesday"
+              id="work_wednesday"
+              value="{% if job.work_wednesday %}true{% else %}false{% endif %}"
+            />
+            <input
+              type="hidden"
+              name="work_thursday"
+              id="work_thursday"
+              value="{% if job.work_thursday %}true{% else %}false{% endif %}"
+            />
+            <input
+              type="hidden"
+              name="work_friday"
+              id="work_friday"
+              value="{% if job.work_friday %}true{% else %}false{% endif %}"
+            />
+            <input
+              type="hidden"
+              name="work_saturday"
+              id="work_saturday"
+              value="{% if job.work_saturday %}true{% else %}false{% endif %}"
+            />
+            <input
+              type="hidden"
+              name="work_sunday"
+              id="work_sunday"
+              value="{% if job.work_sunday %}true{% else %}false{% endif %}"
+            />
           </div>
 
+          <!-- 근무 시간 -->
           <div>
-            <label class="block text-sm font-medium text-gray-700"
-              >근무 시간</label
-            >
-            <div class="mt-1 flex items-center gap-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-3">
+              근무 시간
+            </label>
+            <div class="flex gap-3 items-center">
               <input
                 type="time"
                 name="work_start_time"
                 value="{{ job.work_start_time.strftime('%H:%M') if job.work_start_time else '' }}"
-                class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none"
               />
-              <span>~</span>
+              <span class="text-gray-500">~</span>
               <input
                 type="time"
                 name="work_end_time"
                 value="{{ job.work_end_time.strftime('%H:%M') if job.work_end_time else '' }}"
-                class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none"
               />
             </div>
           </div>
 
+          <!-- 급여 -->
           <div>
-            <label for="salary" class="block text-sm font-medium text-gray-700"
-              >급여</label
-            >
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              급여
+            </label>
             <input
               type="text"
               name="salary"
               id="salary"
               value="{{ job.salary or '' }}"
-              class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none"
               placeholder="예: 시급 10,000원"
             />
           </div>
 
           <!-- 근무 지역 -->
           <div>
-            <label for="region" class="block text-sm font-medium text-gray-700"
-              >근무 지역 <span class="text-red-500">*</span></label
-            >
-            <div class="flex items-center gap-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              근무 지역 <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
               <input
                 type="text"
                 name="region"
                 id="region"
                 readonly
                 value="{{ job.region }}"
-                class="mt-1 block w-full bg-gray-100 rounded-md border border-gray-300 shadow-sm"
-                placeholder="주소 검색 버튼으로 선택"
+                onclick="openAddressModal()"
+                class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none pr-12 cursor-pointer"
+                placeholder="지도에서 위치를 선택해주세요"
                 required
               />
               <button
                 type="button"
                 onclick="openAddressModal()"
-                class="py-2 px-4 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 whitespace-nowrap"
-              >
-                주소 검색
-              </button>
-            </div>
-          </div>
-
-          <!-- 숨은 위도, 경도 필드 -->
-          <input
-            type="hidden"
-            id="latitude"
-            name="latitude"
-            value="{{ job.latitude or '' }}"
-          />
-          <input
-            type="hidden"
-            id="longitude"
-            name="longitude"
-            value="{{ job.longitude or '' }}"
-          />
-
-          <!-- 숨은 지역 정보 필드 -->
-          <input
-            type="hidden"
-            id="region_1depth_name"
-            name="region_1depth_name"
-            value="{{ job.region_1depth_name or '' }}"
-          />
-          <input
-            type="hidden"
-            id="region_2depth_name"
-            name="region_2depth_name"
-            value="{{ job.region_2depth_name or '' }}"
-          />
-          <input
-            type="hidden"
-            id="region_3depth_name"
-            name="region_3depth_name"
-            value="{{ job.region_3depth_name or '' }}"
-          />
-
-          <!-- 주소 선택 모달 -->
-          <div id="addressModal">
-            <div class="modal-card">
-              <!-- 검색 UI 추가 -->
-              <div class="p-3 border-b">
-                <div class="flex gap-2">
-                  <input
-                    type="text"
-                    id="addressSearchKeyword"
-                    class="flex-grow border rounded px-2 py-1"
-                    placeholder="주소나 장소명을 입력하세요"
-                  />
-                  <button
-                    onclick="searchAddress()"
-                    class="bg-gray-200 px-3 rounded"
-                  >
-                    검색
-                  </button>
-                </div>
-              </div>
-              <div id="addressMap"></div>
-              <div class="flex justify-end p-3 border-t border-gray-200">
-                <button
-                  onclick="selectAddress()"
-                  class="bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-md text-sm mr-2"
-                >
-                  이 위치로 선택
-                </button>
-                <button
-                  onclick="closeAddressModal()"
-                  class="bg-gray-500 hover:bg-gray-600 text-white py-1 px-3 rounded-md text-sm"
-                >
-                  닫기
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label
-              for="recruitment_count"
-              class="block text-sm font-medium text-gray-700"
-              >모집 인원</label
-            >
-            <input
-              type="number"
-              name="recruitment_count"
-              id="recruitment_count"
-              value="{{ job.recruitment_count or '' }}"
-              class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="모집 인원 수"
-              min="1"
-            />
-          </div>
-
-          <div>
-            <label
-              for="contact_phone"
-              class="block text-sm font-medium text-gray-700"
-              >연락처</label
-            >
-            <input
-              type="tel"
-              name="contact_phone"
-              id="contact_phone"
-              value="{{ job.contact_phone or '' }}"
-              class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="연락 가능한 전화번호"
-            />
-          </div>
-
-          <div>
-            <div class="flex justify-between items-center">
-              <label
-                for="description"
-                class="block text-sm font-medium text-gray-700"
-                >상세 설명 <span class="text-red-500">*</span></label
-              >
-              <button
-                type="button"
-                onclick="openAIAssistant()"
-                class="text-xs text-green-600 hover:text-green-800 flex items-center gap-1 bg-transparent border-none cursor-pointer font-semibold"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                  />
-                </svg>
-                AI 도우미
-              </button>
-            </div>
-            <textarea
-              name="description"
-              id="description"
-              rows="4"
-              class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="업무 내용, 자격 요건 등을 자세히 작성해주세요&#10;&#10;AI 도우미를 사용하면 전문적인 공고를 쉽게 작성할 수 있습니다."
-              required
-            >
-{{ job.description }}</textarea
-            >
-          </div>
-
-          <div class="flex gap-4 pt-4">
-            <button
-              type="button"
-              class="flex-1 w-full justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-500 hover:bg-gray-600"
-              onclick="history.back()"
-            >
-              취소
-            </button>
-            <button
-              type="submit"
-              class="flex-1 w-full justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-800 hover:bg-blue-900"
-            >
-              수정하기
-            </button>
-          </div>
-        </form>
-      </main>
-
-      <!-- 하단 네비게이션 -->
-      <footer
-        class="fixed bottom-0 left-0 right-0 w-full bg-gray-50 border-t flex justify-around"
-      >
-        <a
-          href="#"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/map.png') }}"
-              alt="지도"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">지도</span>
-        </a>
-        <a
-          href="{{ url_for('jobs.bookmark_list') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/favorite.png') }}"
-              alt="찜"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">찜</span>
-        </a>
-        <a
-          href="{{ url_for('auth.main') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/home.png') }}"
-              alt="홈"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">홈</span>
-        </a>
-        <a
-          href="{{ url_for('chat.chat_list') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/chatting.png') }}"
-              alt="채팅"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">채팅</span>
-        </a>
-        <a
-          href="{{ url_for('auth.profile') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/profile.png') }}"
-              alt="내정보"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">내정보</span>
-        </a>
-      </footer>
-    </div>
-
-    <!-- AI 도우미 모달 -->
-    <div
-      id="aiAssistantModal"
-      class="fixed inset-0 bg-black bg-opacity-50 hidden z-50"
-    >
-      <div class="flex items-center justify-center min-h-screen p-4">
-        <div
-          class="bg-white rounded-lg max-w-md w-full max-h-screen overflow-y-auto"
-        >
-          <div class="p-4 border-b">
-            <div class="flex justify-between items-center">
-              <h3 class="text-lg font-bold text-gray-800">AI 상세 설명 생성</h3>
-              <button
-                onclick="closeAIAssistant()"
-                class="text-gray-500 hover:text-gray-700"
+                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-600"
               >
                 <svg
                   class="w-6 h-6"
@@ -656,108 +357,441 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
                 </svg>
               </button>
             </div>
+
+            <!-- 숨은 필드 -->
+            <input
+              type="hidden"
+              id="latitude"
+              name="latitude"
+              value="{{ job.latitude or '' }}"
+            />
+            <input
+              type="hidden"
+              id="longitude"
+              name="longitude"
+              value="{{ job.longitude or '' }}"
+            />
+            <input
+              type="hidden"
+              id="region_1depth_name"
+              name="region_1depth_name"
+              value="{{ job.region_1depth_name or '' }}"
+            />
+            <input
+              type="hidden"
+              id="region_2depth_name"
+              name="region_2depth_name"
+              value="{{ job.region_2depth_name or '' }}"
+            />
+            <input
+              type="hidden"
+              id="region_3depth_name"
+              name="region_3depth_name"
+              value="{{ job.region_3depth_name or '' }}"
+            />
           </div>
 
-          <div class="p-4">
-            <div
-              class="mb-4 p-3 bg-green-50 rounded-lg border border-green-200"
+          <!-- 모집 인원 -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              모집 인원
+            </label>
+            <input
+              type="number"
+              name="recruitment_count"
+              id="recruitment_count"
+              value="{{ job.recruitment_count or '' }}"
+              class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none"
+              placeholder="모집 인원 수"
+              min="1"
+            />
+          </div>
+
+          <!-- 연락처 -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              연락처
+            </label>
+            <input
+              type="tel"
+              name="contact_phone"
+              id="contact_phone"
+              value="{{ job.contact_phone or '' }}"
+              class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none"
+              placeholder="010-0000-0000"
+              maxlength="13"
+            />
+          </div>
+
+          <!-- 상세 설명 -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-semibold text-gray-700">
+                상세 설명 <span class="text-red-500">*</span>
+              </label>
+              <button
+                type="button"
+                onclick="openAIAssistant()"
+                class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
+              >
+                <span>✨</span>
+                <span>AI로 작성하기</span>
+              </button>
+            </div>
+            <textarea
+              name="description"
+              id="description"
+              rows="8"
+              class="w-full px-4 py-4 text-base border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none resize-none"
+              placeholder="업무 내용, 자격 요건 등을 자세히 작성해주세요"
+              required
             >
-              <p class="text-sm text-green-800">
-                <strong>AI 도우미가 전문적인 공고를 작성해드립니다</strong
-                ><br />
-                • 업무별 맞춤 표현 자동 생성<br />
-                • 깔끔하고 이해하기 쉬운 문체 적용<br />
-                • 구조화된 상세 설명<br />
-                • 모든 필수 정보가 포함된 완성도 높은 공고
-              </p>
+{{ job.description }}</textarea
+            >
+          </div>
+
+          <!-- 하단 버튼 -->
+          <div class="flex gap-3 pt-4">
+            <button
+              type="button"
+              class="flex-1 py-4 px-4 border-2 border-gray-300 rounded-2xl text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
+              onclick="history.back()"
+            >
+              취소
+            </button>
+            <button
+              type="submit"
+              class="flex-1 py-4 px-4 bg-blue-900 hover:bg-blue-800 text-white font-semibold rounded-2xl transition-colors"
+            >
+              수정하기
+            </button>
+          </div>
+        </form>
+      </main>
+    </div>
+
+    <!-- AI 어시스턴트 모달 -->
+    <div
+      id="aiModal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col"
+      >
+        <!-- 헤더 -->
+        <div class="p-4 border-b flex items-center justify-between">
+          <h3 class="text-lg font-bold flex items-center gap-2">
+            <span>✨</span>
+            <span>AI 작성 도우미</span>
+          </h3>
+          <button
+            onclick="closeAIModal()"
+            class="text-gray-400 hover:text-gray-600"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <!-- 콘텐츠 -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-4">
+          <div>
+            <p class="text-sm text-gray-600 mb-2">
+              아래 정보를 바탕으로 AI가 상세 설명을 작성해드립니다.
+            </p>
+          </div>
+
+          <!-- 제목 입력 -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              공고 제목
+            </label>
+            <input
+              type="text"
+              id="aiTitle"
+              placeholder="제목을 입력해주세요"
+              class="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+
+          <!-- 급여 입력 -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              급여 정보
+            </label>
+            <input
+              type="text"
+              id="aiSalary"
+              placeholder="예: 시급 15,000원"
+              class="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+
+          <!-- 직무 내용 -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              직무 내용
+            </label>
+            <textarea
+              id="aiJobContent"
+              placeholder="주요 업무 내용을 입력해주세요"
+              rows="3"
+              class="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none resize-none"
+            ></textarea>
+          </div>
+
+          <!-- 요구사항 -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              요구사항 (선택)
+            </label>
+            <textarea
+              id="aiRequirements"
+              placeholder="필요한 자격이나 경력 등을 입력해주세요"
+              rows="2"
+              class="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none resize-none"
+            ></textarea>
+          </div>
+
+          <!-- 생성된 텍스트 미리보기 -->
+          <div id="aiPreview" class="hidden">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              생성된 내용 미리보기
+            </label>
+            <div
+              id="aiPreviewContent"
+              class="bg-gray-50 rounded-xl p-4 text-sm text-gray-700 border border-gray-200 max-h-48 overflow-y-auto"
+            ></div>
+          </div>
+
+          <!-- 로딩 표시 -->
+          <div id="aiLoading" class="hidden text-center">
+            <p class="text-sm text-gray-600">AI가 작성 중입니다...</p>
+            <div class="mt-2 flex justify-center gap-1">
+              <div
+                class="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
+              ></div>
+              <div
+                class="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
+                style="animation-delay: 0.2s"
+              ></div>
+              <div
+                class="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
+                style="animation-delay: 0.4s"
+              ></div>
             </div>
+          </div>
+        </div>
 
-            <!-- 추가 정보 입력 폼 -->
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"
-                  >주요 업무 (구체적으로)</label
-                >
-                <textarea
-                  id="aiDuties"
-                  rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  placeholder="예: 고객 주문 받기, 음료 제조, 매장 청소"
-                ></textarea>
-              </div>
+        <!-- 버튼 -->
+        <div class="p-4 border-t flex gap-2">
+          <button
+            type="button"
+            onclick="generateWithAI()"
+            class="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors"
+          >
+            작성하기
+          </button>
+          <button
+            type="button"
+            id="aiApplyBtn"
+            onclick="applyAIText()"
+            class="flex-1 py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-colors hidden"
+          >
+            적용하기
+          </button>
+          <button
+            type="button"
+            onclick="closeAIModal()"
+            class="flex-1 py-3 px-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+          >
+            취소
+          </button>
+        </div>
+      </div>
+    </div>
 
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"
-                  >어떤 분을 찾나요?</label
-                >
-                <textarea
-                  id="aiRequirements"
-                  rows="2"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  placeholder="예: 친절하신 분, 책임감 있으신 분"
-                ></textarea>
-              </div>
+    <!-- 주소 검색 모달 -->
+    <div
+      id="addressModal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col"
+      >
+        <!-- 헤더 -->
+        <div class="p-4 border-b">
+          <h3 class="text-lg font-bold">주소 검색</h3>
+        </div>
 
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"
-                  >혜택 / 좋은 점</label
-                >
-                <textarea
-                  id="aiBenefits"
-                  rows="2"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  placeholder="예: 식사 제공, 교통비 지원, 자유로운 분위기"
-                ></textarea>
-              </div>
+        <!-- 검색 입력 -->
+        <div class="p-4 border-b">
+          <div class="flex gap-2">
+            <input
+              type="text"
+              id="addressSearchKeyword"
+              placeholder="주소를 입력하세요 (예: 경산시 조영동)"
+              class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
+              onkeypress="if(event.key === 'Enter') searchAddress()"
+            />
+            <button
+              onclick="searchAddress()"
+              class="px-4 py-3 bg-blue-600 text-white rounded-xl font-medium"
+            >
+              검색
+            </button>
+          </div>
+        </div>
 
-              <!-- 추가 옵션 -->
-              <div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
-                <h4 class="text-sm font-medium text-gray-800 mb-2">
-                  추가 옵션
-                </h4>
-                <div class="space-y-2">
-                  <label class="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="aiTrainingProvided"
-                      class="mr-2"
-                    />
-                    <span class="text-sm">교육 제공</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input type="checkbox" id="aiFlexibleTime" class="mr-2" />
-                    <span class="text-sm">시간 조정 가능</span>
-                  </label>
-                </div>
-              </div>
-            </div>
+        <!-- 지도 영역 -->
+        <div class="flex-1 overflow-hidden">
+          <div id="addressMap" class="w-full h-80"></div>
+        </div>
 
-            <!-- 버튼 -->
-            <div class="flex gap-2 mt-6">
-              <button
-                onclick="closeAIAssistant()"
-                class="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              >
-                취소
-              </button>
-              <button
-                onclick="generateAIDescription()"
-                class="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold"
-              >
-                <span id="generateBtnText">AI로 상세 설명 생성하기</span>
-              </button>
-            </div>
+        <!-- 선택된 주소 표시 -->
+        <div class="p-4 border-t">
+          <p class="text-sm text-gray-600 mb-2">선택된 주소</p>
+          <p
+            id="selectedAddressText"
+            class="text-base font-medium text-gray-900 mb-4"
+          >
+            지도에서 위치를 클릭하거나 검색해주세요
+          </p>
+          <div class="flex gap-2">
+            <button
+              onclick="closeAddressModal()"
+              class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-medium"
+            >
+              취소
+            </button>
+            <button
+              id="confirmAddressBtn"
+              onclick="selectAddress()"
+              class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
+              disabled
+            >
+              선택
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <script>
+      // AI 어시스턴트 함수
+      function openAIAssistant() {
+        // 현재 입력된 값들을 AI 모달에 미리 채우기
+        const title = document.getElementById("title").value;
+        const salary = document.getElementById("salary").value;
+        const description = document.getElementById("description").value;
+
+        document.getElementById("aiTitle").value = title;
+        document.getElementById("aiSalary").value = salary;
+        document.getElementById("aiJobContent").value = description.substring(
+          0,
+          100
+        ); // 처음 100글자만
+
+        document.getElementById("aiModal").classList.remove("hidden");
+        document.getElementById("aiPreview").classList.add("hidden");
+        document.getElementById("aiApplyBtn").classList.add("hidden");
+      }
+
+      function closeAIModal() {
+        document.getElementById("aiModal").classList.add("hidden");
+        document.getElementById("aiPreview").classList.add("hidden");
+        document.getElementById("aiLoading").classList.add("hidden");
+        document.getElementById("aiApplyBtn").classList.add("hidden");
+      }
+
+      async function generateWithAI() {
+        const title = document.getElementById("aiTitle").value.trim();
+        const salary = document.getElementById("aiSalary").value.trim();
+        const jobContent = document.getElementById("aiJobContent").value.trim();
+        const requirements = document
+          .getElementById("aiRequirements")
+          .value.trim();
+
+        if (!title || !jobContent) {
+          alert("제목과 직무 내용은 필수입니다.");
+          return;
+        }
+
+        // 로딩 표시
+        document.getElementById("aiLoading").classList.remove("hidden");
+        document.getElementById("aiPreview").classList.add("hidden");
+
+        try {
+          const response = await fetch(
+            "{{ url_for('jobs.ai_generate_description') }}",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                title,
+                salary,
+                job_content: jobContent,
+                requirements,
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("AI 생성 실패");
+          }
+
+          const data = await response.json();
+          const generatedText = data.description;
+
+          // 미리보기 표시
+          document.getElementById("aiPreviewContent").textContent =
+            generatedText;
+          document.getElementById("aiPreview").classList.remove("hidden");
+          document.getElementById("aiApplyBtn").classList.remove("hidden");
+
+          // 나중에 사용하기 위해 저장
+          window.aiGeneratedText = generatedText;
+        } catch (error) {
+          console.error("Error:", error);
+          alert("AI 작성 중 오류가 발생했습니다: " + error.message);
+        } finally {
+          document.getElementById("aiLoading").classList.add("hidden");
+        }
+      }
+
+      function applyAIText() {
+        if (window.aiGeneratedText) {
+          document.getElementById("description").value = window.aiGeneratedText;
+          alert("내용이 적용되었습니다.");
+          closeAIModal();
+        }
+      }
+
+      // 모집 형태 선택
       function selectRecruitmentType(button, value) {
         document
           .querySelectorAll(".btn-option[data-value]")
@@ -779,61 +813,69 @@
         }
       }
 
-      // 모달/지도 상태
-      var addressModal = document.getElementById("addressModal");
-      var addressMap, addressMarker, selectedPosition;
-      var geocoder = new kakao.maps.services.Geocoder();
-      var ps = new kakao.maps.services.Places();
-
-      // 주소로 검색하는 함수
-      function searchAddress() {
-        var keyword = document.getElementById("addressSearchKeyword").value;
-
-        if (!keyword.replace(/^\s*|\s*$/g, "")) {
-          alert("키워드를 입력해주세요!");
-          return false;
-        }
-
-        // 장소검색 객체를 통해 키워드로 장소검색을 요청합니다
-        ps.keywordSearch(keyword, function (data, status, pagination) {
-          if (status === kakao.maps.services.Status.OK) {
-            // 검색된 장소 위치를 기준으로 지도 범위를 재설정합니다
-            var bounds = new kakao.maps.LatLngBounds();
-
-            for (var i = 0; i < data.length; i++) {
-              bounds.extend(new kakao.maps.LatLng(data[i].y, data[i].x));
-            }
-
-            addressMap.setBounds(bounds);
-
-            // 첫 번째 검색 결과의 위치로 마커와 중심 좌표를 설정합니다.
-            if (data.length > 0) {
-              var firstItem = data[0];
-              var moveLatLon = new kakao.maps.LatLng(firstItem.y, firstItem.x);
-
-              addressMap.setCenter(moveLatLon);
-              addressMarker.setPosition(moveLatLon);
-              selectedPosition = moveLatLon;
-            }
-          } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
-            alert("검색 결과가 존재하지 않습니다.");
-            return;
-          } else if (status === kakao.maps.services.Status.ERROR) {
-            alert("검색 결과 중 오류가 발생했습니다.");
-            return;
-          }
-        });
+      // 근무 기간 선택
+      function selectWorkPeriod(button, value) {
+        document
+          .querySelectorAll("#work_period_group .btn-option")
+          .forEach((btn) => btn.classList.remove("active"));
+        button.classList.add("active");
+        document.getElementById("work_period").value = value;
       }
 
-      // 지도 최초 1회 생성
-      function initAddressMapOnce() {
-        if (addressMap) return;
-        var mapContainer = document.getElementById("addressMap");
-        var mapOption = {
-          center: new kakao.maps.LatLng(37.566826, 126.9786567),
-          level: 3,
+      // 요일 선택 토글
+      function toggleDay(button) {
+        button.classList.toggle("option-selected");
+        const day = button.getAttribute("data-day");
+        const hiddenInput = document.getElementById("work_" + day);
+        hiddenInput.value = button.classList.contains("option-selected")
+          ? "true"
+          : "false";
+      }
+
+      // 전화번호 자동 포맷팅
+      document
+        .getElementById("contact_phone")
+        .addEventListener("input", function (e) {
+          let value = e.target.value.replace(/[^0-9]/g, "");
+          if (value.length > 3 && value.length <= 7) {
+            value = value.slice(0, 3) + "-" + value.slice(3);
+          } else if (value.length > 7) {
+            value =
+              value.slice(0, 3) +
+              "-" +
+              value.slice(3, 7) +
+              "-" +
+              value.slice(7, 11);
+          }
+          e.target.value = value;
+        });
+
+      // 지도 관련 변수
+      let addressMap = null;
+      let addressMarker = null;
+      let selectedPosition = null;
+      let geocoder = new kakao.maps.services.Geocoder();
+      let ps = new kakao.maps.services.Places();
+
+      // 주소 검색 모달 열기
+      function openAddressModal() {
+        document.getElementById("addressModal").classList.remove("hidden");
+        if (!addressMap) {
+          setTimeout(() => {
+            initAddressMap();
+          }, 100);
+        }
+      }
+
+      // 지도 초기화
+      function initAddressMap() {
+        const container = document.getElementById("addressMap");
+        const options = {
+          center: new kakao.maps.LatLng(35.8242, 128.7569),
+          level: 5,
         };
-        addressMap = new kakao.maps.Map(mapContainer, mapOption);
+
+        addressMap = new kakao.maps.Map(container, options);
 
         addressMarker = new kakao.maps.Marker({
           position: addressMap.getCenter(),
@@ -841,32 +883,65 @@
         });
         selectedPosition = addressMap.getCenter();
 
-        // 지도 클릭 -> 좌표 선택 및 마커 이동
         kakao.maps.event.addListener(
           addressMap,
           "click",
           function (mouseEvent) {
-            var latlng = mouseEvent.latLng;
+            const latlng = mouseEvent.latLng;
             addressMarker.setPosition(latlng);
             selectedPosition = latlng;
+
+            // 좌표로 주소 검색
+            geocoder.coord2Address(
+              latlng.getLng(),
+              latlng.getLat(),
+              function (result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                  const address =
+                    result[0].road_address?.address_name ||
+                    result[0].address?.address_name;
+                  document.getElementById("selectedAddressText").textContent =
+                    address;
+                  document.getElementById("confirmAddressBtn").disabled = false;
+                }
+              }
+            );
           }
         );
       }
 
-      // 모달 열기 -> 다음 프레임에 relayout + setCenter
-      function openAddressModal() {
-        addressModal.style.display = "flex";
-        initAddressMapOnce();
-        requestAnimationFrame(function () {
-          addressMap.relayout();
-          addressMap.setCenter(selectedPosition);
+      // 주소 검색
+      function searchAddress() {
+        const keyword = document
+          .getElementById("addressSearchKeyword")
+          .value.trim();
+        if (!keyword) {
+          alert("검색어를 입력해주세요");
+          return;
+        }
+
+        ps.keywordSearch(keyword, function (data, status) {
+          if (status === kakao.maps.services.Status.OK) {
+            const firstItem = data[0];
+            const moveLatLon = new kakao.maps.LatLng(firstItem.y, firstItem.x);
+
+            addressMap.setCenter(moveLatLon);
+            addressMarker.setPosition(moveLatLon);
+            selectedPosition = moveLatLon;
+
+            document.getElementById("selectedAddressText").textContent =
+              firstItem.address_name;
+            document.getElementById("confirmAddressBtn").disabled = false;
+          } else {
+            alert("검색 결과가 없습니다");
+          }
         });
       }
 
-      // 선택 완료: 좌표->주소 변환 후 폼 반영
+      // 주소 선택 완료
       async function selectAddress() {
         if (!selectedPosition) {
-          alert("지도에서 위치를 먼저 클릭해주세요.");
+          alert("지도에서 위치를 선택해주세요");
           return;
         }
 
@@ -877,36 +952,28 @@
         document.getElementById("longitude").value = lng;
 
         try {
-          const getAddress = new Promise((resolve, reject) => {
+          const addrResult = await new Promise((resolve, reject) => {
             geocoder.coord2Address(lng, lat, (result, status) => {
               status === kakao.maps.services.Status.OK
                 ? resolve(result)
-                : reject(new Error("주소 변환 실패"));
+                : reject();
             });
           });
 
-          const getRegion = new Promise((resolve, reject) => {
+          const regionResult = await new Promise((resolve, reject) => {
             geocoder.coord2RegionCode(lng, lat, (result, status) => {
               status === kakao.maps.services.Status.OK
                 ? resolve(result)
-                : reject(new Error("지역 코드 변환 실패"));
+                : reject();
             });
           });
 
-          const [addrResult, regionResult] = await Promise.all([
-            getAddress,
-            getRegion,
-          ]);
-
-          // 도로명/지번 주소 설정 (화면 표시용)
           const roadAddr = addrResult[0].road_address?.address_name || "";
           const jibunAddr = addrResult[0].address?.address_name || "";
           document.getElementById("region").value = roadAddr || jibunAddr;
 
-          // 법정동(B) 정보 설정 (DB 저장 및 필터링용)
           const legalRegion =
             regionResult.find((r) => r.region_type === "B") || regionResult[0];
-
           document.getElementById("region_1depth_name").value =
             legalRegion.region_1depth_name;
           document.getElementById("region_2depth_name").value =
@@ -915,24 +982,18 @@
             legalRegion.region_3depth_name;
         } catch (error) {
           console.error("주소 변환 중 오류 발생:", error);
-          alert("주소 정보를 가져오는 데 실패했습니다.");
+          alert("주소 정보를 가져오는 데 실패했습니다");
         } finally {
           closeAddressModal();
         }
       }
 
+      // 주소 검색 모달 닫기
       function closeAddressModal() {
-        addressModal.style.display = "none";
+        document.getElementById("addressModal").classList.add("hidden");
       }
 
-      function selectWorkPeriod(button, value) {
-        document
-          .querySelectorAll("#work_period_group .btn-option")
-          .forEach((btn) => btn.classList.remove("active"));
-        button.classList.add("active");
-        document.getElementById("work_period").value = value;
-      }
-
+      // 폼 제출 전 검증
       document
         .getElementById("jobForm")
         .addEventListener("submit", function (e) {
@@ -941,180 +1002,15 @@
           const workPeriod = document.getElementById("work_period").value;
 
           if (!recruitmentType) {
-            alert("모집 형태를 선택해주세요.");
+            alert("모집 형태를 선택해주세요");
             e.preventDefault();
             return;
           }
 
           if (recruitmentType === "일용직" && !workPeriod) {
-            alert("근무 기간을 선택해주세요.");
+            alert("근무 기간을 선택해주세요");
             e.preventDefault();
             return;
-          }
-        });
-
-      // AI 도우미 모달 열기
-      function openAIAssistant() {
-        // 기본 폼 데이터 검증
-        const title = document
-          .querySelector('input[name="title"]')
-          .value.trim();
-        const company = document
-          .querySelector('input[name="company"]')
-          .value.trim();
-
-        if (!title) {
-          alert("제목을 먼저 입력해주세요.");
-          return;
-        }
-
-        if (!company) {
-          alert("담당자명을 먼저 입력해주세요.");
-          return;
-        }
-
-        document.getElementById("aiAssistantModal").classList.remove("hidden");
-      }
-
-      // AI 도우미 모달 닫기
-      function closeAIAssistant() {
-        document.getElementById("aiAssistantModal").classList.add("hidden");
-      }
-
-      // AI 상세 설명 생성
-      async function generateAIDescription() {
-        const generateBtn = document.getElementById("generateBtnText");
-        generateBtn.innerHTML = "AI가 작성 중입니다...";
-
-        try {
-          // 기본 폼 데이터 수집
-          const formData = collectFormData();
-
-          // 추가 정보 수집
-          formData.duties =
-            document.getElementById("aiDuties").value.trim() ||
-            "업무 내용을 입력해주세요";
-          formData.requirements = document
-            .getElementById("aiRequirements")
-            .value.trim();
-          formData.benefits = document
-            .getElementById("aiBenefits")
-            .value.trim();
-          formData.training_provided =
-            document.getElementById("aiTrainingProvided").checked;
-          formData.flexible_time =
-            document.getElementById("aiFlexibleTime").checked;
-          formData.job_type = "general";
-
-          const response = await fetch("/api/job-draft", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formData),
-          });
-
-          const result = await response.json();
-
-          if (result.success) {
-            // 생성된 설명을 textarea에 입력
-            const descriptionTextarea = document.getElementById("description");
-            descriptionTextarea.value = result.content.description;
-
-            // 모달 닫기
-            closeAIAssistant();
-
-            // 성공 메시지
-            alert(
-              "AI가 전문적인 상세 설명을 생성했습니다.\n구조화된 내용을 확인하고 필요시 수정해주세요."
-            );
-          } else {
-            alert("생성 실패: " + result.error);
-          }
-        } catch (error) {
-          alert("서버 오류: " + error.message);
-        } finally {
-          generateBtn.innerHTML = "AI로 상세 설명 생성하기";
-        }
-      }
-
-      // 폼 데이터 수집 함수
-      function collectFormData() {
-        const formData = {
-          title:
-            document.querySelector('input[name="title"]').value.trim() ||
-            "일자리 공고",
-          company:
-            document.querySelector('input[name="company"]').value.trim() ||
-            "회사명",
-          location:
-            document.querySelector('input[name="region"]').value.trim() ||
-            "서울",
-        };
-
-        // 모집 형태
-        const recruitmentTypeBtn = document.querySelector(
-          ".btn-option.active[data-value]"
-        );
-        if (recruitmentTypeBtn) {
-          formData.employment_type =
-            recruitmentTypeBtn.getAttribute("data-value");
-        } else {
-          formData.employment_type = "정규직";
-        }
-
-        // 근무 요일
-        const workDays = [];
-        const dayCheckboxes = [
-          "monday",
-          "tuesday",
-          "wednesday",
-          "thursday",
-          "friday",
-          "saturday",
-          "sunday",
-        ];
-        const dayNames = ["월", "화", "수", "목", "금", "토", "일"];
-
-        dayCheckboxes.forEach((day, index) => {
-          const checkbox = document.querySelector(`input[name="work_${day}"]`);
-          if (checkbox && checkbox.checked) {
-            workDays.push(dayNames[index]);
-          }
-        });
-
-        if (workDays.length > 0) {
-          formData.work_days = workDays.join("");
-        }
-
-        // 근무 시간
-        const startTime = document.querySelector(
-          'input[name="work_start_time"]'
-        ).value;
-        const endTime = document.querySelector(
-          'input[name="work_end_time"]'
-        ).value;
-        if (startTime && endTime) {
-          formData.work_time = `${startTime}~${endTime}`;
-        }
-
-        // 급여
-        const salary = document
-          .querySelector('input[name="salary"]')
-          .value.trim();
-        if (salary) {
-          formData.salary = salary;
-        }
-
-        return formData;
-      }
-
-      // 모달 외부 클릭 시 닫기
-      document
-        .getElementById("aiAssistantModal")
-        .addEventListener("click", function (e) {
-          if (e.target === this) {
-            closeAIAssistant();
           }
         });
     </script>

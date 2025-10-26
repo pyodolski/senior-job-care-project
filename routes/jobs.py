@@ -20,7 +20,8 @@ from flask_login import login_required, current_user
 from models import db, JobPost
 from services.job_service import JobService
 from services.application_service import ApplicationService
-from utils.helpers import format_datetime, get_work_days
+from utils.helpers import format_datetime, get_work_days, calculate_time_ago
+from utils.files_handler import generate_presigned_get_url
 from datetime import datetime, time
 
 # 공고 관련 블루프린트 생성
@@ -226,10 +227,75 @@ def job_detail(job_id):
     # 현재 사용자의 지원 상태 확인
     application_status = ApplicationService.check_application_status(current_user.id, job_id)
     
-    return render_template("jobs/job_detail.html", 
-                         job=job, 
+    # 같은 지역의 다른 공고 추천 (최대 6개)
+    related_jobs = []
+    try:
+        print(f"[DEBUG] 현재 공고 ID: {job_id}, 지역: {job.region}")
+        print(f"[DEBUG] region_2depth_name: {job.region_2depth_name}, region_1depth_name: {job.region_1depth_name}")
+        
+        # 1차 시도: region_2depth_name으로 정확 매칭
+        if job.region_2depth_name:
+            related_jobs = JobPost.query.filter(
+                JobPost.region_2depth_name == job.region_2depth_name,
+                JobPost.id != job_id
+            ).order_by(JobPost.created_at.desc()).limit(6).all()
+            print(f"[DEBUG] region_2depth_name으로 조회: {len(related_jobs)}개 공고 발견")
+        
+        # 2차 시도: 결과가 없으면 region_1depth_name으로 시도
+        if not related_jobs and job.region_1depth_name:
+            related_jobs = JobPost.query.filter(
+                JobPost.region_1depth_name == job.region_1depth_name,
+                JobPost.id != job_id
+            ).order_by(JobPost.created_at.desc()).limit(6).all()
+            print(f"[DEBUG] region_1depth_name으로 조회: {len(related_jobs)}개 공고 발견")
+        
+        # 3차 시도: 여전히 결과가 없으면 region 필드로 LIKE 검색
+        if not related_jobs and job.region:
+            region_parts = job.region.split()
+            if region_parts:
+                # 첫 번째 단어(시/도)로 검색
+                search_term = region_parts[0]
+                print(f"[DEBUG] region으로 LIKE 검색 (폴백): '{search_term}'")
+                related_jobs = JobPost.query.filter(
+                    JobPost.region.like(f'%{search_term}%'),
+                    JobPost.id != job_id
+                ).order_by(JobPost.created_at.desc()).limit(6).all()
+                print(f"[DEBUG] LIKE 검색 결과: {len(related_jobs)}개 공고 발견")
+                for rj in related_jobs:
+                    print(f"  - ID: {rj.id}, 제목: {rj.title}, 지역: {rj.region}, 등록일: {rj.created_at}")
+        
+        print(f"[DEBUG] 최종 관련 공고 수: {len(related_jobs)}")
+    except Exception as e:
+        print(f"관련 공고 조회 오류: {e}")
+        import traceback
+        traceback.print_exc()
+        related_jobs = []
+    
+    # Kakao Map API 키
+    kakao_api_key = current_app.config.get('KAKAO_MAP_API_KEY')
+
+    # 작성자 프로필 이미지 URL 생성
+    author_profile_url = None
+    if job.author and job.author.profile_image:
+        author_profile_url = generate_presigned_get_url(job.author.profile_image, expires=900)
+
+    # 공고 작성 시간 차이 계산
+    time_ago = calculate_time_ago(job.created_at)
+
+    # 관련 공고들의 즐겨찾기 상태 확인
+    related_bookmarks = {}
+    for related_job in related_jobs:
+        related_bookmarks[related_job.id] = JobService.is_bookmarked(current_user.id, related_job.id)
+
+    return render_template("jobs/job_detail.html",
+                         job=job,
                          is_bookmarked=is_bookmarked,
-                         application_status=application_status)
+                         application_status=application_status,
+                         related_jobs=related_jobs,
+                         kakao_key=kakao_api_key,
+                         author_profile_url=author_profile_url,
+                         time_ago=time_ago,
+                         related_bookmarks=related_bookmarks)
 
 # 공고 수정
 @jobs_bp.route("/jobs/<int:job_id>/edit", methods=["GET", "POST"])
@@ -576,3 +642,79 @@ def job_applications(job_id):
     except Exception as e:
         flash("지원자 목록을 조회할 수 없습니다.", "error")
         return redirect(url_for("jobs.job_detail", job_id=job_id))
+
+
+@jobs_bp.route("/jobs/ai-generate-description", methods=["POST"])
+@login_required
+def ai_generate_description():
+    """
+    AI 공고 설명 생성 API
+    ===================
+    
+    기능:
+    - 제목, 급여, 직무내용, 요구사항을 받아서 자동으로 상세 설명 생성
+    - 템플릿 기반 텍스트 생성 (추후 실제 AI API 연동 가능)
+    
+    URL: POST /jobs/ai-generate-description
+    
+    Request Body (JSON):
+    - title: 공고 제목
+    - salary: 급여 정보
+    - job_content: 직무 내용
+    - requirements: 요구사항 (선택)
+    
+    Returns:
+    - JSON: {"description": "생성된 설명"}
+    """
+    try:
+        data = request.get_json()
+        title = data.get('title', '')
+        salary = data.get('salary', '')
+        job_content = data.get('job_content', '')
+        requirements = data.get('requirements', '')
+        
+        # 템플릿 기반 텍스트 생성
+        description = f"""📌 모집 공고: {title}
+
+💰 급여 정보
+{salary}
+
+📋 주요 업무
+{job_content}
+"""
+        
+        if requirements:
+            description += f"""
+✅ 지원 자격 및 요구사항
+{requirements}
+"""
+        
+        description += """
+📞 지원 방법
+- 본 공고에서 '지원하기' 버튼을 클릭해주세요
+- 담당자가 확인 후 연락드리겠습니다
+
+⭐ 우대사항
+- 성실하고 책임감 있으신 분
+- 원활한 의사소통이 가능하신 분
+- 장기 근무 가능하신 분
+
+🎯 근무 환경
+- 쾌적한 근무 환경
+- 상호 존중하는 직장 문화
+- 성장할 수 있는 기회 제공
+
+많은 관심과 지원 부탁드립니다! 😊
+"""
+        
+        return jsonify({
+            'success': True,
+            'description': description.strip()
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"AI 설명 생성 중 오류: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'AI 설명 생성에 실패했습니다.'
+        }), 500

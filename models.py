@@ -121,6 +121,7 @@ class JobPost(db.Model):
     work_end_time = db.Column(db.Time, nullable=True)          # 근무 종료 시간
     recruitment_count = db.Column(db.Integer, nullable=True)   # 모집 인원
     region = db.Column(db.String(100), nullable=True)          # 근무 지역 (맵 연동)
+    detail_address = db.Column(db.String(200), nullable=True)  # 상세 주소
     latitude = db.Column(Float, nullable=True)  # 위도
     longitude = db.Column(Float, nullable=True)  # 경도
     salary = db.Column(db.String(100), nullable=True)          # 급여
