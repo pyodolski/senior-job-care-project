@@ -26,7 +26,7 @@ class Config:
     RAILWAY_DB_URI = os.getenv("DATABASE_URL")
     
     # For local development
-    LOCAL_DB_URI = "mysql+pymysql://root:Ckdhfma1406!@localhost:3306/senior_project_new"
+    LOCAL_DB_URI = "mysql+pymysql://root:Ckdhfma1406!@localhost:3306/senior_house"
     
     # Railway DATABASE_URL 우선 사용, 없으면 로컬 DB 사용
     SQLALCHEMY_DATABASE_URI = RAILWAY_DB_URI if RAILWAY_DB_URI else LOCAL_DB_URI

@@ -70,6 +70,12 @@ class User(db.Model):
     is_verified = db.Column(db.Boolean, default=False)  # 관리자 승인 여부 (False=대기, True=승인)
     business_registration_file = db.Column(db.String(255), nullable=True)  # 사업자 등록증 파일 경로
     business_registration_original = db.Column(db.String(255))  # 사용자 원본 파일명
+    
+    # 기업 주소 정보
+    company_sido = db.Column(db.String(30), nullable=True)      # 회사 시/도
+    company_sigungu = db.Column(db.String(30), nullable=True)   # 회사 시/군/구
+    company_dong = db.Column(db.String(40), nullable=True)      # 회사 동
+    company_full_address = db.Column(db.String(255), nullable=True)  # 회사 전체 주소
 
     # 소셜 로그인 정보
     social_type = db.Column(db.String(20), nullable=True)     # 소셜 로그인 타입 (google, kakao 등)

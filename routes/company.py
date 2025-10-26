@@ -135,7 +135,7 @@ def create_company_job():
             description = request.form.get("description", "").strip()
             
             # 직무 내용
-            job_category = request.form.get("job_category", "")
+            job_category = request.form.get("job_category", "일반")
             job_category_custom = request.form.get("job_category_custom", "").strip()
             
             # 임금 정보
@@ -199,8 +199,8 @@ def create_company_job():
                 recruitment_end_date = datetime.strptime(recruitment_end_date_str, "%Y-%m-%d").date()
             
             # 필수 필드 검증
-            if not all([title, company, description, job_category]):
-                flash("채용 제목, 회사명, 상세 설명, 직무 분야는 필수 입력 항목입니다.", "error")
+            if not all([title, company, description]):
+                flash("채용 제목, 회사명, 상세 설명은 필수 입력 항목입니다.", "error")
                 return render_template("company/create_job.html")
             
             # 임금 정보 처리

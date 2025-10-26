@@ -331,6 +331,12 @@ def register_company():
         nickname = request.form["nickname"]
         name = request.form.get("name")
         email = request.form.get("email")
+        
+        # 회사 주소 정보
+        company_sido = request.form.get("company_sido")
+        company_sigungu = request.form.get("company_sigungu")
+        company_dong = request.form.get("company_dong")
+        company_full_address = request.form.get("company_full_address")
 
         # 1. 비밀번호 확인
         if password != confirm_password:
@@ -379,6 +385,10 @@ def register_company():
             is_verified=False,  # 승인 대기
             business_registration_file = unique_filename,  # 업로드 파일명 저장
             business_registration_original = original_filename,
+            company_sido=company_sido,
+            company_sigungu=company_sigungu,
+            company_dong=company_dong,
+            company_full_address=company_full_address,
         )
 
 
@@ -388,7 +398,8 @@ def register_company():
         flash("기업 회원가입 신청이 완료되었습니다. 관리자의 승인을 기다려 주세요.")
         return redirect(url_for("auth.home"))
 
-    return render_template("register_company.html")
+    kakao_key = current_app.config.get("KAKAO_MAP_API_KEY")
+    return render_template("register_company.html", kakao_key=kakao_key)
 
 
 # 로그인 라우트
