@@ -123,6 +123,9 @@ def create_job():
             region = request.form.get("region", "").strip()
             contact_phone = request.form.get("contact_phone", "").strip()
             recruitment_count = request.form.get("recruitment_count", type=int)
+            
+            # 사람이음 카테고리 (업무, 이웃, 과외, 제능, 문화)
+            people_category = request.form.get("people_category", "").strip()
 
             # --- 행정구역 정보 추가로 받기 ---
             region_1depth_name = request.form.get("region_1depth_name")
@@ -176,6 +179,7 @@ def create_job():
                 longitude=longitude,
                 contact_phone=contact_phone,
                 recruitment_count=recruitment_count,
+                people_category=people_category,  # 사람이음 카테고리 추가
                 work_start_time=work_start_time,
                 work_end_time=work_end_time,
                 work_monday=work_monday,
