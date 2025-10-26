@@ -67,20 +67,38 @@ def calculate_time_ago(datetime_obj):
     """상대적 시간 계산 (예: 2시간 전, 3일 전)"""
     if not datetime_obj:
         return ''
-    
-    now = datetime.utcnow()
+
+    from datetime import timezone, timedelta
+
+    # KST (UTC+9)
+    KST = timezone(timedelta(hours=9))
+    now = datetime.now(KST)
+
+    # datetime_obj가 timezone aware가 아니면 KST로 설정
+    if datetime_obj.tzinfo is None:
+        datetime_obj = datetime_obj.replace(tzinfo=KST)
+
     diff = now - datetime_obj
-    
-    if diff.days > 0:
-        return f"{diff.days}일 전"
-    elif diff.seconds > 3600:
-        hours = diff.seconds // 3600
-        return f"{hours}시간 전"
-    elif diff.seconds > 60:
-        minutes = diff.seconds // 60
-        return f"{minutes}분 전"
-    else:
+
+    seconds = diff.total_seconds()
+    minutes = seconds / 60
+    hours = minutes / 60
+    days = diff.days
+    months = days / 30
+    years = days / 365
+
+    if minutes < 1:
         return "방금 전"
+    elif minutes < 60:
+        return f"{int(minutes)}분 전"
+    elif hours < 24:
+        return f"{int(hours)}시간 전"
+    elif days < 30:
+        return f"{int(days)}일 전"
+    elif days < 365:
+        return f"{int(months)}개월 전"
+    else:
+        return f"{int(years)}년 전"
 
 def validate_email(email):
     """이메일 유효성 검사"""

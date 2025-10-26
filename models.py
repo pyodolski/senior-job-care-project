@@ -70,6 +70,12 @@ class User(db.Model):
     is_verified = db.Column(db.Boolean, default=False)  # 관리자 승인 여부 (False=대기, True=승인)
     business_registration_file = db.Column(db.String(255), nullable=True)  # 사업자 등록증 파일 경로
     business_registration_original = db.Column(db.String(255))  # 사용자 원본 파일명
+    
+    # 기업 주소 정보
+    company_sido = db.Column(db.String(30), nullable=True)      # 회사 시/도
+    company_sigungu = db.Column(db.String(30), nullable=True)   # 회사 시/군/구
+    company_dong = db.Column(db.String(40), nullable=True)      # 회사 동
+    company_full_address = db.Column(db.String(255), nullable=True)  # 회사 전체 주소
 
     # 소셜 로그인 정보
     social_type = db.Column(db.String(20), nullable=True)     # 소셜 로그인 타입 (google, kakao 등)
@@ -121,6 +127,7 @@ class JobPost(db.Model):
     work_end_time = db.Column(db.Time, nullable=True)          # 근무 종료 시간
     recruitment_count = db.Column(db.Integer, nullable=True)   # 모집 인원
     region = db.Column(db.String(100), nullable=True)          # 근무 지역 (맵 연동)
+    detail_address = db.Column(db.String(200), nullable=True)  # 상세 주소
     latitude = db.Column(Float, nullable=True)  # 위도
     longitude = db.Column(Float, nullable=True)  # 경도
     salary = db.Column(db.String(100), nullable=True)          # 급여
@@ -284,6 +291,10 @@ class Resume(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # ⚠️ 중요: user_id에 UNIQUE 제약 조건을 설정하지 않음
+    # 한 사용자가 여러 개의 이력서를 작성할 수 있도록 허용
+    # 이전에 데이터베이스에 uq_user_resume 제약이 있었다면 fix_resume_constraint.sql 실행 필요
 
     # --- 공개 여부 ---
     is_public = db.Column(db.Boolean, default=False, nullable=False)

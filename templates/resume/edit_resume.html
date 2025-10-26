@@ -1,217 +1,2213 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>이력서 작성/수정</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9; }
-        .form-container { background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .step-container { border: 1px solid #ddd; padding: 20px; margin-top: 20px; border-radius: 8px; }
-        h1 { text-align: center; color: #333; }
-        h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; color: #444; }
-        h4 { color: #555; margin-top: 20px; }
-        label { display: block; margin: 15px 0 5px; font-weight: bold; }
-        input[type="text"], input[type="time"], input[type="number"], textarea { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; }
-        textarea { min-height: 120px; resize: vertical; }
-        .button-group { margin-top: 25px; display: flex; justify-content: space-between; }
-        button { padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        button[type="submit"] { background-color: #007bff; color: white; width: 100%; }
-        .prev-btn { background-color: #6c757d; color: white; }
-        .next-btn { background-color: #28a745; color: white; }
-        .certificate-entry { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
-        .checkbox-group label { display: inline-block; margin-right: 15px; font-weight: normal; }
-        .alert { padding: 15px; margin-bottom: 20px; border-radius: 5px; }
-        .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .alert-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+      }
+      .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: white;
+        min-height: 100vh;
+        position: relative;
+        padding-top: 70px;
+        padding-bottom: 80px;
+      }
+      .main-content {
+        padding: 20px 30px;
+      }
+      .header-fixed {
+        position: fixed;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 600px;
+        background-color: white;
+        border-bottom: 1px solid #e5e7eb;
+        z-index: 50;
+      }
+      .footer-fixed {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 600px;
+        background-color: white;
+        border-top: 1px solid #e5e7eb;
+        padding: 16px 20px;
+        z-index: 50;
+      }
+      .step-container {
+        border: 1px solid #ddd;
+        padding: 20px;
+        margin-top: 20px;
+        border-radius: 8px;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      h2 {
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+        color: #444;
+      }
+      h4 {
+        color: #555;
+        margin-top: 20px;
+      }
+      label {
+        display: block;
+        margin: 15px 0 5px;
+        font-weight: bold;
+      }
+      input[type="text"],
+      input[type="time"],
+      input[type="number"],
+      textarea {
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+      .button-group {
+        margin-top: 25px;
+        display: flex;
+        justify-content: space-between;
+      }
+      button {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+      }
+      button[type="submit"] {
+        background-color: #007bff;
+        color: white;
+        width: 100%;
+      }
+      .prev-btn {
+        background-color: #6c757d;
+        color: white;
+      }
+      .next-btn {
+        background-color: #28a745;
+        color: white;
+      }
+      .certificate-entry {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .checkbox-group label {
+        display: inline-block;
+        margin-right: 15px;
+        font-weight: normal;
+      }
+      .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+      }
+      .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      /* 카테고리 카드 스타일 */
+      .category-card {
+        transition: all 0.2s ease;
+      }
+      .category-card input[type="radio"]:checked ~ .card-content {
+        border-color: #1e40af;
+        background-color: #eff6ff;
+      }
+      .category-card input[type="radio"]:checked ~ .card-content .radio-circle {
+        background-color: #1e40af;
+        border-color: #1e40af;
+      }
+      .category-card
+        input[type="radio"]:checked
+        ~ .card-content
+        .radio-circle
+        .check-icon {
+        display: block;
+      }
+      .check-icon {
+        display: none;
+      }
+      .button-group {
+        display: none;
+      }
+
+      /* 요일 버튼 스타일 */
+      .day-btn {
+        display: inline-block;
+        width: 48px;
+        height: 48px;
+        line-height: 48px;
+        text-align: center;
+        border: 2px solid #d1d5db;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-weight: 500;
+        color: #4b5563;
+      }
+      .day-checkbox:checked + .day-btn {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        color: white;
+      }
+
+      /* 근무 형태 버튼 스타일 */
+      .work-type-btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border: 2px solid #d1d5db;
+        border-radius: 24px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-weight: 500;
+        color: #4b5563;
+      }
+      .work-type-radio:checked + .work-type-btn {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        color: white;
+      }
+
+      /* 성격 및 강점 버튼 스타일 */
+      .strength-btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border: 2px solid #d1d5db;
+        border-radius: 24px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-weight: 500;
+        color: #4b5563;
+      }
+      .strength-checkbox:checked + .strength-btn {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        color: white;
+      }
+
+      /* 슬라이더 스타일 */
+      .walkable-slider,
+      .commute-slider {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 8px;
+        background: #e5e7eb;
+        outline: none;
+        border-radius: 4px;
+      }
+
+      .walkable-slider::-webkit-slider-thumb,
+      .commute-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 32px;
+        height: 32px;
+        background: #2563eb;
+        cursor: pointer;
+        border-radius: 50%;
+        border: 4px solid white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .walkable-slider::-moz-range-thumb,
+      .commute-slider::-moz-range-thumb {
+        width: 32px;
+        height: 32px;
+        background: #2563eb;
+        cursor: pointer;
+        border-radius: 50%;
+        border: 4px solid white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .walkable-slider::-webkit-slider-thumb::before,
+      .commute-slider::-webkit-slider-thumb::before {
+        content: "👤";
+        position: absolute;
+        font-size: 16px;
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div class="form-container">
-        <h1>이력서 관리</h1>
+      <!-- Header -->
+      <div class="header-fixed">
+        <header class="px-4 py-4 flex items-center justify-between">
+          <button onclick="handleBackButton()" class="focus:outline-none">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-6 h-6 text-gray-700"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <h1 class="text-lg font-bold text-gray-800">이력서 작성</h1>
+          <div class="w-6"></div>
+          <!-- 공간 확보용 -->
+        </header>
+      </div>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+      <!-- Main Content -->
+      <div class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %} {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %} {% endif %} {% endwith %}
 
         <form method="POST" enctype="multipart/form-data">
-            <!-- 단계 1: 희망 직무 분야 및 형태 -->
-            <div id="step-1" class="step-container">
-                <h2>1. 희망 근무 조건</h2>
-                <h4>희망 직무분야 (중복 선택 가능)</h4>
-                <div class="checkbox-group">
-                    {% for category in all_categories %}
-                    <label>
-                        <input type="checkbox" name="categories" value="{{ category.value }}" {% if resume and category.value in (resume.desired_categories or "") %}checked{% endif %}>
-                        {{ category.value }}
-                    </label>
-                    {% endfor %}
-                </div>
+          <!-- 단계 1: 희망 직무 분야 및 형태 -->
+          <div id="step-1" class="step-container">
+            <h2 class="text-xl font-bold text-gray-900 mb-2">
+              나의 희망 직무분야를 선택해 주세요
+            </h2>
+            <p class="text-sm text-gray-500 mb-6">
+              (복수 선택 불가 - 분야별로 이력서를 만들어주세요!)
+            </p>
 
-                <h4>희망 근무 형태</h4>
-                <div class="checkbox-group">
-                    {% for work_type in all_work_types %}
-                    <label>
-                        <input type="radio" name="desired_work_type" value="{{ work_type.name }}" {% if resume and resume.desired_work_type == work_type %}checked{% endif %}>
-                        {{ work_type.value }}
-                    </label>
-                    {% endfor %}
+            <div class="space-y-3 mb-6">
+              <!-- 안전·관리 -->
+              <label class="category-card block cursor-pointer">
+                <input type="radio" name="categories" value="안전·관리"
+                class="hidden" {% if resume and '안전·관리' in
+                (resume.desired_categories or "") %}checked{% endif %} />
+                <div
+                  class="card-content border-2 border-gray-200 rounded-xl p-4 flex items-start justify-between"
+                >
+                  <div class="flex-1">
+                    <div class="flex items-center mb-2">
+                      <span class="text-2xl mr-2">🧯</span>
+                      <h3 class="text-lg font-bold text-gray-900">안전·관리</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">
+                      작업장 안전 관리와 분야를 담당합니다.
+                    </p>
+                    <div class="flex flex-wrap gap-1">
+                      <span class="text-xs text-blue-600">관리자</span>
+                      <span class="text-xs text-gray-400">·</span>
+                      <span class="text-xs text-blue-600">주차 관리</span>
+                      <span class="text-xs text-gray-400">·</span>
+                      <span class="text-xs text-blue-600"
+                        >시설 · 건물 관리</span
+                      >
+                    </div>
+                  </div>
+                  <div class="ml-3">
+                    <div
+                      class="radio-circle w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center"
+                    >
+                      <svg
+                        class="check-icon w-5 h-5 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="3"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
-                <div class="button-group">
-                    <button type="button" class="next-btn" onclick="nextStep(2)">다음</button>
+              </label>
+
+              <!-- 서비스·배장 -->
+              <label class="category-card block cursor-pointer">
+                <input type="radio" name="categories" value="서비스·배장"
+                class="hidden" {% if resume and '서비스·배장' in
+                (resume.desired_categories or "") %}checked{% endif %} />
+                <div
+                  class="card-content border-2 border-gray-200 rounded-xl p-4 flex items-start justify-between"
+                >
+                  <div class="flex-1">
+                    <div class="flex items-center mb-2">
+                      <span class="text-2xl mr-2">🛍️</span>
+                      <h3 class="text-lg font-bold text-gray-900">
+                        서비스·배장
+                      </h3>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">
+                      판매업과 서비스업 분야에 들어가는 분야 적합합니다.
+                    </p>
+                    <div class="flex flex-wrap gap-1">
+                      <span class="text-xs text-blue-600">매장 계산원</span>
+                      <span class="text-xs text-gray-400">·</span>
+                      <span class="text-xs text-blue-600">안내 데스크</span>
+                      <span class="text-xs text-gray-400">·</span>
+                      <span class="text-xs text-blue-600"
+                        >음식점·카페 보조</span
+                      >
+                    </div>
+                  </div>
+                  <div class="ml-3">
+                    <div
+                      class="radio-circle w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center"
+                    >
+                      <svg
+                        class="check-icon w-5 h-5 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="3"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
+              </label>
+
+              <!-- 생활·돌봄 지원 -->
+              <label class="category-card block cursor-pointer">
+                <input type="radio" name="categories" value="생활·돌봄 지원"
+                class="hidden" {% if resume and '생활·돌봄 지원' in
+                (resume.desired_categories or "") %}checked{% endif %} />
+                <div
+                  class="card-content border-2 border-gray-200 rounded-xl p-4 flex items-start justify-between"
+                >
+                  <div class="flex-1">
+                    <div class="flex items-center mb-2">
+                      <span class="text-2xl mr-2">🌱</span>
+                      <h3 class="text-lg font-bold text-gray-900">
+                        생활·돌봄 지원
+                      </h3>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">
+                      생활보건 또는 돌봄 업무를 가진 분야 외 업종입니다.
+                    </p>
+                    <div class="flex flex-wrap gap-1">
+                      <span class="text-xs text-blue-600">아이 돌봄</span>
+                      <span class="text-xs text-gray-400">·</span>
+                      <span class="text-xs text-blue-600">반려동물 산책</span>
+                      <span class="text-xs text-gray-400">·</span>
+                      <span class="text-xs text-blue-600">가사 지원</span>
+                      <span class="text-xs text-gray-400">·</span>
+                      <span class="text-xs text-blue-600">병원 동행</span>
+                    </div>
+                  </div>
+                  <div class="ml-3">
+                    <div
+                      class="radio-circle w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center"
+                    >
+                      <svg
+                        class="check-icon w-5 h-5 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="3"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </label>
+
+              <!-- 운전·배송 -->
+              <label class="category-card block cursor-pointer">
+                <input type="radio" name="categories" value="운전·배송"
+                class="hidden" {% if resume and '운전·배송' in
+                (resume.desired_categories or "") %}checked{% endif %} />
+                <div
+                  class="card-content border-2 border-gray-200 rounded-xl p-4 flex items-start justify-between"
+                >
+                  <div class="flex-1">
+                    <div class="flex items-center mb-2">
+                      <span class="text-2xl mr-2">🚗</span>
+                      <h3 class="text-lg font-bold text-gray-900">운전·배송</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">
+                      운전에 익숙한 분들을 적합합니다.
+                    </p>
+                    <div class="flex flex-wrap gap-1">
+                      <span class="text-xs text-blue-600">음식 배달 기사</span>
+                      <span class="text-xs text-gray-400">·</span>
+                      <span class="text-xs text-blue-600">생활 운전</span>
+                      <span class="text-xs text-gray-400">·</span>
+                      <span class="text-xs text-blue-600"
+                        >스쿠터 배달·심부름</span
+                      >
+                    </div>
+                  </div>
+                  <div class="ml-3">
+                    <div
+                      class="radio-circle w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center"
+                    >
+                      <svg
+                        class="check-icon w-5 h-5 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="3"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </label>
+
+              <!-- 사회·공공 -->
+              <label class="category-card block cursor-pointer">
+                <input type="radio" name="categories" value="사회·공공"
+                class="hidden" {% if resume and '사회·공공' in
+                (resume.desired_categories or "") %}checked{% endif %} />
+                <div
+                  class="card-content border-2 border-gray-200 rounded-xl p-4 flex items-start justify-between"
+                >
+                  <div class="flex-1">
+                    <div class="flex items-center mb-2">
+                      <span class="text-2xl mr-2">🏛️</span>
+                      <h3 class="text-lg font-bold text-gray-900">사회·공공</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">
+                      행사나, 사회적 활동에 살업은 분류를 담당합니다.
+                    </p>
+                    <div class="flex flex-wrap gap-1">
+                      <span class="text-xs text-blue-600">도서관 보조</span>
+                      <span class="text-xs text-gray-400">·</span>
+                      <span class="text-xs text-blue-600"
+                        >환경미화·분리수거</span
+                      >
+                      <span class="text-xs text-gray-400">·</span>
+                      <span class="text-xs text-blue-600">복지센터 업무</span>
+                    </div>
+                  </div>
+                  <div class="ml-3">
+                    <div
+                      class="radio-circle w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center"
+                    >
+                      <svg
+                        class="check-icon w-5 h-5 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="3"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </label>
+
+              <!-- 기타 (직접 작성) -->
+              <label class="category-card block cursor-pointer">
+                <input type="radio" name="categories" value="기타"
+                class="hidden" {% if resume and '기타' in
+                (resume.desired_categories or "") %}checked{% endif %} />
+                <div
+                  class="card-content border-2 border-gray-200 rounded-xl p-4 flex items-start justify-between"
+                >
+                  <div class="flex-1">
+                    <div class="flex items-center mb-2">
+                      <span class="text-2xl mr-2">⭐</span>
+                      <h3 class="text-lg font-bold text-gray-900">
+                        기타 (직접 작성)
+                      </h3>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">
+                      하고싶은 일(분야)를 적어주세요
+                    </p>
+                  </div>
+                  <div class="ml-3">
+                    <div
+                      class="radio-circle w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center"
+                    >
+                      <svg
+                        class="check-icon w-5 h-5 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="3"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </label>
             </div>
 
-            <!-- 단계 2 ~ 4 (이전 코드와 동일, 생략 없이 전체 포함) -->
-            <div id="step-2" class="step-container" style="display:none;">
-                <h2>2. 희망 근무 요일 및 시간</h2>
-                <h4>희망 근무 요일</h4>
-                <div class="checkbox-group">
-                    <label><input type="checkbox" name="work_monday" {% if resume and resume.work_monday %}checked{% endif %}> 월</label>
-                    <label><input type="checkbox" name="work_tuesday" {% if resume and resume.work_tuesday %}checked{% endif %}> 화</label>
-                    <label><input type="checkbox" name="work_wednesday" {% if resume and resume.work_wednesday %}checked{% endif %}> 수</label>
-                    <label><input type="checkbox" name="work_thursday" {% if resume and resume.work_thursday %}checked{% endif %}> 목</label>
-                    <label><input type="checkbox" name="work_friday" {% if resume and resume.work_friday %}checked{% endif %}> 금</label>
-                    <label><input type="checkbox" name="work_saturday" {% if resume and resume.work_saturday %}checked{% endif %}> 토</label>
-                    <label><input type="checkbox" name="work_sunday" {% if resume and resume.work_sunday %}checked{% endif %}> 일</label>
+            <div class="button-group">
+              <button type="button" class="next-btn" onclick="nextStep(2)">
+                다음
+              </button>
+            </div>
+          </div>
+
+          <!-- 단계 2: 희망 근무 요일, 시간, 형태 -->
+          <div id="step-2" class="step-container" style="display: none">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">2. 근무 조건</h2>
+
+            <!-- 희망 근무 요일 -->
+            <div class="mb-6">
+              <h3 class="text-base font-semibold text-gray-900 mb-3">
+                나의 근무 희망 요일을 선택해 주세요
+              </h3>
+              <div class="flex flex-wrap gap-2 mb-3">
+                <label class="day-btn-label">
+                  <input
+                    type="checkbox"
+                    name="work_monday"
+                    class="hidden day-checkbox"
+                    {%
+                    if
+                    resume
+                    and
+                    resume.work_monday
+                    %}checked{%
+                    endif
+                    %}
+                  />
+                  <span class="day-btn">월</span>
+                </label>
+                <label class="day-btn-label">
+                  <input
+                    type="checkbox"
+                    name="work_tuesday"
+                    class="hidden day-checkbox"
+                    {%
+                    if
+                    resume
+                    and
+                    resume.work_tuesday
+                    %}checked{%
+                    endif
+                    %}
+                  />
+                  <span class="day-btn">화</span>
+                </label>
+                <label class="day-btn-label">
+                  <input
+                    type="checkbox"
+                    name="work_wednesday"
+                    class="hidden day-checkbox"
+                    {%
+                    if
+                    resume
+                    and
+                    resume.work_wednesday
+                    %}checked{%
+                    endif
+                    %}
+                  />
+                  <span class="day-btn">수</span>
+                </label>
+                <label class="day-btn-label">
+                  <input
+                    type="checkbox"
+                    name="work_thursday"
+                    class="hidden day-checkbox"
+                    {%
+                    if
+                    resume
+                    and
+                    resume.work_thursday
+                    %}checked{%
+                    endif
+                    %}
+                  />
+                  <span class="day-btn">목</span>
+                </label>
+                <label class="day-btn-label">
+                  <input
+                    type="checkbox"
+                    name="work_friday"
+                    class="hidden day-checkbox"
+                    {%
+                    if
+                    resume
+                    and
+                    resume.work_friday
+                    %}checked{%
+                    endif
+                    %}
+                  />
+                  <span class="day-btn">금</span>
+                </label>
+                <label class="day-btn-label">
+                  <input
+                    type="checkbox"
+                    name="work_saturday"
+                    class="hidden day-checkbox"
+                    {%
+                    if
+                    resume
+                    and
+                    resume.work_saturday
+                    %}checked{%
+                    endif
+                    %}
+                  />
+                  <span class="day-btn">토</span>
+                </label>
+                <label class="day-btn-label">
+                  <input
+                    type="checkbox"
+                    name="work_sunday"
+                    class="hidden day-checkbox"
+                    {%
+                    if
+                    resume
+                    and
+                    resume.work_sunday
+                    %}checked{%
+                    endif
+                    %}
+                  />
+                  <span class="day-btn">일</span>
+                </label>
+              </div>
+              <label class="flex items-center text-sm text-gray-600">
+                <input type="checkbox" id="day_negotiable" class="mr-2" />
+                <span>요일 협의 가능</span>
+              </label>
+            </div>
+
+            <!-- 희망 근무 시간대 -->
+            <div class="mb-6">
+              <h3 class="text-base font-semibold text-gray-900 mb-3">
+                나의 근무 희망 시간대를 선택해 주세요
+              </h3>
+              <div
+                id="time-selector"
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg flex items-center justify-between cursor-pointer hover:border-blue-500 transition-colors mb-3"
+                onclick="openTimeModal()"
+              >
+                <span id="time-display" class="text-gray-700"
+                  >오전 09:00 ~ 오후 06:00</span
+                >
+                <svg
+                  class="w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  ></path>
+                </svg>
+              </div>
+              <label class="flex items-center text-sm text-gray-600">
+                <input
+                  type="checkbox"
+                  id="time_negotiable"
+                  name="is_time_negotiable"
+                  class="mr-2"
+                  {%
+                  if
+                  resume
+                  and
+                  resume.is_time_negotiable
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <span>시간 협의 가능</span>
+              </label>
+
+              <!-- Hidden inputs for actual form submission -->
+              <input
+                type="time"
+                id="start_time"
+                name="start_time"
+                class="hidden"
+                value="{{ resume.desired_start_time.strftime('%H:%M') if resume and resume.desired_start_time else '09:00' }}"
+              />
+              <input
+                type="time"
+                id="end_time"
+                name="end_time"
+                class="hidden"
+                value="{{ resume.desired_end_time.strftime('%H:%M') if resume and resume.desired_end_time else '18:00' }}"
+              />
+            </div>
+
+            <!-- 희망 근무 형태 -->
+            <div class="mb-6">
+              <h3 class="text-base font-semibold text-gray-900 mb-3">
+                나의 근무 형태를 선택해 주세요
+              </h3>
+              <div class="flex flex-wrap gap-2">
+                {% for work_type in all_work_types %}
+                <label class="work-type-label">
+                  <input type="radio" name="desired_work_type" value="{{
+                  work_type.name }}" class="hidden work-type-radio" {% if resume
+                  and resume.desired_work_type == work_type %}checked{% endif
+                  %}>
+                  <span class="work-type-btn">{{ work_type.value }}</span>
+                </label>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="button-group">
+              <button type="button" class="prev-btn" onclick="prevStep(1)">
+                이전
+              </button>
+              <button type="button" class="next-btn" onclick="nextStep(3)">
+                다음
+              </button>
+            </div>
+          </div>
+
+          <!-- 시간 선택 모달 -->
+          <div
+            id="time-modal"
+            class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center"
+            style="z-index: 9999"
+            onclick="closeTimeModal(event)"
+          >
+            <div
+              class="bg-white rounded-t-3xl fixed bottom-0 left-0 right-0 p-6 max-w-600 mx-auto"
+              style="max-width: 600px"
+              onclick="event.stopPropagation()"
+            >
+              <div class="grid grid-cols-2 gap-3 mb-4">
+                <!-- 시작 시간 -->
+                <div class="relative">
+                  <select
+                    id="start-period"
+                    class="w-full px-4 py-3 border-2 border-blue-600 rounded-lg appearance-none bg-white text-gray-900 font-medium"
+                  >
+                    <option value="오전">오전</option>
+                    <option value="오후">오후</option>
+                  </select>
+                  <svg
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    ></path>
+                  </svg>
                 </div>
-                <h4>희망 근무 시간</h4>
+                <div class="relative">
+                  <select
+                    id="start-hour"
+                    class="w-full px-4 py-3 border-2 border-blue-600 rounded-lg appearance-none bg-white text-gray-900 font-medium"
+                  >
+                    <!-- 시간 옵션들 -->
+                  </select>
+                  <svg
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 mb-6">
+                <!-- 종료 시간 -->
+                <div class="relative">
+                  <select
+                    id="end-period"
+                    class="w-full px-4 py-3 border-2 border-blue-600 rounded-lg appearance-none bg-white text-gray-900 font-medium"
+                  >
+                    <option value="오전">오전</option>
+                    <option value="오후">오후</option>
+                  </select>
+                  <svg
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    ></path>
+                  </svg>
+                </div>
+                <div class="relative">
+                  <select
+                    id="end-hour"
+                    class="w-full px-4 py-3 border-2 border-blue-600 rounded-lg appearance-none bg-white text-gray-900 font-medium"
+                  >
+                    <!-- 시간 옵션들 -->
+                  </select>
+                  <svg
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onclick="confirmTime()"
+                class="w-full py-4 bg-blue-600 text-white text-base font-bold rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                입력
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: 경력 및 경험 -->
+          <div id="step-3" class="step-container" style="display: none">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+              나의 경력이나 경험을 입력해 주세요
+            </h2>
+
+            <div class="bg-gray-50 rounded-lg p-4 mb-4 text-sm text-gray-700">
+              <ul class="list-disc list-inside space-y-1">
+                <li>이전 직장 및 업무 경험</li>
+                <li>지역 사회·봉사 활동 경험</li>
+                <li>
+                  생활 속에서 구축이 매우 일품<br />(예: 가족 돌봄, 가계 운영
+                  등)
+                </li>
+              </ul>
+            </div>
+
+            <div class="mb-4">
+              <p class="text-sm font-semibold text-gray-700 mb-2">예시</p>
+              <div
+                class="bg-white border border-gray-200 rounded-lg p-3 space-y-2 text-sm text-gray-600"
+              >
+                <p>"이마트 캐셔원으로 5년 근무했습니다."</p>
+                <p>"외환지 운전기사로 7년간 무사고 근무했습니다."</p>
+              </div>
+            </div>
+
+            <!-- 입력 필드 -->
+            <div class="mb-4 relative">
+              <input
+                type="text"
+                id="experience-input"
+                placeholder="경력 / 경험 입력"
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg pr-12 focus:border-blue-500 focus:outline-none"
+              />
+              <button
+                type="button"
+                onclick="addExperience()"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  stroke-width="3"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 4v16m8-8H4"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+
+            <!-- 추가된 경력 목록 -->
+            <div id="experience-list" class="space-y-2 mb-4">
+              <!-- 기존 경험 데이터 표시 -->
+            </div>
+
+            <!-- Hidden textarea for form submission -->
+            <textarea name="experience" id="experience-hidden" class="hidden">
+{{ resume.experience or '' }}</textarea
+            >
+
+            <div class="button-group">
+              <button type="button" class="prev-btn" onclick="prevStep(2)">
+                이전
+              </button>
+              <button type="button" class="next-btn" onclick="nextStep(4)">
+                다음
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 4: 보유 기술 및 재능 -->
+          <div id="step-4" class="step-container" style="display: none">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+              나의 보유 기술 및 재능을 입력해 주세요
+            </h2>
+
+            <div class="bg-gray-50 rounded-lg p-4 mb-4 text-sm text-gray-700">
+              <ul class="list-disc list-inside space-y-1">
+                <li>전문 기술 (운전, 요리, 목공, 수공예 등)</li>
+                <li>교육 가능 분야 (외국어, 음악, 운동 지도, 실버 지혜)</li>
+                <li>민간차 작지 않아도 괜찮습니다.</li>
+              </ul>
+            </div>
+
+            <div class="mb-4">
+              <p class="text-sm font-semibold text-gray-700 mb-2">예시</p>
+              <div
+                class="bg-white border border-gray-200 rounded-lg p-3 space-y-2 text-sm text-gray-600"
+              >
+                <p>"컴퓨터지사 자격증 보유"</p>
+                <p>"요양보호사 자격증 보유"</p>
+              </div>
+            </div>
+
+            <!-- 입력 필드 -->
+            <div class="mb-4 relative">
+              <input
+                type="text"
+                id="certificate-input"
+                placeholder="보유 자격증 입력"
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg pr-12 focus:border-blue-500 focus:outline-none"
+              />
+              <button
+                type="button"
+                onclick="addCertificateWithFile()"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  stroke-width="3"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 4v16m8-8H4"
+                  ></path>
+                </svg>
+              </button>
+              <input
+                type="file"
+                id="certificate-file"
+                class="hidden"
+                accept="image/*"
+                onchange="addCertificateWithFile()"
+              />
+            </div>
+
+            <!-- 기존 자격증 목록 -->
+            <div id="existing-certificates-list" class="space-y-2 mb-4">
+              {% if resume and resume.certificates %} {% for cert in
+              resume.certificates %}
+              <div
+                class="border-2 border-blue-600 rounded-lg px-4 py-3 flex items-center justify-between"
+              >
+                <span class="text-gray-900">{{ cert.name }}</span>
+                <button
+                  type="button"
+                  class="text-gray-400 hover:text-gray-600"
+                  data-cert-id="{{ cert.id }}"
+                  onclick="deleteCertificate(this.getAttribute('data-cert-id'), this)"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    ></path>
+                  </svg>
+                </button>
+              </div>
+              {% endfor %} {% endif %}
+            </div>
+
+            <!-- 새로운 자격증이 동적으로 추가될 컨테이너 -->
+            <div id="certificates-container"></div>
+
+            <div class="button-group">
+              <button type="button" class="prev-btn" onclick="prevStep(3)">
+                이전
+              </button>
+              <button type="button" class="next-btn" onclick="nextStep(5)">
+                다음
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 5: 개인 특성 및 신체 정보 -->
+          <div id="step-5" class="step-container" style="display: none">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+              나의 성격및 강점을 골라주세요 (1/3)
+            </h2>
+
+            <!-- 성격 및 강점 버튼들 -->
+            <div class="flex flex-wrap gap-2 mb-6">
+              {% for strength in all_strengths %}
+              <label class="strength-label">
+                <input type="checkbox" name="strengths" value="{{ strength.value
+                }}" class="hidden strength-checkbox" {% if resume and
+                strength.value in (resume.strengths or '') %}checked{% endif %}
+                >
+                <span class="strength-btn">{{ strength.value }}</span>
+              </label>
+              {% endfor %}
+            </div>
+
+            <div class="button-group">
+              <button type="button" class="prev-btn" onclick="prevStep(4)">
+                이전
+              </button>
+              <button type="button" class="next-btn" onclick="nextStep('5-2')">
+                다음
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 5-2: 신체적 활동 가능 범위 -->
+          <div id="step-5-2" class="step-container" style="display: none">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+              나의 신체적 활동 가능 범위를 골라주세요
+            </h2>
+
+            <!-- 걸을 수 있는 시간 슬라이더 -->
+            <div class="mb-8">
+              <h3
+                class="text-base font-semibold text-gray-900 mb-6 text-center"
+              >
+                쉬지 않고 걸을 수 있는 시간
+              </h3>
+
+              <div class="px-4">
+                <input
+                  type="range"
+                  id="walkable-slider"
+                  name="walkable_minutes"
+                  min="0"
+                  max="60"
+                  value="{{ resume.walkable_minutes or 20 }}"
+                  step="10"
+                  class="w-full walkable-slider"
+                />
+                <div class="flex justify-between text-sm text-gray-600 mt-2">
+                  <span>못함</span>
+                  <span>20분</span>
+                  <span>40분</span>
+                  <span>1시간</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 신체적 특성 입력 -->
+            <div class="mb-6">
+              <h3 class="text-base font-semibold text-gray-900 mb-3">
+                나의 신체적 특성이 있다면요 적어주세요
+              </h3>
+
+              <div class="bg-gray-50 rounded-lg p-4 mb-4 text-sm text-gray-700">
+                <ul class="list-disc list-inside space-y-1">
+                  <li>장경과 단장 모두 가능해도 괜찮습니다.</li>
+                  <li>한 문장에 하나의 특성을 적어주세요</li>
+                  <li>없다면 작지 않아도 괜찮습니다.</li>
+                </ul>
+              </div>
+
+              <!-- 입력 필드 -->
+              <div class="mb-4 relative">
+                <input
+                  type="text"
+                  id="physical-input"
+                  placeholder="신체적 특성 입력"
+                  class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg pr-12 focus:border-blue-500 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onclick="addPhysicalNote()"
+                  class="absolute right-3 top-1/2 transform -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    stroke-width="3"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 4v16m8-8H4"
+                    ></path>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- 추가된 특성 목록 -->
+              <div id="physical-notes-list" class="space-y-2 mb-4"></div>
+
+              <!-- Hidden textarea for form submission -->
+              <textarea
+                name="physical_notes"
+                id="physical-notes-hidden"
+                class="hidden"
+              >
+{{ resume.physical_notes or '' }}</textarea
+              >
+            </div>
+
+            <div class="button-group">
+              <button type="button" class="prev-btn" onclick="prevStep(5)">
+                이전
+              </button>
+              <button type="button" class="next-btn" onclick="nextStep('5-3')">
+                다음
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 5-3: 이동 가능 범위 -->
+          <div id="step-5-3" class="step-container" style="display: none">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+              나의 이동 가능 범위를 골라주세요
+            </h2>
+
+            <!-- 이동 가능 시간 슬라이더 -->
+            <div class="mb-8">
+              <h3
+                class="text-base font-semibold text-gray-700 mb-6 text-center"
+              >
+                대중교통 또는 자차로 가능한 이동시간
+              </h3>
+
+              <div class="px-4">
+                <input
+                  type="range"
+                  id="commute-slider"
+                  name="commute_time"
+                  min="0"
+                  max="60"
+                  value="{{ resume.commute_time or 20 }}"
+                  step="10"
+                  class="w-full commute-slider"
+                />
+                <div class="flex justify-between text-sm text-gray-600 mt-2">
+                  <span>집</span>
+                  <span>20분</span>
+                  <span>40분</span>
+                  <span>1시간</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-6">
+              <label class="flex items-center text-sm text-gray-600">
+                <input type="checkbox" id="commute-negotiable" class="mr-2" />
+                <span>교통 수단 불가</span>
+              </label>
+            </div>
+
+            <div class="button-group">
+              <button type="button" class="prev-btn" onclick="prevStep('5-2')">
+                이전
+              </button>
+              <button type="button" class="next-btn" onclick="nextStep(6)">
+                다음
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 6: 자기소개 및 최종 제출 -->
+          <div id="step-6" class="step-container" style="display: none">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+              마지막으로 자기소개를 작성해 주세요
+            </h2>
+
+            <div class="bg-gray-50 rounded-lg p-4 mb-4 text-sm text-gray-700">
+              <ul class="list-disc list-inside space-y-1">
+                <li>자신의 강점과 경험을 자유롭게 작성해주세요</li>
+                <li>희망하는 업무나 목표를 포함하면 좋습니다</li>
+                <li>진솔하고 긍정적인 내용으로 작성해주세요</li>
+              </ul>
+            </div>
+
+            <div class="mb-6">
+              <label class="block text-sm font-semibold text-gray-900 mb-2">
+                자기소개
+              </label>
+              <textarea
+                name="self_introduction"
+                rows="8"
+                placeholder="자기소개를 작성해주세요&#10;&#10;예시:&#10;안녕하세요. 20년간 요식업에 종사하며 다양한 경험을 쌓았습니다. 사람들과 소통하는 것을 좋아하고, 성실하고 책임감 있게 일합니다. 새로운 환경에서도 빠르게 적응하며, 팀워크를 중시합니다."
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none resize-none"
+              >
+{{ resume.self_introduction or '' }}</textarea
+              >
+            </div>
+
+            <div class="mb-6">
+              <label class="flex items-start space-x-3">
+                <input
+                  type="checkbox"
+                  name="is_public"
+                  class="mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  {%
+                  if
+                  resume
+                  and
+                  resume.is_public
+                  %}checked{%
+                  endif
+                  %}
+                />
                 <div>
-                    <label>시작 시간: <input type="time" id="start_time" name="start_time" value="{{ resume.desired_start_time.strftime('%H:%M') if resume and resume.desired_start_time }}"></label>
-                    <label>종료 시간: <input type="time" id="end_time" name="end_time" value="{{ resume.desired_end_time.strftime('%H:%M') if resume and resume.desired_end_time }}"></label>
-                    <label><input type="checkbox" id="time_negotiable" name="is_time_negotiable" {% if resume and resume.is_time_negotiable %}checked{% endif %}> 시간 협의 가능</label>
-                </div>
-                <div class="button-group">
-                    <button type="button" class="prev-btn" onclick="prevStep(1)">이전</button>
-                    <button type="button" class="next-btn" onclick="nextStep(3)">다음</button>
-                </div>
-            </div>
-
-            <div id="step-3" class="step-container" style="display:none;">
-                <h2>3. 경력 및 자격증</h2>
-                <label>경험 및 경력
-                    <textarea name="experience">{{ resume.experience or '' }}</textarea>
-                </label>
-
-                <h4>자격증</h4>
-                <div id="existing-certificates-list">
-                    {% if resume and resume.certificates %}
-                        <p><b>현재 등록된 자격증:</b> (X를 누르면 즉시 삭제됩니다)</p>
-                        {% for cert in resume.certificates %}
-                            <div class="existing-cert-item">
-                                <span>{{ cert.name }} - <a href="{{ cert.image_url }}" target="_blank">이미지 보기</a></span>
-                                <button type="button" class="delete-cert-btn" onclick="deleteCertificate({{ cert.id }}, this)">X</button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-
-                <!-- 새로운 자격증이 동적으로 추가될 컨테이너 -->
-                <div id="certificates-container"></div>
-
-                <button type="button" onclick="addCertificateField()">+ 자격증 추가</button>
-                <div class="button-group">
-                    <button type="button" class="prev-btn" onclick="prevStep(2)">이전</button>
-                    <button type="button" class="next-btn" onclick="nextStep(4)">다음</button>
-                </div>
-            </div>
-
-            <div id="step-4" class="step-container" style="display:none;">
-                <h2>4. 개인 특성 및 신체 정보</h2>
-                <h4>나의 성격 및 강점</h4>
-                <div class="checkbox-group">
-                    {% for strength in all_strengths %}
-                    <label>
-                        <input type="checkbox" name="strengths" value="{{ strength.value }}" {% if resume and strength.value in (resume.strengths or '') %}checked{% endif %}>
-                        {{ strength.value }}
-                    </label>
-                    {% endfor %}
-                </div>
-
-                <label>쉬지 않고 걸을 수 있는 시간 (분)
-                    <input type="number" name="walkable_minutes" value="{{ resume.walkable_minutes or '' }}" placeholder="예: 30">
-                </label>
-                <label>나의 신체적 특징
-                    <textarea name="physical_notes" placeholder="예: 장시간 서서 근무는 어려움">{{ resume.physical_notes or '' }}</textarea>
-                </label>
-                <label>이동 가능 시간 (분)
-                    <input type="number" name="commute_time" value="{{ resume.commute_time or '' }}" placeholder="예: 60">
-                </label>
-                <div class="button-group">
-                    <button type="button" class="prev-btn" onclick="prevStep(3)">이전</button>
-                    <button type="button" class="next-btn" onclick="nextStep(5)">다음</button>
-                </div>
-            </div>
-
-            <!-- 단계 5: 자기소개 및 최종 제출 -->
-            <div id="step-5" class="step-container" style="display:none;">
-                <h2>5. 자기소개 및 최종 제출</h2>
-                <label>자기소개
-                    <textarea name="self_introduction">{{ resume.self_introduction or '' }}</textarea>
-                </label>
-                <label>
-                    <input type="checkbox" name="is_public" {% if resume and resume.is_public %}checked{% endif %}>
+                  <span class="block text-sm font-medium text-gray-900">
                     기업에게 이력서 공개하기
-                </label>
-                <div class="button-group">
-                    <button type="button" class="prev-btn" onclick="prevStep(4)">이전</button>
-                    <button type="submit">이력서 저장하기</button>
+                  </span>
+                  <span class="block text-xs text-gray-500 mt-1">
+                    체크하시면 구인 중인 기업들이 회원님의 이력서를 열람할 수
+                    있습니다
+                  </span>
                 </div>
+              </label>
             </div>
+
+            <div class="button-group">
+              <button type="button" class="prev-btn" onclick="prevStep('5-3')">
+                이전
+              </button>
+              <button type="button" onclick="showPreview()">작성 완료</button>
+            </div>
+          </div>
+
+          <!-- Step 7: 미리보기 및 제출 -->
+          <div id="step-7" class="step-container" style="display: none">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+              작성하신 내용을 확인해주세요
+            </h2>
+
+            <div class="space-y-4 mb-6">
+              <!-- 희망 직무분야 -->
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-semibold text-gray-900">
+                    희망 직무분야
+                  </h3>
+                  <button
+                    type="button"
+                    onclick="editStep(1)"
+                    class="text-xs text-blue-600 hover:text-blue-800"
+                  >
+                    수정
+                  </button>
+                </div>
+                <p id="preview-category" class="text-sm text-gray-700"></p>
+              </div>
+
+              <!-- 희망 근무 형태 -->
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-semibold text-gray-900">
+                    희망 근무 형태
+                  </h3>
+                  <button
+                    type="button"
+                    onclick="editStep(2)"
+                    class="text-xs text-blue-600 hover:text-blue-800"
+                  >
+                    수정
+                  </button>
+                </div>
+                <p id="preview-work-type" class="text-sm text-gray-700"></p>
+              </div>
+
+              <!-- 희망 근무 요일 -->
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-semibold text-gray-900">
+                    희망 근무 요일
+                  </h3>
+                  <button
+                    type="button"
+                    onclick="editStep(2)"
+                    class="text-xs text-blue-600 hover:text-blue-800"
+                  >
+                    수정
+                  </button>
+                </div>
+                <p id="preview-days" class="text-sm text-gray-700"></p>
+              </div>
+
+              <!-- 희망 근무 시간 -->
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-semibold text-gray-900">
+                    희망 근무 시간
+                  </h3>
+                  <button
+                    type="button"
+                    onclick="editStep(2)"
+                    class="text-xs text-blue-600 hover:text-blue-800"
+                  >
+                    수정
+                  </button>
+                </div>
+                <p id="preview-time" class="text-sm text-gray-700"></p>
+              </div>
+
+              <!-- 경력 및 경험 -->
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-semibold text-gray-900">
+                    경력 및 경험
+                  </h3>
+                  <button
+                    type="button"
+                    onclick="editStep(3)"
+                    class="text-xs text-blue-600 hover:text-blue-800"
+                  >
+                    수정
+                  </button>
+                </div>
+                <div
+                  id="preview-experience"
+                  class="text-sm text-gray-700 space-y-1"
+                ></div>
+              </div>
+
+              <!-- 보유 기술 및 재능 -->
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-semibold text-gray-900">
+                    보유 기술 및 재능
+                  </h3>
+                  <button
+                    type="button"
+                    onclick="editStep(4)"
+                    class="text-xs text-blue-600 hover:text-blue-800"
+                  >
+                    수정
+                  </button>
+                </div>
+                <div
+                  id="preview-certificates"
+                  class="text-sm text-gray-700 space-y-1"
+                ></div>
+              </div>
+
+              <!-- 성격 및 강점 -->
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-semibold text-gray-900">
+                    성격 및 강점
+                  </h3>
+                  <button
+                    type="button"
+                    onclick="editStep(5)"
+                    class="text-xs text-blue-600 hover:text-blue-800"
+                  >
+                    수정
+                  </button>
+                </div>
+                <p id="preview-strengths" class="text-sm text-gray-700"></p>
+              </div>
+
+              <!-- 신체적 활동 가능 범위 -->
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-semibold text-gray-900">
+                    신체적 활동 가능 범위
+                  </h3>
+                  <button
+                    type="button"
+                    onclick="editStep('5-2')"
+                    class="text-xs text-blue-600 hover:text-blue-800"
+                  >
+                    수정
+                  </button>
+                </div>
+                <p id="preview-walkable" class="text-sm text-gray-700 mb-2"></p>
+                <div
+                  id="preview-physical"
+                  class="text-sm text-gray-700 space-y-1"
+                ></div>
+              </div>
+
+              <!-- 이동 가능 범위 -->
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-semibold text-gray-900">
+                    이동 가능 범위
+                  </h3>
+                  <button
+                    type="button"
+                    onclick="editStep('5-3')"
+                    class="text-xs text-blue-600 hover:text-blue-800"
+                  >
+                    수정
+                  </button>
+                </div>
+                <p id="preview-commute" class="text-sm text-gray-700"></p>
+              </div>
+
+              <!-- 자기소개 -->
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-semibold text-gray-900">자기소개</h3>
+                  <button
+                    type="button"
+                    onclick="editStep(6)"
+                    class="text-xs text-blue-600 hover:text-blue-800"
+                  >
+                    수정
+                  </button>
+                </div>
+                <p
+                  id="preview-introduction"
+                  class="text-sm text-gray-700 whitespace-pre-wrap"
+                ></p>
+              </div>
+
+              <!-- 이력서 공개 설정 -->
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h3 class="text-sm font-semibold text-gray-900">
+                      이력서 공개 설정
+                    </h3>
+                    <p
+                      id="preview-public"
+                      class="text-sm text-gray-600 mt-1"
+                    ></p>
+                  </div>
+                  <button
+                    type="button"
+                    onclick="editStep(6)"
+                    class="text-xs text-blue-600 hover:text-blue-800"
+                  >
+                    수정
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="button-group">
+              <button type="button" class="prev-btn" onclick="prevStep(6)">
+                이전
+              </button>
+              <button type="submit">제출하기</button>
+            </div>
+          </div>
         </form>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer-fixed">
+        <button
+          id="footer-next-btn"
+          type="button"
+          class="w-full py-3 bg-blue-600 text-white text-base font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+          onclick="handleFooterNext()"
+        >
+          다음
+        </button>
+      </div>
     </div>
 
     <script>
-        let currentStep = 1;
-        function showStep(step) { document.querySelectorAll('.step-container').forEach(el => el.style.display = 'none'); document.getElementById(`step-${step}`).style.display = 'block'; }
-        function nextStep(step) { currentStep = step; showStep(step); }
-        function prevStep(step) { currentStep = step; showStep(step); }
-        function addCertificateField() {
-            const container = document.getElementById('certificates-container');
-            const newEntry = document.createElement('div');
-            newEntry.className = 'certificate-entry';
+      let currentStep = 1;
+      const totalSteps = 6;
 
-            // 입력 필드와 함께 'X' 삭제 버튼을 생성합니다.
-            // 이 버튼의 onclick 이벤트는 자신의 부모 요소(newEntry)를 DOM에서 제거합니다.
-            newEntry.innerHTML = `
-                <input type="text" name="certificate_names" placeholder="자격증 이름" required style="flex: 1;">
-                <input type="file" name="certificate_images" required style="flex: 2;">
-                <button type="button" class="delete-cert-btn" onclick="this.parentElement.remove()">X</button>
-            `;
-            container.appendChild(newEntry);
+      function showStep(step) {
+        document
+          .querySelectorAll(".step-container")
+          .forEach((el) => (el.style.display = "none"));
+
+        const stepId =
+          typeof step === "string" ? `step-${step}` : `step-${step}`;
+        const stepElement = document.getElementById(stepId);
+
+        if (stepElement) {
+          stepElement.style.display = "block";
+          currentStep = step;
+          updateFooterButton();
         }
-        const timeNegotiable = document.getElementById('time_negotiable'), startTime = document.getElementById('start_time'), endTime = document.getElementById('end_time');
-        function toggleTime() { const d = timeNegotiable.checked; startTime.disabled = d; endTime.disabled = d; if (d) { startTime.value = ''; endTime.value = ''; } }
-        timeNegotiable.addEventListener('change', toggleTime);
-        document.addEventListener('DOMContentLoaded', () => { showStep(1); toggleTime(); });
-        function deleteCertificate(certId, buttonElement) {
-            if (!confirm('정말로 이 자격증을 영구적으로 삭제하시겠습니까?')) {
-                return;
+      }
+
+      function updateFooterButton() {
+        const footerBtn = document.getElementById("footer-next-btn");
+        const isLastStep = currentStep === 7 || currentStep === "7";
+
+        if (isLastStep) {
+          footerBtn.textContent = "제출하기";
+          footerBtn.classList.remove("bg-blue-600", "hover:bg-blue-700");
+          footerBtn.classList.add("bg-green-600", "hover:bg-green-700");
+        } else {
+          footerBtn.textContent = "다음";
+          footerBtn.classList.remove("bg-green-600", "hover:bg-green-700");
+          footerBtn.classList.add("bg-blue-600", "hover:bg-blue-700");
+        }
+      }
+
+      function handleFooterNext() {
+        if (currentStep === 7 || currentStep === "7") {
+          // 마지막 단계(미리보기)에서는 form submit
+          document.querySelector("form").submit();
+        } else {
+          // 다음 단계로 이동
+          let nextStepValue;
+          if (currentStep === 1) nextStepValue = 2;
+          else if (currentStep === 2) nextStepValue = 3;
+          else if (currentStep === 3) nextStepValue = 4;
+          else if (currentStep === 4) nextStepValue = 5;
+          else if (currentStep === 5) nextStepValue = "5-2";
+          else if (currentStep === "5-2") nextStepValue = "5-3";
+          else if (currentStep === "5-3") nextStepValue = 6;
+          else if (currentStep === 6) nextStepValue = 7;
+          else nextStepValue = currentStep + 1;
+
+          nextStep(nextStepValue);
+        }
+      }
+
+      // 미리보기 표시
+      function showPreview() {
+        updatePreview();
+        nextStep(7);
+      }
+
+      // 특정 단계 수정
+      function editStep(step) {
+        prevStep(step);
+      }
+
+      // 미리보기 업데이트
+      function updatePreview() {
+        // 1. 희망 직무분야
+        const category = document.querySelector(
+          'input[name="categories"]:checked'
+        );
+        document.getElementById("preview-category").textContent = category
+          ? category.value
+          : "미선택";
+
+        // 2. 희망 근무 형태
+        const workType = document.querySelector(
+          'input[name="desired_work_type"]:checked'
+        );
+        document.getElementById("preview-work-type").textContent = workType
+          ? workType.nextElementSibling.textContent
+          : "미선택";
+
+        // 3. 희망 근무 요일
+        const days = [];
+        const dayNames = {
+          monday: "월",
+          tuesday: "화",
+          wednesday: "수",
+          thursday: "목",
+          friday: "금",
+          saturday: "토",
+          sunday: "일",
+        };
+        for (let day in dayNames) {
+          const checkbox = document.querySelector(`input[name="work_${day}"]`);
+          if (checkbox && checkbox.checked) {
+            days.push(dayNames[day]);
+          }
+        }
+        document.getElementById("preview-days").textContent =
+          days.length > 0 ? days.join(", ") : "미선택";
+
+        // 4. 희망 근무 시간
+        const startTime = document.getElementById("start_time").value;
+        const endTime = document.getElementById("end_time").value;
+        const timeNegotiable =
+          document.getElementById("time_negotiable").checked;
+        let timeText = "";
+        if (startTime && endTime) {
+          const startPeriod =
+            parseInt(startTime.split(":")[0]) < 12 ? "오전" : "오후";
+          const endPeriod =
+            parseInt(endTime.split(":")[0]) < 12 ? "오전" : "오후";
+          timeText = `${startPeriod} ${startTime} ~ ${endPeriod} ${endTime}`;
+        }
+        if (timeNegotiable) timeText += " (협의 가능)";
+        document.getElementById("preview-time").textContent =
+          timeText || "미설정";
+
+        // 5. 경력 및 경험
+        const experienceContainer =
+          document.getElementById("preview-experience");
+        experienceContainer.innerHTML = "";
+        if (experienceItems.length > 0) {
+          experienceItems.forEach((item) => {
+            const p = document.createElement("p");
+            p.textContent = "• " + item;
+            experienceContainer.appendChild(p);
+          });
+        } else {
+          experienceContainer.textContent = "등록된 경력이 없습니다";
+        }
+
+        // 6. 보유 기술 및 재능
+        const certsContainer = document.getElementById("preview-certificates");
+        certsContainer.innerHTML = "";
+        const existingCerts = document.querySelectorAll(
+          "#existing-certificates-list .border-blue-600"
+        );
+        const newCerts = document.querySelectorAll(
+          "#certificates-container .certificate-entry"
+        );
+        const totalCerts = existingCerts.length + newCerts.length;
+
+        if (totalCerts > 0) {
+          existingCerts.forEach((cert) => {
+            const p = document.createElement("p");
+            p.textContent = "• " + cert.querySelector("span").textContent;
+            certsContainer.appendChild(p);
+          });
+          newCerts.forEach((cert) => {
+            const p = document.createElement("p");
+            p.textContent = "• " + cert.querySelector("span").textContent;
+            certsContainer.appendChild(p);
+          });
+        } else {
+          certsContainer.textContent = "등록된 자격증이 없습니다";
+        }
+
+        // 7. 성격 및 강점
+        const strengths = [];
+        document
+          .querySelectorAll('input[name="strengths"]:checked')
+          .forEach((input) => {
+            strengths.push(input.value);
+          });
+        document.getElementById("preview-strengths").textContent =
+          strengths.length > 0 ? strengths.join(", ") : "미선택";
+
+        // 8. 신체적 활동 가능 범위
+        const walkableMinutes =
+          document.getElementById("walkable-slider").value;
+        let walkableText = "";
+        if (walkableMinutes == 0) walkableText = "못함";
+        else if (walkableMinutes <= 20) walkableText = "20분";
+        else if (walkableMinutes <= 40) walkableText = "40분";
+        else walkableText = "1시간";
+        document.getElementById(
+          "preview-walkable"
+        ).textContent = `쉬지 않고 걸을 수 있는 시간: ${walkableText}`;
+
+        const physicalContainer = document.getElementById("preview-physical");
+        physicalContainer.innerHTML = "";
+        if (physicalNotes.length > 0) {
+          physicalNotes.forEach((item) => {
+            const p = document.createElement("p");
+            p.textContent = "• " + item;
+            physicalContainer.appendChild(p);
+          });
+        }
+
+        // 9. 이동 가능 범위
+        const commuteTime = document.getElementById("commute-slider").value;
+        let commuteText = "";
+        if (commuteTime == 0) commuteText = "집";
+        else if (commuteTime <= 20) commuteText = "20분";
+        else if (commuteTime <= 40) commuteText = "40분";
+        else commuteText = "1시간";
+        document.getElementById(
+          "preview-commute"
+        ).textContent = `대중교통 또는 자차로 가능한 이동시간: ${commuteText}`;
+
+        // 10. 자기소개
+        const introduction = document.querySelector(
+          'textarea[name="self_introduction"]'
+        ).value;
+        document.getElementById("preview-introduction").textContent =
+          introduction || "작성되지 않았습니다";
+
+        // 11. 이력서 공개 설정
+        const isPublic = document.querySelector(
+          'input[name="is_public"]'
+        ).checked;
+        document.getElementById("preview-public").textContent = isPublic
+          ? "기업에게 공개됨"
+          : "비공개";
+      }
+
+      function handleBackButton() {
+        if (currentStep === 1) {
+          // 첫 단계에서는 프로필 페이지로 이동
+          window.location.href = "{{ url_for('auth.profile') }}";
+        } else {
+          // 이전 단계로 이동
+          let prevStepValue;
+          if (currentStep === 2) prevStepValue = 1;
+          else if (currentStep === 3) prevStepValue = 2;
+          else if (currentStep === 4) prevStepValue = 3;
+          else if (currentStep === 5) prevStepValue = 4;
+          else if (currentStep === "5-2") prevStepValue = 5;
+          else if (currentStep === "5-3") prevStepValue = "5-2";
+          else if (currentStep === 6) prevStepValue = "5-3";
+          else if (currentStep === 7) prevStepValue = 6;
+          else prevStepValue = currentStep - 1;
+
+          prevStep(prevStepValue);
+        }
+      }
+
+      function nextStep(step) {
+        currentStep = step;
+        showStep(step);
+      }
+
+      function prevStep(step) {
+        currentStep = step;
+        showStep(step);
+      }
+
+      // 초기화
+      document.addEventListener("DOMContentLoaded", function () {
+        showStep(1);
+        initTimeSelectors();
+        updateTimeDisplay();
+        initExperienceList();
+        initPhysicalNotesList();
+      });
+
+      // 신체적 특성 관련 함수
+      let physicalNotes = [];
+
+      function initPhysicalNotesList() {
+        const physicalHidden = document.getElementById("physical-notes-hidden");
+        const physicalText = physicalHidden.value.trim();
+
+        if (physicalText) {
+          physicalNotes = physicalText
+            .split("\n")
+            .filter((item) => item.trim());
+          updatePhysicalNotesDisplay();
+        }
+      }
+
+      function addPhysicalNote() {
+        const input = document.getElementById("physical-input");
+        const value = input.value.trim();
+
+        if (value) {
+          physicalNotes.push(value);
+          updatePhysicalNotesDisplay();
+          updatePhysicalNotesHidden();
+          input.value = "";
+        }
+      }
+
+      function removePhysicalNote(index) {
+        physicalNotes.splice(index, 1);
+        updatePhysicalNotesDisplay();
+        updatePhysicalNotesHidden();
+      }
+
+      function updatePhysicalNotesDisplay() {
+        const list = document.getElementById("physical-notes-list");
+        list.innerHTML = "";
+
+        physicalNotes.forEach((item, index) => {
+          const div = document.createElement("div");
+          div.className =
+            "border-2 border-blue-600 rounded-lg px-4 py-3 flex items-center justify-between";
+          div.innerHTML = `
+            <span class="text-gray-900 flex-1">${item}</span>
+            <button
+              type="button"
+              class="text-gray-400 hover:text-gray-600 ml-2"
+              onclick="removePhysicalNote(${index})"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          `;
+          list.appendChild(div);
+        });
+      }
+
+      function updatePhysicalNotesHidden() {
+        const hidden = document.getElementById("physical-notes-hidden");
+        hidden.value = physicalNotes.join("\n");
+      }
+
+      // Enter 키로 신체적 특성 추가
+      document.addEventListener("DOMContentLoaded", function () {
+        const physicalInput = document.getElementById("physical-input");
+        if (physicalInput) {
+          physicalInput.addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              addPhysicalNote();
             }
+          });
+        }
+      });
 
-            fetch(`/resume/certificate/delete/${certId}`, {
-                method: 'DELETE'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    buttonElement.closest('.existing-cert-item').remove();
-                    alert('자격증이 성공적으로 삭제되었습니다.');
-                } else {
-                    alert('삭제에 실패했습니다: ' + (data.message || '서버 오류'));
-                }
-            })
-            .catch(error => {
-                console.error('삭제 요청 중 오류 발생:', error);
-                alert('삭제 처리 중 오류가 발생했습니다.');
-            });
+      // 경력/경험 관련 함수
+      let experienceItems = [];
+
+      function initExperienceList() {
+        const experienceHidden = document.getElementById("experience-hidden");
+        const experienceText = experienceHidden.value.trim();
+
+        if (experienceText) {
+          // 줄바꿈으로 구분된 경험들을 배열로 변환
+          experienceItems = experienceText
+            .split("\n")
+            .filter((item) => item.trim());
+          updateExperienceDisplay();
+        }
+      }
+
+      function addExperience() {
+        const input = document.getElementById("experience-input");
+        const value = input.value.trim();
+
+        if (value) {
+          experienceItems.push(value);
+          updateExperienceDisplay();
+          updateExperienceHidden();
+          input.value = "";
+        }
+      }
+
+      function removeExperience(index) {
+        experienceItems.splice(index, 1);
+        updateExperienceDisplay();
+        updateExperienceHidden();
+      }
+
+      function updateExperienceDisplay() {
+        const list = document.getElementById("experience-list");
+        list.innerHTML = "";
+
+        experienceItems.forEach((item, index) => {
+          const div = document.createElement("div");
+          div.className =
+            "border-2 border-blue-600 rounded-lg px-4 py-3 flex items-center justify-between";
+          div.innerHTML = `
+            <span class="text-gray-900 flex-1">${item}</span>
+            <button
+              type="button"
+              class="text-gray-400 hover:text-gray-600 ml-2"
+              onclick="removeExperience(${index})"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          `;
+          list.appendChild(div);
+        });
+      }
+
+      function updateExperienceHidden() {
+        const hidden = document.getElementById("experience-hidden");
+        hidden.value = experienceItems.join("\n");
+      }
+
+      // Enter 키로 경력 추가
+      document.addEventListener("DOMContentLoaded", function () {
+        const experienceInput = document.getElementById("experience-input");
+        if (experienceInput) {
+          experienceInput.addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              addExperience();
+            }
+          });
+        }
+      });
+
+      // 자격증 관련 함수 (새 디자인용)
+      function addCertificateWithFile() {
+        const input = document.getElementById("certificate-input");
+        const fileInput = document.getElementById("certificate-file");
+        const certName = input.value.trim();
+        const file = fileInput.files[0];
+
+        if (!certName) {
+          alert("자격증 이름을 입력해주세요.");
+          return;
         }
 
-    </script>
+        // 새 자격증 항목 추가
+        const container = document.getElementById("certificates-container");
+        const div = document.createElement("div");
+        div.className =
+          "border-2 border-blue-600 rounded-lg px-4 py-3 flex items-center justify-between certificate-entry mb-2";
+        div.innerHTML = `
+          <span class="text-gray-900">${certName}</span>
+          <button
+            type="button"
+            class="text-gray-400 hover:text-gray-600"
+            onclick="this.parentElement.remove()"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+          <input type="hidden" name="certificate_names" value="${certName}">
+        `;
 
-</body>
+        container.appendChild(div);
+
+        // 파일이 선택된 경우 파일도 추가
+        if (file) {
+          const fileContainer = document.createElement("div");
+          fileContainer.style.display = "none";
+          const fileInputClone = document.createElement("input");
+          fileInputClone.type = "file";
+          fileInputClone.name = "certificate_images";
+
+          // FileList를 전달하기 위해 DataTransfer 사용
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          fileInputClone.files = dataTransfer.files;
+
+          div.appendChild(fileInputClone);
+        }
+
+        // 입력 필드 초기화
+        input.value = "";
+        fileInput.value = "";
+      }
+
+      // Enter 키로 자격증 추가
+      document.addEventListener("DOMContentLoaded", function () {
+        const certInput = document.getElementById("certificate-input");
+        if (certInput) {
+          certInput.addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              addCertificateWithFile();
+            }
+          });
+        }
+      });
+
+      // 시간 선택 모달 관련 함수
+      function initTimeSelectors() {
+        const startHourSelect = document.getElementById("start-hour");
+        const endHourSelect = document.getElementById("end-hour");
+
+        // 시간 옵션 생성 (00:00 ~ 23:30, 30분 단위)
+        const timeOptions = [];
+        for (let h = 0; h < 24; h++) {
+          for (let m = 0; m < 60; m += 30) {
+            const hour = String(h).padStart(2, "0");
+            const minute = String(m).padStart(2, "0");
+            timeOptions.push(`${hour}:${minute}`);
+          }
+        }
+
+        timeOptions.forEach((time) => {
+          const option1 = document.createElement("option");
+          option1.value = time;
+          option1.textContent = time;
+          startHourSelect.appendChild(option1);
+
+          const option2 = document.createElement("option");
+          option2.value = time;
+          option2.textContent = time;
+          endHourSelect.appendChild(option2);
+        });
+      }
+
+      function openTimeModal() {
+        const modal = document.getElementById("time-modal");
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+
+        // 현재 설정된 시간 가져오기
+        const startTime =
+          document.getElementById("start_time").value || "09:00";
+        const endTime = document.getElementById("end_time").value || "18:00";
+
+        // 시작 시간 설정
+        const [startHour, startMin] = startTime.split(":");
+        const startH = parseInt(startHour);
+        document.getElementById("start-period").value =
+          startH < 12 ? "오전" : "오후";
+        document.getElementById("start-hour").value = startTime;
+
+        // 종료 시간 설정
+        const [endHour, endMin] = endTime.split(":");
+        const endH = parseInt(endHour);
+        document.getElementById("end-period").value =
+          endH < 12 ? "오전" : "오후";
+        document.getElementById("end-hour").value = endTime;
+      }
+
+      function closeTimeModal(event) {
+        if (event.target.id === "time-modal") {
+          const modal = document.getElementById("time-modal");
+          modal.classList.add("hidden");
+          modal.classList.remove("flex");
+        }
+      }
+
+      function confirmTime() {
+        const startPeriod = document.getElementById("start-period").value;
+        const startHour = document.getElementById("start-hour").value;
+        const endPeriod = document.getElementById("end-period").value;
+        const endHour = document.getElementById("end-hour").value;
+
+        // hidden input에 24시간 형식으로 저장
+        document.getElementById("start_time").value = startHour;
+        document.getElementById("end_time").value = endHour;
+
+        // 디스플레이 업데이트
+        updateTimeDisplay();
+
+        // 모달 닫기
+        const modal = document.getElementById("time-modal");
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      }
+
+      function updateTimeDisplay() {
+        const startTime =
+          document.getElementById("start_time").value || "09:00";
+        const endTime = document.getElementById("end_time").value || "18:00";
+
+        const startPeriod =
+          parseInt(startTime.split(":")[0]) < 12 ? "오전" : "오후";
+        const endPeriod =
+          parseInt(endTime.split(":")[0]) < 12 ? "오전" : "오후";
+
+        const display = `${startPeriod} ${startTime} ~ ${endPeriod} ${endTime}`;
+        document.getElementById("time-display").textContent = display;
+      }
+
+      const timeNegotiable = document.getElementById("time_negotiable"),
+        startTime = document.getElementById("start_time"),
+        endTime = document.getElementById("end_time");
+      function toggleTime() {
+        const d = timeNegotiable.checked;
+        startTime.disabled = d;
+        endTime.disabled = d;
+        if (d) {
+          startTime.value = "";
+          endTime.value = "";
+        }
+      }
+      timeNegotiable.addEventListener("change", toggleTime);
+      document.addEventListener("DOMContentLoaded", () => {
+        showStep(1);
+        toggleTime();
+      });
+      function deleteCertificate(certId, buttonElement) {
+        if (!confirm("정말로 이 자격증을 영구적으로 삭제하시겠습니까?")) {
+          return;
+        }
+
+        fetch(`/resume/certificate/delete/${certId}`, {
+          method: "DELETE",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              buttonElement.closest(".existing-cert-item").remove();
+              alert("자격증이 성공적으로 삭제되었습니다.");
+            } else {
+              alert("삭제에 실패했습니다: " + (data.message || "서버 오류"));
+            }
+          })
+          .catch((error) => {
+            console.error("삭제 요청 중 오류 발생:", error);
+            alert("삭제 처리 중 오류가 발생했습니다.");
+          });
+      }
+    </script>
+  </body>
 </html>

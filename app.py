@@ -119,7 +119,6 @@ def toggle_page():
     return render_template('toggle_page.html')
 
 
-
 # 템플릿 필터 등록
 app.jinja_env.filters['format_date'] = format_date
 app.jinja_env.filters['format_datetime'] = format_datetime
@@ -152,6 +151,9 @@ app.register_blueprint(resumes_bp,url_prefix='/')
 app.register_blueprint(job_assistant_bp)
 app.register_blueprint(news_bp)
 app.register_blueprint(map_bp)
+
+# CLI 명령어 등록
+register_cli(app)
 
 from routes.chat_events import init_chat_socketio
 init_chat_socketio(socketio)
