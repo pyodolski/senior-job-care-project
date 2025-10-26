@@ -291,10 +291,6 @@ class Resume(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    
-    # ⚠️ 중요: user_id에 UNIQUE 제약 조건을 설정하지 않음
-    # 한 사용자가 여러 개의 이력서를 작성할 수 있도록 허용
-    # 이전에 데이터베이스에 uq_user_resume 제약이 있었다면 fix_resume_constraint.sql 실행 필요
 
     # --- 공개 여부 ---
     is_public = db.Column(db.Boolean, default=False, nullable=False)
