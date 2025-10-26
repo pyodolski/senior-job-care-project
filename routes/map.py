@@ -18,19 +18,38 @@ def show_map():
 @map_bp.route('/jobs_all')
 @login_required
 def jobs_all():
-    # 모든 일자리 데이터를 DB에서 한 번에 불러옴
-    jobs = JobPost.query.filter(
+    # 필터 파라미터 받기 (all, company, people)
+    job_type = request.args.get('type', 'all')
+    
+    # 기본 쿼리 (위치 정보가 있는 공고만)
+    query = JobPost.query.filter(
         JobPost.latitude.isnot(None),
         JobPost.longitude.isnot(None)
-    ).all()
+    )
+    
+    # 필터 적용
+    if job_type == 'company':
+        # 기업 이음: job_category 필드가 있는 공고 (기업 전용 필드)
+        query = query.filter(JobPost.job_category.isnot(None))
+    elif job_type == 'people':
+        # 사람 이음: job_category 필드가 없는 공고
+        query = query.filter(JobPost.job_category.is_(None))
+    
+    jobs = query.all()
 
     job_locations = [
-        {'title': job.title, 'lat': job.latitude, 'company': job.company,
-         'salary': job.salary, 'lng': job.longitude}
+        {
+            'title': job.title, 
+            'lat': job.latitude, 
+            'company': job.company,
+            'salary': job.salary, 
+            'lng': job.longitude,
+            'type': 'company' if job.job_category else 'people'
+        }
         for job in jobs
     ]
 
-    return jsonify({'jobs': job_locations})
+    return jsonify({'jobs': job_locations, 'count': len(job_locations)})
 
 @map_bp.route('/api/address_search')
 @login_required
