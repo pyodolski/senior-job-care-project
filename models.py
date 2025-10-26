@@ -290,7 +290,7 @@ class Resume(db.Model):
 
     # --- 희망 근무 조건 ---
     desired_categories = db.Column(db.String(255), nullable=True)
-    desired_work_type = db.Column(db.Enum(WorkType), nullable=True)
+    desired_work_type = db.Column(db.String(50), nullable=True)
 
     work_monday = db.Column(db.Boolean, default=False)
     work_tuesday = db.Column(db.Boolean, default=False)
