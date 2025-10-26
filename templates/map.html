@@ -9,7 +9,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_key }}"></script>
+    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_key }}&libraries=clusterer"></script>
     <style>
       /* 사용자 정의 폰트 및 스타일 */
       body {
@@ -79,6 +79,59 @@
           transform: scale(1);
           opacity: 1;
         }
+      }
+
+      /* 필터 버튼 스타일 */
+      .filter-btn {
+        background-color: white;
+        color: #6b7280;
+        border: 2px solid #e5e7eb;
+        cursor: pointer;
+      }
+
+      .filter-btn:hover {
+        background-color: #f3f4f6;
+        border-color: #d1d5db;
+      }
+
+      .filter-btn.active {
+        background-color: #023591;
+        color: white;
+        border-color: #023591;
+      }
+
+      /* 클러스터 마커 스타일 */
+      .cluster-marker {
+        background-color: #023591;
+        color: white;
+        border-radius: 50%;
+        font-weight: bold;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        border: 3px solid white;
+      }
+
+      .cluster-marker.small {
+        width: 40px;
+        height: 40px;
+        font-size: 12px;
+      }
+
+      .cluster-marker.medium {
+        width: 50px;
+        height: 50px;
+        font-size: 14px;
+        background-color: #2d71eb;
+      }
+
+      .cluster-marker.large {
+        width: 60px;
+        height: 60px;
+        font-size: 16px;
+        background-color: #1d4ed8;
       }
 
       /* 얼굴 토글 스위치 스타일 */
@@ -262,7 +315,37 @@
       </div>
 
       <!-- 메인 컨텐츠: 지도 -->
-      <main class="bg-white" style="height: calc(100vh - 129px)">
+      <main
+        class="bg-white"
+        style="height: calc(100vh - 129px); position: relative"
+      >
+        <!-- 필터 버튼 -->
+        <div
+          class="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 flex gap-2"
+        >
+          <button
+            id="filterAll"
+            class="filter-btn active px-4 py-2 rounded-full font-bold text-sm shadow-lg transition-all"
+            onclick="filterJobs('all')"
+          >
+            전체
+          </button>
+          <button
+            id="filterCompany"
+            class="filter-btn px-4 py-2 rounded-full font-bold text-sm shadow-lg transition-all"
+            onclick="filterJobs('company')"
+          >
+            기업 이음
+          </button>
+          <button
+            id="filterPeople"
+            class="filter-btn px-4 py-2 rounded-full font-bold text-sm shadow-lg transition-all"
+            onclick="filterJobs('people')"
+          >
+            사람 이음
+          </button>
+        </div>
+
         <div id="map" aria-label="일자리 지도"></div>
       </main>
 
@@ -345,7 +428,9 @@
       // 상태
       let map = null;
       const markers = [];
+      let clusterer = null; // 클러스터러
       let currentLocationMarker = null; // 현재 위치 마커
+      let currentFilter = "all"; // 현재 필터 상태
       const infoWindow = new kakao.maps.InfoWindow({ removable: true }); // 단일 재사용
 
       // 유틸: 안전 숫자 변환
@@ -447,6 +532,9 @@
 
       // 기존 마커 제거 (현재 위치 마커는 유지)
       function clearMarkers() {
+        if (clusterer) {
+          clusterer.clear();
+        }
         for (const m of markers) m.setMap(null);
         markers.length = 0;
       }
@@ -475,10 +563,31 @@
       `;
       }
 
+      // 필터 변경 함수
+      function filterJobs(type) {
+        currentFilter = type;
+
+        // 버튼 활성화 상태 변경
+        document.querySelectorAll(".filter-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        document
+          .getElementById(
+            `filter${type.charAt(0).toUpperCase() + type.slice(1)}`
+          )
+          .classList.add("active");
+
+        // 데이터 다시 로드
+        loadAllJobs();
+      }
+      window.filterJobs = filterJobs; // 전역으로 노출
+
       // 데이터 로드 및 마커 렌더링
       async function loadAllJobs() {
         try {
-          const res = await fetch("/jobs_all", { credentials: "same-origin" });
+          const res = await fetch(`/jobs_all?type=${currentFilter}`, {
+            credentials: "same-origin",
+          });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const data = await res.json();
 
@@ -506,6 +615,72 @@
 
             markers.push(marker);
           }
+
+          // 클러스터러 생성 및 마커 추가
+          if (clusterer) {
+            clusterer.clear();
+          }
+
+          clusterer = new kakao.maps.MarkerClusterer({
+            map: map,
+            markers: markers,
+            gridSize: 60, // 클러스터 그리드 크기
+            averageCenter: true, // 클러스터 중심을 마커들의 평균 위치로
+            minLevel: 6, // 클러스터 표시 최소 레벨 (6 이상에서만 클러스터링)
+            disableClickZoom: false, // 클러스터 클릭 시 확대
+            calculator: [10, 30, 50], // 클러스터 크기 구분 기준
+            styles: [
+              {
+                width: "40px",
+                height: "40px",
+                background: "#023591",
+                borderRadius: "50%",
+                color: "#fff",
+                textAlign: "center",
+                lineHeight: "40px",
+                fontSize: "12px",
+                fontWeight: "bold",
+                border: "3px solid white",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+              },
+              {
+                width: "50px",
+                height: "50px",
+                background: "#2D71EB",
+                borderRadius: "50%",
+                color: "#fff",
+                textAlign: "center",
+                lineHeight: "50px",
+                fontSize: "14px",
+                fontWeight: "bold",
+                border: "3px solid white",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+              },
+              {
+                width: "60px",
+                height: "60px",
+                background: "#1d4ed8",
+                borderRadius: "50%",
+                color: "#fff",
+                textAlign: "center",
+                lineHeight: "60px",
+                fontSize: "16px",
+                fontWeight: "bold",
+                border: "3px solid white",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+              },
+            ],
+          });
+
+          const filterText =
+            currentFilter === "all"
+              ? "전체"
+              : currentFilter === "company"
+              ? "기업 이음"
+              : "사람 이음";
+          console.log(
+            `${filterText}: ${markers.length}개의 일자리 마커가 표시되었습니다.`
+          );
         } catch (err) {
           console.error("일자리 데이터 불러오기 실패:", err);
           alert("일자리를 불러오는 중 오류가 발생했습니다.");
