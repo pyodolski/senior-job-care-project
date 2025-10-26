@@ -1,165 +1,456 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>회원 정보 수정 - 사람이음</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet" />
-  <style>
-    body { font-family: "Noto Sans KR", sans-serif; background: #f9fafb; }
-    .step-label { font-weight: 600; margin-bottom: 0.5rem; }
-    #selected-address { font-weight: 700; color: #3b82f6; min-height: 1.5rem; margin-top: 0.25rem; }
-  </style>
-</head>
-<body>
-  <div class="max-w-md mx-auto bg-white mt-8 shadow rounded-lg p-6">
-    <h2 class="text-2xl font-bold mb-6 text-gray-900">회원 정보 수정</h2>
-      {% if profile_url %}
-          <div class="flex items-center mb-4">
-              <img src="{{ profile_url }}" alt="profile"
-                   class="w-16 h-16 rounded-full object-cover mr-3"/>
-              <span class="text-gray-600 text-sm">현재 등록된 프로필 이미지</span>
-          </div>
-      {% endif %}
-    <form method="POST" action="{{ url_for('auth.edit_profile') }}" enctype="multipart/form-data">
-      <label class="block mb-2 font-semibold">프로필 이미지</label>
-       <input type="file" name="profile_image" accept="image/*"
-         class="w-full mb-4 px-3 py-2 border border-gray-300 rounded" />
-      <input type="text" name="name" placeholder="이름" value="{{ user.name }}"
-             class="w-full mb-4 px-3 py-2 border border-gray-300 rounded" required />
-
-      <input type="text" name="nickname" placeholder="닉네임" value="{{ user.nickname }}"
-             class="w-full mb-4 px-3 py-2 border border-gray-300 rounded" required />
-
-      <input type="tel" name="phone" placeholder="휴대폰 번호" value="{{ user.phone }}"
-             class="w-full mb-4 px-3 py-2 border border-gray-300 rounded"
-             pattern="^\d{2,3}-\d{3,4}-\d{4}$"
-             title="010-1234-5678 형식으로 입력해주세요" required />
-
-      <input type="date" name="birth_date" value="{{ user.birth_date }}" class="w-full mb-4 px-3 py-2 border border-gray-300 rounded" />
-
-      <div class="mb-4">
-        <label class="step-label block">주소(시/군/동)</label>
-        <select id="sido-select" name="sido" required
-                class="w-full mb-2 px-3 py-2 border border-gray-300 rounded">
-          <option value="">시/도 선택</option>
-        </select>
-        <select id="sigungu-select" name="sigungu" required disabled
-                class="w-full mb-2 px-3 py-2 border border-gray-300 rounded">
-          <option value="">시/군/구 선택</option>
-        </select>
-        <select id="dong-select" name="dong" required disabled
-                class="w-full px-3 py-2 border border-gray-300 rounded">
-          <option value="">읍/면/동 선택</option>
-        </select>
-        <div id="selected-address"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>프로필 수정 - 사람이음</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      type="text/javascript"
+      src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_key }}&libraries=services"
+    ></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <div class="w-full max-w-md mx-auto px-4 bg-white shadow-lg min-h-screen">
+      <!-- 상단 헤더 -->
+      <div class="pt-6 pb-4">
+        <div class="flex items-center justify-between mb-4">
+          <button type="button" onclick="goBack()" class="text-gray-600">
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <h2 class="text-xl font-semibold text-gray-800">프로필 수정</h2>
+          <div class="w-6"></div>
+        </div>
       </div>
 
-      <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded hover:bg-indigo-700 transition">
-        정보 수정 완료
-      </button>
-      <a href="{{ url_for('auth.profile') }}" class="block mt-4 text-indigo-600 text-center font-semibold hover:underline">
-        ← 프로필로 돌아가기
-      </a>
-    </form>
-  </div>
+      <!-- 수정 폼 -->
+      <form
+        method="POST"
+        action="{{ url_for('auth.edit_profile') }}"
+        id="edit-form"
+        class="px-4 py-8"
+      >
+        <!-- Hidden inputs for form data -->
+        <input type="hidden" name="sido" id="final-sido" />
+        <input type="hidden" name="sigungu" id="final-sigungu" />
+        <input type="hidden" name="dong" id="final-dong" />
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const sidoSelect = document.getElementById('sido-select');
-      const sigunguSelect = document.getElementById('sigungu-select');
-      const dongSelect = document.getElementById('dong-select');
-      const addrText = document.getElementById('selected-address');
+        <!-- 이름 -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            이름
+          </label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            value="{{ user.name }}"
+            placeholder="이름을 입력하세요"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
 
-      const selectedSido = "{{ user.sido|default('') }}";
-      const selectedSigungu = "{{ user.sigungu|default('') }}";
-      const selectedDong = "{{ user.dong|default('') }}";
+        <!-- 닉네임 -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            닉네임
+          </label>
+          <input
+            type="text"
+            name="nickname"
+            id="nickname"
+            value="{{ user.nickname }}"
+            placeholder="닉네임을 입력하세요"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
 
-      function updateAddrText() {
-        const sido = sidoSelect.value;
-        const sigungu = sigunguSelect.value;
-        const dong = dongSelect.value;
-        if(sido && sigungu && dong) {
-          addrText.textContent = `선택된 주소: ${sido} ${sigungu} ${dong}`;
-        } else if(sido && sigungu) {
-          addrText.textContent = `선택 중: ${sido} ${sigungu}`;
-        } else if(sido) {
-          addrText.textContent = `선택 중: ${sido}`;
+        <!-- 전화번호 -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            전화번호
+          </label>
+          <input
+            type="tel"
+            name="phone"
+            id="phone"
+            value="{{ user.phone }}"
+            placeholder="010-0000-0000"
+            maxlength="13"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
+
+        <!-- 생년월일 -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            생년월일
+          </label>
+          <input
+            type="date"
+            name="birth_date"
+            id="birth_date"
+            value="{{ user.birth_date }}"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <!-- 거주지 -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            거주지
+          </label>
+          <div class="relative">
+            <input
+              type="text"
+              id="address-search"
+              placeholder="찾아보기"
+              readonly
+              onclick="openMapModal()"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 cursor-pointer bg-white"
+            />
+            <svg
+              class="w-5 h-5 absolute right-3 top-3.5 text-gray-400 pointer-events-none"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+          <div id="address-display" class="mt-3 text-sm text-gray-600">
+            <p id="full-address" class="font-medium">
+              {% if user.sido and user.sigungu and user.dong %}
+                {{ user.sido }} {{ user.sigungu }} {{ user.dong }}
+              {% endif %}
+            </p>
+          </div>
+          <!-- Hidden inputs to store actual values -->
+          <input type="hidden" id="sido" value="{{ user.sido }}" />
+          <input type="hidden" id="sigungu" value="{{ user.sigungu }}" />
+          <input type="hidden" id="dong" value="{{ user.dong }}" />
+        </div>
+
+        <!-- 제출 버튼 -->
+        <div class="mt-8">
+          <button
+            type="submit"
+            class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-4 px-4 rounded-lg transition-colors"
+          >
+            정보 수정 완료
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- 지도 모달 -->
+    <div
+      id="map-modal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+    >
+      <div
+        class="bg-white rounded-lg overflow-hidden"
+        style="width: 80%; max-width: 400px; height: 45vh"
+      >
+        <!-- 모달 헤더 -->
+        <div class="p-4 border-b flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-gray-800">거주지 선택</h3>
+          <button
+            type="button"
+            onclick="closeMapModal()"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <!-- 지도 영역 -->
+        <div id="map" style="width: 100%; height: calc(100% - 180px)"></div>
+
+        <!-- 주소 표시 및 확인 버튼 -->
+        <div class="p-4 border-t">
+          <p id="selected-address" class="text-sm text-gray-600 mb-3">
+            지도를 클릭하여 위치를 선택해주세요
+          </p>
+          <button
+            type="button"
+            id="confirm-location-btn"
+            onclick="confirmLocation()"
+            class="w-full bg-gray-300 text-gray-500 font-medium py-3 px-4 rounded-lg transition-colors"
+            disabled
+          >
+            확인
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      // 지도 관련 변수
+      let map = null;
+      let marker = null;
+      let geocoder = null;
+      let selectedLocation = null;
+
+      // 페이지 로드 시 초기 주소 표시
+      document.addEventListener("DOMContentLoaded", function () {
+        const sido = document.getElementById("sido").value;
+        const sigungu = document.getElementById("sigungu").value;
+        const dong = document.getElementById("dong").value;
+
+        if (sido && sigungu && dong) {
+          document.getElementById("address-search").value = `${sido} ${sigungu} ${dong}`;
+          document.getElementById("full-address").textContent = `${sido} ${sigungu} ${dong}`;
+
+          // Hidden input에도 설정
+          document.getElementById("final-sido").value = sido;
+          document.getElementById("final-sigungu").value = sigungu;
+          document.getElementById("final-dong").value = dong;
+        }
+      });
+
+      // 뒤로가기
+      function goBack() {
+        window.location.href = "{{ url_for('auth.profile') }}";
+      }
+
+      // 지도 모달 열기
+      function openMapModal() {
+        document.getElementById("map-modal").classList.remove("hidden");
+
+        // 지도가 아직 초기화되지 않았으면 초기화
+        if (!map) {
+          initMap();
         } else {
-          addrText.textContent = '';
+          // 이미 초기화된 경우 지도 크기 재조정
+          setTimeout(function () {
+            map.relayout();
+          }, 100);
         }
       }
 
-      fetch('/api/areas/sido')
-        .then(res => res.json())
-        .then(data => {
-          data.forEach(area => {
-            const opt = document.createElement('option');
-            opt.value = area.name;
-            opt.textContent = area.name;
-            sidoSelect.appendChild(opt);
+      // 지도 모달 닫기
+      function closeMapModal() {
+        document.getElementById("map-modal").classList.add("hidden");
+      }
+
+      // 지도 초기화
+      function initMap() {
+        const container = document.getElementById("map");
+
+        // 먼저 기본 위치로 지도 생성
+        const defaultPosition = new kakao.maps.LatLng(37.5665, 126.978); // 서울 시청
+        const options = {
+          center: defaultPosition,
+          level: 3,
+        };
+
+        map = new kakao.maps.Map(container, options);
+        geocoder = new kakao.maps.services.Geocoder();
+
+        // 현재 위치 가져오기
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+              const locPosition = new kakao.maps.LatLng(lat, lng);
+
+              // 지도 중심을 현재 위치로 이동
+              map.setCenter(locPosition);
+
+              // 지도 크기 재설정 (위치 이동 후)
+              setTimeout(function () {
+                map.relayout();
+              }, 100);
+
+              // 마커 생성
+              if (!marker) {
+                marker = new kakao.maps.Marker({
+                  position: locPosition,
+                  map: map,
+                });
+              } else {
+                marker.setPosition(locPosition);
+              }
+
+              // 현재 위치의 주소 가져오기
+              getAddressFromCoords(lat, lng);
+            },
+            function (error) {
+              console.log("현재 위치를 가져올 수 없습니다:", error);
+              // 기본 위치(서울 시청)에 마커 표시
+              marker = new kakao.maps.Marker({
+                position: defaultPosition,
+                map: map,
+              });
+              getAddressFromCoords(37.5665, 126.978);
+            }
+          );
+        } else {
+          // Geolocation을 지원하지 않는 경우 기본 위치 사용
+          marker = new kakao.maps.Marker({
+            position: defaultPosition,
+            map: map,
           });
-          if(selectedSido) {
-            sidoSelect.value = selectedSido;
-            sidoSelect.dispatchEvent(new Event('change'));
+          getAddressFromCoords(37.5665, 126.978);
+        }
+
+        // 지도 클릭 이벤트
+        kakao.maps.event.addListener(map, "click", function (mouseEvent) {
+          const latlng = mouseEvent.latLng;
+          const lat = latlng.getLat();
+          const lng = latlng.getLng();
+
+          // 마커 이동
+          if (!marker) {
+            marker = new kakao.maps.Marker({
+              position: latlng,
+              map: map,
+            });
+          } else {
+            marker.setPosition(latlng);
+          }
+
+          // 주소 가져오기
+          getAddressFromCoords(lat, lng);
+        });
+      }
+
+      // 좌표로 주소 가져오기
+      function getAddressFromCoords(lat, lng) {
+        geocoder.coord2Address(lng, lat, function (result, status) {
+          if (status === kakao.maps.services.Status.OK) {
+            const address = result[0].address;
+
+            // 주소 파싱 (읍/면/동까지만)
+            const sido = address.region_1depth_name; // 시/도
+            const sigungu = address.region_2depth_name; // 시/군/구
+            let dong = address.region_3depth_name; // 읍/면/동
+
+            // dong이 없는 경우 (예: 세종특별자치시)
+            if (!dong || dong === "") {
+              dong = address.region_3depth_h_name || sigungu;
+            }
+
+            // 읍/면/동까지만 포함된 주소 생성
+            let displayAddress = sido + " " + sigungu;
+            if (dong && dong !== sigungu) {
+              displayAddress += " " + dong;
+            }
+
+            // 선택된 위치 정보 저장
+            selectedLocation = {
+              lat: lat,
+              lng: lng,
+              displayAddress: displayAddress, // 읍/면/동까지만
+              sido: sido,
+              sigungu: sigungu,
+              dong: dong,
+            };
+
+            // 화면에 표시 (읍/면/동까지만)
+            document.getElementById("selected-address").textContent =
+              displayAddress;
+
+            // 확인 버튼 활성화
+            const confirmBtn = document.getElementById("confirm-location-btn");
+            confirmBtn.disabled = false;
+            confirmBtn.classList.remove("bg-gray-300", "text-gray-500");
+            confirmBtn.classList.add(
+              "bg-blue-900",
+              "text-white",
+              "hover:bg-blue-800"
+            );
           }
         });
+      }
 
-      sidoSelect.addEventListener('change', () => {
-        const sido = sidoSelect.value;
-        sigunguSelect.innerHTML = '<option value="">시/군/구 선택</option>';
-        dongSelect.innerHTML = '<option value="">읍/면/동 선택</option>';
-        sigunguSelect.disabled = !sido;
-        dongSelect.disabled = true;
-        updateAddrText();
+      // 위치 확인 버튼 클릭
+      function confirmLocation() {
+        if (selectedLocation) {
+          // 주소 정보를 hidden input에 저장 (읍/면/동까지만)
+          document.getElementById("sido").value = selectedLocation.sido;
+          document.getElementById("sigungu").value = selectedLocation.sigungu;
+          document.getElementById("dong").value = selectedLocation.dong;
 
-        if(sido) {
-          fetch(`/api/areas/sigungu_by_name/${encodeURIComponent(sido)}`)
-            .then(res => res.json())
-            .then(data => {
-              data.forEach(sgg => {
-                const opt = document.createElement('option');
-                opt.value = sgg.name;
-                opt.textContent = sgg.name;
-                sigunguSelect.appendChild(opt);
-              });
-              if(selectedSigungu) {
-                sigunguSelect.value = selectedSigungu;
-                sigunguSelect.disabled = false;
-                sigunguSelect.dispatchEvent(new Event('change'));
-              }
-            });
+          document.getElementById("final-sido").value = selectedLocation.sido;
+          document.getElementById("final-sigungu").value = selectedLocation.sigungu;
+          document.getElementById("final-dong").value = selectedLocation.dong;
+
+          // 화면에 표시 (읍/면/동까지만)
+          document.getElementById("address-search").value =
+            selectedLocation.displayAddress;
+          document.getElementById("full-address").textContent =
+            selectedLocation.displayAddress;
+
+          // 모달 닫기
+          closeMapModal();
         }
-      });
+      }
 
-      sigunguSelect.addEventListener('change', () => {
-        const sido = sidoSelect.value;
-        const sigungu = sigunguSelect.value;
-        dongSelect.innerHTML = '<option value="">읍/면/동 선택</option>';
-        dongSelect.disabled = !sigungu;
-        updateAddrText();
+      // 전화번호 자동 포맷팅
+      document.getElementById("phone").addEventListener("input", function (e) {
+        let value = e.target.value.replace(/[^0-9]/g, "");
+        let formattedValue = "";
 
-        if(sido && sigungu) {
-          fetch(`/api/areas/dong_by_name/${encodeURIComponent(sido)}/${encodeURIComponent(sigungu)}`)
-            .then(res => res.json())
-            .then(data => {
-              data.forEach(dong => {
-                const opt = document.createElement('option');
-                opt.value = dong.name;
-                opt.textContent = dong.name;
-                dongSelect.appendChild(opt);
-              });
-              if(selectedDong) {
-                dongSelect.value = selectedDong;
-                dongSelect.disabled = false;
-              }
-            });
+        if (value.length <= 3) {
+          formattedValue = value;
+        } else if (value.length <= 7) {
+          formattedValue = value.slice(0, 3) + "-" + value.slice(3);
+        } else {
+          formattedValue =
+            value.slice(0, 3) +
+            "-" +
+            value.slice(3, 7) +
+            "-" +
+            value.slice(7, 11);
         }
-      });
 
-      dongSelect.addEventListener('change', updateAddrText);
-    });
-  </script>
-</body>
+        e.target.value = formattedValue;
+      });
+    </script>
+  </body>
 </html>

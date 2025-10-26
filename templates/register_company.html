@@ -5,140 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>기업 회원가입 - 사람이음</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      type="text/javascript"
+      src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_key }}&libraries=services"
+    ></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
     <style>
-      /* 사용자 정의 폰트 및 스타일 */
       body {
         font-family: "Noto Sans KR", sans-serif;
+      }
+      .step-content {
+        display: none;
+      }
+      .step-content.active {
+        display: block;
+        animation: fadeIn 0.3s ease-in;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .progress-bar {
+        transition: width 0.3s ease;
       }
     </style>
   </head>
   <body class="bg-gray-100">
-    <div
-      class="w-full max-w-md mx-auto px-4 bg-white shadow-lg min-h-screen flex items-center justify-center"
-    >
-      <div class="w-full p-6 sm:p-8">
-        <!-- 로고 및 타이틀 -->
-        <div class="text-center mb-8">
-          <div class="flex items-center justify-center mb-4">
-            <div class="w-12 h-12 mr-3 flex items-center justify-center">
-              <img
-                src="{{ url_for('static', filename='images/header/logo.png') }}"
-                alt="로고"
-                class="max-w-full max-h-full object-contain"
-              />
-            </div>
-            <span class="text-3xl font-bold text-blue-900">이음</span>
-          </div>
-          <h2 class="text-xl font-semibold text-gray-700 mb-2">
-            기업 회원가입
-          </h2>
-          <p class="text-sm text-gray-500">
-            기업 정보를 입력하고 사업자등록증을 업로드해주세요
-          </p>
-        </div>
-
-        <!-- 기업 회원가입 폼 -->
-        <form
-          method="POST"
-          action="{{ url_for('auth.register_company') }}"
-          enctype="multipart/form-data"
-          class="space-y-4"
-        >
-          <!-- 기본 계정 정보 -->
-          <div>
-            <input
-              type="text"
-              name="username"
-              placeholder="아이디"
-              required
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            />
-          </div>
-          <div>
-            <input
-              type="password"
-              name="password"
-              placeholder="비밀번호"
-              required
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            />
-          </div>
-          <div>
-            <input
-              type="password"
-              name="confirm_password"
-              placeholder="비밀번호 확인"
-              required
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            />
-          </div>
-
-          <!-- 기업 정보 -->
-          <div>
-            <input
-              type="text"
-              name="nickname"
-              placeholder="회사 이름"
-              required
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            />
-          </div>
-          <div>
-            <input
-              type="text"
-              name="name"
-              placeholder="담당자 이름"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            />
-          </div>
-          <div>
-            <input
-              type="email"
-              name="email"
-              placeholder="이메일"
-              required
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            />
-          </div>
-
-          <!-- 사업자등록증 업로드 -->
-          <div class="space-y-2">
-            <label
-              for="business_registration"
-              class="block text-sm font-medium text-gray-700"
-            >
-              사업자등록증 업로드 (PDF, JPG, PNG)
-            </label>
-            <input
-              type="file"
-              name="business_registration"
-              id="business_registration"
-              accept=".pdf,.jpg,.jpeg,.png"
-              required
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            />
-          </div>
-
-          <button
-            type="submit"
-            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
-          >
-            기업 회원가입 신청
-          </button>
-        </form>
-
-        <!-- 뒤로가기 링크 -->
-        <div class="mt-6 text-center">
-          <a
-            href="{{ url_for('auth.first_login_page') }}"
-            class="inline-flex items-center text-sm text-gray-600 hover:text-blue-900 transition-colors"
-          >
+    <div class="w-full max-w-md mx-auto px-4 bg-white shadow-lg min-h-screen">
+      <!-- 상단 헤더 -->
+      <div class="pt-6 pb-4">
+        <div class="flex items-center justify-between mb-4">
+          <button type="button" onclick="goBack()" class="text-gray-600">
             <svg
-              class="w-4 h-4 mr-1"
+              class="w-6 h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -150,23 +58,722 @@
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            홈으로 돌아가기
-          </a>
+          </button>
+          <h2 class="text-xl font-semibold text-gray-800">기업 회원가입</h2>
+          <div class="w-6"></div>
+        </div>
+        <!-- 진행바 -->
+        <div class="w-full bg-gray-200 h-1 rounded-full">
+          <div
+            id="progress-bar"
+            class="progress-bar bg-blue-900 h-1 rounded-full"
+            style="width: 12.5%"
+          ></div>
+        </div>
+      </div>
+
+      <!-- 기업 회원가입 폼 -->
+      <form
+        method="POST"
+        action="{{ url_for('auth.register_company') }}"
+        enctype="multipart/form-data"
+        id="company-register-form"
+        class="px-4 py-8"
+      >
+        <!-- Hidden inputs for form data -->
+        <input type="hidden" name="username" id="final-username" />
+        <input type="hidden" name="password" id="final-password" />
+        <input
+          type="hidden"
+          name="confirm_password"
+          id="final-confirm-password"
+        />
+        <input type="hidden" name="nickname" id="final-nickname" />
+        <input type="hidden" name="name" id="final-name" />
+        <input type="hidden" name="email" id="final-email" />
+        <input type="hidden" name="company_sido" id="final-company-sido" />
+        <input
+          type="hidden"
+          name="company_sigungu"
+          id="final-company-sigungu"
+        />
+        <input type="hidden" name="company_dong" id="final-company-dong" />
+        <input
+          type="hidden"
+          name="company_full_address"
+          id="final-company-full-address"
+        />
+
+        <!-- Step 1: 아이디 -->
+        <div class="step-content active" data-step="1">
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">
+            기업 회원가입을 위해
+          </h3>
+          <h3 class="text-lg font-semibold text-gray-800 mb-8">
+            아이디를 입력해주세요
+          </h3>
+          <input
+            type="text"
+            id="username"
+            placeholder="아이디를 입력하세요"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
 
-        <!-- 일반 회원가입 링크 -->
-        <div class="mt-4 text-center">
-          <p class="text-sm text-gray-600">
-            개인 회원이신가요?
-            <a
-              href="{{ url_for('auth.register') }}"
-              class="text-blue-900 hover:text-blue-700 font-medium transition-colors"
+        <!-- Step 2: 비밀번호 & 비밀번호 확인 -->
+        <div class="step-content" data-step="2">
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">
+            기업 회원가입을 위해
+          </h3>
+          <h3 class="text-lg font-semibold text-gray-800 mb-8">
+            비밀번호를 입력해주세요
+          </h3>
+          <input
+            type="password"
+            id="password"
+            placeholder="비밀번호를 입력하세요"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3"
+          />
+          <div id="confirm-password-container" class="hidden">
+            <input
+              type="password"
+              id="confirm-password"
+              placeholder="비밀번호를 다시 입력하세요"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <p id="password-error" class="text-red-500 text-sm mt-2 hidden">
+              비밀번호가 일치하지 않습니다
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 3: 회사 이름 -->
+        <div class="step-content" data-step="3">
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">
+            기업 회원가입을 위해
+          </h3>
+          <h3 class="text-lg font-semibold text-gray-800 mb-8">
+            회사 이름을 입력해주세요
+          </h3>
+          <input
+            type="text"
+            id="company-name"
+            placeholder="회사 이름을 입력하세요"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <!-- Step 4: 담당자 이름 -->
+        <div class="step-content" data-step="4">
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">
+            기업 회원가입을 위해
+          </h3>
+          <h3 class="text-lg font-semibold text-gray-800 mb-8">
+            담당자 이름을 입력해주세요
+          </h3>
+          <input
+            type="text"
+            id="manager-name"
+            placeholder="담당자 이름을 입력하세요"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <!-- Step 5: 이메일 -->
+        <div class="step-content" data-step="5">
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">
+            기업 회원가입을 위해
+          </h3>
+          <h3 class="text-lg font-semibold text-gray-800 mb-8">
+            이메일을 입력해주세요
+          </h3>
+          <input
+            type="email"
+            id="email"
+            placeholder="이메일을 입력하세요"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <!-- Step 6: 회사 주소 -->
+        <div class="step-content" data-step="6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">
+            기업 회원가입을 위해
+          </h3>
+          <h3 class="text-lg font-semibold text-gray-800 mb-8">
+            회사 주소를 선택해주세요
+          </h3>
+          <div class="relative">
+            <input
+              type="text"
+              id="company-address-search"
+              placeholder="지도에서 회사 위치를 선택해주세요"
+              readonly
+              onclick="openCompanyMapModal()"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 cursor-pointer bg-white"
+            />
+            <svg
+              class="w-5 h-5 absolute right-3 top-3.5 text-gray-400 pointer-events-none"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              일반 회원가입
-            </a>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+          </div>
+          <!-- Hidden inputs for address data -->
+          <input type="hidden" id="company-sido" />
+          <input type="hidden" id="company-sigungu" />
+          <input type="hidden" id="company-dong" />
+          <input type="hidden" id="company-full-address" />
+        </div>
+
+        <!-- Step 7: 사업자등록증 업로드 -->
+        <div class="step-content" data-step="7">
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">
+            기업 회원가입을 위해
+          </h3>
+          <h3 class="text-lg font-semibold text-gray-800 mb-8">
+            사업자등록증을 업로드해주세요
+          </h3>
+          <div class="space-y-2">
+            <input
+              type="file"
+              name="business_registration"
+              id="business_registration"
+              accept=".pdf,.jpg,.jpeg,.png"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            />
+            <p class="text-sm text-gray-500">허용 파일: PDF, JPG, PNG</p>
+          </div>
+        </div>
+
+        <!-- Step 8: 완료 -->
+        <div class="step-content" data-step="8">
+          <div class="text-center py-12">
+            <div class="text-6xl mb-6">🏢</div>
+            <h2 class="text-3xl font-bold text-blue-900 mb-4">이음</h2>
+            <p class="text-xl font-semibold text-gray-800 mb-2">
+              기업 회원가입 신청 완료!
+            </p>
+            <p class="text-gray-600">관리자의 승인을 기다려 주세요</p>
+            <div class="mt-8">
+              <div
+                class="inline-block w-12 h-12 border-4 border-blue-900 border-t-transparent rounded-full animate-spin"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- 하단 버튼 -->
+      <div
+        class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white p-4 shadow-lg"
+        id="next-button-container"
+      >
+        <button
+          type="button"
+          id="next-button"
+          onclick="nextStep()"
+          class="w-full bg-gray-300 text-gray-500 font-medium py-4 px-4 rounded-lg transition-colors"
+          disabled
+        >
+          다음
+        </button>
+      </div>
+    </div>
+
+    <!-- 회사 주소 선택 지도 모달 -->
+    <div
+      id="company-map-modal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+    >
+      <div
+        class="bg-white rounded-lg overflow-hidden"
+        style="width: 80%; max-width: 400px; height: 45vh"
+      >
+        <!-- 모달 헤더 -->
+        <div class="p-4 border-b flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-gray-800">회사 주소 선택</h3>
+          <button
+            type="button"
+            onclick="closeCompanyMapModal()"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <!-- 지도 영역 -->
+        <div
+          id="company-map"
+          style="width: 100%; height: calc(100% - 180px)"
+        ></div>
+
+        <!-- 주소 표시 및 확인 버튼 -->
+        <div class="p-4 border-t">
+          <p id="company-selected-address" class="text-sm text-gray-600 mb-3">
+            지도를 클릭하여 회사 위치를 선택해주세요
           </p>
+          <button
+            type="button"
+            id="company-confirm-location-btn"
+            onclick="confirmCompanyLocation()"
+            class="w-full bg-gray-300 text-gray-500 font-medium py-3 px-4 rounded-lg transition-colors"
+            disabled
+          >
+            확인
+          </button>
         </div>
       </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      let currentStep = 1;
+      const totalSteps = 8;
+      const formData = {};
+
+      // 지도 관련 변수
+      let companyMap = null;
+      let companyMarker = null;
+      let companyGeocoder = null;
+      let selectedCompanyLocation = null;
+
+      // 뒤로가기
+      function goBack() {
+        if (currentStep === 1) {
+          window.location.href = "{{ url_for('auth.first_login_page') }}";
+        } else {
+          currentStep--;
+          showStep(currentStep);
+        }
+      }
+
+      // 스텝 표시
+      function showStep(step) {
+        document
+          .querySelectorAll(".step-content")
+          .forEach((el) => el.classList.remove("active"));
+        document
+          .querySelector(`.step-content[data-step="${step}"]`)
+          .classList.add("active");
+
+        // 진행바 업데이트
+        const progress = (step / totalSteps) * 100;
+        document.getElementById("progress-bar").style.width = progress + "%";
+
+        // 다음 버튼 상태 초기화
+        updateNextButton();
+      }
+
+      // 다음 버튼 상태 업데이트
+      function updateNextButton() {
+        const button = document.getElementById("next-button");
+        let isValid = false;
+
+        switch (currentStep) {
+          case 1:
+            isValid = document.getElementById("username").value.trim() !== "";
+            break;
+          case 2:
+            const password = document.getElementById("password").value.trim();
+            const confirmPassword = document
+              .getElementById("confirm-password")
+              .value.trim();
+
+            // 비밀번호가 입력되면 확인 필드 표시
+            if (password !== "") {
+              document
+                .getElementById("confirm-password-container")
+                .classList.remove("hidden");
+              // 두 비밀번호가 모두 입력되고 일치해야 다음 버튼 활성화
+              isValid = confirmPassword !== "" && password === confirmPassword;
+
+              // 비밀번호 불일치 에러 메시지
+              if (confirmPassword !== "" && password !== confirmPassword) {
+                document
+                  .getElementById("password-error")
+                  .classList.remove("hidden");
+              } else {
+                document
+                  .getElementById("password-error")
+                  .classList.add("hidden");
+              }
+            } else {
+              document
+                .getElementById("confirm-password-container")
+                .classList.add("hidden");
+              isValid = false;
+            }
+            break;
+          case 3:
+            isValid =
+              document.getElementById("company-name").value.trim() !== "";
+            break;
+          case 4:
+            isValid =
+              document.getElementById("manager-name").value.trim() !== "";
+            break;
+          case 5:
+            const email = document.getElementById("email").value.trim();
+            // 이메일 형식 체크
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            isValid = email !== "" && emailRegex.test(email);
+            break;
+          case 6:
+            // 지도에서 선택한 주소가 있는지 확인
+            isValid =
+              selectedCompanyLocation !== null &&
+              document.getElementById("company-sido").value !== "" &&
+              document.getElementById("company-sigungu").value !== "" &&
+              document.getElementById("company-dong").value !== "";
+            break;
+          case 7:
+            // 파일이 선택되었는지 확인
+            const fileInput = document.getElementById("business_registration");
+            isValid = fileInput.files.length > 0;
+            break;
+        }
+
+        if (isValid) {
+          button.disabled = false;
+          button.classList.remove("bg-gray-300", "text-gray-500");
+          button.classList.add(
+            "bg-blue-900",
+            "text-white",
+            "hover:bg-blue-800"
+          );
+        } else {
+          button.disabled = true;
+          button.classList.add("bg-gray-300", "text-gray-500");
+          button.classList.remove(
+            "bg-blue-900",
+            "text-white",
+            "hover:bg-blue-800"
+          );
+        }
+      }
+
+      // 다음 단계로
+      function nextStep() {
+        // 현재 단계 데이터 저장
+        switch (currentStep) {
+          case 1:
+            formData.username = document.getElementById("username").value;
+            break;
+          case 2:
+            formData.password = document.getElementById("password").value;
+            formData.confirmPassword =
+              document.getElementById("confirm-password").value;
+            break;
+          case 3:
+            formData.companyName =
+              document.getElementById("company-name").value;
+            break;
+          case 4:
+            formData.managerName =
+              document.getElementById("manager-name").value;
+            break;
+          case 5:
+            formData.email = document.getElementById("email").value;
+            break;
+          case 6:
+            formData.companySido =
+              document.getElementById("company-sido").value;
+            formData.companySigungu =
+              document.getElementById("company-sigungu").value;
+            formData.companyDong =
+              document.getElementById("company-dong").value;
+            formData.companyFullAddress = document.getElementById(
+              "company-full-address"
+            ).value;
+            break;
+          case 7:
+            // 모든 데이터를 hidden input에 저장하고 폼 제출
+            document.getElementById("final-username").value = formData.username;
+            document.getElementById("final-password").value = formData.password;
+            document.getElementById("final-confirm-password").value =
+              formData.confirmPassword;
+            document.getElementById("final-nickname").value =
+              formData.companyName;
+            document.getElementById("final-name").value = formData.managerName;
+            document.getElementById("final-email").value = formData.email;
+            document.getElementById("final-company-sido").value =
+              formData.companySido;
+            document.getElementById("final-company-sigungu").value =
+              formData.companySigungu;
+            document.getElementById("final-company-dong").value =
+              formData.companyDong;
+            document.getElementById("final-company-full-address").value =
+              formData.companyFullAddress;
+
+            currentStep++;
+            showStep(currentStep);
+            document.getElementById("next-button-container").style.display =
+              "none";
+
+            // 폼 제출
+            setTimeout(() => {
+              document.getElementById("company-register-form").submit();
+            }, 2000);
+            return;
+        }
+
+        if (currentStep < totalSteps) {
+          currentStep++;
+          showStep(currentStep);
+        }
+      }
+
+      // ===== 지도 관련 함수들 =====
+
+      // 회사 주소 지도 모달 열기
+      function openCompanyMapModal() {
+        document.getElementById("company-map-modal").classList.remove("hidden");
+
+        // 지도가 아직 초기화되지 않았으면 초기화
+        if (!companyMap) {
+          initCompanyMap();
+        } else {
+          // 이미 초기화된 경우 지도 크기 재조정
+          setTimeout(function () {
+            companyMap.relayout();
+          }, 100);
+        }
+      }
+
+      // 회사 주소 지도 모달 닫기
+      function closeCompanyMapModal() {
+        document.getElementById("company-map-modal").classList.add("hidden");
+      }
+
+      // 회사 주소 지도 초기화
+      function initCompanyMap() {
+        const container = document.getElementById("company-map");
+
+        // 먼저 기본 위치로 지도 생성
+        const defaultPosition = new kakao.maps.LatLng(37.5665, 126.978); // 서울 시청
+        const options = {
+          center: defaultPosition,
+          level: 3,
+        };
+
+        companyMap = new kakao.maps.Map(container, options);
+        companyGeocoder = new kakao.maps.services.Geocoder();
+
+        // 현재 위치 가져오기
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+              const locPosition = new kakao.maps.LatLng(lat, lng);
+
+              // 지도 중심을 현재 위치로 이동
+              companyMap.setCenter(locPosition);
+
+              // 지도 크기 재설정 (위치 이동 후)
+              setTimeout(function () {
+                companyMap.relayout();
+              }, 100);
+
+              // 마커 생성
+              if (!companyMarker) {
+                companyMarker = new kakao.maps.Marker({
+                  position: locPosition,
+                  map: companyMap,
+                });
+              } else {
+                companyMarker.setPosition(locPosition);
+              }
+
+              // 현재 위치의 주소 가져오기
+              getCompanyAddressFromCoords(lat, lng);
+            },
+            function (error) {
+              console.log("현재 위치를 가져올 수 없습니다:", error);
+              // 기본 위치(서울 시청)에 마커 표시
+              companyMarker = new kakao.maps.Marker({
+                position: defaultPosition,
+                map: companyMap,
+              });
+              getCompanyAddressFromCoords(37.5665, 126.978);
+            }
+          );
+        } else {
+          // Geolocation을 지원하지 않는 경우 기본 위치 사용
+          companyMarker = new kakao.maps.Marker({
+            position: defaultPosition,
+            map: companyMap,
+          });
+          getCompanyAddressFromCoords(37.5665, 126.978);
+        }
+
+        // 지도 클릭 이벤트
+        kakao.maps.event.addListener(
+          companyMap,
+          "click",
+          function (mouseEvent) {
+            const latlng = mouseEvent.latLng;
+            const lat = latlng.getLat();
+            const lng = latlng.getLng();
+
+            // 마커 이동
+            if (!companyMarker) {
+              companyMarker = new kakao.maps.Marker({
+                position: latlng,
+                map: companyMap,
+              });
+            } else {
+              companyMarker.setPosition(latlng);
+            }
+
+            // 주소 가져오기
+            getCompanyAddressFromCoords(lat, lng);
+          }
+        );
+      }
+
+      // 회사 주소 좌표로 주소 가져오기
+      function getCompanyAddressFromCoords(lat, lng) {
+        companyGeocoder.coord2Address(lng, lat, function (result, status) {
+          if (status === kakao.maps.services.Status.OK) {
+            const address = result[0].address;
+            const roadAddress = result[0].road_address;
+
+            // 주소 파싱
+            const sido = address.region_1depth_name; // 시/도
+            const sigungu = address.region_2depth_name; // 시/군/구
+            let dong = address.region_3depth_name; // 읍/면/동
+
+            // dong이 없는 경우 (예: 세종특별자치시)
+            if (!dong || dong === "") {
+              dong = address.region_3depth_h_name || sigungu;
+            }
+
+            // 전체 주소
+            const fullAddress = address.address_name;
+
+            // 표시용 주소 (시/도 시/군/구 읍/면/동)
+            let displayAddress = sido + " " + sigungu;
+            if (dong && dong !== sigungu) {
+              displayAddress += " " + dong;
+            }
+
+            // 선택된 위치 정보 저장
+            selectedCompanyLocation = {
+              lat: lat,
+              lng: lng,
+              fullAddress: fullAddress,
+              displayAddress: displayAddress,
+              sido: sido,
+              sigungu: sigungu,
+              dong: dong,
+            };
+
+            // 화면에 표시
+            document.getElementById("company-selected-address").textContent =
+              fullAddress;
+
+            // 확인 버튼 활성화
+            const confirmBtn = document.getElementById(
+              "company-confirm-location-btn"
+            );
+            confirmBtn.disabled = false;
+            confirmBtn.classList.remove("bg-gray-300", "text-gray-500");
+            confirmBtn.classList.add(
+              "bg-blue-900",
+              "text-white",
+              "hover:bg-blue-800"
+            );
+          }
+        });
+      }
+
+      // 회사 위치 확인 버튼 클릭
+      function confirmCompanyLocation() {
+        if (selectedCompanyLocation) {
+          // 주소 정보를 hidden input에 저장
+          document.getElementById("company-sido").value =
+            selectedCompanyLocation.sido;
+          document.getElementById("company-sigungu").value =
+            selectedCompanyLocation.sigungu;
+          document.getElementById("company-dong").value =
+            selectedCompanyLocation.dong;
+          document.getElementById("company-full-address").value =
+            selectedCompanyLocation.fullAddress;
+
+          // 화면에 표시
+          document.getElementById("company-address-search").value =
+            selectedCompanyLocation.displayAddress;
+
+          // 모달 닫기
+          closeCompanyMapModal();
+
+          // 다음 버튼 활성화 체크
+          updateNextButton();
+        }
+      }
+
+      // 입력 이벤트 리스너
+      document
+        .getElementById("username")
+        .addEventListener("input", updateNextButton);
+      document
+        .getElementById("password")
+        .addEventListener("input", updateNextButton);
+      document
+        .getElementById("confirm-password")
+        .addEventListener("input", updateNextButton);
+      document
+        .getElementById("company-name")
+        .addEventListener("input", updateNextButton);
+      document
+        .getElementById("manager-name")
+        .addEventListener("input", updateNextButton);
+      document
+        .getElementById("email")
+        .addEventListener("input", updateNextButton);
+      document
+        .getElementById("business_registration")
+        .addEventListener("change", updateNextButton);
+
+      // Enter 키로 다음 단계
+      document.querySelectorAll("input").forEach((input) => {
+        input.addEventListener("keypress", function (e) {
+          if (
+            e.key === "Enter" &&
+            !document.getElementById("next-button").disabled
+          ) {
+            e.preventDefault();
+            nextStep();
+          }
+        });
+      });
+    </script>
   </body>
 </html>

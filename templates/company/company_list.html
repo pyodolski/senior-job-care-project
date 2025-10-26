@@ -93,7 +93,13 @@
                 clip-rule="evenodd"
               />
             </svg>
-            <span>경상시 조영동</span>
+            <span>
+              {% if current_user.is_authenticated and current_user.sido %}
+                {{ current_user.sido }} {{ current_user.sigungu }} {{ current_user.dong }}
+              {% else %}
+                주소를 설정해주세요
+              {% endif %}
+            </span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-4 w-4 ml-1"

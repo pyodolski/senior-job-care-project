@@ -13,29 +13,27 @@
       body {
         font-family: "Noto Sans KR", sans-serif;
       }
-      .resume-card {
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 12px;
-        background: white;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-      .resume-card:hover {
-        border-color: #1e3a8a;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      }
     </style>
   </head>
   <body class="bg-gray-50">
-    <div class="w-full min-h-screen flex flex-col">
+    <div class="max-w-md mx-auto bg-gray-50 min-h-screen flex flex-col">
       <!-- 상단 헤더 -->
-      <div class="sticky top-0 z-10 bg-white border-b">
-        <header class="px-4 py-3 flex items-center">
+      <div class="sticky top-0 z-10 bg-white">
+        <header class="px-4 py-4 flex items-center">
           <a href="{{ url_for('auth.profile') }}" class="mr-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-6 h-6 text-gray-700"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </a>
           <h1 class="text-lg font-bold text-gray-800">내 이력서</h1>
@@ -47,136 +45,232 @@
         <!-- 새 이력서 등록 버튼 -->
         <button
           onclick="location.href='{{ url_for('resumes.create_resume') }}'"
-          class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center mb-4"
+          class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-4 rounded-xl transition-colors flex items-center justify-center mb-4 shadow-sm"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5 mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 4v16m8-8H4"
+            />
           </svg>
           새 이력서 등록하기
         </button>
 
         <!-- 이력서 개수 표시 -->
-        <div class="text-sm text-gray-600 mb-3">
+        <div class="text-sm text-gray-600 font-medium mb-4">
           총 {{ resumes|length }}건
         </div>
 
         <!-- 이력서 목록 -->
-        {% if resumes %}
-        {% for resume in resumes %}
-        <div class="resume-card"
-             data-resume-id="{{ resume.id }}"
-             onclick="location.href='{{ url_for('resumes.my_resume_detail', resume_id=resume.id) }}'">
-          <div class="flex items-center justify-between mb-3">
+        {% if resumes %} {% for resume in resumes %}
+        <div
+          class="bg-white rounded-xl p-5 mb-3 shadow-sm border border-gray-100 cursor-pointer hover:shadow-md transition-shadow"
+          data-resume-id="{{ resume.id }}"
+          onclick="location.href='{{ url_for('resumes.my_resume_detail', resume_id=resume.id) }}'"
+        >
+          <!-- 상단: 최근 수정일 및 토글 -->
+          <div class="flex items-start justify-between mb-3">
             <div class="text-xs text-gray-500">
-              최근 수정일: {{ resume.updated_at.strftime('%Y-%m-%d %H:%M') if resume.updated_at else '알 수 없음' }}
+              최근 수정일: {{ resume.updated_at.strftime('%Y-%m-%d %H:%M') if
+              resume.updated_at else '알 수 없음' }}
             </div>
             <div class="flex items-center">
-              <label class="relative inline-flex items-center cursor-pointer"
-                     onclick="event.stopPropagation()">
+              <label
+                class="relative inline-flex items-center cursor-pointer"
+                onclick="event.stopPropagation()"
+              >
                 <input
-                        id="toggle-{{ resume.id }}"
-                        type="checkbox"
-                        {% if resume.is_public %}checked{% endif %}
-                        class="sr-only peer"
-                        onchange="event.stopPropagation(); togglePublic('{{ url_for('resumes.toggle_public', resume_id=resume.id) }}', this.checked, {{ resume.id }})"
-                >
-                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-900"></div>
+                  id="toggle-{{ resume.id }}"
+                  type="checkbox"
+                  {%
+                  if
+                  resume.is_public
+                  %}checked{%
+                  endif
+                  %}
+                  class="sr-only peer"
+                  onchange="event.stopPropagation(); togglePublic('{{ url_for('resumes.toggle_public', resume_id=resume.id) }}', this.checked, {{ resume.id }})"
+                />
+                <div
+                  class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-900"
+                ></div>
               </label>
 
-              <svg id="public-icon-{{ resume.id }}"
-                   xmlns="http://www.w3.org/2000/svg"
-                   class="w-5 h-5 ml-2 {% if resume.is_public %}text-blue-900{% else %}text-gray-400{% endif %}"
-                   fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                {% if resume.is_public %}
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                {% else %}
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                {% endif %}
+              <svg
+                id="public-icon-{{ resume.id }}"
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-6 h-6 ml-2 {% if resume.is_public %}text-blue-900{% else %}text-gray-400{% endif %}"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
           </div>
 
-          <!-- 이력서 제목 (자기소개 첫 줄 또는 기본 제목) -->
-          <h3 class="text-base font-bold text-gray-800 mb-3">
-              {% if resume.self_introduction %}
-                {{ resume.self_introduction.split('\n')[0][:30] }}{% if resume.self_introduction.split('\n')[0]|length > 30 %}...{% endif %}
-              {% else %}
-                나의 이력서
-              {% endif %}
-            </h3>
+          <!-- 이력서 제목 -->
+          <h3 class="text-lg font-bold text-gray-900 mb-3">
+            {% if resume.self_introduction %} {{
+            resume.self_introduction.split('\n')[0][:30] }}{% if
+            resume.self_introduction.split('\n')[0]|length > 30 %}...{% endif %}
+            {% else %} 나의 이력서 {% endif %}
+          </h3>
 
-            <!-- 희망 분야 -->
-            <div class="mb-3">
-              <span class="text-xs text-gray-600">희망분야:</span>
-              {% if resume.desired_categories %}
-                {% for cat in resume.desired_categories.split(',')[:3] %}
-                <span class="inline-block text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded mr-1">{{ cat }}</span>
-                {% endfor %}
-              {% else %}
-                <span class="text-xs text-gray-500">미설정</span>
-              {% endif %}
-            </div>
+          <!-- 희망 요일 -->
+          <div class="mb-2">
+            <span class="text-sm text-gray-600">희망요일: </span>
+            <span class="text-sm text-gray-900">
+              {% set days = [] %}
+              {% if resume.work_monday %}{% set _ = days.append('월') %}{% endif %}
+              {% if resume.work_tuesday %}{% set _ = days.append('화') %}{% endif %}
+              {% if resume.work_wednesday %}{% set _ = days.append('수') %}{% endif %}
+              {% if resume.work_thursday %}{% set _ = days.append('목') %}{% endif %}
+              {% if resume.work_friday %}{% set _ = days.append('금') %}{% endif %}
+              {% if resume.work_saturday %}{% set _ = days.append('토') %}{% endif %}
+              {% if resume.work_sunday %}{% set _ = days.append('일') %}{% endif %}
+              {% if days %}{{ days|join(', ') }}{% else %}미설정{% endif %}
+            </span>
+          </div>
 
-            <!-- 하단 버튼들 -->
-            <div class="flex items-center justify-between mt-4 pt-3 border-t">
-              <button
-                onclick="event.stopPropagation(); location.href='{{ url_for('resumes.edit_resume', resume_id=resume.id) }}'"
-                class="text-sm text-blue-900 font-medium"
-              >
-                수정하기
-              </button>
-              <button
-                onclick="event.stopPropagation(); deleteResume('{{ url_for('resumes.delete_resume', resume_id=resume.id) }}', {{ resume.id }})"
-                class="text-sm text-gray-500 hover:text-red-600 font-medium"
-              >
-                삭제
-              </button>
-            </div>
+          <!-- 희망 직종 -->
+          <div class="mb-3">
+            <span class="text-sm text-gray-600">희망직종: </span>
+            <span class="text-sm text-gray-900">
+              {% if resume.desired_categories %} {{ resume.desired_categories }}
+              {% else %} 미설정 {% endif %}
+            </span>
           </div>
-          {% endfor %}
-        {% else %}
-          <!-- 이력서 없을 때 -->
-          <div class="text-center py-16">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <p class="text-gray-500 mb-2">등록된 이력서가 없습니다.</p>
-            <p class="text-sm text-gray-400">위의 버튼을 눌러 이력서를 등록해보세요!</p>
+
+          <!-- 이력서 공개일 -->
+          <div class="mb-4">
+            <span class="text-sm text-gray-600">이력서 공개일: </span>
+            <span class="text-sm text-gray-900">
+              {{ resume.created_at.strftime('%Y.%m.%d') if resume.created_at
+              else '알 수 없음' }}
+            </span>
           </div>
+
+          <!-- 하단 버튼들 -->
+          <div class="flex items-center justify-between pt-3 border-t">
+            <button
+              onclick="event.stopPropagation(); deleteResume('{{ url_for('resumes.delete_resume', resume_id=resume.id) }}', {{ resume.id }})"
+              class="text-sm text-gray-500 hover:text-gray-700 font-medium"
+            >
+              삭제
+            </button>
+            <button
+              onclick="event.stopPropagation(); location.href='{{ url_for('resumes.edit_resume', resume_id=resume.id) }}'"
+              class="text-sm text-blue-900 hover:text-blue-800 font-semibold"
+            >
+              수정하기
+            </button>
+          </div>
+        </div>
+        {% endfor %} {% else %}
+        <!-- 이력서 없을 때 -->
+        <div class="text-center py-16">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-16 h-16 mx-auto text-gray-300 mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          <p class="text-gray-500 mb-2">등록된 이력서가 없습니다.</p>
+          <p class="text-sm text-gray-400">
+            위의 버튼을 눌러 이력서를 등록해보세요!
+          </p>
+        </div>
         {% endif %}
       </main>
 
       <!-- 하단 네비게이션 -->
-      <footer class="fixed bottom-0 left-0 right-0 w-full bg-gray-50 border-t flex justify-around">
-        <a href="{{ url_for('map.show_map') }}" class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500">
+      <footer
+        class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t flex justify-around"
+      >
+        <a
+          href="{{ url_for('map.show_map') }}"
+          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
+        >
           <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img src="{{ url_for('static', filename='images/footer/map.png') }}" alt="지도" class="max-w-full max-h-full object-contain" />
+            <img
+              src="{{ url_for('static', filename='images/footer/map.png') }}"
+              alt="지도"
+              class="max-w-full max-h-full object-contain"
+            />
           </div>
           <span class="text-xs">지도</span>
         </a>
-        <a href="{{ url_for('jobs.bookmark_list') }}" class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500">
+        <a
+          href="{{ url_for('jobs.bookmark_list') }}"
+          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
+        >
           <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img src="{{ url_for('static', filename='images/footer/favorite.png') }}" alt="찜" class="max-w-full max-h-full object-contain" />
+            <img
+              src="{{ url_for('static', filename='images/footer/favorite.png') }}"
+              alt="찜"
+              class="max-w-full max-h-full object-contain"
+            />
           </div>
           <span class="text-xs">찜</span>
         </a>
-        <a href="{{ url_for('auth.main') }}" class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500">
+        <a
+          href="{{ url_for('auth.main') }}"
+          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
+        >
           <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img src="{{ url_for('static', filename='images/footer/home.png') }}" alt="홈" class="max-w-full max-h-full object-contain" />
+            <img
+              src="{{ url_for('static', filename='images/footer/home.png') }}"
+              alt="홈"
+              class="max-w-full max-h-full object-contain"
+            />
           </div>
           <span class="text-xs">홈</span>
         </a>
-        <a href="{{ url_for('chat.chat_list') }}" class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500">
+        <a
+          href="{{ url_for('chat.chat_list') }}"
+          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
+        >
           <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img src="{{ url_for('static', filename='images/footer/chatting.png') }}" alt="채팅" class="max-w-full max-h-full object-contain" />
+            <img
+              src="{{ url_for('static', filename='images/footer/chatting.png') }}"
+              alt="채팅"
+              class="max-w-full max-h-full object-contain"
+            />
           </div>
           <span class="text-xs">채팅</span>
         </a>
-        <a href="{{ url_for('auth.profile') }}" class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500">
+        <a
+          href="{{ url_for('auth.profile') }}"
+          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
+        >
           <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img src="{{ url_for('static', filename='images/footer/profile.png') }}" alt="내정보" class="max-w-full max-h-full object-contain" />
+            <img
+              src="{{ url_for('static', filename='images/footer/profile.png') }}"
+              alt="내정보"
+              class="max-w-full max-h-full object-contain"
+            />
           </div>
           <span class="text-xs">내정보</span>
         </a>
@@ -185,23 +279,25 @@
 
     <script>
       async function deleteResume(url, resumeId) {
-        if (!confirm('정말 이력서를 삭제하시겠습니까?')) return;
+        if (!confirm("정말 이력서를 삭제하시겠습니까?")) return;
 
         try {
           const res = await fetch(url, {
-            method: 'POST',
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
-              'X-Requested-With': 'XMLHttpRequest'
+              "Content-Type": "application/json",
+              "X-Requested-With": "XMLHttpRequest",
             },
-            credentials: 'same-origin'
+            credentials: "same-origin",
           });
           const data = await res.json();
 
           // 삭제 성공 시 로직
           if (data.success) {
-            alert('삭제되었습니다.');
-            const cardToRemove = document.querySelector(`[data-resume-id="${resumeId}"]`);
+            alert("삭제되었습니다.");
+            const cardToRemove = document.querySelector(
+              `[data-resume-id="${resumeId}"]`
+            );
             if (cardToRemove) {
               cardToRemove.remove(); // 화면에서 해당 카드만 제거
             } else {
@@ -210,49 +306,47 @@
           }
           // 삭제 실패 시 로직
           else {
-            alert(data.message || '삭제에 실패했습니다.');
+            alert(data.message || "삭제에 실패했습니다.");
           }
         } catch (e) {
-          console.error('Error:', e);
-          alert('요청 중 오류가 발생했습니다.');
+          console.error("Error:", e);
+          alert("요청 중 오류가 발생했습니다.");
         }
       }
 
       async function togglePublic(url, isPublic, resumeId) {
         try {
           const res = await fetch(url, {
-            method: 'POST',
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
-              'X-Requested-With': 'XMLHttpRequest'
+              "Content-Type": "application/json",
+              "X-Requested-With": "XMLHttpRequest",
             },
-            credentials: 'same-origin',
-            body: JSON.stringify({ ispublic: isPublic })
+            credentials: "same-origin",
+            body: JSON.stringify({ ispublic: isPublic }),
           });
           const data = await res.json();
 
           if (data.success) {
-            // 성공 시, 페이지 새로고침 대신 아이콘 색상만 바로 변경
+            // 성공 시, 아이콘 색상 변경
             const icon = document.querySelector(`#public-icon-${resumeId}`);
             if (icon) {
-                icon.classList.toggle('text-blue-900', isPublic);
-                icon.classList.toggle('text-gray-400', !isPublic);
-                // 아이콘 모양도 바꿔주면 더 좋습니다 (현재 코드는 색상만 변경)
+              icon.classList.toggle("text-blue-900", isPublic);
+              icon.classList.toggle("text-gray-400", !isPublic);
             }
           } else {
             // 실패 시, 스위치를 원래 상태로 되돌림
-            alert(data.message || '공개 설정 변경에 실패했습니다.');
+            alert(data.message || "공개 설정 변경에 실패했습니다.");
             const input = document.querySelector(`#toggle-${resumeId}`);
             if (input) input.checked = !isPublic;
           }
         } catch (e) {
-          console.error('Error:', e);
-          alert('요청 중 오류가 발생했습니다.');
+          console.error("Error:", e);
+          alert("요청 중 오류가 발생했습니다.");
           const input = document.querySelector(`#toggle-${resumeId}`);
           if (input) input.checked = !isPublic;
         }
       }
     </script>
-
   </body>
 </html>
