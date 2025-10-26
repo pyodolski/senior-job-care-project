@@ -160,4 +160,4 @@ init_chat_socketio(socketio)
 
 if __name__ == '__main__':
     # 로컬 개발 환경에서 데이터베이스 연결 테스트
-    socketio.run(app, port=5002, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, port=5002, debug=True)
