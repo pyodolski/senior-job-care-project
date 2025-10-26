@@ -1,7 +1,7 @@
 // 채팅 관련 JavaScript 함수들
 
 // 다른 도메인이면: const socket = io("https://api.example.com", { withCredentials: true });
-const socket = io({ withCredentials: true }); // 세션 기반 인증 공유[web:17]
+const socket = io({ withCredentials: true }); // 세션 기반 인증 공유
 
 // 템플릿에서 주입된 전역 값 사용
 const ROOM_ID = window.roomId;
