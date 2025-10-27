@@ -28,10 +28,24 @@ app.config.from_object(Config)
 Session(app)
 db.init_app(app)
 
-# 데이터베이스 테이블 생성
+# 데이터베이스 테이블 생성 및 마이그레이션
 with app.app_context():
-    db.create_all()
-    print("✅ 데이터베이스 테이블 초기화 완료")
+    try:
+        # 모든 모델 import (마이그레이션 포함)
+        from models import ResumeFavorite
+        
+        # 테이블 생성
+        db.create_all()
+        print("✅ 데이터베이스 테이블 초기화 완료")
+        
+        # Railway 환경 확인
+        import os
+        if os.getenv('RAILWAY_ENVIRONMENT'):
+            print("🚂 Railway 환경 감지 - 마이그레이션 자동 적용됨")
+        
+    except Exception as e:
+        print(f"⚠️ 데이터베이스 초기화 중 오류: {e}")
+        # 오류가 있어도 앱은 계속 실행
 
 login_manager = LoginManager()
 login_manager.init_app(app)

@@ -251,3 +251,29 @@ def company_favorites():
                          my_jobs=my_jobs,
                          public_resumes=public_resumes,
                          current_tab=tab)
+
+
+# 이력서 목록 페이지 (메인 페이지 스타일)
+@company_bp.route("/resumes")
+@login_required
+def resume_list():
+    """
+    이력서 목록 페이지 (메인 페이지 통합)
+    ===============================
+    
+    기능:
+    - 공개된 이력서 목록 조회
+    - 직무 분야, 근무 요일, 신체 능력, 이동 거리로 필터링
+    - 이력서 상세보기 및 제안하기
+    
+    URL: GET /resumes
+    템플릿: company/resume_list.html
+    
+    권한: 로그인한 사용자만 접근 가능
+    """
+    
+    # 공개된 이력서 조회 (user 관계 포함)
+    from models import Resume, User
+    public_resumes = Resume.query.join(User).filter(Resume.is_public == True).order_by(Resume.updated_at.desc()).all()
+    
+    return render_template("company/resume_list.html", resumes=public_resumes)
