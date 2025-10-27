@@ -72,8 +72,10 @@
           <div class="relative">
             <input
               type="text"
+              id="chatSearchInput"
               placeholder="채팅방 검색"
               class="w-full px-4 py-3 pl-10 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900"
+              oninput="searchChatRooms()"
             />
             <svg
               class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
@@ -104,55 +106,68 @@
           </h2>
         </div>
 
+        <!-- 검색 결과 없음 메시지 -->
+        <div
+          id="noSearchResults"
+          class="chat-empty-state"
+          style="display: none"
+        >
+          <h3>검색 결과가 없습니다</h3>
+          <p>다른 검색어로 시도해보세요.</p>
+        </div>
+
         <!-- 채팅 목록 -->
         <div class="chat-list">
           {% if chat_rooms %} {% for chat_data in chat_rooms %}
           <div
             class="chat-item {% if chat_data.unread_count > 0 %}unread{% endif %}"
             data-room-id="{{ chat_data.room.id }}"
+            data-user-name="{{ chat_data.other_user.nickname }}"
+            data-job-title="{{ chat_data.room.job.title }}"
+            data-last-message="{% if chat_data.last_message %}{{ chat_data.last_message.message }}{% endif %}"
             onclick="goToChatRoom({{ chat_data.room.id }})"
           >
-            <div
-              class="chat-unread-badge {% if chat_data.unread_count == 0 %}hidden{% endif %}"
-            >
-              {% if chat_data.unread_count > 0 %}{{ chat_data.unread_count }}{%
-              endif %}
+            <!-- 프로필 사진 -->
+            <div class="chat-avatar">
+              {% if chat_data.other_user.profile_image_url %}
+              <img
+                src="{{ chat_data.other_user.profile_image_url }}"
+                alt="profile"
+                class="w-full h-full rounded-full object-cover"
+              />
+              {% else %} {{ chat_data.other_user.nickname[0] if
+              chat_data.other_user.nickname else '?' }} {% endif %}
             </div>
 
-            <div class="chat-header">
-              <div class="chat-user-info">
-                <div class="chat-avatar">
-                  {% if chat_data.other_user.profile_image_url %}
-                  <img
-                    src="{{ chat_data.other_user.profile_image_url }}"
-                    alt="profile"
-                    class="w-full h-full rounded-full object-cover"
-                  />
-                  {% else %} {{ chat_data.other_user.nickname[0] if
-                  chat_data.other_user.nickname else '?' }} {% endif %}
+            <!-- 채팅 정보 -->
+            <div class="chat-info">
+              <!-- 첫 번째 행: 이름과 시간 -->
+              <div class="chat-info-row">
+                <div class="chat-user-name">
+                  {{ chat_data.other_user.nickname }}
                 </div>
-                <div>
-                  <div class="chat-user-name">
-                    {{ chat_data.other_user.nickname }}
-                  </div>
-                  <div class="chat-job-title">
-                    {{ chat_data.room.job.title }}
-                  </div>
+                <div class="chat-time">
+                  {% if chat_data.last_message %} {{
+                  chat_data.last_message.created_at|time_ago }} {% else %} {{
+                  chat_data.room.created_at|time_ago }} {% endif %}
                 </div>
               </div>
-              <div class="chat-time">
-                {% if chat_data.last_message %} {{
-                chat_data.last_message.created_at|time_ago }} {% else %} {{
-                chat_data.room.created_at|time_ago }} {% endif %}
-              </div>
-            </div>
 
-            <div class="chat-last-message">
-              {% if chat_data.last_message %} {% if
-              chat_data.last_message.message_type == 'system' %}
-              <em>{{ chat_data.last_message.message }}</em>
-              {% else %} {{ chat_data.last_message.message }} {% endif %} {%
-              else %} 채팅을 시작해보세요! {% endif %}
+              <!-- 두 번째 행: 마지막 메시지와 미확인 개수 -->
+              <div class="chat-info-row">
+                <div class="chat-last-message">
+                  {% if chat_data.last_message %} {% if
+                  chat_data.last_message.message_type == 'system' %}
+                  <em>{{ chat_data.last_message.message }}</em>
+                  {% else %} {{ chat_data.last_message.message }} {% endif %} {%
+                  else %} 채팅을 시작해보세요! {% endif %}
+                </div>
+                {% if chat_data.unread_count > 0 %}
+                <div class="chat-unread-badge">
+                  {{ chat_data.unread_count }}
+                </div>
+                {% endif %}
+              </div>
             </div>
           </div>
           {% endfor %} {% else %}
@@ -244,5 +259,43 @@
 
     <script src="{{ url_for('static', filename='js/common.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+    <script>
+      // 채팅방 검색 기능
+      function searchChatRooms() {
+        const searchInput = document.getElementById("chatSearchInput");
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const chatItems = document.querySelectorAll(".chat-item");
+        const noResultsMessage = document.getElementById("noSearchResults");
+        let visibleCount = 0;
+
+        chatItems.forEach((item) => {
+          const userName = item.getAttribute("data-user-name").toLowerCase();
+          const jobTitle = item.getAttribute("data-job-title").toLowerCase();
+          const lastMessage = item
+            .getAttribute("data-last-message")
+            .toLowerCase();
+
+          // 사용자 이름, 공고 제목, 마지막 메시지에서 검색
+          const isMatch =
+            userName.includes(searchTerm) ||
+            jobTitle.includes(searchTerm) ||
+            lastMessage.includes(searchTerm);
+
+          if (isMatch) {
+            item.style.display = "";
+            visibleCount++;
+          } else {
+            item.style.display = "none";
+          }
+        });
+
+        // 검색 결과가 없을 때 메시지 표시
+        if (searchTerm && visibleCount === 0) {
+          noResultsMessage.style.display = "block";
+        } else {
+          noResultsMessage.style.display = "none";
+        }
+      }
+    </script>
   </body>
 </html>
