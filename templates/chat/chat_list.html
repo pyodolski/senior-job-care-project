@@ -58,45 +58,50 @@
             </div>
           </div>
         </header>
-
-        <!-- 네비게이션 탭 -->
-        <nav class="flex border-b">
-          <a
-            href="{{ url_for('auth.main') }}"
-            class="flex-1 text-center py-3 text-gray-500"
-            >나의 이음</a
-          >
-          <a
-            href="{{ url_for('company.company_list') }}"
-            class="flex-1 text-center py-3 text-gray-500"
-            >기업 이음</a
-          >
-          <a
-            href="{{ url_for('jobs.job_list') }}"
-            class="flex-1 text-center py-3 text-gray-500"
-            >사람 이음</a
-          >
-        </nav>
       </div>
 
       <!-- 메인 컨텐츠 -->
-      <main class="px-4 py-4 sm:px-6 bg-white pb-24">
-        <!-- 채팅 목록 제목 -->
-        <div class="section-title">
-          채팅 {% if unread_total > 0 %}
-          <span
-            style="
-              background: #e74c3c;
-              color: white;
-              border-radius: 50%;
-              padding: 2px 8px;
-              font-size: 12px;
-              margin-left: 10px;
-            "
-          >
-            {{ unread_total }}
-          </span>
-          {% endif %}
+      <main class="bg-white pb-24">
+        <!-- 채팅 제목 -->
+        <div class="px-4 py-4 sm:px-6">
+          <h1 class="text-2xl font-bold text-gray-800">채팅</h1>
+        </div>
+
+        <!-- 검색바 -->
+        <div class="px-4 pb-4 sm:px-6">
+          <div class="relative">
+            <input
+              type="text"
+              placeholder="채팅방 검색"
+              class="w-full px-4 py-3 pl-10 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900"
+            />
+            <svg
+              class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <!-- 내 채팅 섹션 -->
+        <div class="px-4 py-3 sm:px-6 border-t border-b bg-gray-50">
+          <h2 class="text-base font-semibold text-gray-800 flex items-center">
+            내 채팅 {% if unread_total > 0 %}
+            <span
+              class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5"
+            >
+              {{ unread_total }}
+            </span>
+            {% endif %}
+          </h2>
         </div>
 
         <!-- 채팅 목록 -->
@@ -107,19 +112,24 @@
             data-room-id="{{ chat_data.room.id }}"
             onclick="goToChatRoom({{ chat_data.room.id }})"
           >
-            <div class="chat-unread-badge {% if chat_data.unread_count == 0 %}hidden{% endif %}">
-                {% if chat_data.unread_count > 0 %}{{ chat_data.unread_count }}{% endif %}
+            <div
+              class="chat-unread-badge {% if chat_data.unread_count == 0 %}hidden{% endif %}"
+            >
+              {% if chat_data.unread_count > 0 %}{{ chat_data.unread_count }}{%
+              endif %}
             </div>
 
             <div class="chat-header">
               <div class="chat-user-info">
                 <div class="chat-avatar">
                   {% if chat_data.other_user.profile_image_url %}
-                  <img src="{{ chat_data.other_user.profile_image_url }}" alt="profile"
-                       class="w-full h-full rounded-full object-cover"/>
-                  {% else %}
-                  {{ chat_data.other_user.nickname[0] if chat_data.other_user.nickname else '?' }}
-                  {% endif %}
+                  <img
+                    src="{{ chat_data.other_user.profile_image_url }}"
+                    alt="profile"
+                    class="w-full h-full rounded-full object-cover"
+                  />
+                  {% else %} {{ chat_data.other_user.nickname[0] if
+                  chat_data.other_user.nickname else '?' }} {% endif %}
                 </div>
                 <div>
                   <div class="chat-user-name">
