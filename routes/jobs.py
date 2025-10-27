@@ -80,11 +80,18 @@ def job_list():
         region3 = request.args.get('region3')
         conditions.append(JobPost.region_3depth_name.like(f"{region3}%"))
 
+    # 사람이음 공고만 필터링 (job_category가 없는 공고)
+    people_condition = JobPost.job_category.is_(None)
+    if conditions:
+        conditions.append(people_condition)
+    else:
+        conditions = [people_condition]
+    
     # 검색어나 필터가 있으면 검색 실행, 없으면 전체 목록 조회
-    if query or filters or conditions:
+    if query or filters or len(conditions) > 1:  # people_condition 외에 다른 조건이 있으면
         jobs = JobService.search_jobs(query, filters, conditions, sort_by)
     else:
-        jobs_pagination = JobService.get_all_jobs(page=1, per_page=20, sort_by=sort_by)
+        jobs_pagination = JobService.get_all_jobs(page=1, per_page=20, sort_by=sort_by, conditions=conditions)
         jobs = jobs_pagination.items
 
     # 각 공고의 지원 상태 확인
@@ -218,6 +225,7 @@ def create_job():
 @login_required
 def create_company_job():
     kakao_api_key = current_app.config.get('KAKAO_MAP_API_KEY')
+    print(f"🗺️ 기업이음 글쓰기 - KAKAO_MAP_API_KEY: {kakao_api_key}")
     if request.method == "POST":
         try:
             # 폼 데이터 받기
@@ -233,6 +241,7 @@ def create_company_job():
             
             # 기업이음 카테고리 (안전·관리, 서비스·매장, 생활·돌봄 지원, 운전·배송, 사회·공공, 기타)
             job_category = request.form.get("job_category", "").strip()
+            print(f"📝 기업이음 공고 작성 - job_category: '{job_category}'")
 
             # 행정구역 정보
             region_1depth_name = request.form.get("region_1depth_name")
@@ -305,8 +314,10 @@ def create_company_job():
             db.session.add(new_job)
             db.session.commit()
             
-            flash("공고가 성공적으로 등록되었습니다!", "success")
-            return redirect(url_for("jobs.job_list"))
+            print(f"✅ 기업이음 공고 저장 완료 - ID: {new_job.id}, job_category: '{new_job.job_category}'")
+            
+            flash("기업 공고가 성공적으로 등록되었습니다!", "success")
+            return redirect(url_for("company.company_list"))
             
         except Exception as e:
             db.session.rollback()
