@@ -70,15 +70,15 @@ def company_list():
     if work_period:
         filters['work_period'] = work_period
     
-    # 기업 회원들이 작성한 공고만 조회
+    # 기업이음 공고만 조회 (job_category가 있는 공고)
+    company_condition = JobPost.job_category.isnot(None)
+    conditions = [company_condition]
+    
     if query or filters:
-        all_jobs = JobService.search_jobs(query, filters, None, sort_by)
-        # 기업 회원이 작성한 공고만 필터링
-        jobs = [job for job in all_jobs if job.author.user_type == 1]
+        jobs = JobService.search_jobs(query, filters, conditions, sort_by)
     else:
-        jobs_pagination = JobService.get_all_jobs(page=1, per_page=20, sort_by=sort_by)
-        # 기업 회원이 작성한 공고만 필터링
-        jobs = [job for job in jobs_pagination.items if job.author.user_type == 1]
+        jobs_pagination = JobService.get_all_jobs(page=1, per_page=20, sort_by=sort_by, conditions=conditions)
+        jobs = jobs_pagination.items
     
     # 각 공고의 지원 상태 확인 (일반 사용자만)
     jobs_with_status = []
@@ -107,15 +107,15 @@ def company_list():
 @login_required
 def create_company_job():
     """
-    기업 공고 작성
+    기업 공고 작성 - 새로운 스크롤 방식으로 리다이렉트
     ==============
     
     기능:
     - 기업 회원만 공고 작성 가능
     - 승인된 기업 회원만 접근 허용
+    - /jobs/create_company로 리다이렉트
     
     URL: GET/POST /company/create
-    템플릿: company/create_job.html
     
     권한:
     - user_type == 1 (기업)
@@ -127,145 +127,8 @@ def create_company_job():
         flash("기업 회원만 공고를 작성할 수 있습니다. 기업 회원 인증을 완료해주세요.", "error")
         return redirect(url_for("company.company_list"))
     
-    if request.method == "POST":
-        try:
-            # 기본 정보
-            title = request.form.get("title", "").strip()
-            company = request.form.get("company", "").strip()
-            description = request.form.get("description", "").strip()
-            
-            # 직무 내용
-            job_category = request.form.get("job_category", "일반")
-            job_category_custom = request.form.get("job_category_custom", "").strip()
-            
-            # 임금 정보
-            salary_min = request.form.get("salary_min", type=int)
-            salary_max = request.form.get("salary_max", type=int)
-            salary_negotiable = bool(request.form.get("salary_negotiable"))
-            
-            # 경력
-            experience_required = request.form.get("experience_required", "")
-            
-            # 복리후생
-            benefit_commute_bus = bool(request.form.get("benefit_commute_bus"))
-            benefit_lunch = bool(request.form.get("benefit_lunch"))
-            benefit_uniform = bool(request.form.get("benefit_uniform"))
-            benefit_health_checkup = bool(request.form.get("benefit_health_checkup"))
-            benefit_other = request.form.get("benefit_other", "").strip()
-            
-            # 장애인용 복지시설
-            disabled_parking = bool(request.form.get("disabled_parking"))
-            disabled_elevator = bool(request.form.get("disabled_elevator"))
-            disabled_ramp = bool(request.form.get("disabled_ramp"))
-            disabled_restroom = bool(request.form.get("disabled_restroom"))
-            
-            # 고용형태 및 근무조건
-            recruitment_type = request.form.get("recruitment_type", "")
-            region = request.form.get("region", "").strip()
-            contact_phone = request.form.get("contact_phone", "").strip()
-            recruitment_count = request.form.get("recruitment_count", type=int)
-            
-            # 근무 시간
-            work_start_time_str = request.form.get("work_start_time", "")
-            work_end_time_str = request.form.get("work_end_time", "")
-            
-            work_start_time = None
-            work_end_time = None
-            
-            if work_start_time_str:
-                work_start_time = datetime.strptime(work_start_time_str, "%H:%M").time()
-            if work_end_time_str:
-                work_end_time = datetime.strptime(work_end_time_str, "%H:%M").time()
-            
-            # 근무 요일
-            work_monday = bool(request.form.get("work_monday"))
-            work_tuesday = bool(request.form.get("work_tuesday"))
-            work_wednesday = bool(request.form.get("work_wednesday"))
-            work_thursday = bool(request.form.get("work_thursday"))
-            work_friday = bool(request.form.get("work_friday"))
-            work_saturday = bool(request.form.get("work_saturday"))
-            work_sunday = bool(request.form.get("work_sunday"))
-            
-            # 모집기간
-            recruitment_start_date_str = request.form.get("recruitment_start_date", "")
-            recruitment_end_date_str = request.form.get("recruitment_end_date", "")
-            
-            recruitment_start_date = None
-            recruitment_end_date = None
-            
-            if recruitment_start_date_str:
-                recruitment_start_date = datetime.strptime(recruitment_start_date_str, "%Y-%m-%d").date()
-            if recruitment_end_date_str:
-                recruitment_end_date = datetime.strptime(recruitment_end_date_str, "%Y-%m-%d").date()
-            
-            # 필수 필드 검증
-            if not all([title, company, description]):
-                flash("채용 제목, 회사명, 상세 설명은 필수 입력 항목입니다.", "error")
-                return render_template("company/create_job.html")
-            
-            # 임금 정보 처리
-            salary = ""
-            if salary_negotiable:
-                salary = "협의"
-            elif salary_min or salary_max:
-                if salary_min and salary_max:
-                    salary = f"{salary_min}~{salary_max}만원"
-                elif salary_min:
-                    salary = f"{salary_min}만원 이상"
-                elif salary_max:
-                    salary = f"{salary_max}만원 이하"
-            
-            # 새 공고 생성
-            new_job = JobPost(
-                title=title,
-                company=company,
-                description=description,
-                job_category=job_category,
-                job_category_custom=job_category_custom if job_category == "기타" else None,
-                salary=salary,
-                salary_min=salary_min if not salary_negotiable else None,
-                salary_max=salary_max if not salary_negotiable else None,
-                salary_negotiable=salary_negotiable,
-                experience_required=experience_required,
-                benefit_commute_bus=benefit_commute_bus,
-                benefit_lunch=benefit_lunch,
-                benefit_uniform=benefit_uniform,
-                benefit_health_checkup=benefit_health_checkup,
-                benefit_other=benefit_other,
-                disabled_parking=disabled_parking,
-                disabled_elevator=disabled_elevator,
-                disabled_ramp=disabled_ramp,
-                disabled_restroom=disabled_restroom,
-                recruitment_type=recruitment_type,
-                region=region,
-                contact_phone=contact_phone,
-                recruitment_count=recruitment_count,
-                work_start_time=work_start_time,
-                work_end_time=work_end_time,
-                work_monday=work_monday,
-                work_tuesday=work_tuesday,
-                work_wednesday=work_wednesday,
-                work_thursday=work_thursday,
-                work_friday=work_friday,
-                work_saturday=work_saturday,
-                work_sunday=work_sunday,
-                recruitment_start_date=recruitment_start_date,
-                recruitment_end_date=recruitment_end_date,
-                author_id=current_user.id
-            )
-            
-            db.session.add(new_job)
-            db.session.commit()
-            
-            flash("기업 공고가 성공적으로 등록되었습니다!", "success")
-            return redirect(url_for("company.company_list"))
-            
-        except Exception as e:
-            db.session.rollback()
-            flash("공고 등록 중 오류가 발생했습니다. 다시 시도해주세요.", "error")
-            return render_template("company/create_job.html")
-    
-    return render_template("company/create_job.html")
+    # 새로운 스크롤 방식 페이지로 리다이렉트
+    return redirect(url_for("jobs.create_company_job"))
 
 @company_bp.route("/company/<int:job_id>")
 @login_required

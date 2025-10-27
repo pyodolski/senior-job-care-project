@@ -4,7 +4,7 @@ from flask_login import current_user
 
 class JobService:
     @staticmethod
-    def get_all_jobs(page=1, per_page=10, sort_by='latest'):
+    def get_all_jobs(page=1, per_page=10, sort_by='latest', conditions=None):
         """
         모든 공고 조회 (페이지네이션 및 정렬)
         
@@ -12,8 +12,14 @@ class JobService:
             page: 페이지 번호
             per_page: 페이지당 항목 수
             sort_by: 정렬 기준 ('latest', 'popular', 'views')
+            conditions: 추가 필터 조건 리스트
         """
         query = JobPost.query
+        
+        # 추가 조건 적용
+        if conditions:
+            for condition in conditions:
+                query = query.filter(condition)
         
         if sort_by == 'latest':
             # 최신순 (기본값)
