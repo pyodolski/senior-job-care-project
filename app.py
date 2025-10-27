@@ -60,26 +60,39 @@ def ensure_db_initialized():
                 
                 # people_category 컬럼 마이그레이션 자동 실행
                 try:
-                    check_query = text("""
+                    # 먼저 테이블이 존재하는지 확인
+                    table_check = text("""
                         SELECT COUNT(*) as count
-                        FROM information_schema.COLUMNS 
+                        FROM information_schema.TABLES 
                         WHERE TABLE_SCHEMA = DATABASE()
-                        AND TABLE_NAME = 'job_post' 
-                        AND COLUMN_NAME = 'people_category'
+                        AND TABLE_NAME = 'job_post'
                     """)
-                    result = db.session.execute(check_query).fetchone()
+                    table_exists = db.session.execute(table_check).fetchone()
                     
-                    if result[0] == 0:
-                        print("🔧 people_category 컬럼 마이그레이션 시작...")
-                        alter_query = "ALTER TABLE job_post ADD COLUMN people_category VARCHAR(20) AFTER contact_phone"
-                        db.session.execute(text(alter_query))
-                        db.session.commit()
-                        print("✅ people_category 컬럼 마이그레이션 완료")
+                    if table_exists and table_exists[0] > 0:
+                        check_query = text("""
+                            SELECT COUNT(*) as count
+                            FROM information_schema.COLUMNS 
+                            WHERE TABLE_SCHEMA = DATABASE()
+                            AND TABLE_NAME = 'job_post' 
+                            AND COLUMN_NAME = 'people_category'
+                        """)
+                        result = db.session.execute(check_query).fetchone()
+                        
+                        if result[0] == 0:
+                            print("🔧 people_category 컬럼 마이그레이션 시작...")
+                            alter_query = text("ALTER TABLE job_post ADD COLUMN people_category VARCHAR(20) AFTER contact_phone")
+                            db.session.execute(alter_query)
+                            db.session.commit()
+                            print("✅ people_category 컬럼 마이그레이션 완료")
+                        else:
+                            print("ℹ️ people_category 컬럼이 이미 존재합니다")
                     else:
-                        print("ℹ️ people_category 컬럼이 이미 존재합니다")
+                        print("ℹ️ job_post 테이블이 아직 생성되지 않았습니다")
                 except Exception as migration_error:
-                    print(f"⚠️ 마이그레이션 오류 (무시 가능): {migration_error}")
+                    print(f"⚠️ 마이그레이션 오류: {migration_error}")
                     db.session.rollback()
+                    # 오류가 발생해도 앱은 계속 실행
                 
                 db_initialized = True
                 print("✅ 데이터베이스 연결 및 테이블 초기화 완료")
