@@ -22,8 +22,23 @@ class Config:
     AWS_S3_REGION = os.environ.get("AWS_S3_REGION")
 
     # SQLAlchemy configuration
-    # Railway에서 제공하는 DATABASE_URL 사용 (이미 mysql+pymysql 형태로 설정됨)
+    # Railway에서 제공하는 DATABASE_URL 사용
     RAILWAY_DB_URI = os.getenv("DATABASE_URL")
+    
+    # mysql:// 를 mysql+pymysql:// 로 변환 (Railway 기본 URL 수정)
+    if RAILWAY_DB_URI and RAILWAY_DB_URI.startswith("mysql://"):
+        RAILWAY_DB_URI = RAILWAY_DB_URI.replace("mysql://", "mysql+pymysql://", 1)
+    
+    # Railway MySQL 개별 변수로 URL 구성 (DATABASE_URL이 없는 경우)
+    if not RAILWAY_DB_URI:
+        mysql_host = os.getenv("MYSQLHOST")
+        mysql_port = os.getenv("MYSQLPORT", "3306")
+        mysql_user = os.getenv("MYSQLUSER")
+        mysql_password = os.getenv("MYSQLPASSWORD")
+        mysql_database = os.getenv("MYSQLDATABASE", "railway")
+        
+        if mysql_host and mysql_user and mysql_password:
+            RAILWAY_DB_URI = f"mysql+pymysql://{mysql_user}:{mysql_password}@{mysql_host}:{mysql_port}/{mysql_database}"
     
     # For local development
     LOCAL_DB_URI = "mysql+pymysql://root:Ckdhfma1406!@localhost:3306/senior_house"
