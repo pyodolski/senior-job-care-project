@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>이력서 검색 - 이음</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+      }
+      .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto pb-20">
+      <!-- 상단 헤더 -->
+      <header class="bg-white border-b px-4 py-4 sticky top-0 z-20">
+        <div class="flex items-center justify-between">
+          <a href="{{ url_for('auth.main') }}">
+            <img
+              src="{{ url_for('static', filename='images/header/logo.png') }}"
+              alt="이음 로고"
+              class="h-8"
+            />
+          </a>
+          <div class="flex items-center gap-4">
+            <button class="text-gray-600">
+              <img
+                src="{{ url_for('static', filename='images/header/mic.png') }}"
+                alt="음성검색"
+                class="w-6 h-6"
+              />
+            </button>
+            <button class="text-gray-600">
+              <img
+                src="{{ url_for('static', filename='images/header/search.png') }}"
+                alt="검색"
+                class="w-6 h-6"
+              />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- 필터 영역 -->
+      <div class="bg-white px-4 py-3 border-b">
+        <div class="flex gap-2 overflow-x-auto">
+          <button
+            onclick="filterResumes('all')"
+            id="filter-all"
+            class="px-4 py-2 rounded-full bg-blue-600 text-white text-sm whitespace-nowrap"
+          >
+            전체
+          </button>
+          <button
+            onclick="filterResumes('장기')"
+            id="filter-장기"
+            class="px-4 py-2 rounded-full border border-gray-300 text-gray-700 text-sm whitespace-nowrap"
+          >
+            근무 유형: 장기
+          </button>
+          <button
+            onclick="filterResumes('단기')"
+            id="filter-단기"
+            class="px-4 py-2 rounded-full border border-gray-300 text-gray-700 text-sm whitespace-nowrap"
+          >
+            근무 유형: 단기
+          </button>
+          <button
+            onclick="filterResumes('시간협의')"
+            id="filter-시간협의"
+            class="px-4 py-2 rounded-full border border-gray-300 text-gray-700 text-sm whitespace-nowrap"
+          >
+            시간 협의 가능
+          </button>
+        </div>
+      </div>
+
+      <!-- 이력서 목록 -->
+      <div class="p-4">
+        <p class="text-sm text-gray-500 mb-4">
+          총 {{ resumes|length }}개의 공개 이력서
+        </p>
+
+        {% if resumes|length > 0 %}
+        <div class="space-y-4" id="resumeList">
+          {% for resume in resumes %}
+          <div
+            class="resume-card bg-white rounded-2xl p-4 shadow-sm border border-gray-200"
+            data-work-type="{{ resume.desired_work_type or '' }}"
+            data-time-negotiable="{{ 'true' if resume.is_time_negotiable else 'false' }}"
+          >
+            <!-- 사용자 정보 -->
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-center flex-1">
+                <div
+                  class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mr-3"
+                >
+                  <span class="text-xl">👤</span>
+                </div>
+                <div class="flex-1">
+                  <h3 class="font-bold text-lg text-gray-900">
+                    {{ resume.user.name }}
+                  </h3>
+                  <div class="flex items-center text-sm text-gray-600">
+                    {% if resume.user.birth_date %}
+                    <span class="mr-3"
+                      >{{ (2024 - resume.user.birth_date.year) }}세</span
+                    >
+                    {% endif %} {% if resume.user.gender %}
+                    <span>{{ resume.user.gender }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <button class="text-blue-600">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <!-- 희망 직무 -->
+            {% if resume.desired_job %}
+            <div class="mb-2">
+              <span
+                class="inline-block px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded mr-2"
+              >
+                {{ resume.desired_job }}
+              </span>
+            </div>
+            {% endif %}
+
+            <!-- 근무 조건 -->
+            <div class="flex flex-wrap gap-2 mb-3">
+              {% if resume.desired_work_type %}
+              <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                {{ resume.desired_work_type }}
+              </span>
+              {% endif %} {% if resume.desired_salary %}
+              <span
+                class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded"
+              >
+                💰 {{ resume.desired_salary }}
+              </span>
+              {% endif %} {% if resume.is_time_negotiable %}
+              <span
+                class="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded"
+              >
+                ⏰ 시간 협의 가능
+              </span>
+              {% endif %}
+            </div>
+
+            <!-- 주소 -->
+            {% if resume.user.sido %}
+            <div class="flex items-center text-sm text-gray-600 mb-3">
+              <span>📍 {{ resume.user.sido }} {{ resume.user.sigungu }}</span>
+            </div>
+            {% endif %}
+
+            <!-- 자기소개 (일부) -->
+            {% if resume.self_introduction %}
+            <p class="text-sm text-gray-600 mb-3 line-clamp-2">
+              {{ resume.self_introduction[:100] }}{% if
+              resume.self_introduction|length > 100 %}...{% endif %}
+            </p>
+            {% endif %}
+
+            <div class="flex items-center justify-between pt-3 border-t">
+              <span class="text-xs text-gray-500">최근 업데이트</span>
+              <a
+                href="{{ url_for('resumes.my_resume_detail', resume_id=resume.id) }}"
+                class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+              >
+                상세보기
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-20">
+          <p class="text-gray-500">공개된 이력서가 없습니다</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- 하단 네비게이션 (기업 회원 전용) -->
+      <footer
+        class="fixed bottom-0 left-0 right-0 w-full bg-white border-t flex justify-around max-w-md mx-auto"
+      >
+        <a
+          href="{{ url_for('company.resume_search') }}"
+          class="flex-1 flex flex-col items-center justify-center p-2 text-blue-600"
+        >
+          <img
+            src="{{ url_for('static', filename='images/main_page/completion_of_Resume.png') }}"
+            alt="이력서"
+            class="w-6 h-6 mb-1"
+          />
+          <span class="text-xs">이력서</span>
+        </a>
+        <a
+          href="{{ url_for('company.company_favorites') }}"
+          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
+        >
+          <img
+            src="{{ url_for('static', filename='images/footer/favorite.png') }}"
+            alt="좋아요"
+            class="w-6 h-6 mb-1"
+          />
+          <span class="text-xs">좋아요</span>
+        </a>
+        <a
+          href="{{ url_for('auth.main') }}"
+          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
+        >
+          <img
+            src="{{ url_for('static', filename='images/footer/home.png') }}"
+            alt="홈"
+            class="w-6 h-6 mb-1"
+          />
+          <span class="text-xs">홈</span>
+        </a>
+        <a
+          href="{{ url_for('chat.chat_list') }}"
+          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
+        >
+          <img
+            src="{{ url_for('static', filename='images/footer/chatting.png') }}"
+            alt="채팅"
+            class="w-6 h-6 mb-1"
+          />
+          <span class="text-xs">채팅</span>
+        </a>
+        <a
+          href="{{ url_for('auth.profile') }}"
+          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
+        >
+          <img
+            src="{{ url_for('static', filename='images/footer/profile.png') }}"
+            alt="내정보"
+            class="w-6 h-6 mb-1"
+          />
+          <span class="text-xs">내정보</span>
+        </a>
+      </footer>
+    </div>
+
+    <script>
+      function filterResumes(type) {
+        // 모든 필터 버튼 초기화
+        document.querySelectorAll('[id^="filter-"]').forEach((btn) => {
+          btn.classList.remove("bg-blue-600", "text-white");
+          btn.classList.add("border", "border-gray-300", "text-gray-700");
+        });
+
+        // 선택된 필터 버튼 활성화
+        const activeBtn = document.getElementById("filter-" + type);
+        activeBtn.classList.remove(
+          "border",
+          "border-gray-300",
+          "text-gray-700"
+        );
+        activeBtn.classList.add("bg-blue-600", "text-white");
+
+        // 이력서 카드 필터링
+        const resumeCards = document.querySelectorAll(".resume-card");
+        resumeCards.forEach((card) => {
+          if (type === "all") {
+            card.style.display = "block";
+          } else if (type === "시간협의") {
+            const isTimeNegotiable = card.dataset.timeNegotiable === "true";
+            card.style.display = isTimeNegotiable ? "block" : "none";
+          } else {
+            const workType = card.dataset.workType;
+            card.style.display = workType === type ? "block" : "none";
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -255,7 +255,7 @@ def toggle_public(resume_id):
 @login_required
 def resume_list():
     """
-    공개된 이력서 목록 (기업회원만 접근 가능)
+    좋아요한 이력서 목록 (기업회원만 접근 가능)
     """
     if current_user.user_type != 1:
         flash("기업회원만 접근 가능한 페이지입니다.", "error")
@@ -264,7 +264,19 @@ def resume_list():
     page = request.args.get('page', 1, type=int)
     per_page = 5
 
-    pagination = ResumeService.get_public_resumes_paginated(page=page, per_page=per_page)
+    # 좋아요한 이력서만 조회
+    from models import ResumeFavorite, Resume, User
+    
+    favorites = ResumeFavorite.query.filter_by(user_id=current_user.id).all()
+    resume_ids = [fav.resume_id for fav in favorites]
+    
+    # 좋아요한 이력서 목록 조회 (페이지네이션)
+    pagination = Resume.query.join(User).filter(
+        Resume.id.in_(resume_ids),
+        Resume.is_public == True
+    ).order_by(Resume.updated_at.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
 
     return render_template(
         "resume/resume_list.html",
@@ -317,3 +329,41 @@ def view_resume(resume_id):
         return redirect(url_for('resumes.resume_list'))
 
     return render_template("resume/view_resume.html", resume=resume)
+
+
+
+# ==================== 이력서 좋아요 토글 API ====================
+@resumes_bp.route("/api/resume/<int:resume_id>/favorite", methods=["POST"])
+@login_required
+def toggle_resume_favorite(resume_id):
+    """
+    이력서 좋아요 토글 (기업회원만 가능)
+    """
+    if current_user.user_type != 1:
+        return jsonify({"success": False, "message": "기업회원만 가능합니다."}), 403
+    
+    from models import ResumeFavorite, Resume, db
+    
+    # 이력서 존재 확인
+    resume = Resume.query.get_or_404(resume_id)
+    
+    # 이미 좋아요했는지 확인
+    favorite = ResumeFavorite.query.filter_by(
+        user_id=current_user.id,
+        resume_id=resume_id
+    ).first()
+    
+    if favorite:
+        # 좋아요 취소
+        db.session.delete(favorite)
+        db.session.commit()
+        return jsonify({"success": True, "favorited": False, "message": "좋아요가 취소되었습니다."})
+    else:
+        # 좋아요 추가
+        new_favorite = ResumeFavorite(
+            user_id=current_user.id,
+            resume_id=resume_id
+        )
+        db.session.add(new_favorite)
+        db.session.commit()
+        return jsonify({"success": True, "favorited": True, "message": "좋아요가 추가되었습니다."})

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>이력서 - 이음</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto pb-20">
+      <!-- 상단 헤더 -->
+      <header class="bg-white border-b px-4 py-4 sticky top-0 z-20">
+        <div class="flex items-center justify-between">
+          <a href="{{ url_for('auth.main') }}">
+            <img
+              src="{{ url_for('static', filename='images/header/logo.png') }}"
+              alt="이음 로고"
+              class="h-8"
+            />
+          </a>
+          <div class="flex items-center gap-4">
+            <button class="text-gray-600">
+              <img
+                src="{{ url_for('static', filename='images/header/mic.png') }}"
+                alt="음성검색"
+                class="w-6 h-6"
+              />
+            </button>
+            <button class="text-gray-600">
+              <img
+                src="{{ url_for('static', filename='images/header/search.png') }}"
+                alt="검색"
+                class="w-6 h-6"
+              />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- 필터 영역 -->
+      <div class="bg-white px-4 py-3 border-b">
+        <div class="flex gap-2 overflow-x-auto whitespace-nowrap">
+          <button
+            onclick="toggleFilter('category')"
+            class="px-3 py-1.5 rounded-full border border-gray-300 text-gray-700 text-sm flex items-center gap-1"
+          >
+            직무 분야 <span class="text-xs">▼</span>
+          </button>
+          <button
+            onclick="toggleFilter('days')"
+            class="px-3 py-1.5 rounded-full border border-gray-300 text-gray-700 text-sm flex items-center gap-1"
+          >
+            근무 요일 <span class="text-xs">▼</span>
+          </button>
+          <button
+            onclick="toggleFilter('physical')"
+            class="px-3 py-1.5 rounded-full border border-gray-300 text-gray-700 text-sm flex items-center gap-1"
+          >
+            신체 능력 <span class="text-xs">▼</span>
+          </button>
+          <button
+            onclick="toggleFilter('distance')"
+            class="px-3 py-1.5 rounded-full border border-gray-300 text-gray-700 text-sm flex items-center gap-1"
+          >
+            이동 거리 <span class="text-xs">▼</span>
+          </button>
+        </div>
+
+        <!-- 필터 드롭다운 (숨김 상태) -->
+        <div id="filter-category" class="hidden mt-3 p-3 bg-gray-50 rounded-lg">
+          <div class="grid grid-cols-2 gap-2">
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="mr-2"
+                value="안전·관리"
+                onchange="applyFilters()"
+              />
+              <span class="text-sm">안전·관리</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="mr-2"
+                value="서비스·매장"
+                onchange="applyFilters()"
+              />
+              <span class="text-sm">서비스·매장</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="mr-2"
+                value="생활·돌봄 지원"
+                onchange="applyFilters()"
+              />
+              <span class="text-sm">생활·돌봄 지원</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="mr-2"
+                value="운전·배송"
+                onchange="applyFilters()"
+              />
+              <span class="text-sm">운전·배송</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="mr-2"
+                value="사회·공공"
+                onchange="applyFilters()"
+              />
+              <span class="text-sm">사회·공공</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="mr-2"
+                value="기타"
+                onchange="applyFilters()"
+              />
+              <span class="text-sm">기타</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="filter-days" class="hidden mt-3 p-3 bg-gray-50 rounded-lg">
+          <div class="grid grid-cols-4 gap-2">
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="mr-2"
+                value="월"
+                onchange="applyFilters()"
+              />
+              <span class="text-sm">월</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="mr-2"
+                value="화"
+                onchange="applyFilters()"
+              />
+              <span class="text-sm">화</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="mr-2"
+                value="수"
+                onchange="applyFilters()"
+              />
+              <span class="text-sm">수</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="mr-2"
+                value="목"
+                onchange="applyFilters()"
+              />
+              <span class="text-sm">목</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="mr-2"
+                value="금"
+                onchange="applyFilters()"
+              />
+              <span class="text-sm">금</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="mr-2"
+                value="토"
+                onchange="applyFilters()"
+              />
+              <span class="text-sm">토</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="mr-2"
+                value="일"
+                onchange="applyFilters()"
+              />
+              <span class="text-sm">일</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="filter-physical" class="hidden mt-3 p-3 bg-gray-50 rounded-lg">
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="physical"
+                class="mr-2"
+                value="30"
+                onchange="applyFilters()"
+              />
+              <span class="text-sm">30분 이상 걸을 수 있음</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="physical"
+                class="mr-2"
+                value="60"
+                onchange="applyFilters()"
+              />
+              <span class="text-sm">1시간 이상 걸을 수 있음</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="physical"
+                class="mr-2"
+                value="all"
+                onchange="applyFilters()"
+                checked
+              />
+              <span class="text-sm">전체</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="filter-distance" class="hidden mt-3 p-3 bg-gray-50 rounded-lg">
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="distance"
+                class="mr-2"
+                value="30"
+                onchange="applyFilters()"
+              />
+              <span class="text-sm">30분 이내</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="distance"
+                class="mr-2"
+                value="60"
+                onchange="applyFilters()"
+              />
+              <span class="text-sm">1시간 이내</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="distance"
+                class="mr-2"
+                value="all"
+                onchange="applyFilters()"
+                checked
+              />
+              <span class="text-sm">전체</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 이력서 목록 -->
+      <div class="p-4">
+        {% if resumes|length > 0 %}
+        <div class="space-y-3" id="resumeList">
+          {% for resume in resumes %} {% set is_favorited =
+          resume.favorites|selectattr('user_id', 'equalto',
+          current_user.id)|list|length > 0 %}
+          <div
+            class="resume-card bg-white rounded-xl p-4 shadow-sm border border-gray-200"
+            data-categories="{{ resume.desired_categories or '' }}"
+            data-monday="{{ 'true' if resume.work_monday else 'false' }}"
+            data-tuesday="{{ 'true' if resume.work_tuesday else 'false' }}"
+            data-wednesday="{{ 'true' if resume.work_wednesday else 'false' }}"
+            data-thursday="{{ 'true' if resume.work_thursday else 'false' }}"
+            data-friday="{{ 'true' if resume.work_friday else 'false' }}"
+            data-saturday="{{ 'true' if resume.work_saturday else 'false' }}"
+            data-sunday="{{ 'true' if resume.work_sunday else 'false' }}"
+            data-walkable="{{ resume.walkable_minutes or 0 }}"
+            data-commute="{{ resume.commute_time or 0 }}"
+          >
+            <!-- 사용자 정보 -->
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-center flex-1">
+                <div
+                  class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3"
+                >
+                  <span class="text-lg">👤</span>
+                </div>
+                <div class="flex-1">
+                  <h3 class="font-bold text-base text-gray-900">
+                    {{ resume.user.name }}
+                  </h3>
+                  <div class="flex items-center text-xs text-gray-500 mt-0.5">
+                    {% if resume.user.birth_date %}
+                    <span class="mr-2"
+                      >{{ (2024 - resume.user.birth_date.year) }}세</span
+                    >
+                    {% endif %}
+                    <span class="text-gray-400">{{ '30분 전' }}</span>
+                  </div>
+                </div>
+              </div>
+              <button
+                onclick="toggleFavorite({{ resume.id }}, this)"
+                class="favorite-btn {% if is_favorited %}text-red-500{% else %}text-gray-400{% endif %} hover:text-red-500"
+                data-resume-id="{{ resume.id }}"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <!-- 제목 -->
+            <h4 class="font-bold text-base text-gray-900 mb-2">
+              성실과 책임으로 함께하는...
+            </h4>
+
+            <!-- 직무 분야 -->
+            {% if resume.desired_categories %}
+            <div class="mb-2">
+              {% for category in resume.desired_categories.split(',') %}
+              <span
+                class="inline-block px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded mr-1"
+              >
+                🏢 {{ category.strip() }}
+              </span>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- 하단 버튼 -->
+            <div class="flex items-center justify-end pt-2">
+              <a
+                href="{{ url_for('resumes.my_resume_detail', resume_id=resume.id) }}"
+                class="px-6 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 font-medium"
+              >
+                제안하기
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-20">
+          <p class="text-gray-500">공개된 이력서가 없습니다</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- 하단 네비게이션 -->
+      <footer
+        class="fixed bottom-0 left-0 right-0 w-full bg-white border-t flex justify-around max-w-md mx-auto"
+      >
+        <a
+          href="{{ url_for('company.company_favorites') }}"
+          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
+        >
+          <img
+            src="{{ url_for('static', filename='images/footer/favorite.png') }}"
+            alt="좋아요"
+            class="w-6 h-6 mb-1"
+          />
+          <span class="text-xs">좋아요</span>
+        </a>
+        <a
+          href="{{ url_for('company.resume_list') }}"
+          class="flex-1 flex flex-col items-center justify-center p-2 text-blue-600"
+        >
+          <img
+            src="{{ url_for('static', filename='images/main_page/completion_of_Resume.png') }}"
+            alt="이력서"
+            class="w-6 h-6 mb-1"
+          />
+          <span class="text-xs font-medium">이력서</span>
+        </a>
+        <a
+          href="{{ url_for('auth.main') }}"
+          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
+        >
+          <img
+            src="{{ url_for('static', filename='images/footer/home.png') }}"
+            alt="홈"
+            class="w-6 h-6 mb-1"
+          />
+          <span class="text-xs">홈</span>
+        </a>
+        <a
+          href="{{ url_for('chat.chat_list') }}"
+          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
+        >
+          <img
+            src="{{ url_for('static', filename='images/footer/chatting.png') }}"
+            alt="채팅"
+            class="w-6 h-6 mb-1"
+          />
+          <span class="text-xs">채팅</span>
+        </a>
+        <a
+          href="{{ url_for('auth.profile') }}"
+          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
+        >
+          <img
+            src="{{ url_for('static', filename='images/footer/profile.png') }}"
+            alt="내정보"
+            class="w-6 h-6 mb-1"
+          />
+          <span class="text-xs">내정보</span>
+        </a>
+      </footer>
+    </div>
+
+    <script>
+      // 좋아요 토글
+      function toggleFavorite(resumeId, button) {
+        fetch(`/api/resume/${resumeId}/favorite`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              if (data.favorited) {
+                button.classList.remove("text-gray-400");
+                button.classList.add("text-red-500");
+              } else {
+                button.classList.remove("text-red-500");
+                button.classList.add("text-gray-400");
+              }
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("좋아요 처리 중 오류가 발생했습니다.");
+          });
+      }
+
+      // 필터 토글
+      function toggleFilter(filterType) {
+        const filterId = "filter-" + filterType;
+        const filterEl = document.getElementById(filterId);
+
+        // 다른 필터들 닫기
+        ["category", "days", "physical", "distance"].forEach((type) => {
+          if (type !== filterType) {
+            document.getElementById("filter-" + type).classList.add("hidden");
+          }
+        });
+
+        // 현재 필터 토글
+        filterEl.classList.toggle("hidden");
+      }
+
+      // 필터 적용
+      function applyFilters() {
+        const resumeCards = document.querySelectorAll(".resume-card");
+
+        // 선택된 직무 분야
+        const selectedCategories = Array.from(
+          document.querySelectorAll("#filter-category input:checked")
+        ).map((cb) => cb.value);
+
+        // 선택된 근무 요일
+        const selectedDays = Array.from(
+          document.querySelectorAll("#filter-days input:checked")
+        ).map((cb) => cb.value);
+
+        // 선택된 신체 능력
+        const selectedPhysical = document.querySelector(
+          'input[name="physical"]:checked'
+        )?.value;
+
+        // 선택된 이동 거리
+        const selectedDistance = document.querySelector(
+          'input[name="distance"]:checked'
+        )?.value;
+
+        resumeCards.forEach((card) => {
+          let show = true;
+
+          // 직무 분야 필터
+          if (selectedCategories.length > 0) {
+            const cardCategories = card.dataset.categories
+              .split(",")
+              .map((c) => c.trim());
+            const hasMatch = selectedCategories.some((cat) =>
+              cardCategories.includes(cat)
+            );
+            if (!hasMatch) show = false;
+          }
+
+          // 근무 요일 필터
+          if (selectedDays.length > 0) {
+            const dayMap = {
+              월: "monday",
+              화: "tuesday",
+              수: "wednesday",
+              목: "thursday",
+              금: "friday",
+              토: "saturday",
+              일: "sunday",
+            };
+
+            const hasMatch = selectedDays.some((day) => {
+              const dayKey = dayMap[day];
+              return card.dataset[dayKey] === "true";
+            });
+
+            if (!hasMatch) show = false;
+          }
+
+          // 신체 능력 필터
+          if (selectedPhysical && selectedPhysical !== "all") {
+            const walkable = parseInt(card.dataset.walkable) || 0;
+            const minWalkable = parseInt(selectedPhysical);
+            if (walkable < minWalkable) show = false;
+          }
+
+          // 이동 거리 필터
+          if (selectedDistance && selectedDistance !== "all") {
+            const commute = parseInt(card.dataset.commute) || 0;
+            const maxCommute = parseInt(selectedDistance);
+            if (commute > maxCommute) show = false;
+          }
+
+          card.style.display = show ? "block" : "none";
+        });
+      }
+    </script>
+  </body>
+</html>
