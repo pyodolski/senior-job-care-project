@@ -221,11 +221,22 @@
             class="flex-1 text-center py-3 text-gray-500"
             >기업 이음</a
           >
+          <!-- 로그인한 유저의 타입에 따라 '사람 이음' 링크를 다르게 표시 -->
+          {% if current_user.is_authenticated and current_user.user_type == 1 %}
+          <!-- 기업 회원(user_type=1)일 경우: 공개 이력서 목록으로 링크 -->
+          <a
+            href="{{ url_for('resumes.resume_list') }}"
+            class="flex-1 text-center py-3 text-gray-500"
+            >이력서 쪽</a
+          >
+          {% else %}
+          <!-- 일반 회원이거나 비로그인 상태일 경우: 구인글 목록으로 링크 -->
           <a
             href="{{ url_for('jobs.job_list') }}"
             class="flex-1 text-center py-3 text-gray-500"
             >사람 이음</a
           >
+          {% endif %}
         </nav>
         {% endif %}
       </div>
@@ -433,19 +444,20 @@
 
         <!-- AI 추천 -->
         <section class="mb-8">
-          <div class="flex items-center mb-4">
+          <div class="flex items-center mb-1">
             <span
               class="bg-blue-100 text-blue-800 text-sm font-bold px-3 py-1 rounded-full mr-3"
               >AI 추천</span
             >
           </div>
+          <div class="mb-2">
+            <span class="text-red-500 text-lg mr-2">📌</span>
+            <span class="font-bold text-gray-800"
+              >{{ user.nickname }}님이 찾으실만한 공고예요!</span
+            >
+          </div>
           <div class="bg-white rounded-2xl p-4 shadow-sm border">
-            <div class="flex items-center mb-3">
-              <span class="text-red-500 text-lg mr-2">📌</span>
-              <span class="font-bold text-gray-800"
-                >철원님이 찾으실만한 공고예요!</span
-              >
-            </div>
+            <div class="flex items-center mb-3"></div>
             {% if company_jobs %} {% for job_data in company_jobs[:2] %} {% set
             job = job_data.job %} {% set status = job_data.application_status %}
             <div
@@ -534,19 +546,21 @@
 
         <!-- 시간대별 공고 -->
         <section>
-          <div class="flex items-center mb-4">
+          <div class="flex items-center mb-1">
             <span
               class="bg-yellow-100 text-yellow-800 text-sm font-bold px-3 py-1 rounded-full mr-3"
               >시간대</span
             >
           </div>
+          <div class="mb-2">
+            <span class="text-yellow-500 text-lg mr-2">👑</span>
+            <span class="font-bold text-gray-800"
+              >{% if user and user.dong %}{{ user.dong }}{% else %}우리 동{%
+              endif %}의 실시간 공고예요!</span
+            >
+          </div>
           <div class="bg-white rounded-2xl p-4 shadow-sm border">
-            <div class="flex items-center mb-3">
-              <span class="text-yellow-500 text-lg mr-2">👑</span>
-              <span class="font-bold text-gray-800"
-                >조영동의 실시간 공고예요!</span
-              >
-            </div>
+            <div class="flex items-center mb-3"></div>
             {% if people_jobs %} {% for job_data in people_jobs[:2] %} {% set
             job = job_data.job %} {% set status = job_data.application_status %}
             <div
