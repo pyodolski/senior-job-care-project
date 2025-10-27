@@ -266,7 +266,7 @@ class ChatRoom(db.Model):
     def __repr__(self):
         return f"<ChatRoom id={self.id} job_id={self.job_id} applicant_id={self.applicant_id} employer_id={self.employer_id}>"
 
-class ChatMessage(db.Model):
+class ChatMessage(db.Model): 
     """채팅 메시지 모델"""
     __tablename__ = 'chat_message'
     
@@ -349,3 +349,25 @@ class Certificate(db.Model):
 
     def __repr__(self):
         return f'<Certificate {self.name}>'
+
+
+class ResumeFavorite(db.Model):
+    """이력서 좋아요 모델"""
+    __tablename__ = 'resume_favorite'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    resume_id = db.Column(db.Integer, db.ForeignKey('resume.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=get_kst_now)
+    
+    # 관계 설정
+    user = db.relationship('User', backref=db.backref('resume_favorites', lazy=True))
+    resume = db.relationship('Resume', backref=db.backref('favorites', lazy=True))
+    
+    # 유니크 제약: 한 사용자가 같은 이력서를 중복으로 좋아요할 수 없음
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'resume_id', name='uq_user_resume_favorite'),
+    )
+    
+    def __repr__(self):
+        return f"<ResumeFavorite user_id={self.user_id} resume_id={self.resume_id}>"
