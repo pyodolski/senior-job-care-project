@@ -87,10 +87,14 @@ def job_list():
         jobs_pagination = JobService.get_all_jobs(page=1, per_page=20, sort_by=sort_by)
         jobs = jobs_pagination.items
 
-    # 각 공고의 지원 상태 확인
+    # 각 공고의 지원 상태 및 북마크 상태 확인
     jobs_with_status = []
     for job in jobs:
         application_status = ApplicationService.check_application_status(current_user.id, job.id)
+        # 북마크 상태 추가
+        application_status['bookmarked'] = JobService.is_bookmarked(current_user.id, job.id)
+        # 시간 경과 계산 추가
+        job.time_ago = calculate_time_ago(job.created_at)
         job_data = {
             'job': job,
             'application_status': application_status
@@ -600,10 +604,12 @@ def bookmark_list():
     else:  # latest
         jobs.sort(key=lambda x: x.created_at, reverse=True)
 
-    # 각 공고의 지원 상태 확인
+    # 각 공고의 지원 상태 및 북마크 상태 확인
     jobs_with_status = []
     for job in jobs:
         application_status = ApplicationService.check_application_status(current_user.id, job.id)
+        # 북마크 상태 추가 (북마크 리스트에서는 항상 true)
+        application_status['bookmarked'] = True
         job_data = {
             'job': job,
             'application_status': application_status
