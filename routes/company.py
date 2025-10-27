@@ -212,3 +212,42 @@ def update_application_status(application_id):
         application_id, current_user.id, status
     )
     return jsonify(result)
+
+
+# 기업 회원 전용 - 좋아요 페이지 (올린 공고 + 공개 이력서)
+@company_bp.route("/company/favorites")
+@login_required
+def company_favorites():
+    """
+    기업 회원 전용 좋아요 페이지
+    ===========================
+    
+    기능:
+    - 올린 모집공고 탭: 기업이 작성한 공고 목록
+    - 이력서 탭: 공개 동의된 일반 유저 이력서 목록
+    
+    URL: GET /company/favorites
+    템플릿: company/favorites.html
+    
+    권한: 기업 회원만 접근 가능
+    """
+    
+    # 기업 회원 권한 확인
+    if not check_company_permission():
+        flash("기업 회원만 접근할 수 있습니다.", "error")
+        return redirect(url_for("auth.main"))
+    
+    # 탭 파라미터 (기본값: 올린 공고)
+    tab = request.args.get('tab', 'jobs')
+    
+    # 올린 모집공고 조회 (기업이 작성한 공고)
+    my_jobs = JobPost.query.filter_by(author_id=current_user.id).order_by(JobPost.created_at.desc()).all()
+    
+    # 공개 이력서 조회 (Resume 모델 사용)
+    from models import Resume
+    public_resumes = Resume.query.filter_by(is_public=True).order_by(Resume.updated_at.desc()).all()
+    
+    return render_template("company/favorites.html",
+                         my_jobs=my_jobs,
+                         public_resumes=public_resumes,
+                         current_tab=tab)

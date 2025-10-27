@@ -747,17 +747,20 @@
           <span class="text-xs">지도</span>
         </a>
         <a
-          href="{{ url_for('jobs.bookmark_list') }}"
+          href="{% if current_user.user_type == 1 %}{{ url_for('company.company_favorites') }}{% else %}{{ url_for('jobs.bookmark_list') }}{% endif %}"
           class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
         >
           <div class="w-6 h-6 mb-1 flex items-center justify-center">
             <img
               src="{{ url_for('static', filename='images/footer/favorite.png') }}"
-              alt="찜"
+              alt="{% if current_user.user_type == 1 %}좋아요{% else %}찜{% endif %}"
               class="max-w-full max-h-full object-contain"
             />
           </div>
-          <span class="text-xs">찜</span>
+          <span class="text-xs"
+            >{% if current_user.user_type == 1 %}좋아요{% else %}찜{% endif
+            %}</span
+          >
         </a>
         <a
           href="{{ url_for('auth.main') }}"
