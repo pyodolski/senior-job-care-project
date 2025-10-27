@@ -3,6 +3,8 @@ from flask_login import login_required, current_user
 from functools import wraps
 from models import User, db
 from flask import send_from_directory, current_app
+from urllib.parse import urlparse
+from utils.files_handler import generate_presigned_get_url
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -42,17 +44,34 @@ def reject_company(user_id):
     flash(f"{user.nickname}님의 승인 거부!")
     return redirect(url_for("admin.pending_companies"))
 
+
+
 @admin_bp.route("/download_business_file/<int:user_id>")
 @admin_required
 def download_business_file(user_id):
     user = User.query.get_or_404(user_id)
-    folder = current_app.config['UPLOAD_FOLDER']            # 서버 파일 저장경로
-    stored_name = user.business_registration_file           # 서버 파일명(UUID 등)
-    original_name = user.business_registration_original     # 원본 파일명
+    s3_url = user.business_registration_file
 
-    return send_from_directory(
-        folder,
-        stored_name,
-        as_attachment=True,
-        download_name=original_name or stored_name
-    )
+    if not s3_url:
+        flash("업로드된 사업자등록증 파일이 없습니다.", "error")
+        return redirect(url_for("admin.pending_companies"))
+
+    try:
+        file_key = urlparse(s3_url).path.lstrip('/')
+
+        original_filename = user.business_registration_original
+
+        presigned_url = generate_presigned_get_url(
+            key=file_key,
+            expires=300,
+            download_name=original_filename
+        )
+
+        if presigned_url:
+            return redirect(presigned_url)
+        else:
+            return redirect(url_for("admin.pending_companies"))
+
+    except Exception as e:
+        flash(f"파일을 불러오는 중 오류가 발생했습니다: {e}", "error")
+        return redirect(url_for("admin.pending_companies"))

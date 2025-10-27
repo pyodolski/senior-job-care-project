@@ -2,7 +2,7 @@ import boto3
 from flask import current_app
 import uuid
 from werkzeug.utils import secure_filename
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote
 
 def upload_file(file, sub_path):
     """AWS S3에 파일 업로드 후 파일 URL 반환"""
@@ -76,18 +76,25 @@ def delete_file(file_url):
         print(f"S3 파일 삭제 실패: {e}")
         return False
 
-def generate_presigned_get_url(key, expires=900):
+def generate_presigned_get_url(key, expires=900, download_name=None):
     s3 = boto3.client(
         "s3",
         aws_access_key_id=current_app.config["AWS_ACCESS_KEY_ID"],
         aws_secret_access_key=current_app.config["AWS_SECRET_ACCESS_KEY"],
         region_name=current_app.config["AWS_S3_REGION"]
     )
+
+    params = {
+        'Bucket': current_app.config["AWS_S3_BUCKET_NAME"],
+        'Key': key
+    }
+
+    if download_name:
+        encoded_filename = quote(download_name)
+        params['ResponseContentDisposition'] = f"attachment; filename*=UTF-8''{encoded_filename}"
+
     return s3.generate_presigned_url(
         ClientMethod='get_object',
-        Params={
-            'Bucket': current_app.config["AWS_S3_BUCKET_NAME"],
-            'Key': key
-        },
+        Params=params,
         ExpiresIn=expires
     )
