@@ -1039,38 +1039,67 @@
             </div>
 
             <!-- 입력 필드 -->
-            <div class="mb-4 relative">
-              <input
-                type="text"
-                id="certificate-input"
-                placeholder="보유 자격증 입력"
-                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg pr-12 focus:border-blue-500 focus:outline-none"
-              />
-              <button
-                type="button"
-                onclick="addCertificateWithFile()"
-                class="absolute right-3 top-1/2 transform -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
-              >
-                <svg
-                  class="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  stroke-width="3"
+            <div class="mb-4">
+              <div class="relative">
+                <input
+                  type="text"
+                  id="certificate-input"
+                  placeholder="보유 자격증 입력"
+                  class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg pr-12 focus:border-blue-500 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onclick="addCertificateWithFile()"
+                  class="absolute right-3 top-1/2 transform -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                  title="자격증 추가"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M12 4v16m8-8H4"
-                  ></path>
-                </svg>
-              </button>
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    stroke-width="3"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 4v16m8-8H4"
+                    ></path>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- 파일 첨부 버튼 -->
+              <div class="mt-2 flex items-center">
+                <button
+                  type="button"
+                  onclick="document.getElementById('certificate-file').click()"
+                  class="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors"
+                >
+                  <svg
+                    class="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                    ></path>
+                  </svg>
+                  자격증 사진 첨부 (선택)
+                </button>
+                <span id="certificate-file-name" class="ml-3 text-sm text-gray-600"></span>
+              </div>
+
               <input
                 type="file"
                 id="certificate-file"
                 class="hidden"
                 accept="image/*"
-                onchange="addCertificateWithFile()"
+                onchange="updateFileName()"
               />
             </div>
 
@@ -2009,6 +2038,18 @@
       });
 
       // 자격증 관련 함수 (새 디자인용)
+      // 파일 선택 시 파일 이름 표시
+      function updateFileName() {
+        const fileInput = document.getElementById("certificate-file");
+        const fileNameSpan = document.getElementById("certificate-file-name");
+
+        if (fileInput.files.length > 0) {
+          fileNameSpan.textContent = fileInput.files[0].name;
+        } else {
+          fileNameSpan.textContent = "";
+        }
+      }
+
       function addCertificateWithFile() {
         const input = document.getElementById("certificate-input");
         const fileInput = document.getElementById("certificate-file");
@@ -2025,8 +2066,14 @@
         const div = document.createElement("div");
         div.className =
           "border-2 border-blue-600 rounded-lg px-4 py-3 flex items-center justify-between certificate-entry mb-2";
+
+        let certDisplayText = certName;
+        if (file) {
+          certDisplayText += ` <span class="text-xs text-gray-500">(사진 첨부됨)</span>`;
+        }
+
         div.innerHTML = `
-          <span class="text-gray-900">${certName}</span>
+          <span class="text-gray-900">${certDisplayText}</span>
           <button
             type="button"
             class="text-gray-400 hover:text-gray-600"
@@ -2060,6 +2107,7 @@
         // 입력 필드 초기화
         input.value = "";
         fileInput.value = "";
+        document.getElementById("certificate-file-name").textContent = "";
       }
 
       // Enter 키로 자격증 추가
