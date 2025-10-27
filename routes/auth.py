@@ -407,7 +407,33 @@ def login():
         password = request.form["password"]
 
         user = User.query.filter_by(username=username).first()
-        if not user or not bcrypt.checkpw(password.encode("utf-8"), user.password.encode("utf-8")):
+        
+        # 사용자가 없으면 로그인 실패
+        if not user:
+            flash("로그인 실패. 아이디 또는 비밀번호를 확인하세요.", "warning")
+            return redirect(url_for("auth.login"))
+        
+        # 비밀번호 검증
+        password_valid = False
+        try:
+            # bcrypt로 해시된 비밀번호 검증 시도
+            password_valid = bcrypt.checkpw(password.encode("utf-8"), user.password.encode("utf-8"))
+        except (ValueError, AttributeError):
+            # bcrypt 형식이 아닌 경우 평문 비교 (레거시 데이터)
+            password_valid = (user.password == password)
+            
+            # 평문 비밀번호를 bcrypt로 업데이트
+            if password_valid:
+                try:
+                    hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+                    user.password = hashed.decode("utf-8")
+                    db.session.commit()
+                    print(f"✅ 사용자 {username}의 비밀번호를 bcrypt로 업데이트했습니다.")
+                except Exception as e:
+                    print(f"⚠️ 비밀번호 업데이트 실패: {e}")
+                    db.session.rollback()
+        
+        if not password_valid:
             flash("로그인 실패. 아이디 또는 비밀번호를 확인하세요.", "warning")
             return redirect(url_for("auth.login"))
 
