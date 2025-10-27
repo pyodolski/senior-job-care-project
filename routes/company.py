@@ -243,13 +243,21 @@ def company_favorites():
     # 올린 모집공고 조회 (기업이 작성한 공고)
     my_jobs = JobPost.query.filter_by(author_id=current_user.id).order_by(JobPost.created_at.desc()).all()
     
-    # 공개 이력서 조회 (Resume 모델 사용)
-    from models import Resume
-    public_resumes = Resume.query.filter_by(is_public=True).order_by(Resume.updated_at.desc()).all()
+    # 좋아요한 이력서 조회 (ResumeFavorite 모델 사용)
+    from models import Resume, ResumeFavorite, User
+    
+    # 현재 사용자가 좋아요한 이력서 ID 목록
+    favorite_resume_ids = [fav.resume_id for fav in ResumeFavorite.query.filter_by(user_id=current_user.id).all()]
+    
+    # 좋아요한 이력서 목록 조회
+    favorited_resumes = Resume.query.join(User).filter(
+        Resume.id.in_(favorite_resume_ids) if favorite_resume_ids else False,
+        Resume.is_public == True
+    ).order_by(Resume.updated_at.desc()).all()
     
     return render_template("company/favorites.html",
                          my_jobs=my_jobs,
-                         public_resumes=public_resumes,
+                         favorited_resumes=favorited_resumes,
                          current_tab=tab)
 
 

@@ -371,65 +371,7 @@
       </div>
 
       <!-- 하단 네비게이션 -->
-      <footer
-        class="fixed bottom-0 left-0 right-0 w-full bg-white border-t flex justify-around max-w-md mx-auto"
-      >
-        <a
-          href="{{ url_for('company.company_favorites') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <img
-            src="{{ url_for('static', filename='images/footer/favorite.png') }}"
-            alt="좋아요"
-            class="w-6 h-6 mb-1"
-          />
-          <span class="text-xs">좋아요</span>
-        </a>
-        <a
-          href="{{ url_for('company.resume_list') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-blue-600"
-        >
-          <img
-            src="{{ url_for('static', filename='images/main_page/completion_of_Resume.png') }}"
-            alt="이력서"
-            class="w-6 h-6 mb-1"
-          />
-          <span class="text-xs font-medium">이력서</span>
-        </a>
-        <a
-          href="{{ url_for('auth.main') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <img
-            src="{{ url_for('static', filename='images/footer/home.png') }}"
-            alt="홈"
-            class="w-6 h-6 mb-1"
-          />
-          <span class="text-xs">홈</span>
-        </a>
-        <a
-          href="{{ url_for('chat.chat_list') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <img
-            src="{{ url_for('static', filename='images/footer/chatting.png') }}"
-            alt="채팅"
-            class="w-6 h-6 mb-1"
-          />
-          <span class="text-xs">채팅</span>
-        </a>
-        <a
-          href="{{ url_for('auth.profile') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <img
-            src="{{ url_for('static', filename='images/footer/profile.png') }}"
-            alt="내정보"
-            class="w-6 h-6 mb-1"
-          />
-          <span class="text-xs">내정보</span>
-        </a>
-      </footer>
+      {% include 'components/company_footer.html' %}
     </div>
 
     <script>

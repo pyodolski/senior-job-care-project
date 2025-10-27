@@ -35,9 +35,7 @@
               />
             </svg>
           </button>
-          <h1 class="text-xl font-bold text-gray-800">
-            뉴스
-          </h1>
+          <h1 class="text-xl font-bold text-gray-800">뉴스</h1>
         </div>
       </header>
 
@@ -129,9 +127,19 @@
                 </div>
                 {% else %}
                 <div class="w-24 h-24 flex-shrink-0">
-                  <div class="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
-                    <svg class="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+                  <div
+                    class="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center"
+                  >
+                    <svg
+                      class="w-8 h-8 text-gray-400"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                        clip-rule="evenodd"
+                      />
                     </svg>
                   </div>
                 </div>
@@ -259,19 +267,19 @@
       let currentQuery = "{{ query }}";
 
       // 페이지 로드시 초기 카테고리 활성화
-      document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener("DOMContentLoaded", function () {
         updateActiveCategory(currentQuery);
       });
 
       function updateActiveCategory(category) {
-        const buttons = document.querySelectorAll('.category-btn');
-        buttons.forEach(btn => {
+        const buttons = document.querySelectorAll(".category-btn");
+        buttons.forEach((btn) => {
           if (btn.dataset.category === category) {
-            btn.classList.add('bg-blue-600', 'text-white');
-            btn.classList.remove('bg-gray-100', 'text-gray-700');
+            btn.classList.add("bg-blue-600", "text-white");
+            btn.classList.remove("bg-gray-100", "text-gray-700");
           } else {
-            btn.classList.add('bg-gray-100', 'text-gray-700');
-            btn.classList.remove('bg-blue-600', 'text-white');
+            btn.classList.add("bg-gray-100", "text-gray-700");
+            btn.classList.remove("bg-blue-600", "text-white");
           }
         });
       }
@@ -282,35 +290,39 @@
         updateActiveCategory(category);
 
         // 뉴스 목록 로드
-        const response = await fetch(`/news?q=${encodeURIComponent(category)}&page=1`);
+        const response = await fetch(
+          `/news?q=${encodeURIComponent(category)}&page=1`
+        );
         const html = await response.text();
 
         // HTML 파싱하여 뉴스 목록만 추출
         const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const newArticles = doc.querySelectorAll('article');
+        const doc = parser.parseFromString(html, "text/html");
+        const newArticles = doc.querySelectorAll("article");
 
         // 기존 뉴스 목록 교체
-        const newsContainer = document.querySelector('.space-y-6');
-        newsContainer.innerHTML = '';
-        newArticles.forEach(article => {
+        const newsContainer = document.querySelector(".space-y-6");
+        newsContainer.innerHTML = "";
+        newArticles.forEach((article) => {
           newsContainer.appendChild(article);
         });
       }
 
       async function loadMoreNews() {
         currentPage += 1;
-        const response = await fetch(`/news?q=${encodeURIComponent(currentQuery)}&page=${currentPage}`);
+        const response = await fetch(
+          `/news?q=${encodeURIComponent(currentQuery)}&page=${currentPage}`
+        );
         const html = await response.text();
 
         // HTML 파싱하여 뉴스 목록만 추출
         const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const newArticles = doc.querySelectorAll('article');
+        const doc = parser.parseFromString(html, "text/html");
+        const newArticles = doc.querySelectorAll("article");
 
         // 기존 뉴스 목록에 추가
-        const newsContainer = document.querySelector('.space-y-6');
-        newArticles.forEach(article => {
+        const newsContainer = document.querySelector(".space-y-6");
+        newArticles.forEach((article) => {
           newsContainer.appendChild(article);
         });
       }
