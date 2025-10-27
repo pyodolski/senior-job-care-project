@@ -349,24 +349,17 @@ def register_company():
         # 3. 파일 업로드 처리
         file = request.files.get("business_registration")
 
-        # 허용 확장자 검사 함수
-        def allowed_file(filename):
-            return '.' in filename and \
-                filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
+        if not file or file.filename == "":
+            flash("사업자등록증 파일을 업로드해주세요.")
+            return redirect(url_for("auth.register_company"))
 
-        filename = None
-        if file and file.filename != "" and allowed_file(file.filename):
-            original_filename = file.filename  # 원본 파일명 확보
-            ext = original_filename.rsplit('.', 1)[1].lower()  # 확장자 분리
+        # S3에 파일 업로드 (resume_service.py에서 사용한 방식과 동일)
+        # 'business_registrations' 라는 폴더(sub_path)에 저장됩니다.
+        s3_url = upload_file(file=file, sub_path='business_registrations')  #
 
-            # 🔸 파일명 충돌 완전 방지: UUID.확장자 로 저장
-            unique_filename = f"{uuid.uuid4().hex}.{ext}"
-
-            upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_filename)
-            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
-            file.save(upload_path)
-        else:
-            flash("사업자등록증 파일을 업로드해주세요. (허용 확장자: png, jpg, jpeg, pdf)")
+        # S3 업로드 실패 시 처리
+        if not s3_url:
+            flash("파일을 S3에 업로드하는 중 오류가 발생했습니다.")
             return redirect(url_for("auth.register_company"))
 
         # 4. 비밀번호 해시 처리
@@ -381,8 +374,8 @@ def register_company():
             email=email,
             user_type=1,  # 기업회원
             is_verified=False,  # 승인 대기
-            business_registration_file = unique_filename,  # 업로드 파일명 저장
-            business_registration_original = original_filename,
+            business_registration_file = s3_url,  # 업로드 파일명 저장
+            business_registration_original = file.filename,
             company_sido=company_sido,
             company_sigungu=company_sigungu,
             company_dong=company_dong,
