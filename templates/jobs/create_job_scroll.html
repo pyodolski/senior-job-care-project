@@ -14,8 +14,6 @@
       body {
         font-family: "Noto Sans KR", sans-serif;
       }
-
-      /* 단계별 점진적 표시 */
       .scroll-section {
         opacity: 0;
         max-height: 0;
@@ -23,40 +21,26 @@
         transition: opacity 0.5s ease, max-height 0.5s ease;
         padding: 0 1rem;
       }
-
       .scroll-section.visible {
         opacity: 1;
         max-height: 3000px;
         padding: 1rem 1rem;
       }
-
       .scroll-section.completed {
         pointer-events: none;
         opacity: 0.6;
       }
-
-      /* 선택된 옵션 스타일 */
       .option-selected {
         background-color: #1d4ed8 !important;
         color: white !important;
         border-color: #1d4ed8 !important;
       }
-
-      /* 카테고리 버튼 선택 스타일 */
-      .category-btn.option-selected {
-        background-color: #1d4ed8 !important;
-        color: white !important;
-        border-color: #1d4ed8 !important;
-      }
-
-      /* 기간 버튼 선택 스타일 */
+      .category-btn.option-selected,
       .period-btn.option-selected {
         background-color: #1d4ed8 !important;
         color: white !important;
         border-color: #1d4ed8 !important;
       }
-
-      /* 라디오 버튼 스타일 */
       .radio-option {
         cursor: pointer;
         transition: all 0.3s ease;
@@ -72,8 +56,6 @@
         pointer-events: none;
         opacity: 0.6;
       }
-
-      /* 다음 버튼 고정 */
       .next-btn-fixed {
         position: fixed;
         bottom: 0;
@@ -83,8 +65,6 @@
         margin: 0 auto;
         z-index: 50;
       }
-
-      /* 부드러운 스크롤 */
       html {
         scroll-behavior: smooth;
       }
@@ -92,7 +72,6 @@
   </head>
   <body class="bg-gray-50">
     <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto pb-24">
-      <!-- 상단 헤더 (고정) -->
       <header
         class="bg-white border-b px-4 py-4 fixed top-0 left-0 right-0 max-w-md mx-auto z-40"
       >
@@ -117,7 +96,6 @@
         </div>
       </header>
 
-      <!-- 1단계: 어떤 분을 찾고 계세요? -->
       <section id="step1" class="scroll-section visible pt-20">
         <div class="mb-4">
           <h2 class="text-xl font-bold text-gray-900 mb-6">
@@ -125,7 +103,6 @@
           </h2>
 
           <div class="space-y-4">
-            <!-- 함께 일하실 분 (업무) -->
             <div
               class="radio-option border-2 border-gray-200 rounded-2xl p-4"
               data-value="업무"
@@ -152,7 +129,6 @@
               </div>
             </div>
 
-            <!-- 도와주실 분 (이웃) -->
             <div
               class="radio-option border-2 border-gray-200 rounded-2xl p-4"
               data-value="이웃"
@@ -177,7 +153,6 @@
               </div>
             </div>
 
-            <!-- 가르쳐 주실 분 (과외) -->
             <div
               class="radio-option border-2 border-gray-200 rounded-2xl p-4"
               data-value="과외"
@@ -204,7 +179,6 @@
               </div>
             </div>
 
-            <!-- 만들어 주실 분 (제능) -->
             <div
               class="radio-option border-2 border-gray-200 rounded-2xl p-4"
               data-value="제능"
@@ -231,7 +205,6 @@
               </div>
             </div>
 
-            <!-- 같이 즐기실 분 (문화) -->
             <div
               class="radio-option border-2 border-gray-200 rounded-2xl p-4"
               data-value="문화"
@@ -261,7 +234,6 @@
         </div>
       </section>
 
-      <!-- 2단계: 어떤 제목으로 올려볼까요? -->
       <section id="step2" class="scroll-section">
         <div class="mb-4">
           <h2 class="text-xl font-bold text-gray-900 mb-6">
@@ -278,7 +250,6 @@
             />
           </div>
 
-          <!-- 카테고리 선택 (다중 선택 가능) -->
           <div class="flex flex-wrap gap-2">
             <button
               class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
@@ -338,7 +309,6 @@
         </div>
       </section>
 
-      <!-- 3단계: 원하는 근무 조건이 무엇인가요? -->
       <section id="step3" class="scroll-section">
         <div class="mb-4">
           <h2 class="text-xl font-bold text-gray-900 mb-6">
@@ -372,7 +342,6 @@
             </button>
           </div>
 
-          <!-- 단기 선택 시 캘린더 표시 -->
           <div id="shortTermCalendar" class="hidden mb-8">
             <h3 class="text-lg font-medium text-gray-800 mb-4">
               일하는 날짜를 선택해 주세요
@@ -383,7 +352,6 @@
               </p>
             </div>
             <div class="bg-white rounded-xl p-3 border border-gray-200">
-              <!-- 월 선택 -->
               <div class="flex justify-between items-center mb-4">
                 <button
                   onclick="changeMonth(-1)"
@@ -426,7 +394,6 @@
                 </button>
               </div>
 
-              <!-- 요일 헤더 -->
               <div class="grid grid-cols-7 gap-1 mb-2">
                 <div class="text-center text-sm text-red-500 py-1 font-medium">
                   일
@@ -451,10 +418,8 @@
                 </div>
               </div>
 
-              <!-- 날짜 그리드 -->
               <div id="calendarGrid" class="grid grid-cols-7 gap-1 mb-3">
-                <!-- JavaScript로 동적 생성 -->
-              </div>
+                </div>
             </div>
 
             <p class="text-sm text-gray-600 mt-3 text-center">
@@ -465,9 +430,7 @@
             </p>
           </div>
 
-          <!-- 장기 선택 시 요일/시간 선택 표시 -->
           <div id="longTermSchedule" class="hidden">
-            <!-- 요일 선택 -->
             <div class="mb-8">
               <h3 class="text-lg font-medium text-gray-800 mb-4">
                 일하는 요일을 선택해 주세요
@@ -528,7 +491,6 @@
               </div>
             </div>
 
-            <!-- 시간 선택 -->
             <div class="mb-8">
               <h3 class="text-lg font-medium text-gray-800 mb-4">
                 일하는 시간을 선택해 주세요
@@ -586,7 +548,6 @@
         </div>
       </section>
 
-      <!-- 4단계: 일에 대한 참고사항 -->
       <section id="step4" class="scroll-section">
         <div class="mb-4">
           <div class="flex items-center justify-between mb-6">
@@ -621,7 +582,6 @@
         </div>
       </section>
 
-      <!-- 5단계: 일할 장소를 알려주세요 -->
       <section id="step5" class="scroll-section">
         <div class="mb-4">
           <h2 class="text-xl font-bold text-gray-900 mb-6">
@@ -629,7 +589,6 @@
           </h2>
 
           <div class="space-y-4">
-            <!-- 지도에서 선택한 주소 표시 -->
             <div class="relative">
               <input
                 type="text"
@@ -665,18 +624,34 @@
               </button>
             </div>
 
-            <!-- 상세 주소 입력 -->
             <input
               type="text"
               id="detailAddress"
               placeholder="상세 주소를 입력해주세요 (예: 101동 502호, 2층)"
               class="w-full px-4 py-4 text-base border-2 border-gray-300 rounded-2xl focus:border-blue-500 focus:outline-none"
             />
+
+            <input type="hidden" id="latitude" name="latitude" />
+            <input type="hidden" id="longitude" name="longitude" />
+            <input
+              type="hidden"
+              id="region_1depth_name"
+              name="region_1depth_name"
+            />
+            <input
+              type="hidden"
+              id="region_2depth_name"
+              name="region_2depth_name"
+            />
+            <input
+              type="hidden"
+              id="region_3depth_name"
+              name="region_3depth_name"
+            />
           </div>
         </div>
       </section>
 
-      <!-- 6단계: 연락처 입력 -->
       <section id="step6" class="scroll-section">
         <div class="mb-4">
           <h2 class="text-xl font-bold text-gray-900 mb-6">
@@ -696,7 +671,6 @@
             </p>
           </div>
 
-          <!-- 동의 체크박스 -->
           <div class="bg-blue-50 rounded-2xl p-4 border border-blue-200">
             <div class="flex items-start">
               <input
@@ -719,7 +693,6 @@
         </div>
       </section>
 
-      <!-- 하단 다음 버튼 (고정) -->
       <div class="next-btn-fixed bg-white border-t p-4">
         <button
           id="nextBtn"
@@ -731,7 +704,6 @@
         </button>
       </div>
 
-      <!-- AI 어시스턴트 모달 -->
       <div
         id="aiModal"
         class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
@@ -739,7 +711,6 @@
         <div
           class="bg-white rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col"
         >
-          <!-- 헤더 -->
           <div class="p-4 border-b flex items-center justify-between">
             <h3 class="text-lg font-bold flex items-center gap-2">
               <span>✨</span>
@@ -765,7 +736,6 @@
             </button>
           </div>
 
-          <!-- 콘텐츠 -->
           <div class="flex-1 overflow-y-auto p-4 space-y-4">
             <div>
               <p class="text-sm text-gray-600 mb-2">
@@ -773,7 +743,6 @@
               </p>
             </div>
 
-            <!-- 제목 입력 -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">
                 공고 제목
@@ -786,7 +755,6 @@
               />
             </div>
 
-            <!-- 급여 입력 -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">
                 급여 정보
@@ -799,7 +767,6 @@
               />
             </div>
 
-            <!-- 직무 내용 -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">
                 직무 내용
@@ -812,7 +779,6 @@
               ></textarea>
             </div>
 
-            <!-- 요구사항 -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">
                 요구사항 (선택)
@@ -825,7 +791,6 @@
               ></textarea>
             </div>
 
-            <!-- 생성된 텍스트 미리보기 -->
             <div id="aiPreview" class="hidden">
               <label class="block text-sm font-semibold text-gray-700 mb-2">
                 생성된 내용 미리보기
@@ -836,7 +801,6 @@
               ></div>
             </div>
 
-            <!-- 로딩 표시 -->
             <div id="aiLoading" class="hidden text-center">
               <p class="text-sm text-gray-600">AI가 작성 중입니다...</p>
               <div class="mt-2 flex justify-center gap-1">
@@ -855,7 +819,6 @@
             </div>
           </div>
 
-          <!-- 버튼 -->
           <div class="p-4 border-t flex gap-2">
             <button
               type="button"
@@ -883,7 +846,6 @@
         </div>
       </div>
 
-      <!-- 주소 검색 모달 (지도 포함) -->
       <div
         id="addressModal"
         class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
@@ -891,12 +853,10 @@
         <div
           class="bg-white rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col"
         >
-          <!-- 헤더 -->
           <div class="p-4 border-b">
             <h3 class="text-lg font-bold">주소 검색</h3>
           </div>
 
-          <!-- 검색 입력 -->
           <div class="p-4 border-b">
             <div class="flex gap-2">
               <input
@@ -915,12 +875,10 @@
             </div>
           </div>
 
-          <!-- 지도 영역 -->
           <div class="flex-1 overflow-hidden">
             <div id="addressMap" class="w-full h-80"></div>
           </div>
 
-          <!-- 선택된 주소 표시 -->
           <div class="p-4 border-t">
             <p class="text-sm text-gray-600 mb-2">선택된 주소</p>
             <p
@@ -953,16 +911,13 @@
     <script>
       // AI 어시스턴트 함수
       function openAIAssistant() {
-        // 현재 입력된 값들을 AI 모달에 미리 채우기
         const title = document.getElementById("jobTitle").value;
         const description = document.getElementById("jobDescription").value;
-
         document.getElementById("aiTitle").value = title;
         document.getElementById("aiJobContent").value = description.substring(
           0,
           100
         );
-
         document.getElementById("aiModal").classList.remove("hidden");
         document.getElementById("aiPreview").classList.add("hidden");
         document.getElementById("aiApplyBtn").classList.add("hidden");
@@ -982,24 +937,18 @@
         const requirements = document
           .getElementById("aiRequirements")
           .value.trim();
-
         if (!title || !jobContent) {
           alert("제목과 직무 내용은 필수입니다.");
           return;
         }
-
-        // 로딩 표시
         document.getElementById("aiLoading").classList.remove("hidden");
         document.getElementById("aiPreview").classList.add("hidden");
-
         try {
           const response = await fetch(
             "{{ url_for('jobs.ai_generate_description') }}",
             {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 title,
                 salary,
@@ -1008,21 +957,13 @@
               }),
             }
           );
-
-          if (!response.ok) {
-            throw new Error("AI 생성 실패");
-          }
-
+          if (!response.ok) throw new Error("AI 생성 실패");
           const data = await response.json();
           const generatedText = data.description;
-
-          // 미리보기 표시
           document.getElementById("aiPreviewContent").textContent =
             generatedText;
           document.getElementById("aiPreview").classList.remove("hidden");
           document.getElementById("aiApplyBtn").classList.remove("hidden");
-
-          // 나중에 사용하기 위해 저장
           window.aiGeneratedText = generatedText;
         } catch (error) {
           console.error("Error:", error);
@@ -1050,7 +991,7 @@
         title: "",
         categories: [],
         workPeriod: "",
-        selectedDates: [], // 단기 선택 시 선택된 날짜들
+        selectedDates: [],
         days: [],
         startTime: "",
         endTime: "",
@@ -1062,28 +1003,21 @@
         description: "",
       };
 
-      // 캘린더 관련 변수
+      let geocodeResult = null;
+
       let currentCalendarDate = new Date();
       const today = new Date();
 
-      // 다음 단계로 이동
       function goToNextStep() {
         if (currentStep < maxStep) {
-          // 현재 단계 완료 처리
           const currentSection = document.getElementById(`step${currentStep}`);
           if (currentSection) {
             currentSection.classList.add("completed");
-
-            // 라디오 옵션 비활성화
             if (currentStep === 1) {
               document
                 .querySelectorAll("#step1 .radio-option")
-                .forEach((opt) => {
-                  opt.classList.add("disabled");
-                });
+                .forEach((opt) => opt.classList.add("disabled"));
             }
-
-            // 입력 필드 읽기 전용으로 변경
             const inputs = currentSection.querySelectorAll(
               "input:not([type='checkbox']):not([type='radio']), textarea, select"
             );
@@ -1091,40 +1025,29 @@
               input.readOnly = true;
               input.disabled = true;
             });
-
-            // 버튼들 비활성화
             const buttons = currentSection.querySelectorAll(
               "button:not(#nextBtn)"
             );
             buttons.forEach((btn) => (btn.disabled = true));
           }
-
           currentStep++;
           const nextSection = document.getElementById(`step${currentStep}`);
           if (nextSection) {
-            // 다음 단계 표시
             nextSection.classList.add("visible");
-
-            // 다음 버튼 비활성화 (새 단계 입력 전까지)
             document.getElementById("nextBtn").disabled = true;
-
-            // 다음 단계로 스크롤 (footer 위로 여유공간 확보)
             setTimeout(() => {
               nextSection.scrollIntoView({
                 behavior: "smooth",
                 block: "center",
               });
             }, 100);
-
             updateNextButton();
           }
         } else {
-          // 마지막 단계에서 제출
           submitJob();
         }
       }
 
-      // 뒤로가기
       function goBack() {
         if (currentStep > 1) {
           currentStep--;
@@ -1138,11 +1061,9 @@
         }
       }
 
-      // 다음 버튼 상태 업데이트
       function updateNextButton() {
         const nextBtn = document.getElementById("nextBtn");
         let isValid = false;
-
         switch (currentStep) {
           case 1:
             isValid = selectedData.category !== "";
@@ -1153,7 +1074,6 @@
               selectedData.categories.length > 0;
             break;
           case 3:
-            // 단기 선택 시 날짜 선택 필요, 장기 선택 시 기간만 선택하면 됨
             if (selectedData.workPeriod === "단기") {
               isValid = selectedData.selectedDates.length > 0;
             } else {
@@ -1172,20 +1092,15 @@
             nextBtn.textContent = "AI가 작성한 공고 보기";
             break;
         }
-
         nextBtn.disabled = !isValid;
       }
 
-      // 1단계: 라디오 옵션 선택
       document.querySelectorAll(".radio-option").forEach((option) => {
         option.addEventListener("click", function () {
-          // 기존 선택 해제
           document.querySelectorAll(".radio-option").forEach((opt) => {
             opt.classList.remove("selected");
             opt.querySelector(".radio-dot").classList.add("hidden");
           });
-
-          // 현재 옵션 선택
           this.classList.add("selected");
           this.querySelector(".radio-dot").classList.remove("hidden");
           selectedData.category = this.dataset.value;
@@ -1193,7 +1108,6 @@
         });
       });
 
-      // 2단계: 제목 입력
       document
         .getElementById("jobTitle")
         ?.addEventListener("input", function () {
@@ -1201,23 +1115,18 @@
           updateNextButton();
         });
 
-      // 2단계: 카테고리 선택
       document.querySelectorAll(".category-btn").forEach((btn) => {
         btn.addEventListener("click", function () {
           this.classList.toggle("option-selected");
-
           const selectedCategories = [];
           document
             .querySelectorAll(".category-btn.option-selected")
-            .forEach((b) => {
-              selectedCategories.push(b.dataset.category);
-            });
+            .forEach((b) => selectedCategories.push(b.dataset.category));
           selectedData.categories = selectedCategories;
           updateNextButton();
         });
       });
 
-      // 3단계: 근무 기간 선택
       document.querySelectorAll(".period-btn").forEach((btn) => {
         btn.addEventListener("click", function () {
           document
@@ -1225,46 +1134,36 @@
             .forEach((b) => b.classList.remove("option-selected"));
           this.classList.add("option-selected");
           selectedData.workPeriod = this.dataset.period;
-
-          // 단기 선택 시 캘린더 표시, 장기 선택 시 요일/시간 표시
           const calendar = document.getElementById("shortTermCalendar");
           const schedule = document.getElementById("longTermSchedule");
-
           if (this.dataset.period === "단기") {
             calendar.classList.remove("hidden");
             schedule.classList.add("hidden");
-            generateCalendar(); // 캘린더 생성
+            generateCalendar();
           } else {
             calendar.classList.add("hidden");
             schedule.classList.remove("hidden");
           }
-
           updateNextButton();
         });
       });
 
-      // 캘린더 생성 함수
       function generateCalendar() {
         const year = currentCalendarDate.getFullYear();
         const month = currentCalendarDate.getMonth();
-
         document.getElementById("currentMonth").textContent = `${year}년 ${
           month + 1
         }월`;
-
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
         const startDayOfWeek = firstDay.getDay();
-
         const calendarGrid = document.getElementById("calendarGrid");
         calendarGrid.innerHTML = "";
-
         for (let i = 0; i < startDayOfWeek; i++) {
           const emptyCell = document.createElement("div");
           emptyCell.className = "text-center py-2";
           calendarGrid.appendChild(emptyCell);
         }
-
         for (let day = 1; day <= lastDay.getDate(); day++) {
           const dateCell = document.createElement("button");
           const currentDate = new Date(year, month, day);
@@ -1272,55 +1171,38 @@
             2,
             "0"
           )}-${String(day).padStart(2, "0")}`;
-
           const dayOfWeek = (startDayOfWeek + day - 1) % 7;
-
           dateCell.className =
             "text-center py-2 rounded-full hover:bg-gray-100 transition-colors text-sm font-medium w-9 h-9 flex items-center justify-center mx-auto";
           dateCell.textContent = day;
           dateCell.type = "button";
           dateCell.onclick = () => toggleDateSelection(dateString, dateCell);
-
-          // 오늘 날짜 표시
           if (currentDate.toDateString() === today.toDateString()) {
             dateCell.classList.add("font-bold", "border", "border-blue-500");
           }
-
-          // 선택된 날짜 스타일
           if (selectedData.selectedDates.includes(dateString)) {
             dateCell.classList.add("bg-blue-600", "text-white", "font-bold");
             dateCell.classList.remove("hover:bg-gray-100");
           } else {
-            // 일요일은 빨간색, 토요일은 파란색
-            if (dayOfWeek === 0) {
-              dateCell.classList.add("text-red-500");
-            } else if (dayOfWeek === 6) {
+            if (dayOfWeek === 0) dateCell.classList.add("text-red-500");
+            else if (dayOfWeek === 6)
               dateCell.classList.add("text-blue-500");
-            }
           }
-
           calendarGrid.appendChild(dateCell);
         }
-
         updateSelectedDatesDisplay();
       }
 
       function toggleDateSelection(dateString, element) {
         const index = selectedData.selectedDates.indexOf(dateString);
-
         if (index > -1) {
           selectedData.selectedDates.splice(index, 1);
           element.classList.remove("bg-blue-600", "text-white", "font-bold");
           element.classList.add("hover:bg-gray-100");
-
-          // 선택 해제 시 원래 색상 복원
           const date = new Date(dateString);
           const dayOfWeek = date.getDay();
-          if (dayOfWeek === 0) {
-            element.classList.add("text-red-500");
-          } else if (dayOfWeek === 6) {
-            element.classList.add("text-blue-500");
-          }
+          if (dayOfWeek === 0) element.classList.add("text-red-500");
+          else if (dayOfWeek === 6) element.classList.add("text-blue-500");
         } else {
           selectedData.selectedDates.push(dateString);
           element.classList.add("bg-blue-600", "text-white", "font-bold");
@@ -1330,15 +1212,13 @@
             "text-blue-500"
           );
         }
-
         updateSelectedDatesDisplay();
-        updateNextButton(); // 다음 버튼 상태 업데이트
+        updateNextButton();
       }
 
       function updateSelectedDatesDisplay() {
         const count = selectedData.selectedDates.length;
         document.getElementById("selectedDatesCount").textContent = count;
-
         if (count > 0) {
           const sortedDates = selectedData.selectedDates.sort();
           const firstDate = sortedDates[0].replace(/-/g, ".");
@@ -1346,8 +1226,6 @@
             /-/g,
             "."
           );
-
-          // 날짜 범위 표시 (시작일 - 종료일 형식)
           if (count === 1) {
             document.getElementById("selectedDatesDisplay").textContent =
               firstDate;
@@ -1368,60 +1246,23 @@
       }
       window.changeMonth = changeMonth;
 
-      // 3단계: 요일 선택
       document.querySelectorAll(".day-btn").forEach((btn) => {
         btn.addEventListener("click", function () {
           this.classList.toggle("option-selected");
-
           const selectedDays = [];
-          document.querySelectorAll(".day-btn.option-selected").forEach((b) => {
-            selectedDays.push(b.dataset.day);
-          });
+          document
+            .querySelectorAll(".day-btn.option-selected")
+            .forEach((b) => selectedDays.push(b.dataset.day));
           selectedData.days = selectedDays;
         });
       });
 
-      // 최저임금 계산 함수
-      function calculateMinimumWage() {
-        const minHourlyWage = 10030; // 2025년 최저시급
-        const salaryType = selectedData.salaryType;
-        const startTime = document.getElementById("startTimeSelect")?.value;
-        const endTime = document.getElementById("endTimeSelect")?.value;
-
-        let minWageText = "";
-
-        if (salaryType === "시급") {
-          // 시급 선택 시
-          if (startTime && endTime) {
-            const start = parseInt(startTime.split(":")[0]);
-            const end = parseInt(endTime.split(":")[0]);
-            const hours = end > start ? end - start : 24 - start + end;
-            const dailyWage = minHourlyWage * hours;
-            minWageText = `이 조건으로 근무할 경우 최소 일급은 <strong>${dailyWage.toLocaleString()}원</strong>이에요`;
-          } else {
-            minWageText = `이 조건으로 근무할 경우 최소 일급은 <strong>70,210원</strong>이에요 (7시간 기준)`;
-          }
-        } else if (salaryType === "일급") {
-          minWageText = `최저시급 기준 7시간 근무 시 최소 일급은 <strong>70,210원</strong>이에요`;
-        } else if (salaryType === "월급") {
-          const daysCount = selectedData.days.length || 5; // 선택된 요일 수 (기본 5일)
-          const monthlyWage = minHourlyWage * 7 * daysCount * 4; // 7시간 * 요일수 * 4주
-          minWageText = `주 ${daysCount}일 근무 시 최소 월급은 <strong>${monthlyWage.toLocaleString()}원</strong>이에요`;
-        } else if (salaryType === "건당") {
-          minWageText = `건당 급여는 작업 내용에 따라 협의하여 결정해주세요`;
-        }
-
-        document.getElementById("minimumWageInfo").innerHTML = minWageText;
-      }
-
-      // 5단계: 근무 장소 입력 (지도로 선택)
       document
         .getElementById("detailAddress")
         .addEventListener("input", function () {
           selectedData.detailAddress = this.value;
         });
 
-      // 6단계: 연락처 입력 (자동 하이픈 추가)
       document
         .getElementById("contactPhone")
         .addEventListener("input", function (e) {
@@ -1441,23 +1282,18 @@
           updateNextButton();
         });
 
-      // 동의 체크박스
       document
         .getElementById("agreeTerms")
         ?.addEventListener("change", function () {
           updateNextButton();
         });
 
-      // 지도 관련 변수
       let addressMap = null;
       let addressMarker = null;
       let selectedAddress = null;
 
-      // 주소 검색 모달 열기
       function openAddressSearch() {
         document.getElementById("addressModal").classList.remove("hidden");
-
-        // 지도 초기화 (처음 열 때만)
         if (!addressMap) {
           setTimeout(() => {
             initAddressMap();
@@ -1466,34 +1302,23 @@
       }
       window.openAddressSearch = openAddressSearch;
 
-      // 지도 초기화
       function initAddressMap() {
         const container = document.getElementById("addressMap");
         const options = {
-          center: new kakao.maps.LatLng(35.8242, 128.7569), // 경산시 중심
+          center: new kakao.maps.LatLng(35.8242, 128.7569),
           level: 5,
         };
-
         addressMap = new kakao.maps.Map(container, options);
-
-        // 지도 클릭 이벤트
         kakao.maps.event.addListener(
           addressMap,
           "click",
           function (mouseEvent) {
             const latlng = mouseEvent.latLng;
-
-            // 마커 표시
-            if (addressMarker) {
-              addressMarker.setMap(null);
-            }
-
+            if (addressMarker) addressMarker.setMap(null);
             addressMarker = new kakao.maps.Marker({
               position: latlng,
               map: addressMap,
             });
-
-            // 좌표로 주소 검색
             const geocoder = new kakao.maps.services.Geocoder();
             geocoder.coord2Address(
               latlng.getLng(),
@@ -1502,7 +1327,6 @@
                 if (status === kakao.maps.services.Status.OK) {
                   const address = result[0].address;
                   const roadAddress = result[0].road_address;
-
                   selectedAddress = {
                     address: roadAddress
                       ? roadAddress.address_name
@@ -1510,7 +1334,6 @@
                     lat: latlng.getLat(),
                     lng: latlng.getLng(),
                   };
-
                   document.getElementById("selectedAddressText").textContent =
                     selectedAddress.address;
                   document.getElementById("confirmAddressBtn").disabled = false;
@@ -1521,41 +1344,29 @@
         );
       }
 
-      // 주소 검색
       function searchAddress() {
         const query = document.getElementById("addressSearch").value.trim();
         if (!query) {
           alert("주소를 입력해주세요");
           return;
         }
-
         const geocoder = new kakao.maps.services.Geocoder();
-
         geocoder.addressSearch(query, function (result, status) {
           if (status === kakao.maps.services.Status.OK) {
             const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-
-            // 지도 중심 이동
             addressMap.setCenter(coords);
             addressMap.setLevel(3);
-
-            // 마커 표시
-            if (addressMarker) {
-              addressMarker.setMap(null);
-            }
-
+            if (addressMarker) addressMarker.setMap(null);
             addressMarker = new kakao.maps.Marker({
               position: coords,
               map: addressMap,
             });
-
             selectedAddress = {
               address:
                 result[0].address_name || result[0].road_address?.address_name,
               lat: parseFloat(result[0].y),
               lng: parseFloat(result[0].x),
             };
-
             document.getElementById("selectedAddressText").textContent =
               selectedAddress.address;
             document.getElementById("confirmAddressBtn").disabled = false;
@@ -1566,7 +1377,6 @@
       }
       window.searchAddress = searchAddress;
 
-      // 주소 검색 모달 닫기
       function closeAddressModal() {
         document.getElementById("addressModal").classList.add("hidden");
         selectedAddress = null;
@@ -1577,16 +1387,57 @@
       }
       window.closeAddressModal = closeAddressModal;
 
-      // 주소 확정
-      function confirmAddress() {
+
+      async function confirmAddress() {
         if (selectedAddress) {
           document.getElementById("workLocation").value =
             selectedAddress.address;
           selectedData.location = selectedAddress.address;
           selectedData.latitude = selectedAddress.lat;
           selectedData.longitude = selectedAddress.lng;
-          updateNextButton();
-          closeAddressModal();
+          const geocoder = new kakao.maps.services.Geocoder();
+          try {
+            const regionResult = await new Promise((resolve, reject) => {
+              geocoder.coord2RegionCode(
+                selectedAddress.lng,
+                selectedAddress.lat,
+                (result, status) => {
+                  if (status === kakao.maps.services.Status.OK) {
+                    resolve(result);
+                  } else {
+                    reject(new Error("주소 변환 실패"));
+                  }
+                }
+              );
+            });
+            const legalRegion =
+              regionResult.find((r) => r.region_type === "B") ||
+              regionResult[0];
+            geocodeResult = {
+              lat: selectedAddress.lat,
+              lng: selectedAddress.lng,
+              region1: legalRegion.region_1depth_name,
+              region2: legalRegion.region_2depth_name,
+              region3: legalRegion.region_3depth_name,
+            };
+            document.getElementById("latitude").value = selectedAddress.lat;
+            document.getElementById("longitude").value = selectedAddress.lng;
+            document.getElementById("region_1depth_name").value =
+              legalRegion.region_1depth_name;
+            document.getElementById("region_2depth_name").value =
+              legalRegion.region_2depth_name;
+            document.getElementById("region_3depth_name").value =
+              legalRegion.region_3depth_name;
+          } catch (error) {
+            console.error("주소 변환 중 오류 발생:", error);
+            geocodeResult = null;
+            alert(
+              "주소 정보를 가져오는 데 실패했습니다. 다른 위치를 선택해주세요."
+            );
+          } finally {
+            updateNextButton();
+            closeAddressModal();
+          }
         }
       }
       window.confirmAddress = confirmAddress;
@@ -1598,80 +1449,35 @@
           updateNextButton();
         });
 
-      // 제출 함수
       async function submitJob() {
         console.log("제출 데이터:", selectedData);
-
         try {
-          // 좌표가 없으면 주소로 변환 시도
-          let geocodeResult = null;
-          if (selectedData.latitude && selectedData.longitude) {
-            geocodeResult = {
-              lat: selectedData.latitude,
-              lng: selectedData.longitude,
-            };
-          } else {
-            geocodeResult = await geocodeAddress(selectedData.location);
-          }
-
-          // 폼 데이터 생성
           const formData = new FormData();
-
-          // 필수 필드
           formData.append("title", selectedData.title);
-          formData.append("company", "{{ current_user.nickname }}"); // 작성자 닉네임
-          formData.append("people_category", selectedData.category); // 사람이음 카테고리 (업무, 이웃, 과외, 제능, 문화)
+          formData.append("company", "{{ current_user.nickname }}");
+          formData.append("people_category", selectedData.category);
           formData.append(
             "description",
             selectedData.description || "상세 설명 없음"
           );
-
-          // 모집 형태 (카테고리들을 모집형태로)
           formData.append(
             "recruitment_type",
             selectedData.categories.join(", ")
           );
-
-          // 근무 기간
           formData.append("work_period", selectedData.workPeriod);
-
-          // 단기 선택 시 날짜 정보
-          if (
-            selectedData.workPeriod === "단기" &&
-            selectedData.startDate &&
-            selectedData.endDate
-          ) {
-            formData.append("recruitment_start_date", selectedData.startDate);
-            formData.append("recruitment_end_date", selectedData.endDate);
-          }
-
-          // 급여 정보
-          formData.append(
-            "salary",
-            `${selectedData.salaryType} ${selectedData.salaryAmount}원`
-          );
-
-          // 지역 정보
+          formData.append("salary", "임의 급여"); // 급여 부분이 없으므로 임시값
           formData.append("region", selectedData.location);
-
-          // 상세 주소
+          formData.append("contact_phone", selectedData.phone);
           if (selectedData.detailAddress) {
             formData.append("detail_address", selectedData.detailAddress);
           }
-
-          // 좌표 정보 (지도 표시용)
-          if (geocodeResult) {
+          if (geocodeResult && geocodeResult.lat && geocodeResult.lng) {
             formData.append("latitude", geocodeResult.lat);
             formData.append("longitude", geocodeResult.lng);
             formData.append("region_1depth_name", geocodeResult.region1 || "");
             formData.append("region_2depth_name", geocodeResult.region2 || "");
             formData.append("region_3depth_name", geocodeResult.region3 || "");
           }
-
-          // 연락처
-          formData.append("contact_phone", selectedData.phone);
-
-          // 근무 요일 (Boolean 값으로 전송)
           formData.append(
             "work_monday",
             selectedData.days.includes("월") ? "true" : "false"
@@ -1700,27 +1506,20 @@
             "work_sunday",
             selectedData.days.includes("일") ? "true" : "false"
           );
-
-          // 근무 시간 설정 (select에서 가져오기)
           const startTimeSelect = document.getElementById("startTimeSelect");
           const endTimeSelect = document.getElementById("endTimeSelect");
-
           if (startTimeSelect && startTimeSelect.value) {
             formData.append("work_start_time", startTimeSelect.value);
           }
           if (endTimeSelect && endTimeSelect.value) {
             formData.append("work_end_time", endTimeSelect.value);
           }
-
           const response = await fetch("{{ url_for('jobs.create_job') }}", {
             method: "POST",
             body: formData,
           });
-
           if (response.ok) {
-            alert(
-              "공고가 성공적으로 작성되었습니다! 지도에서 확인할 수 있습니다."
-            );
+            alert("공고가 성공적으로 작성되었습니다!");
             window.location.href = "{{ url_for('jobs.job_list') }}";
           } else {
             const text = await response.text();
@@ -1733,32 +1532,6 @@
         }
       }
 
-      // 주소를 좌표로 변환하는 함수 (카카오 지오코딩 API 사용)
-      async function geocodeAddress(address) {
-        try {
-          const response = await fetch(
-            `/api/address_search?query=${encodeURIComponent(address)}`
-          );
-          const data = await response.json();
-
-          if (data.documents && data.documents.length > 0) {
-            const result = data.documents[0];
-            return {
-              lat: parseFloat(result.y),
-              lng: parseFloat(result.x),
-              region1: result.address?.region_1depth_name || "",
-              region2: result.address?.region_2depth_name || "",
-              region3: result.address?.region_3depth_name || "",
-            };
-          }
-          return null;
-        } catch (error) {
-          console.error("주소 변환 오류:", error);
-          return null;
-        }
-      }
-
-      // 초기 상태 설정
       updateNextButton();
     </script>
   </body>

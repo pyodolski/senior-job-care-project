@@ -172,56 +172,80 @@
             class="bg-white p-4 rounded-lg border cursor-pointer"
             onclick="location.href='{{ url_for('jobs.job_detail', job_id=job.id) }}'"
           >
-            <div class="flex items-start justify-between">
+            <!-- 첫 번째 줄: 프로필 아이콘 - 회사명/이름 - 마감 기한 -->
+            <div class="flex items-start justify-between mb-1">
               <div class="flex items-start">
                 <div
                   class="w-10 h-10 bg-gray-200 rounded-full mr-3 flex-shrink-0"
                 ></div>
-                <div>
-                  <p class="text-sm text-gray-600">{{ job.company }} 담당자</p>
-                  <h3 class="font-bold text-lg">{{ job.title }}</h3>
-                  <p class="text-blue-800 font-semibold">
-                    {% if job.salary %}{{ job.salary }}{% else %}급여 협의{%
-                    endif %}
-                  </p>
-                </div>
+                <p class="text-sm text-gray-600 mt-2">
+                  {% if job.author.user_type == 1 %}
+                    {{ job.company }}
+                  {% else %}
+                    {{ job.author.nickname or '익명' }}
+                  {% endif %}
+                </p>
               </div>
+              <p class="text-xs text-gray-400">
+                {{ job.time_ago }}
+              </p>
             </div>
-            <div class="flex items-center justify-between mt-4">
+
+            <!-- 두 번째 줄: 공고 제목 - 즐겨찾기 아이콘 -->
+            <div class="flex items-start justify-between mb-1">
+              <h3 class="font-bold text-lg flex-1">{{ job.title }}</h3>
+              <button
+                class="bookmark-btn ml-2 flex-shrink-0"
+                onclick="event.stopPropagation(); toggleBookmark({{ job.id }}, this)"
+                data-bookmarked="{{ 'true' if status.bookmarked else 'false' }}"
+              >
+                <svg class="w-6 h-6 {% if status.bookmarked %}text-red-500{% else %}text-gray-400{% endif %}" fill="{% if status.bookmarked %}currentColor{% else %}none{% endif %}" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+              </button>
+            </div>
+
+            <!-- 세 번째 줄: 급여 -->
+            <p class="text-blue-900 font-bold text-base mb-2">
+              {% if job.salary %}월급 {{ job.salary }}{% else %}급여 협의{% endif %}
+            </p>
+
+            <!-- 네 번째 줄: 카테고리 - 지원하기 버튼 -->
+            <div class="flex items-center justify-between">
               <div class="flex space-x-2">
                 {% if job.recruitment_type %}<span
                   class="bg-gray-200 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full"
                   >{{ job.recruitment_type }}</span
-                >{% endif %} {% if job.work_period %}<span
+                >{% endif %}
+                {% if job.work_period %}<span
                   class="bg-gray-200 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full"
                   >{{ job.work_period }}</span
                 >{% endif %}
               </div>
               {% if current_user.id == job.author_id %}
               <button
-                class="bg-gray-400 text-white font-bold py-2 px-6 rounded-full cursor-not-allowed"
+                class="bg-gray-400 text-white font-bold py-2 px-4 rounded-full text-sm cursor-not-allowed"
                 disabled
+                onclick="event.stopPropagation();"
               >
                 내 공고
               </button>
               {% elif status.applied %}
               <button
-                class="bg-green-500 text-white font-bold py-2 px-6 rounded-full"
+                class="bg-green-500 text-white font-bold py-2 px-4 rounded-full text-sm"
                 onclick="event.stopPropagation(); goToChat({{ job.id }})"
               >
                 채팅하기
               </button>
               {% else %}
               <button
-                class="bg-blue-900 text-white font-bold py-2 px-6 rounded-full"
+                class="text-white font-bold py-2 px-4 rounded-full text-sm"
+                style="background-color: #023591"
                 onclick="event.stopPropagation(); applyJob({{ job.id }})"
               >
                 지원하기
               </button>
               {% endif %}
-            </div>
-            <div class="text-center text-xs text-gray-500 mt-3">
-              조회 {{ job.view_count }} | 찜 {{ job.bookmark_count }}
             </div>
           </div>
           {% endfor %} {% else %}
@@ -353,6 +377,40 @@
         } catch (error) {
           console.error("Error:", error);
           alert("채팅방 이동 중 오류가 발생했습니다.");
+        }
+      }
+
+      // 즐겨찾기 토글 함수
+      async function toggleBookmark(jobId, buttonElement) {
+        try {
+          const isBookmarked = buttonElement.dataset.bookmarked === 'true';
+          const response = await fetch(`/jobs/${jobId}/bookmark`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          });
+          const data = await response.json();
+
+          if (data.success) {
+            const svg = buttonElement.querySelector('svg');
+            if (isBookmarked) {
+              // 북마크 해제
+              svg.classList.remove('text-red-500');
+              svg.classList.add('text-gray-400');
+              svg.setAttribute('fill', 'none');
+              buttonElement.dataset.bookmarked = 'false';
+            } else {
+              // 북마크 추가
+              svg.classList.remove('text-gray-400');
+              svg.classList.add('text-red-500');
+              svg.setAttribute('fill', 'currentColor');
+              buttonElement.dataset.bookmarked = 'true';
+            }
+          } else {
+            alert(data.message || "즐겨찾기 처리 중 오류가 발생했습니다.");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("즐겨찾기 처리 중 오류가 발생했습니다.");
         }
       }
 
