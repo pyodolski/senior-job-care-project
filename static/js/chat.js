@@ -53,10 +53,12 @@ async function sendMessage(roomId) {
     messageInput.value = "";
     scrollToBottom();
   } catch (error) {
-    if (typeof showAlert === "function") showAlert("메시지 전송 중 오류가 발생했습니다.");
+    if (typeof showAlert === "function")
+      showAlert("메시지 전송 중 오류가 발생했습니다.");
     console.error(error);
   } finally {
-    if (typeof hideLoading === "function" && sendBtn) hideLoading(sendBtn, originalText);
+    if (typeof hideLoading === "function" && sendBtn)
+      hideLoading(sendBtn, originalText);
     messageInput.focus();
   }
 }
@@ -193,11 +195,13 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener("DOMContentLoaded", function () {
   // 연결되면 방 참가 + 초기 읽음 처리
   socket.on("connect", () => {
-    socket.emit("join", { room_id: ROOM_ID });           // 방 참가
-    socket.emit("read_messages", { room_id: ROOM_ID });   // 초기 읽음 처리
+    socket.emit("join", { room_id: ROOM_ID }); // 방 참가
+    socket.emit("read_messages", { room_id: ROOM_ID }); // 초기 읽음 처리
   });
 
-  socket.on("connect_error", (err) => console.error("socket connect_error", err));
+  socket.on("connect_error", (err) =>
+    console.error("socket connect_error", err)
+  );
   socket.on("error", (err) => console.error("socket error", err));
 
   // 목록의 마지막 메시지/시간 갱신
@@ -205,7 +209,7 @@ document.addEventListener("DOMContentLoaded", function () {
     updateChatListLastMessage(data.room_id, {
       message: data.message,
       created_at: data.created_at,
-      message_type: data.message_type
+      message_type: data.message_type,
     });
   });
 
@@ -215,14 +219,17 @@ document.addEventListener("DOMContentLoaded", function () {
     const isOwn = msg.sender_id === CURRENT_USER_ID;
 
     // addMessageToChat
-    addMessageToChat({
-      id: msg.id,
-      message: msg.message,
-      sender_id: msg.sender_id,
-      sender_name: isOwn ? CURRENT_USER_NAME : OTHER_USER_NAME,
-      created_at: msg.created_at,
-      message_type: msg.message_type,
-    }, isOwn);
+    addMessageToChat(
+      {
+        id: msg.id,
+        message: msg.message,
+        sender_id: msg.sender_id,
+        sender_name: isOwn ? CURRENT_USER_NAME : OTHER_USER_NAME,
+        created_at: msg.created_at,
+        message_type: msg.message_type,
+      },
+      isOwn
+    );
 
     if (!isOwn) {
       // 수신 즉시 읽음 처리
@@ -239,18 +246,35 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // 방별 미읽음 실시간 갱신
   socket.on("room_unread_count", ({ room_id, count }) => {
-    const item = document.querySelector(`.chat-item[data-room-id="${room_id}"]`);
+    const item = document.querySelector(
+      `.chat-item[data-room-id="${room_id}"]`
+    );
     if (!item) return;
-    const badge = item.querySelector(".chat-unread-badge");
-    if (!badge) return;
+
+    let badge = item.querySelector(".chat-unread-badge");
     const n = Number(count) || 0;
+
     if (n > 0) {
-      badge.textContent = String(n);
-      badge.classList.remove("hidden");
+      // 배지가 없으면 생성
+      if (!badge) {
+        const secondRow = item.querySelector(".chat-info-row:last-child");
+        if (secondRow) {
+          badge = document.createElement("div");
+          badge.className = "chat-unread-badge";
+          secondRow.appendChild(badge);
+        }
+      }
+
+      if (badge) {
+        badge.textContent = String(n);
+        badge.style.display = "flex";
+      }
       item.classList.add("unread");
     } else {
-      badge.textContent = "";
-      badge.classList.add("hidden");
+      // 배지가 있으면 숨김
+      if (badge) {
+        badge.style.display = "none";
+      }
       item.classList.remove("unread");
     }
   });
@@ -290,13 +314,15 @@ function updateUnreadBadge(count) {
 }
 
 function updateChatListLastMessage(roomId, messageData) {
-  const chatItem = document.querySelector(`.chat-item[data-room-id="${roomId}"]`);
+  const chatItem = document.querySelector(
+    `.chat-item[data-room-id="${roomId}"]`
+  );
   if (!chatItem) return;
-  const lastMessageElement = chatItem.querySelector('.chat-last-message');
-  const timeElement = chatItem.querySelector('.chat-time');
+  const lastMessageElement = chatItem.querySelector(".chat-last-message");
+  const timeElement = chatItem.querySelector(".chat-time");
   if (!lastMessageElement || !timeElement) return;
 
-  if (messageData.message_type === 'system') {
+  if (messageData.message_type === "system") {
     lastMessageElement.innerHTML = `<em>${messageData.message}</em>`;
   } else {
     lastMessageElement.textContent = messageData.message;
@@ -309,7 +335,7 @@ function updateChatListLastMessage(roomId, messageData) {
 
 // 채팅 목록 젤 위로
 function moveChatItemToTop(roomId) {
-  const chatList = document.querySelector('.chat-list');
+  const chatList = document.querySelector(".chat-list");
   if (!chatList) return;
   const item = document.querySelector(`.chat-item[data-room-id="${roomId}"]`);
   if (!item) return;

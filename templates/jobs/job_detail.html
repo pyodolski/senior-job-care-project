@@ -110,18 +110,7 @@
           </div>
         </div>
 
-        <!-- 3. 조회, 찜, 지원 -->
-        <div class="px-6 py-4 border-b">
-          <div class="flex gap-4 text-sm text-gray-600">
-            <span>조회 {{ job.view_count }}</span>
-            <span>•</span>
-            <span>찜 {{ job.bookmark_count }}</span>
-            <span>•</span>
-            <span>지원 {{ job.application_count }}</span>
-          </div>
-        </div>
-
-        <!-- 4. 시급, 근무시간, 근무요일, 근무기간 카드 -->
+        <!-- 3. 시급, 근무시간, 근무요일, 근무기간 카드 -->
         {% set ns = namespace(count=0) %}
         <div class="px-6 py-4 space-y-2">
           <!-- 시급 카드 -->
@@ -227,6 +216,14 @@
           <h3 class="text-sm font-semibold text-gray-700 mb-3">상세 설명</h3>
           <div class="text-gray-700 whitespace-pre-wrap leading-relaxed">
             {{ job.description }}
+          </div>
+          <!-- 조회, 찜, 지원 -->
+          <div class="flex justify-end gap-4 text-sm text-gray-500 mt-4">
+            <span>조회 {{ job.view_count }}</span>
+            <span>•</span>
+            <span>찜 {{ job.bookmark_count }}</span>
+            <span>•</span>
+            <span>지원 {{ job.application_count }}</span>
           </div>
         </div>
 
@@ -401,31 +398,33 @@
             </svg>
           </button>
 
-          <!-- 지원하기/채팅하기 버튼 (작성자가 아닐 때만) -->
+          <!-- 작성자가 아닐 때: 지원하기/채팅하기 버튼만 표시 -->
           {% if current_user.id != job.author_id %} {% if
           application_status.applied %}
           <button
-            class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl transition-colors"
+            class="flex-1 text-white font-bold py-4 rounded-xl transition-colors hover:opacity-90"
+            style="background-color: #002fa7"
             onclick="goToChatFromDetail()"
           >
-            💬 채팅하기
+            채팅하기
           </button>
           {% else %}
           <button
-            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-colors"
+            class="flex-1 text-white font-bold py-4 rounded-xl transition-colors hover:opacity-90"
+            style="background-color: #002fa7"
             onclick="applyJob()"
           >
             지원하기
           </button>
-          {% endif %} {% endif %}
-
-          <!-- 모집글 올리기 버튼 -->
+          {% endif %} {% else %}
+          <!-- 작성자일 때: 모집글 올리기 버튼 표시 -->
           <button
             onclick="window.location.href='{{ url_for('jobs.create_job') }}'"
             class="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-bold py-4 rounded-xl transition-colors"
           >
             모집글 올리기
           </button>
+          {% endif %}
         </div>
       </div>
     </div>
