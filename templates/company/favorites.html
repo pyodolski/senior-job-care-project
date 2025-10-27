@@ -154,7 +154,7 @@
           <div class="space-y-4">
             {% for resume in public_resumes %}
             <a
-              href="{{ url_for('resumes.my_resume_detail', resume_id=resume.id) }}"
+              href="{{ url_for('resumes.view_resume', resume_id=resume.id) }}"
               class="block bg-white rounded-2xl p-4 shadow-sm border border-gray-200"
             >
               <div class="flex items-start justify-between mb-2">
