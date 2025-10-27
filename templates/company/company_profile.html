@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>기업 내정보 - 이음</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+      }
+      .menu-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 20px;
+        background: white;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      .menu-item:hover {
+        background-color: #f9fafb;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <div class="max-w-md mx-auto bg-white min-h-screen flex flex-col pb-20">
+      <!-- 상단 고정 영역 -->
+      <div class="sticky top-0 z-10 bg-white shadow-sm">
+        <!-- 상단 바 -->
+        <header class="px-4 py-3 sm:px-6 flex justify-between items-center">
+          <div class="flex items-center">
+            <div class="w-8 h-8 mr-2 flex items-center justify-center">
+              <img
+                src="{{ url_for('static', filename='images/header/logo.png') }}"
+                alt="로고"
+                class="max-w-full max-h-full object-contain"
+              />
+            </div>
+            <span class="text-2xl font-bold text-blue-900">이음</span>
+          </div>
+          <div class="flex items-center space-x-4">
+            <div class="w-6 h-6 flex items-center justify-center">
+              <img
+                src="{{ url_for('static', filename='images/header/mic.png') }}"
+                alt="마이크"
+                class="max-w-full max-h-full object-contain"
+              />
+            </div>
+            <div class="w-6 h-6 flex items-center justify-center">
+              <img
+                src="{{ url_for('static', filename='images/header/search.png') }}"
+                alt="검색"
+                class="max-w-full max-h-full object-contain"
+              />
+            </div>
+          </div>
+        </header>
+      </div>
+
+      <!-- 내정보 타이틀 -->
+      <div class="bg-white px-6 pt-4 pb-6">
+        <h1 class="text-xl font-bold text-gray-800">내정보</h1>
+      </div>
+
+      <!-- 콘텐츠 영역 -->
+      <main class="flex-grow bg-gray-50 overflow-auto">
+        <!-- 프로필 카드 -->
+        <div class="bg-white px-6 pt-8 pb-6">
+          <!-- 프로필 이미지 -->
+          <div class="flex justify-center mb-4">
+            <div class="relative">
+              {% if profile_url %}
+              <img
+                src="{{ profile_url }}"
+                alt="profile"
+                class="w-24 h-24 rounded-full object-cover border-2 border-gray-200"
+              />
+              {% else %}
+              <div
+                class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-12 h-12 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
+                </svg>
+              </div>
+              {% endif %}
+              <a
+                href="{{ url_for('auth.edit_profile_image') }}"
+                class="absolute bottom-0 right-0 bg-blue-600 rounded-full p-2 shadow-lg"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-4 h-4 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- 기업명 -->
+          <div class="text-center mb-2">
+            <h2 class="text-xl font-bold text-gray-800">{{ user.name }}</h2>
+            <p class="text-sm text-gray-500 mt-1">기업 회원</p>
+          </div>
+
+          <!-- 구인글 작성하기 버튼 -->
+          <div class="mt-6">
+            <a
+              href="{{ url_for('jobs.create_company_job') }}"
+              class="block w-full bg-blue-600 text-white text-center py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            >
+              ✏️ 구인글 작성하기
+            </a>
+          </div>
+
+          <!-- 통계 -->
+          <div class="flex justify-around mt-6 pt-6 border-t border-gray-200">
+            <div class="text-center">
+              <p class="text-sm text-gray-500 mb-1">올린 공고</p>
+              <p class="text-2xl font-bold text-blue-600">{{ job_count }}</p>
+            </div>
+            <div class="text-center">
+              <p class="text-sm text-gray-500 mb-1">좋아요한 이력서</p>
+              <p class="text-2xl font-bold text-red-500">
+                {{ favorite_resume_count }}
+              </p>
+            </div>
+            <div class="text-center">
+              <p class="text-sm text-gray-500 mb-1">채팅</p>
+              <p class="text-2xl font-bold text-blue-600">0</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 메뉴 리스트 -->
+        <div class="mt-4">
+          <!-- 올린 공고 -->
+          <a
+            href="{{ url_for('company.company_favorites', tab='jobs') }}"
+            class="menu-item border-b border-gray-100"
+          >
+            <span class="text-base font-medium text-gray-800">올린 공고</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-5 h-5 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </a>
+
+          <!-- 좋아요한 이력서 -->
+          <a
+            href="{{ url_for('company.company_favorites', tab='resumes') }}"
+            class="menu-item border-b border-gray-100"
+          >
+            <span class="text-base font-medium text-gray-800"
+              >좋아요한 이력서</span
+            >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-5 h-5 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </a>
+
+          <!-- 지원자 관리 -->
+          <a
+            href="{{ url_for('company.company_list') }}"
+            class="menu-item border-b border-gray-100"
+          >
+            <span class="text-base font-medium text-gray-800">지원자 관리</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-5 h-5 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </a>
+        </div>
+
+        <!-- 설정 섹션 -->
+        <div class="mt-4">
+          <div class="bg-gray-100 px-6 py-2">
+            <p class="text-xs font-medium text-gray-500">설정</p>
+          </div>
+
+          <!-- 공지사항 -->
+          <a href="#" class="menu-item border-b border-gray-100">
+            <span class="text-base font-medium text-gray-800">공지사항</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-5 h-5 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </a>
+
+          <!-- 문의하기 -->
+          <a href="#" class="menu-item border-b border-gray-100">
+            <span class="text-base font-medium text-gray-800">문의하기</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-5 h-5 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </a>
+        </div>
+
+        <!-- 로그아웃 -->
+        <div class="mt-4 px-6 py-4">
+          <a
+            href="{{ url_for('auth.logout') }}"
+            class="block text-center text-red-600 font-medium"
+          >
+            로그아웃
+          </a>
+        </div>
+
+        <!-- 회원탈퇴 -->
+        <div class="px-6 pb-6">
+          <a href="#" class="block text-center text-gray-400 text-sm">
+            회원탈퇴
+          </a>
+        </div>
+      </main>
+
+      <!-- 하단 네비게이션 -->
+      {% include 'components/company_footer.html' %}
+    </div>
+  </body>
+</html>

@@ -730,37 +730,39 @@
       </main>
 
       <!-- 하단 네비게이션 -->
+      <!-- 하단 네비게이션 -->
+      {% if current_user.user_type == 1 %}
+      <!-- 기업 회원 네비게이션 -->
+      {% include 'components/company_footer.html' %} {% else %}
+      <!-- 일반 회원 네비게이션 -->
       <footer
         class="fixed bottom-0 left-0 right-0 w-full bg-gray-50 border-t flex justify-around max-w-md mx-auto"
       >
         <a
-          href="{{ url_for('company.resume_list') }}"
+          href="{{ url_for('map.show_map') }}"
           class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
         >
           <div class="w-6 h-6 mb-1 flex items-center justify-center">
             <img
-              src="{{ url_for('static', filename='images/main_page/completion_of_Resume.png') }}"
-              alt="이력서"
+              src="{{ url_for('static', filename='images/footer/map.png') }}"
+              alt="지도"
               class="max-w-full max-h-full object-contain"
             />
           </div>
-          <span class="text-xs">이력서</span>
+          <span class="text-xs">지도</span>
         </a>
         <a
-          href="{% if current_user.user_type == 1 %}{{ url_for('company.company_favorites') }}{% else %}{{ url_for('jobs.bookmark_list') }}{% endif %}"
+          href="{{ url_for('jobs.bookmark_list') }}"
           class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
         >
           <div class="w-6 h-6 mb-1 flex items-center justify-center">
             <img
               src="{{ url_for('static', filename='images/footer/favorite.png') }}"
-              alt="{% if current_user.user_type == 1 %}좋아요{% else %}찜{% endif %}"
+              alt="찜"
               class="max-w-full max-h-full object-contain"
             />
           </div>
-          <span class="text-xs"
-            >{% if current_user.user_type == 1 %}좋아요{% else %}찜{% endif
-            %}</span
-          >
+          <span class="text-xs">찜</span>
         </a>
         <a
           href="{{ url_for('auth.main') }}"
@@ -802,6 +804,7 @@
           <span class="text-xs">내정보</span>
         </a>
       </footer>
+      {% endif %}
     </div>
     <script>
       // 공고 지원하기 함수

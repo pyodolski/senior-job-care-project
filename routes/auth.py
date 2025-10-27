@@ -221,9 +221,7 @@ def main():
 @auth_bp.route("/profile")
 @login_required
 def profile():
-    resume_count = ResumeService.get_resume_count_by_user(current_user.id)
-
-    # /profile 경로에 접속하면 profile.html을 렌더링
+    # 프로필 이미지 URL 생성
     profile_url = None
     if current_user.profile_image:
         profile_url = generate_presigned_get_url(current_user.profile_image, expires=900)
@@ -232,7 +230,21 @@ def profile():
     else:
         print("프로필 페이지 - 프로필 이미지가 설정되지 않음")  # 디버깅
     
-    return render_template("profile.html", user=current_user, profile_url=profile_url, resume_count=resume_count)
+    # 기업 회원과 일반 회원 분리
+    if current_user.user_type == 1:
+        # 기업 회원 - 작성한 공고 수 및 좋아요한 이력서 수 조회
+        from models import JobPost, ResumeFavorite
+        job_count = JobPost.query.filter_by(author_id=current_user.id).count()
+        favorite_resume_count = ResumeFavorite.query.filter_by(user_id=current_user.id).count()
+        return render_template("company/company_profile.html", 
+                             user=current_user, 
+                             profile_url=profile_url, 
+                             job_count=job_count,
+                             favorite_resume_count=favorite_resume_count)
+    else:
+        # 일반 회원 - 이력서 수 조회
+        resume_count = ResumeService.get_resume_count_by_user(current_user.id)
+        return render_template("profile.html", user=current_user, profile_url=profile_url, resume_count=resume_count)
 
 @auth_bp.route("/profile/detail")
 @login_required
