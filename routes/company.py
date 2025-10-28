@@ -19,6 +19,7 @@ from flask_login import login_required, current_user
 from models import db, JobPost, User
 from services.job_service import JobService
 from services.application_service import ApplicationService
+from services.suggestion_service import SuggestionService
 from utils.helpers import format_datetime, get_work_days
 from datetime import datetime, time
 
@@ -376,9 +377,7 @@ def company_jobs_json():
             if current_user.user_type == 0:
                 application_status = ApplicationService.check_application_status(current_user.id, job.id)
 
-            # 여기서 job.company가 User 테이블에서 가져온 company 필드인지,
-            # 아니면 JobPost 모델에 company 필드가 있는지에 따라 접근 방식이 달라집니다.
-            # JobPost에 company 필드가 있다고 가정하고 진행합니다.
+
             jobs_data.append({
                 'id': job.id,
                 'title': job.title,
@@ -406,3 +405,87 @@ def company_jobs_json():
         # 오류 발생 시 빈 목록 반환
         return jsonify({'success': False, 'message': str(e), 'jobs': []}), 500
 
+# 기업이 공고를 제안하는 페이지 및 로직
+@company_bp.route("/resume/<int:resume_id>/suggest", methods=["GET", "POST"])
+@login_required
+def suggest_job(resume_id):
+    """
+    이력서에 공고 제안하기
+    =====================
+    GET: 제안할 수 있는 내 공고 목록을 보여주는 페이지
+    POST: 선택된 공고들을 제안으로 보냄
+    """
+    # 1. 기업 회원 권한 확인
+    if not check_company_permission():
+        flash("기업 회원만 공고를 제안할 수 있습니다.", "error")
+        return redirect(url_for("company.resume_list"))
+
+    # 2. POST 요청 처리 (제안 보내기 버튼을 눌렀을 때)
+    if request.method == "POST":
+        # 공고 ID 목록을 가져옵니다.
+        selected_job_ids = request.form.getlist('job_ids')
+
+        if not selected_job_ids:
+            flash("제안할 공고를 하나 이상 선택해주세요.", "warning")
+            return redirect(url_for("company.suggest_job", resume_id=resume_id))
+
+        new_count = SuggestionService.create_suggestions(
+            suggester_id=current_user.id,
+            resume_id=resume_id,
+            job_ids=selected_job_ids
+        )
+
+        flash(f"{new_count}개의 공고를 성공적으로 제안했습니다.", "success")
+        return redirect(url_for("company.resume_list"))
+
+    # 3. GET 요청 처리 (제안할 공고 선택 페이지를 보여줄 때)
+    resume = SuggestionService.get_resume_for_suggestion_page(resume_id)
+    # 현재 기업이 올린 공고 목록
+    my_jobs = JobPost.query.filter_by(author_id=current_user.id).order_by(JobPost.created_at.desc()).all()
+
+    return render_template("company/suggest_job.html", resume=resume, my_jobs=my_jobs)
+
+
+# 일반 사용자가 받은 제안 목록을 보는 페이지
+@company_bp.route("/suggestions/received")
+@login_required
+def received_suggestions():
+    """
+    받은 제안 목록 페이지 (일반 사용자용)
+    ================================
+    """
+    # 일반 사용자(user_type=0)
+    if current_user.user_type != 0:
+        flash("일반 사용자만 접근할 수 있는 페이지입니다.", "error")
+        return redirect(url_for("auth.main"))
+
+    # 현재 사용자가 받은 제안 목록
+    suggestions = SuggestionService.get_received_suggestions(user_id=current_user.id)
+
+    return render_template("company/received_suggestions.html", suggestions=suggestions)
+
+
+@company_bp.route("/api/suggestions/<int:suggestion_id>/accept", methods=["POST"])
+@login_required
+def accept_suggestion(suggestion_id):
+    """
+    [API] 제안을 수락하고 채팅방으로 연결합니다.
+    """
+    try:
+        # 서비스의 '제안 수락 및 채팅방 생성' 기능을 호출합니다.
+        chat_room_id = SuggestionService.accept_suggestion_and_get_chat(
+            suggestion_id=suggestion_id,
+            user_id=current_user.id
+        )
+
+        # 성공하면, 채팅방 ID를 포함하여 JSON 형태로 응답합니다.
+        return jsonify({
+            'success': True,
+            'chat_room_id': chat_room_id
+        })
+
+    except PermissionError:
+        return jsonify({'success': False, 'message': '권한이 없습니다.'}), 403
+    except Exception as e:
+        print(f"제안 수락 오류: {e}")
+        return jsonify({'success': False, 'message': '오류가 발생했습니다.'}), 500

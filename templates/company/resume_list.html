@@ -353,10 +353,7 @@
 
             <!-- 하단 버튼 -->
             <div class="flex items-center justify-end pt-2">
-              <a
-                href="{{ url_for('resumes.my_resume_detail', resume_id=resume.id) }}"
-                class="px-6 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 font-medium"
-              >
+              <a href="{{ url_for('company.suggest_job', resume_id=resume.id) }}">
                 제안하기
               </a>
             </div>

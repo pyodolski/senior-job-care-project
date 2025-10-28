@@ -211,7 +211,7 @@
                   >{{ resume.updated_at|time_ago }} 업데이트</span
                 >
                 <a
-                  href="{{ url_for('resumes.my_resume_detail', resume_id=resume.id) }}"
+                  href="{{ url_for('resumes.view_resume', resume_id=resume.id) }}"
                   class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
                   >상세보기</a
                 >

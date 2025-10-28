@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>받은 제안 - 이음</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <div class="max-w-md mx-auto bg-white min-h-screen">
+      <header class="bg-white p-4 border-b sticky top-0 z-10">
+        <div class="relative flex items-center justify-center">
+          <a href="#" class="absolute left-0">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 text-gray-800"
+              fill="none"
+              viewBox="0 0 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </a>
+          <h1 class="text-lg font-bold text-gray-800">받은 제안</h1>
+        </div>
+      </header>
+
+      <div class="bg-white border-b">
+        <nav class="flex">
+          <a
+            href="#"
+            class="flex-1 text-center py-3 font-semibold text-blue-600 border-b-2 border-blue-600"
+          >
+            전체
+          </a>
+          <a
+            href="#"
+            class="flex-1 text-center py-3 font-medium text-gray-500"
+          >
+            미응답
+          </a>
+        </nav>
+      </div>
+
+      <main class="p-4">
+        <div class="mb-4">
+          <span class="font-semibold text-gray-700">
+            총 {{ suggestions|length }}건
+          </span>
+        </div>
+
+        {% if suggestions %}
+        <div class="space-y-4">
+          {% for suggestion in suggestions %}
+          <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+            <p class="text-xs text-gray-400 mb-3">
+              {{ suggestion.created_at|format_datetime }}
+            </p>
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-sm text-gray-600">
+                  {{ suggestion.suggester.name }}
+                </p>
+                <h2 class="font-bold text-lg text-gray-900 mt-1">
+                  {{ suggestion.job.title }}
+                </h2>
+              </div>
+              {% if suggestion.status == 'sent' %}
+              <span class="text-xs font-semibold text-red-500">응답대기중</span>
+              {% endif %}
+            </div>
+            <div class="mt-2 flex items-center gap-2">
+              <span
+                class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
+              >
+                {{ suggestion.job.recruitment_type }}
+              </span>
+              <span
+                class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
+              >
+                {{ suggestion.job.job_category or '기타' }}
+              </span>
+            </div>
+            {% if suggestion.job.recruitment_end_date %}
+            <div class="mt-4 flex items-center text-xs text-gray-500">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 mr-1.5"
+                fill="none"
+                viewBox="0 0 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              제안에 대한 답변은
+              {{ suggestion.job.recruitment_end_date|format_date }}까지 응답할
+              수 있습니다.
+            </div>
+            {% endif %}
+
+            <div class="mt-4">
+              {% if suggestion.status == 'sent' %}
+              <button
+                class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700"
+                onclick="acceptSuggestion({{ suggestion.id }}, this)"
+              >
+                응답하기
+              </button>
+              {% else %}
+              <button
+                class="w-full bg-gray-300 text-gray-500 font-bold py-3 rounded-lg cursor-not-allowed"
+                disabled
+              >
+                응답완료
+              </button>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-20">
+          <p class="text-gray-500">받은 제안이 없습니다.</p>
+        </div>
+        {% endif %}
+      </main>
+    </div>
+
+    <script>
+      function acceptSuggestion(suggestionId, button) {
+        // 중복 클릭을 막기 위해 버튼을 비활성화하고 텍스트를 변경합니다.
+        button.disabled = true;
+        button.textContent = "처리 중...";
+        button.classList.add("bg-gray-400");
+        button.classList.remove("bg-blue-600");
+
+        // 서버의 API 주소로 '제안을 수락하겠다'는 POST 요청을 보냅니다.
+        fetch(`/api/suggestions/${suggestionId}/accept`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // 만약 CSRF 토큰을 사용한다면 여기에 헤더를 추가해야 합니다.
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success && data.chat_room_id) {
+              // 성공적으로 응답을 받으면, 알림을 띄우고 채팅방으로 이동합니다.
+              alert("제안을 수락했습니다. 채팅방으로 이동합니다.");
+              window.location.href = `/chat/${data.chat_room_id}`;
+            } else {
+              // 실패하면 사용자에게 오류 메시지를 보여주고 버튼을 원래 상태로 되돌립니다.
+              alert(data.message || "오류가 발생했습니다. 다시 시도해주세요.");
+              button.disabled = false;
+              button.textContent = "응답하기";
+              button.classList.remove("bg-gray-400");
+              button.classList.add("bg-blue-600");
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+            button.disabled = false;
+            button.textContent = "응답하기";
+            button.classList.remove("bg-gray-400");
+            button.classList.add("bg-blue-600");
+          });
+      }
+    </script>
+  </body>
+</html>

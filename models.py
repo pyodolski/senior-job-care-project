@@ -380,3 +380,42 @@ class ResumeFavorite(db.Model):
     
     def __repr__(self):
         return f"<ResumeFavorite user_id={self.user_id} resume_id={self.resume_id}>"
+
+
+class JobSuggestion(db.Model):
+    """공고 제안 모델"""
+    __tablename__ = 'job_suggestion'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    # 제안 보낸 사람 (기업)
+    suggester_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    # 제안 받은 사람 (일반 사용자)
+    suggestee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    # 제안된 공고
+    job_id = db.Column(db.Integer, db.ForeignKey('job_post.id'), nullable=False)
+
+    # 제안이 연결된 이력서
+    resume_id = db.Column(db.Integer, db.ForeignKey('resume.id'), nullable=False)
+
+    # 제안 상태: sent(보냄), viewed(읽음), accepted(수락), rejected(거절)
+    status = db.Column(db.String(20), default='sent', nullable=False)
+
+    created_at = db.Column(db.DateTime, default=get_kst_now)
+
+    # 관계 설정
+    suggester = db.relationship('User', foreign_keys=[suggester_id], backref=db.backref('sent_suggestions', lazy=True))
+    suggestee = db.relationship('User', foreign_keys=[suggestee_id],
+                                backref=db.backref('received_suggestions', lazy=True))
+    job = db.relationship('JobPost', backref=db.backref('suggestions', lazy=True))
+    resume = db.relationship('Resume', backref=db.backref('suggestions', lazy=True))
+
+    # 유니크 제약: 한 기업이 같은 이력서에 동일한 공고를 중복 제안 불가
+    __table_args__ = (
+        db.UniqueConstraint('suggester_id', 'resume_id', 'job_id', name='uq_job_suggestion'),
+    )
+
+    def __repr__(self):
+        return f"<JobSuggestion suggester={self.suggester_id} resume={self.resume_id} job={self.job_id}>"
