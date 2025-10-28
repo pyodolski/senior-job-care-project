@@ -53,6 +53,9 @@ def company_list():
     - current_sort: 현재 정렬 기준
     - can_create: 공고 작성 권한 여부
     """
+
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
     
     # URL 쿼리 파라미터에서 검색 및 필터 조건 추출
     query = request.args.get('q', '')
@@ -78,7 +81,7 @@ def company_list():
     if query or filters:
         jobs = JobService.search_jobs(query, filters, conditions, sort_by, base_query=base_query)
     else:
-        jobs_pagination = JobService.get_all_jobs(page=1, per_page=20, sort_by=sort_by, conditions=conditions, base_query=base_query)
+        jobs_pagination = JobService.get_all_jobs(page=page, per_page=per_page, sort_by=sort_by, conditions=conditions, base_query=base_query)
         jobs = jobs_pagination.items
     
     # 각 공고의 지원 상태 확인 (일반 사용자만)
@@ -102,7 +105,8 @@ def company_list():
                          jobs_with_status=jobs_with_status, 
                          current_region=region,
                          current_sort=sort_by,
-                         can_create=can_create)
+                         can_create=can_create,
+                         pagination=jobs_pagination)
 
 @company_bp.route("/company/create", methods=["GET", "POST"])
 @login_required
@@ -286,3 +290,82 @@ def resume_list():
     public_resumes = Resume.query.join(User).filter(Resume.is_public == True).order_by(Resume.updated_at.desc()).all()
     
     return render_template("company/resume_list.html", resumes=public_resumes)
+
+
+@company_bp.route("/company/jobs/json")
+@login_required
+def company_jobs_json():
+    """
+    기업 공고 목록을 JSON 형식으로 반환 (AJAX 전용)
+    ======================================
+
+    URL: GET /company/jobs/json?page=<page_num>&sort=<sort_by>...
+    """
+
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    query = request.args.get('q', '')
+    region = request.args.get('region', '')
+    recruitment_type = request.args.get('recruitment_type', '')
+    work_period = request.args.get('work_period', '')
+    sort_by = request.args.get('sort', 'latest')
+
+    # 필터 조건 구성
+    filters = {}
+    if region:
+        filters['region'] = region
+    if recruitment_type:
+        filters['recruitment_type'] = recruitment_type
+    if work_period:
+        filters['work_period'] = work_period
+
+    base_query = JobPost.query.join(User)
+    conditions = [User.user_type == 1]
+
+    try:
+        jobs_pagination = JobService.get_all_jobs(
+            page=page,
+            per_page=per_page,
+            sort_by=sort_by,
+            conditions=conditions,
+            base_query=base_query,
+        )
+
+        # JSON으로 반환하기 위해 데이터 가공
+        jobs_data = []
+        for job in jobs_pagination.items:
+            # 각 공고의 지원 상태 확인 (일반 사용자만)
+            application_status = {'applied': False, 'status': None}
+            if current_user.user_type == 0:
+                application_status = ApplicationService.check_application_status(current_user.id, job.id)
+
+            # 여기서 job.company가 User 테이블에서 가져온 company 필드인지,
+            # 아니면 JobPost 모델에 company 필드가 있는지에 따라 접근 방식이 달라집니다.
+            # JobPost에 company 필드가 있다고 가정하고 진행합니다.
+            jobs_data.append({
+                'id': job.id,
+                'title': job.title,
+                'company': job.company,
+                'salary': job.salary,
+                'recruitment_type': job.recruitment_type,
+                'work_period': job.work_period,
+                'view_count': job.view_count,
+                'bookmark_count': job.bookmark_count,
+                'application_count': job.application_count,
+                'author_id': job.author_id,  # author_id를 사용하여 클라이언트에서 '내 공고' 구분
+                'is_applied': application_status['applied']
+            })
+
+        return jsonify({
+            'success': True,
+            'jobs': jobs_data,
+            'has_next': jobs_pagination.has_next,
+            'next_num': jobs_pagination.next_num if jobs_pagination.has_next else None,
+            'total_pages': jobs_pagination.pages,
+            'current_user_id': current_user.id,
+            'current_user_type': current_user.user_type
+        })
+    except Exception as e:
+        # 오류 발생 시 빈 목록 반환
+        return jsonify({'success': False, 'message': str(e), 'jobs': []}), 500
+
