@@ -192,6 +192,15 @@ class JobPost(db.Model):
 
     author = db.relationship('User', backref=db.backref('job_posts', lazy=True))
 
+    #외부 데이터 연동을 위한 필드
+    source = db.Column(db.String(50), nullable=True, index=True)  # 데이터 출처 (예: 'K-Senior')
+    external_id = db.Column(db.String(100), nullable=True, unique=True, index=True)  # 외부 API의 공고 ID (jobId)
+    application_method = db.Column(db.String(50), nullable=True)
+
+    homepage_url = db.Column(db.String(255), nullable=True)  # 홈페이지 URL
+    full_address = db.Column(db.String(255), nullable=True)  # 상세 API 전체 주소 (plDetAddr)
+    contact_name = db.Column(db.String(50), nullable=True)  # 담당자 이름 (clerk)
+
     def __repr__(self):
         return f"<JobPost id={self.id} title={self.title} company={self.company}>"
 

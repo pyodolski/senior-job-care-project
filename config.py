@@ -111,6 +111,9 @@ class Config:
 
     KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
 
+    # 한국 노인인력개발원 공공데이터 API키
+    SENIOR_API_KEY = os.getenv("SENIOR_API_KEY")
+
     # 세션 저장 방식
     SESSION_TYPE = os.getenv("SESSION_TYPE", "filesystem")
 

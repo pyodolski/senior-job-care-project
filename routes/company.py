@@ -16,7 +16,7 @@
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
-from models import db, JobPost
+from models import db, JobPost, User
 from services.job_service import JobService
 from services.application_service import ApplicationService
 from utils.helpers import format_datetime, get_work_days
@@ -71,13 +71,14 @@ def company_list():
         filters['work_period'] = work_period
     
     # 기업이음 공고만 조회 (job_category가 있는 공고)
-    company_condition = JobPost.job_category.isnot(None)
-    conditions = [company_condition]
+    base_query = JobPost.query.join(User)
+    # 2. 기업 공고 조건을 user_type으로 변경합니다.
+    conditions = [User.user_type == 1]
     
     if query or filters:
-        jobs = JobService.search_jobs(query, filters, conditions, sort_by)
+        jobs = JobService.search_jobs(query, filters, conditions, sort_by, base_query=base_query)
     else:
-        jobs_pagination = JobService.get_all_jobs(page=1, per_page=20, sort_by=sort_by, conditions=conditions)
+        jobs_pagination = JobService.get_all_jobs(page=1, per_page=20, sort_by=sort_by, conditions=conditions, base_query=base_query)
         jobs = jobs_pagination.items
     
     # 각 공고의 지원 상태 확인 (일반 사용자만)
