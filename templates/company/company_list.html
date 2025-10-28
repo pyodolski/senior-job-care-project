@@ -24,9 +24,7 @@
   </head>
   <body class="bg-gray-100">
     <div class="w-full bg-white shadow-lg min-h-screen">
-      <!-- 상단 고정 영역 -->
       <div class="sticky top-0 z-10 bg-white shadow-sm">
-        <!-- 상단 바 -->
         <header class="px-4 py-3 sm:px-6 flex justify-between items-center">
           <div class="flex items-center">
             <div class="w-8 h-8 mr-2 flex items-center justify-center">
@@ -56,7 +54,6 @@
           </div>
         </header>
 
-        <!-- 네비게이션 탭 -->
         <nav class="flex border-b">
           <a
             href="{{ url_for('auth.main') }}"
@@ -76,9 +73,7 @@
         </nav>
       </div>
 
-      <!-- 메인 컨텐츠 -->
       <main class="px-4 py-4 sm:px-6 bg-white pb-24">
-        <!-- 지역 선택 및 정렬 -->
         <section class="flex items-center justify-between mb-4">
           <div class="flex items-center text-sm text-gray-600">
             <svg
@@ -164,7 +159,6 @@
           </div>
         </section>
 
-        <!-- 글쓰기 버튼 -->
         <section class="mb-6">
           {% if can_create %}
           <a
@@ -187,8 +181,7 @@
           {% endif %}
         </section>
 
-        <!-- 공고 리스트 -->
-        <section class="space-y-4">
+        <section id="job-list-section" class="space-y-4">
           {% if jobs_with_status %} {% for job_data in jobs_with_status %} {%
           set job = job_data.job %} {% set status = job_data.application_status
           %}
@@ -196,7 +189,6 @@
             class="bg-white p-4 rounded-lg border cursor-pointer relative"
             onclick="location.href='{{ url_for('company.company_job_detail', job_id=job.id) }}'"
           >
-            <!-- 기업 배지 -->
             <div class="absolute top-3 right-3">
               <span
                 class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full"
@@ -236,7 +228,6 @@
 
               {% if current_user.user_type == 1 and current_user.id ==
               job.author_id %}
-              <!-- 본인이 작성한 기업 공고인 경우 -->
               <button
                 class="bg-gray-400 text-white font-bold py-2 px-6 rounded-full cursor-not-allowed"
                 disabled
@@ -244,7 +235,6 @@
                 내 공고
               </button>
               {% elif current_user.user_type == 0 %}
-              <!-- 일반 사용자인 경우 -->
               {% if status.applied %}
               <button
                 class="bg-green-500 text-white font-bold py-2 px-6 rounded-full"
@@ -260,7 +250,6 @@
                 지원하기
               </button>
               {% endif %} {% else %}
-              <!-- 다른 기업 회원인 경우 -->
               <button
                 class="bg-gray-400 text-white font-bold py-2 px-6 rounded-full cursor-not-allowed"
                 disabled
@@ -300,9 +289,24 @@
           </div>
           {% endif %}
         </section>
+
+
+        {% if pagination and pagination.has_next %}
+        <div class="mt-6 text-center">
+          <button
+            id="load-more-btn"
+            data-next-page="{{ pagination.next_num }}"
+            data-total-pages="{{ pagination.pages }}"
+            class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg transition-colors"
+          >
+            더 보기 ({{ pagination.next_num }} / {{ pagination.pages }})
+          </button>
+        </div>
+        {% endif %}
+
+
       </main>
 
-      <!-- 하단 네비게이션 -->
       <footer
         class="fixed bottom-0 left-0 right-0 w-full bg-gray-50 border-t flex justify-around"
       >
@@ -444,6 +448,8 @@
       function changeSortOrder(sortBy) {
         const currentUrl = new URL(window.location.href);
         currentUrl.searchParams.set("sort", sortBy);
+        // 페이지네이션을 1페이지로 리셋
+        currentUrl.searchParams.set("page", 1);
         window.location.href = currentUrl.toString();
       }
 
@@ -453,6 +459,170 @@
         const dropdown = document.getElementById("sortDropdown");
         if (dropdown && !sortBtn && dropdown.classList.contains("show")) {
           dropdown.classList.remove("show");
+        }
+      });
+
+
+      /**
+       * 공고 데이터를 기반으로 HTML 카드 문자열을 생성하는 함수
+       * 백엔드 company/jobs/json 엔드포인트의 JSON 응답에 맞게 작성되었습니다.
+       */
+      function createJobCardHTML(job, current_user_id, current_user_type) {
+
+        const isAuthor = current_user_id === job.author_id;
+        const isUser = current_user_type === 0;
+        const isCompany = current_user_type === 1;
+        const isApplied = job.is_applied;
+
+        let buttonHTML;
+
+        if (isCompany && isAuthor) {
+          // 본인이 작성한 기업 공고인 경우
+          buttonHTML = `
+            <button
+              class="bg-gray-400 text-white font-bold py-2 px-6 rounded-full cursor-not-allowed"
+              disabled
+            >
+              내 공고
+            </button>
+          `;
+        } else if (isUser) {
+          // 일반 사용자인 경우
+          if (isApplied) {
+            buttonHTML = `
+              <button
+                class="bg-green-500 text-white font-bold py-2 px-6 rounded-full"
+                onclick="event.stopPropagation(); goToChat(${job.id})"
+              >
+                채팅하기
+              </button>
+            `;
+          } else {
+            buttonHTML = `
+              <button
+                class="bg-blue-900 text-white font-bold py-2 px-6 rounded-full"
+                onclick="event.stopPropagation(); applyJob(${job.id})"
+              >
+                지원하기
+              </button>
+            `;
+          }
+        } else {
+          // 다른 기업 회원인 경우 (또는 권한 없는 사용자)
+          buttonHTML = `
+            <button
+              class="bg-gray-400 text-white font-bold py-2 px-6 rounded-full cursor-not-allowed"
+              disabled
+            >
+              기업 회원 전용
+            </button>
+          `;
+        }
+
+        const detailUrl = `{{ url_for('company.company_job_detail', job_id=0) }}`.replace('0', job.id);
+        const companyInitial = job.company ? job.company[0] : '기';
+
+        return `
+          <div
+            class="bg-white p-4 rounded-lg border cursor-pointer relative"
+            onclick="location.href='${detailUrl}'"
+          >
+            <div class="absolute top-3 right-3">
+              <span
+                class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full"
+              >
+                기업
+              </span>
+            </div>
+
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-start">
+                <div
+                  class="w-10 h-10 bg-gray-200 rounded-full mr-3 flex-shrink-0 flex items-center justify-center text-gray-600 font-bold"
+                >
+                  ${companyInitial}
+                </div>
+                <div>
+                  <p class="text-sm text-gray-600">${job.company || ''}</p>
+                  <h3 class="font-bold text-lg">${job.title}</h3>
+                  <p class="text-blue-800 font-semibold">
+                    ${job.salary || '급여 협의'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between mt-4">
+              <div class="flex space-x-2">
+                ${job.recruitment_type ? `<span class="bg-gray-200 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full">${job.recruitment_type}</span>` : ''}
+                ${job.work_period ? `<span class="bg-gray-200 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full">${job.work_period}</span>` : ''}
+              </div>
+
+              ${buttonHTML}
+            </div>
+
+            <div class="text-center text-xs text-gray-500 mt-3">
+              조회 ${job.view_count} | 찜 ${job.bookmark_count} | 지원 ${job.application_count}
+            </div>
+          </div>
+        `;
+      }
+
+      // 더 보기 기능 (JSON API 사용)
+      document.addEventListener("DOMContentLoaded", function () {
+        const loadMoreBtn = document.getElementById("load-more-btn");
+        const jobListSection = document.getElementById("job-list-section");
+
+        if (loadMoreBtn) {
+          loadMoreBtn.addEventListener("click", async function () {
+            const nextPage = loadMoreBtn.getAttribute("data-next-page");
+            const totalPages = loadMoreBtn.getAttribute("data-total-pages");
+
+            // JSON API URL 구성
+            // /company/jobs/json 엔드포인트를 사용합니다.
+            const url = new URL('{{ url_for('company.company_jobs_json') }}', window.location.origin);
+            const currentSearchParams = new URLSearchParams(window.location.search);
+
+            // 정렬 조건 유지
+            const currentSort = currentSearchParams.get("sort") || 'latest';
+            url.searchParams.set("sort", currentSort);
+            url.searchParams.set("page", nextPage);
+
+            // 로딩 상태 표시
+            loadMoreBtn.innerText = "로딩 중...";
+            loadMoreBtn.disabled = true;
+
+            try {
+              const response = await fetch(url.toString());
+              const data = await response.json(); // JSON 응답 파싱
+
+              if (data.success) {
+                // 1. 새 공고 항목들을 현재 목록에 추가
+                data.jobs.forEach(job => {
+                  const jobCardHTML = createJobCardHTML(job, data.current_user_id, data.current_user_type);
+                  jobListSection.insertAdjacentHTML('beforeend', jobCardHTML);
+                });
+
+                // 2. '더 보기' 버튼 상태 업데이트
+                if (data.has_next) {
+                  loadMoreBtn.setAttribute("data-next-page", data.next_num);
+                  loadMoreBtn.innerText = `더 보기 (${data.next_num} / ${totalPages})`;
+                  loadMoreBtn.disabled = false;
+                } else {
+                  // 다음 페이지가 없으면 버튼 제거
+                  loadMoreBtn.remove();
+                }
+              } else {
+                alert("공고 로드에 실패했습니다: " + data.message);
+              }
+            } catch (error) {
+              console.error("공고 로드 중 오류 발생:", error);
+              alert("공고 로드에 실패했습니다.");
+              // 에러 발생 시 버튼을 다시 활성화
+              loadMoreBtn.innerText = `더 보기 (${nextPage} / ${totalPages})`;
+              loadMoreBtn.disabled = false;
+            }
+          });
         }
       });
     </script>
