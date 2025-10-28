@@ -5,7 +5,7 @@ from models import db, User
 import bcrypt
 import click
 from flask.cli import with_appcontext
-from scripts.fetch_senior_jobs import fetch_and_store_jobs
+
 
 def register_cli(app):
     @app.cli.command("db-init")
@@ -40,6 +40,7 @@ def register_cli(app):
     @with_appcontext
     def fetch_senior_jobs_command(page):
         """한국노인인력개발원 API에서 공고 데이터를 가져옵니다."""
+        from scripts.fetch_senior_jobs import fetch_and_store_jobs
         print(f"🚀 {page} 페이지의 채용 공고를 가져옵니다...")
 
         # fetch_and_store_jobs 함수에 page 파라미터를 넘겨줍니다.
