@@ -6,6 +6,7 @@ from datetime import datetime
 import xml.etree.ElementTree as ET
 import os
 
+
 # API 정보
 API_URL_LIST = "http://apis.data.go.kr/B552474/SenuriService/getJobList"
 API_URL_DETAIL = "http://apis.data.go.kr/B552474/SenuriService/getJobInfo"  # 상세 API 주소
@@ -192,6 +193,20 @@ def fetch_and_store_jobs():
             # 1. 상세 정보 API 호출 (공고마다 개별 호출)
             detail_data = fetch_job_detail(job_id)
 
+            full_addr = detail_data.get('full_address')
+            depth_data = {}
+            if full_addr:
+                # 카카오 REST API를 호출하여 주소를 시/도/군/구로 분해
+                depth_data = convert_full_address_to_depths(full_addr)
+                # ▼▼▼ [핵심 디버깅 추가] 변환 결과를 터미널에 출력 ▼▼▼
+                if not depth_data:
+                    # depth_data가 비어있으면, 카카오 API 호출이 실패했다는 뜻
+                    print(f"*** 주소 변환 실패! (입력 주소: {full_addr}) ***")
+                else:
+                    # 주소 변환 성공!
+                    print(
+                        f"*** 주소 변환 성공: {depth_data.get('region_1depth_name')} {depth_data.get('region_2depth_name')} ***")
+
             # 2. 데이터 매핑
             full_address = detail_data.get('full_address')
             
@@ -224,6 +239,10 @@ def fetch_and_store_jobs():
                 'homepage_url': detail_data.get('homepage_url'),
                 'contact_phone': detail_data.get('contact_phone'),
                 'contact_name': detail_data.get('contact_name'),
+
+                'region_1depth_name': depth_data.get('region_1depth_name'),
+                'region_2depth_name': depth_data.get('region_2depth_name'),
+                'region_3depth_name': depth_data.get('region_3depth_name'),
 
                 'author_id': system_user.id,
                 'source': 'K-Senior',

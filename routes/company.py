@@ -56,34 +56,50 @@ def company_list():
 
     page = request.args.get('page', 1, type=int)
     per_page = 20
-    
+
     # URL 쿼리 파라미터에서 검색 및 필터 조건 추출
     query = request.args.get('q', '')
     region = request.args.get('region', '')
     recruitment_type = request.args.get('recruitment_type', '')
     work_period = request.args.get('work_period', '')
     sort_by = request.args.get('sort', 'latest')
-    
-    # 필터 조건 구성
+
+    region1 = request.args.get('region1')
+    region2 = request.args.get('region2')
+    region3 = request.args.get('region3')
+
     filters = {}
-    if region:
-        filters['region'] = region
     if recruitment_type:
         filters['recruitment_type'] = recruitment_type
     if work_period:
         filters['work_period'] = work_period
-    
-    # 기업이음 공고만 조회 (job_category가 있는 공고)
+
+    # 지역 필터 조건 및 기업 공고 조건을 위한 리스트
+    conditions = []
+
+    # 1. 기업 공고 조건을 user_type으로 추가
+    conditions.append(User.user_type == 1)  # 기업이 작성한 공고만 조회
+
+    # 2. 지역 필터링 조건 추가
+    if region1:
+        conditions.append(JobPost.region_1depth_name.like(f"{region1}%"))
+    if region2:
+        conditions.append(JobPost.region_2depth_name.like(f"{region2}%"))
+    if region3:
+        conditions.append(JobPost.region_3depth_name.like(f"{region3}%"))
+
+    # 기업이음 공고만 조회
     base_query = JobPost.query.join(User)
-    # 2. 기업 공고 조건을 user_type으로 변경합니다.
-    conditions = [User.user_type == 1]
-    
-    if query or filters:
+
+    if query or filters or len(conditions) > 1:  # 기업 조건 외에 다른 필터가 있는 경우
         jobs = JobService.search_jobs(query, filters, conditions, sort_by, base_query=base_query)
+        jobs_pagination = None  # search_jobs는 페이지네이션을 반환하지 않음
     else:
-        jobs_pagination = JobService.get_all_jobs(page=page, per_page=per_page, sort_by=sort_by, conditions=conditions, base_query=base_query)
+        # 지역 필터링 조건이 없는 순수 전체 기업 공고 리스트 조회
+        jobs_pagination = JobService.get_all_jobs(page=page, per_page=per_page, sort_by=sort_by, conditions=conditions,
+                                                  base_query=base_query)
         jobs = jobs_pagination.items
-    
+
     # 각 공고의 지원 상태 확인 (일반 사용자만)
     jobs_with_status = []
     for job in jobs:
@@ -91,19 +107,26 @@ def company_list():
             application_status = ApplicationService.check_application_status(current_user.id, job.id)
         else:
             application_status = {'applied': False, 'status': None}
-        
+
         job_data = {
             'job': job,
             'application_status': application_status
         }
         jobs_with_status.append(job_data)
-    
+
     # 공고 작성 권한 확인
     can_create = check_company_permission()
-    
-    return render_template("company/company_list.html", 
-                         jobs_with_status=jobs_with_status, 
-                         current_region=region,
+
+    # 현재 적용된 필터 정보를 템플릿으로 전달
+    current_filters = filters.copy()
+    current_filters['region_1depth_name'] = region1
+    current_filters['region_2depth_name'] = region2
+    current_filters['region_3depth_name'] = region3
+    current_filters['sort'] = sort_by
+
+    return render_template("company/company_list.html",
+                         jobs_with_status=jobs_with_status,
+                         current_filters=current_filters,
                          current_sort=sort_by,
                          can_create=can_create,
                          pagination=jobs_pagination)
@@ -310,17 +333,31 @@ def company_jobs_json():
     work_period = request.args.get('work_period', '')
     sort_by = request.args.get('sort', 'latest')
 
+    # 계층적 지역 필터링을 위한 쿼리 파라미터
+    region1 = request.args.get('region1')
+    region2 = request.args.get('region2')
+    region3 = request.args.get('region3')
+
     # 필터 조건 구성
     filters = {}
-    if region:
-        filters['region'] = region
     if recruitment_type:
         filters['recruitment_type'] = recruitment_type
     if work_period:
         filters['work_period'] = work_period
 
     base_query = JobPost.query.join(User)
-    conditions = [User.user_type == 1]
+    conditions = []
+
+    # 1. 기업 공고 조건
+    conditions.append(User.user_type == 1)
+
+    # 2. 지역 필터링 조건 추가
+    if region1:
+        conditions.append(JobPost.region_1depth_name.like(f"{region1}%"))
+    if region2:
+        conditions.append(JobPost.region_2depth_name.like(f"{region2}%"))
+    if region3:
+        conditions.append(JobPost.region_3depth_name.like(f"{region3}%"))
 
     try:
         jobs_pagination = JobService.get_all_jobs(
