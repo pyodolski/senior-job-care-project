@@ -1,5 +1,5 @@
 import requests
-from app import app, db
+from app import db
 from models import JobPost, User
 from config import Config
 from datetime import datetime
@@ -118,7 +118,7 @@ def fetch_job_detail(job_id):
         'id': job_id,  # 상세 조회의 필수 파라미터는 'id' 태그
     }
     try:
-        # [수정] 상세 정보 조회 시 타임아웃을 넉넉하게 설정 (15초)
+        # 상세 정보 조회 시 타임아웃을 넉넉하게 설정 (15초)
         response = requests.get(API_URL_DETAIL, params=params, timeout=15)
         response.raise_for_status()
 
@@ -142,7 +142,7 @@ def fetch_job_detail(job_id):
         return {}
 
 
-def fetch_and_store_jobs():
+def fetch_and_store_jobs(page_number=1):
     """한국노인인력개발원 API에서 공고를 가져와 DB에 저장/업데이트합니다."""
 
     if not API_SERVICE_KEY:
@@ -159,7 +159,7 @@ def fetch_and_store_jobs():
 
     params = {
         'serviceKey': API_SERVICE_KEY,
-        'pageNo': '1',
+        'pageNo': str(page_number),
         'numOfRows': '100',
     }
 
@@ -198,12 +198,10 @@ def fetch_and_store_jobs():
             if full_addr:
                 # 카카오 REST API를 호출하여 주소를 시/도/군/구로 분해
                 depth_data = convert_full_address_to_depths(full_addr)
-                # ▼▼▼ [핵심 디버깅 추가] 변환 결과를 터미널에 출력 ▼▼▼
+                #  변환 결과 디버깅
                 if not depth_data:
-                    # depth_data가 비어있으면, 카카오 API 호출이 실패했다는 뜻
                     print(f"*** 주소 변환 실패! (입력 주소: {full_addr}) ***")
                 else:
-                    # 주소 변환 성공!
                     print(
                         f"*** 주소 변환 성공: {depth_data.get('region_1depth_name')} {depth_data.get('region_2depth_name')} ***")
 
@@ -281,7 +279,3 @@ def fetch_and_store_jobs():
         db.session.rollback()
         print(f"❌ 데이터 처리 중 오류 발생: {e}")
 
-
-if __name__ == '__main__':
-    with app.app_context():
-        fetch_and_store_jobs()

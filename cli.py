@@ -6,6 +6,7 @@ import bcrypt
 import click
 from flask.cli import with_appcontext
 
+
 def register_cli(app):
     @app.cli.command("db-init")
     @with_appcontext
@@ -35,12 +36,14 @@ def register_cli(app):
         print("관리자 계정이 생성되었습니다.")
 
     @app.cli.command("fetch-senior-jobs")
+    @click.option('--page', default=1, type=int, help='가져올 페이지 번호')
     @with_appcontext
-    def fetch_senior_jobs_command():
+    def fetch_senior_jobs_command(page):
         """한국노인인력개발원 API에서 공고 데이터를 가져옵니다."""
-        # scripts 폴더에 있는 스크립트의 함수를 여기서 가져옵니다.
         from scripts.fetch_senior_jobs import fetch_and_store_jobs
+        print(f"🚀 {page} 페이지의 채용 공고를 가져옵니다...")
 
-        print(">> 노인일자리 공공데이터 가져오기를 시작합니다...")
-        fetch_and_store_jobs()
+        # fetch_and_store_jobs 함수에 page 파라미터를 넘겨줍니다.
+        fetch_and_store_jobs(page_number=page)
+
         print(">> 작업이 완료되었습니다.")
