@@ -20,6 +20,14 @@
       .sort-dropdown.show {
         display: block;
       }
+      #filterModal {
+        display: none;
+      }
+      #filterModal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     </style>
   </head>
   <body class="bg-gray-100">
@@ -75,89 +83,85 @@
 
       <main class="px-4 py-4 sm:px-6 bg-white pb-24">
         <section class="flex items-center justify-between mb-4">
-          <div class="flex items-center text-sm text-gray-600">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5 mr-1 text-gray-400"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M5.05 4.05a7 7 0 119.9 9.9L10 21l-4.95-6.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                clip-rule="evenodd"
-              />
+          <button onclick="openFilterModal()"
+                  class="flex items-center text-sm text-gray-600 p-1 rounded-md hover:bg-gray-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-gray-400" viewBox="0 0 20 20"
+                 fill="currentColor">
+              <path fill-rule="evenodd"
+                    d="M5.05 4.05a7 7 0 119.9 9.9L10 21l-4.95-6.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                    clip-rule="evenodd"/>
             </svg>
             <span>
-              {% if current_user.is_authenticated and current_user.sido %}
-                {{ current_user.sido }} {{ current_user.sigungu }} {{ current_user.dong }}
-              {% else %}
-                주소를 설정해주세요
-              {% endif %}
+                {% set region_parts = [] %}
+                {% if current_filters.region_1depth_name %}{% set _ = region_parts.append(current_filters.region_1depth_name) %}{% endif %}
+                {% if current_filters.region_2depth_name %}{% set _ = region_parts.append(current_filters.region_2depth_name) %}{% endif %}
+                {% if current_filters.region_3depth_name %}{% set _ = region_parts.append(current_filters.region_3depth_name) %}{% endif %}
+                {% if region_parts %}
+                    {{ region_parts | join(' ') }}
+                {% elif current_user.is_authenticated and current_user.sido %}
+                    {{ current_user.sido }} {{ current_user.sigungu }} {{ current_user.dong }}
+                {% else %}
+                    전체 지역
+                {% endif %}
             </span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4 ml-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 9l-7 7-7-7"
-              />
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
             </svg>
-          </div>
+          </button>
+
           <div class="relative">
-            <button
-              onclick="toggleSortDropdown()"
-              class="text-sm text-gray-600 flex items-center"
-            >
-              {% if current_sort == 'latest' %}최신순 {% elif current_sort ==
-              'popular' %}인기순 {% elif current_sort == 'views' %}조회순 {%
-              else %}최신순{% endif %}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 ml-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 9l-7 7-7-7"
-                />
+            <button onclick="toggleSortDropdown()" class="text-sm text-gray-600 flex items-center">
+              {% if current_sort == 'popular' %}인기순
+              {% elif current_sort == 'views' %}조회순
+              {% else %}최신순{% endif %}
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24"
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
               </svg>
             </button>
-            <div
-              id="sortDropdown"
-              class="sort-dropdown absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-20"
-            >
-              <a
-                href="#"
-                onclick="changeSortOrder('latest')"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >최신순</a
-              >
-              <a
-                href="#"
-                onclick="changeSortOrder('popular')"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >인기순</a
-              >
-              <a
-                href="#"
-                onclick="changeSortOrder('views')"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >조회순</a
-              >
+            <div id="sortDropdown" class="sort-dropdown absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-30">
+              <a href="#" onclick="changeSortOrder('latest')"
+                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">최신순</a>
+              <a href="#" onclick="changeSortOrder('popular')"
+                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">인기순</a>
+              <a href="#" onclick="changeSortOrder('views')"
+                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">조회순</a>
             </div>
           </div>
         </section>
+
+        <div id="filterModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+          <div class="bg-white rounded-lg p-6 w-11/12 max-w-sm">
+            <h3 class="text-lg font-bold mb-4">지역 필터</h3>
+            <form id="filterForm">
+              <div class="space-y-4">
+                <div>
+                  <label class="text-sm font-medium">시/도</label>
+                  <input type="text" name="region1" value="{{ current_filters.region_1depth_name or '' }}"
+                         class="mt-1 w-full border rounded-md px-3 py-2" placeholder="예: 경상북도">
+                </div>
+                <div>
+                  <label class="text-sm font-medium">시/군/구</label>
+                  <input type="text" name="region2" value="{{ current_filters.region_2depth_name or '' }}"
+                         class="mt-1 w-full border rounded-md px-3 py-2" placeholder="예: 경산시">
+                </div>
+                <div>
+                  <label class="text-sm font-medium">읍/면/동</label>
+                  <input type="text" name="region3" value="{{ current_filters.region_3depth_name or '' }}"
+                         class="mt-1 w-full border rounded-md px-3 py-2" placeholder="예: 조영동">
+                </div>
+              </div>
+              <div class="flex items-center justify-end gap-2 mt-6">
+                <button type="button" onclick="resetFilters()" class="px-4 py-2 text-sm text-gray-600">초기화</button>
+                <button type="button" onclick="closeFilterModal()" class="px-4 py-2 bg-gray-200 rounded-md text-sm">닫기
+                </button>
+                <button type="submit" class="px-4 py-2 bg-blue-800 text-white rounded-md text-sm font-semibold">필터 적용
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
 
         <section class="mb-6">
           {% if can_create %}
@@ -379,6 +383,76 @@
     </div>
 
     <script>
+
+      const filterModal = document.getElementById('filterModal');
+        const filterForm = document.getElementById('filterForm');
+
+        function toggleSortDropdown() {
+            const dropdown = document.getElementById("sortDropdown");
+            dropdown.classList.toggle("show");
+        }
+
+        function openFilterModal() { filterModal.classList.add('show'); }
+        function closeFilterModal() { filterModal.classList.remove('show'); }
+
+        // 정렬 순서 변경 함수
+        function changeSortOrder(sortBy) {
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set("sort", sortBy);
+            currentUrl.searchParams.set("page", 1);
+            window.location.href = currentUrl.toString();
+        }
+
+        // 필터 초기화 함수
+        function resetFilters() {
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.delete('region1');
+            currentUrl.searchParams.delete('region2');
+            currentUrl.searchParams.delete('region3');
+            currentUrl.searchParams.delete('page'); // 페이지 리셋
+            window.location.href = currentUrl.pathname + '?' + currentUrl.searchParams.toString();
+        }
+
+        // 필터 적용 폼 제출 이벤트
+        filterForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(filterForm);
+            const currentUrl = new URL(window.location.href);
+            const params = currentUrl.searchParams;
+
+            // 지역 필터 파라미터 업데이트
+            ['region1', 'region2', 'region3'].forEach(key => {
+                const value = formData.get(key).trim();
+                if (value) {
+                    params.set(key, value);
+                } else {
+                    params.delete(key);
+                }
+            });
+
+            params.set("page", 1); // 필터 적용 시 1페이지로 리셋
+
+            window.location.href = currentUrl.pathname + '?' + params.toString();
+        });
+
+        // 외부 클릭 시 드롭다운 닫기 (기존 로직 유지)
+        document.addEventListener("click", function (event) {
+            const sortBtn = event.target.closest(".relative");
+            const dropdown = document.getElementById("sortDropdown");
+            const filterModalElement = document.getElementById("filterModal");
+
+            // 정렬 드롭다운 닫기
+            if (dropdown && !sortBtn && dropdown.classList.contains("show")) {
+                dropdown.classList.remove("show");
+            }
+            // 모달 외부 클릭 시 닫기 (단, 모달 콘텐츠 내부 클릭은 제외)
+            if (event.target === filterModalElement) {
+                closeFilterModal();
+            }
+        });
+
+
       // 공고 지원하기 함수
       async function applyJob(jobId) {
         if (
