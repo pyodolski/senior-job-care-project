@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>공고 제안하기 - 이음</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <div class="max-w-md mx-auto bg-white min-h-screen">
+      <header class="bg-white p-4 border-b">
+        <div class="relative flex items-center justify-center">
+          <a href="{{ url_for('company.resume_list') }}" class="absolute left-0">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 text-gray-800"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </a>
+          <h1 class="text-lg font-bold text-gray-800">공고 제안하기</h1>
+        </div>
+      </header>
+
+      <main class="p-6">
+        <p class="text-gray-700 text-center mb-6">
+          <span class="font-bold text-blue-600">{{ resume.user.name }}</span>
+          님에게 제안할 공고를 선택해주세요.
+        </p>
+
+        <form
+          action="{{ url_for('company.suggest_job', resume_id=resume.id) }}"
+          method="POST"
+        >
+          <div class="space-y-3">
+            {% if my_jobs %} {% for job in my_jobs %}
+            <label
+              class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+            >
+              <input
+                type="checkbox"
+                name="job_ids"
+                value="{{ job.id }}"
+                class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+              />
+              <div class="ml-4 flex-1">
+                <p class="font-semibold text-gray-800">{{ job.title }}</p>
+                <p class="text-sm text-gray-500 mt-0.5">{{ job.company }}</p>
+              </div>
+            </label>
+            {% endfor %} {% else %}
+            <div class="text-center text-gray-500 py-16">
+              <p>제안할 수 있는 공고가 없습니다.</p>
+              <a
+                href="{{ url_for('jobs.create_company_job') }}"
+                class="mt-4 inline-block text-blue-600 font-semibold"
+              >
+                공고 등록하러 가기 &rarr;
+              </a>
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="mt-8">
+            {% if my_jobs %}
+            <button
+              type="submit"
+              class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors"
+            >
+              선택한 공고 제안하기
+            </button>
+            {% endif %}
+            <a
+              href="{{ url_for('company.resume_list') }}"
+              class="block w-full text-center mt-3 text-gray-600 font-medium py-3 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              취소
+            </a>
+          </div>
+        </form>
+      </main>
+    </div>
+  </body>
+</html>

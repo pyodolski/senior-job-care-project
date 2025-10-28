@@ -35,11 +35,9 @@ def my_resume_detail(resume_id):
     )
 
     if not resume:
-        flash("이력서를 찾을 수 없습니다.", "error")
         return redirect(url_for('resumes.my_view_resume'))
 
     if not is_owner:
-        flash("접근 권한이 없습니다.", "error")
         return redirect(url_for('resumes.my_view_resume'))
 
     from datetime import datetime
@@ -258,7 +256,6 @@ def resume_list():
     좋아요한 이력서 목록 (기업회원만 접근 가능)
     """
     if current_user.user_type != 1:
-        flash("기업회원만 접근 가능한 페이지입니다.", "error")
         return redirect(url_for('auth.main'))
 
     page = request.args.get('page', 1, type=int)
@@ -319,7 +316,6 @@ def view_resume(resume_id):
     기업 회원이 특정 공개 이력서를 조회하는 페이지
     """
     if current_user.user_type != 1:
-        flash("기업회원만 접근 가능합니다.", "error")
         return redirect(url_for('auth.main'))
 
     resume = ResumeService.get_resume_by_id(resume_id)
