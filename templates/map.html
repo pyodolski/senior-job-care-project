@@ -26,39 +26,71 @@
       }
 
       .info-window {
-        padding: 10px;
-        width: 220px;
+        padding: 16px;
+        width: 280px;
         text-align: left;
-        line-height: 1.5;
+        line-height: 1.6;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
 
       .info-window .title {
         font-weight: 700;
-        font-size: 14px;
-        margin-bottom: 6px;
+        font-size: 16px;
+        margin-bottom: 12px;
+        color: #1a1a1a;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
       }
 
       .info-window .details {
-        font-size: 12px;
-        color: #555;
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+      }
+
+      .info-window .details strong {
+        color: #333;
+        font-weight: 600;
+        min-width: 50px;
+        margin-right: 8px;
+      }
+
+      .info-window .salary {
+        color: #023591;
+        font-weight: 600;
       }
 
       .info-window button {
         display: block;
         width: 100%;
-        margin-top: 8px;
-        padding: 6px 0;
-        background-color: #ffd600;
-        color: #3c1e1e;
+        margin-top: 12px;
+        padding: 10px 0;
+        background: linear-gradient(135deg, #023591 0%, #2d71eb 100%);
+        color: white;
         border: none;
-        border-radius: 4px;
-        font-size: 12px;
+        border-radius: 8px;
+        font-size: 14px;
         font-weight: 700;
         cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(2, 53, 145, 0.3);
       }
 
       .info-window button:hover {
-        background-color: #e6c200;
+        background: linear-gradient(135deg, #012a6e 0%, #1d4ed8 100%);
+        box-shadow: 0 4px 12px rgba(2, 53, 145, 0.4);
+        transform: translateY(-1px);
+      }
+
+      .info-window button:active {
+        transform: translateY(0);
       }
 
       /* 현재 위치 마커 애니메이션 */
@@ -487,26 +519,31 @@
         // 현재 위치 마커 클릭 시 인포윈도우 (정확도 정보 포함)
         kakao.maps.event.addListener(currentLocationMarker, "click", () => {
           const accuracyText = accuracy
-            ? `정확도: ${Math.round(accuracy)}m`
-            : "정확도: 측정 중...";
+            ? `${Math.round(accuracy)}m`
+            : "측정 중...";
           const statusColor =
             accuracy < 50 ? "#4CAF50" : accuracy < 100 ? "#FF9800" : "#F44336";
+          const statusText =
+            accuracy < 50
+              ? "🟢 매우 정확"
+              : accuracy < 100
+              ? "🟡 보통 정확"
+              : "🔴 정확도 낮음";
 
           const content = `
             <div class="info-window">
               <div class="title">📍 내 현재 위치</div>
-              <div class="details">현재 있는 위치입니다</div>
-              <div class="details" style="color: ${statusColor}; font-weight: 600;">
-                ${accuracyText}
+              <div class="details">
+                <strong>📌 상태</strong>
+                <span>현재 있는 위치입니다</span>
               </div>
-              <div class="details" style="font-size: 11px; color: #888; margin-top: 4px;">
-                ${
-                  accuracy < 50
-                    ? "🟢 매우 정확"
-                    : accuracy < 100
-                    ? "🟡 보통 정확"
-                    : "🔴 정확도 낮음"
-                }
+              <div class="details">
+                <strong>📏 정확도</strong>
+                <span style="color: ${statusColor}; font-weight: 600;">${accuracyText}</span>
+              </div>
+              <div class="details">
+                <strong>✅ 신뢰도</strong>
+                <span style="font-size: 12px;">${statusText}</span>
               </div>
             </div>
           `;
@@ -551,14 +588,25 @@
         const lat = toNumber(job.lat);
         const lng = toNumber(job.lng);
 
+        // 이모지 아이콘 추가
+        const companyIcon = "🏢";
+        const salaryIcon = "💰";
+        const navIcon = "🧭";
+
         return `
         <div class="info-window">
           <div class="title">${title}</div>
-          <div class="details">회사명: ${company}</div>
-          <div class="details">급여: ${salary}</div>
+          <div class="details">
+            <strong>${companyIcon} 회사</strong>
+            <span>${company}</span>
+          </div>
+          <div class="details">
+            <strong>${salaryIcon} 급여</strong>
+            <span class="salary">${salary}</span>
+          </div>
           <button onclick="navigateTo(${lat}, ${lng}, '${escapeForAttr(
           title
-        )}')">길찾기</button>
+        )}')">${navIcon} 길찾기</button>
         </div>
       `;
       }

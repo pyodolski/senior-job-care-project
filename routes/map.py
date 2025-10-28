@@ -29,11 +29,19 @@ def jobs_all():
     
     # 필터 적용
     if job_type == 'company':
-        # 기업 이음: job_category 필드가 있는 공고 (기업 전용 필드)
-        query = query.filter(JobPost.job_category.isnot(None))
+        # 기업 이음: job_category가 있거나 외부 데이터(K-Senior 등)인 공고
+        query = query.filter(
+            db.or_(
+                JobPost.job_category.isnot(None),
+                JobPost.source.isnot(None)  # 외부 데이터는 모두 기업 이음
+            )
+        )
     elif job_type == 'people':
-        # 사람 이음: job_category 필드가 없는 공고
-        query = query.filter(JobPost.job_category.is_(None))
+        # 사람 이음: job_category가 없고 외부 데이터가 아닌 공고
+        query = query.filter(
+            JobPost.job_category.is_(None),
+            JobPost.source.is_(None)
+        )
     
     jobs = query.all()
 
@@ -44,7 +52,7 @@ def jobs_all():
             'company': job.company,
             'salary': job.salary, 
             'lng': job.longitude,
-            'type': 'company' if job.job_category else 'people'
+            'type': 'company' if (job.job_category or job.source) else 'people'
         }
         for job in jobs
     ]
