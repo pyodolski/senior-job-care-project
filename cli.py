@@ -33,3 +33,14 @@ def register_cli(app):
         db.session.add(admin_user)
         db.session.commit()
         print("관리자 계정이 생성되었습니다.")
+
+    @app.cli.command("fetch-senior-jobs")
+    @with_appcontext
+    def fetch_senior_jobs_command():
+        """한국노인인력개발원 API에서 공고 데이터를 가져옵니다."""
+        # scripts 폴더에 있는 스크립트의 함수를 여기서 가져옵니다.
+        from scripts.fetch_senior_jobs import fetch_and_store_jobs
+
+        print(">> 노인일자리 공공데이터 가져오기를 시작합니다...")
+        fetch_and_store_jobs()
+        print(">> 작업이 완료되었습니다.")

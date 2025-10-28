@@ -4,7 +4,7 @@ from flask_login import current_user
 
 class JobService:
     @staticmethod
-    def get_all_jobs(page=1, per_page=10, sort_by='latest', conditions=None):
+    def get_all_jobs(page=1, per_page=10, sort_by='latest', conditions=None, base_query=None):
         """
         모든 공고 조회 (페이지네이션 및 정렬)
         
@@ -14,7 +14,7 @@ class JobService:
             sort_by: 정렬 기준 ('latest', 'popular', 'views')
             conditions: 추가 필터 조건 리스트
         """
-        query = JobPost.query
+        query = base_query if base_query is not None else JobPost.query
         
         # 추가 조건 적용
         if conditions:
@@ -121,7 +121,7 @@ class JobService:
         ).first() is not None
     
     @staticmethod
-    def search_jobs(query, filters=None, conditions=None, sort_by='latest'):
+    def search_jobs(query, filters=None, conditions=None, sort_by='latest', base_query=None):
         """
         공고 검색
         
@@ -131,7 +131,7 @@ class JobService:
             conditions: 추가 검색 조건 (LIKE 검색 등)
             sort_by: 정렬 기준 ('latest', 'popular', 'views')
         """
-        jobs_query = JobPost.query
+        jobs_query = base_query if base_query is not None else JobPost.query
         
         if query:
             jobs_query = jobs_query.filter(
