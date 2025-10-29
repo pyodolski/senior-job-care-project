@@ -9,26 +9,10 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <style>
-      /* 사용자 정의 폰트 및 스타일 */
-      body {
-        font-family: "Noto Sans KR", sans-serif;
-      }
-      .sort-dropdown {
-        display: none;
-      }
-      .sort-dropdown.show {
-        display: block;
-      }
-      #filterModal {
-        display: none;
-      }
-      #filterModal.show {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-    </style>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/company_list.css') }}"
+    />
   </head>
   <body class="bg-gray-100">
     <div class="w-full bg-white shadow-lg min-h-screen">
@@ -82,81 +66,168 @@
       </div>
 
       <main class="px-4 py-4 sm:px-6 bg-white pb-24">
-        <section class="flex items-center justify-between mb-4">
-          <button onclick="openFilterModal()"
-                  class="flex items-center text-sm text-gray-600 p-1 rounded-md hover:bg-gray-100">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-gray-400" viewBox="0 0 20 20"
-                 fill="currentColor">
-              <path fill-rule="evenodd"
-                    d="M5.05 4.05a7 7 0 119.9 9.9L10 21l-4.95-6.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                    clip-rule="evenodd"/>
-            </svg>
-            <span>
-                {% set region_parts = [] %}
-                {% if current_filters.region_1depth_name %}{% set _ = region_parts.append(current_filters.region_1depth_name) %}{% endif %}
-                {% if current_filters.region_2depth_name %}{% set _ = region_parts.append(current_filters.region_2depth_name) %}{% endif %}
-                {% if current_filters.region_3depth_name %}{% set _ = region_parts.append(current_filters.region_3depth_name) %}{% endif %}
-                {% if region_parts %}
+        <!-- 위치 정보와 정렬 -->
+        <section class="mb-6">
+          <div class="flex items-center justify-between gap-2">
+            <!-- 위치 정보 -->
+            <button
+              onclick="openFilterModal()"
+              class="flex-1 flex items-center justify-between text-gray-700 h-12 px-4 rounded-full"
+              style="background: #eef1f9"
+            >
+              <div class="flex items-center">
+                <svg
+                  class="w-5 h-5 mr-2 text-blue-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <span class="text-base font-medium">
+                  {% set region_parts = [] %}
+                  {% if current_filters.region_1depth_name %}{% set _ = region_parts.append(current_filters.region_1depth_name) %}{% endif %}
+                  {% if current_filters.region_2depth_name %}{% set _ = region_parts.append(current_filters.region_2depth_name) %}{% endif %}
+                  {% if current_filters.region_3depth_name %}{% set _ = region_parts.append(current_filters.region_3depth_name) %}{% endif %}
+                  {% if region_parts %}
                     {{ region_parts | join(' ') }}
-                {% elif current_user.is_authenticated and current_user.sido %}
+                  {% elif current_user.is_authenticated and current_user.sido %}
                     {{ current_user.sido }} {{ current_user.sigungu }} {{ current_user.dong }}
-                {% else %}
+                  {% else %}
                     전체 지역
-                {% endif %}
-            </span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24"
-                 stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
-          </button>
-
-          <div class="relative">
-            <button onclick="toggleSortDropdown()" class="text-sm text-gray-600 flex items-center">
-              {% if current_sort == 'popular' %}인기순
-              {% elif current_sort == 'views' %}조회순
-              {% else %}최신순{% endif %}
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24"
-                   stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                  {% endif %}
+                </span>
+              </div>
+              <svg
+                class="w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
-            <div id="sortDropdown" class="sort-dropdown absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-30">
-              <a href="#" onclick="changeSortOrder('latest')"
-                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">최신순</a>
-              <a href="#" onclick="changeSortOrder('popular')"
-                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">인기순</a>
-              <a href="#" onclick="changeSortOrder('views')"
-                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">조회순</a>
+
+            <!-- 정렬 방법 -->
+            <div class="relative">
+              <button
+                onclick="toggleSortDropdown()"
+                class="flex items-center justify-between h-12 px-4 rounded-full text-gray-700"
+                style="background: #eef1f9; min-width: 100px;"
+              >
+                <span class="text-base font-medium">
+                  {% if current_sort == 'popular' %}인기순
+                  {% elif current_sort == 'views' %}조회순
+                  {% else %}최신순{% endif %}
+                </span>
+                <svg
+                  class="w-4 h-4 ml-2 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+              <div
+                id="sortDropdown"
+                class="sort-dropdown absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-30"
+              >
+                <a
+                  href="#"
+                  onclick="changeSortOrder('latest')"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >최신순</a
+                >
+                <a
+                  href="#"
+                  onclick="changeSortOrder('popular')"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >인기순</a
+                >
+                <a
+                  href="#"
+                  onclick="changeSortOrder('views')"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >조회순</a
+                >
+              </div>
             </div>
           </div>
         </section>
 
-        <div id="filterModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+        <div
+          id="filterModal"
+          class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center"
+        >
           <div class="bg-white rounded-lg p-6 w-11/12 max-w-sm">
             <h3 class="text-lg font-bold mb-4">지역 필터</h3>
             <form id="filterForm">
               <div class="space-y-4">
                 <div>
                   <label class="text-sm font-medium">시/도</label>
-                  <input type="text" name="region1" value="{{ current_filters.region_1depth_name or '' }}"
-                         class="mt-1 w-full border rounded-md px-3 py-2" placeholder="예: 경상북도">
+                  <input
+                    type="text"
+                    name="region1"
+                    value="{{ current_filters.region_1depth_name or '' }}"
+                    class="mt-1 w-full border rounded-md px-3 py-2"
+                    placeholder="예: 경상북도"
+                  />
                 </div>
                 <div>
                   <label class="text-sm font-medium">시/군/구</label>
-                  <input type="text" name="region2" value="{{ current_filters.region_2depth_name or '' }}"
-                         class="mt-1 w-full border rounded-md px-3 py-2" placeholder="예: 경산시">
+                  <input
+                    type="text"
+                    name="region2"
+                    value="{{ current_filters.region_2depth_name or '' }}"
+                    class="mt-1 w-full border rounded-md px-3 py-2"
+                    placeholder="예: 경산시"
+                  />
                 </div>
                 <div>
                   <label class="text-sm font-medium">읍/면/동</label>
-                  <input type="text" name="region3" value="{{ current_filters.region_3depth_name or '' }}"
-                         class="mt-1 w-full border rounded-md px-3 py-2" placeholder="예: 조영동">
+                  <input
+                    type="text"
+                    name="region3"
+                    value="{{ current_filters.region_3depth_name or '' }}"
+                    class="mt-1 w-full border rounded-md px-3 py-2"
+                    placeholder="예: 조영동"
+                  />
                 </div>
               </div>
               <div class="flex items-center justify-end gap-2 mt-6">
-                <button type="button" onclick="resetFilters()" class="px-4 py-2 text-sm text-gray-600">초기화</button>
-                <button type="button" onclick="closeFilterModal()" class="px-4 py-2 bg-gray-200 rounded-md text-sm">닫기
+                <button
+                  type="button"
+                  onclick="resetFilters()"
+                  class="px-4 py-2 text-sm text-gray-600"
+                >
+                  초기화
                 </button>
-                <button type="submit" class="px-4 py-2 bg-blue-800 text-white rounded-md text-sm font-semibold">필터 적용
+                <button
+                  type="button"
+                  onclick="closeFilterModal()"
+                  class="px-4 py-2 bg-gray-200 rounded-md text-sm"
+                >
+                  닫기
+                </button>
+                <button
+                  type="submit"
+                  class="px-4 py-2 bg-blue-800 text-white rounded-md text-sm font-semibold"
+                >
+                  필터 적용
                 </button>
               </div>
             </form>
@@ -171,17 +242,6 @@
           >
             기업 공고 작성하기 +
           </a>
-          {% else %}
-          <div
-            class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center"
-          >
-            <div class="text-2xl mb-2">🏢</div>
-            <h4 class="font-bold text-yellow-800 mb-2">기업 회원 전용</h4>
-            <p class="text-sm text-yellow-700">
-              기업 공고 작성은 승인된 기업 회원만 가능합니다.<br />
-              기업 회원 인증을 완료해주세요.
-            </p>
-          </div>
           {% endif %}
         </section>
 
@@ -190,82 +250,93 @@
           set job = job_data.job %} {% set status = job_data.application_status
           %}
           <div
-            class="bg-white p-4 rounded-lg border cursor-pointer relative"
+            class="bg-white rounded-2xl p-4 shadow-sm border mb-3 cursor-pointer"
             onclick="location.href='{{ url_for('company.company_job_detail', job_id=job.id) }}'"
           >
-            <div class="absolute top-3 right-3">
-              <span
-                class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full"
-              >
-                기업
-              </span>
-            </div>
-
-            <div class="flex items-start justify-between mb-4">
-              <div class="flex items-start">
+            <!-- 행[0]: 프로필사진, 회사명, 마감일, 요일 -->
+            <div class="flex items-center justify-between mb-1">
+              <div class="flex items-center gap-2">
                 <div
-                  class="w-10 h-10 bg-gray-200 rounded-full mr-3 flex-shrink-0 flex items-center justify-center text-gray-600 font-bold"
+                  class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-sm font-bold"
                 >
                   {{ job.company[0] if job.company else '기' }}
                 </div>
-                <div>
-                  <p class="text-sm text-gray-600">{{ job.company }}</p>
-                  <h3 class="font-bold text-lg">{{ job.title }}</h3>
-                  <p class="text-blue-800 font-semibold">
-                    {% if job.salary %}{{ job.salary }}{% else %}급여 협의{%
-                    endif %}
-                  </p>
-                </div>
+                <p class="text-sm text-gray-600">{{ job.company }}</p>
               </div>
+              <p class="text-xs text-gray-500">
+                ~{{ job.created_at.strftime('%m/%d') }} ({% set day_map =
+                {'Mon': '월', 'Tue': '화', 'Wed': '수', 'Thu': '목', 'Fri':
+                '금', 'Sat': '토', 'Sun': '일'} %}{{
+                day_map[job.created_at.strftime('%a')] }})
+              </p>
             </div>
 
-            <div class="flex items-center justify-between mt-4">
-              <div class="flex space-x-2">
-                {% if job.recruitment_type %}<span
-                  class="bg-gray-200 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full"
-                  >{{ job.recruitment_type }}</span
-                >{% endif %} {% if job.work_period %}<span
-                  class="bg-gray-200 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full"
-                  >{{ job.work_period }}</span
-                >{% endif %}
-              </div>
+            <!-- 행[1]: 공고명, 하트 버튼 -->
+            <div class="flex items-center justify-between mb-1">
+              <h3 class="font-bold text-lg">{{ job.title }}</h3>
+              <button
+                class="{% if status.bookmarked %}text-red-500{% else %}text-gray-400{% endif %} hover:text-red-500"
+                onclick="event.stopPropagation(); toggleBookmark({{ job.id }}, this);"
+              >
+                <svg
+                  class="w-6 h-6"
+                  fill="{% if status.bookmarked %}currentColor{% else %}none{% endif %}"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
+                  />
+                </svg>
+              </button>
+            </div>
 
+            <!-- 행[2]: 급여 -->
+            <div class="mb-2">
+              <p class="text-blue-600 font-bold">
+                월급 {{ job.salary or '3,000,000원' }}
+              </p>
+            </div>
+
+            <!-- 행[3]: 카테고리, 지원하기 버튼 -->
+            <div class="flex items-center justify-between">
+              <div class="flex space-x-2">
+                <span
+                  class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
+                  >{{ job.recruitment_type or '정직원' }}</span
+                >
+                <span
+                  class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
+                  >{{ job.work_period or '상주직' }}</span
+                >
+              </div>
               {% if current_user.user_type == 1 and current_user.id ==
               job.author_id %}
               <button
-                class="bg-gray-400 text-white font-bold py-2 px-6 rounded-full cursor-not-allowed"
+                class="bg-gray-400 text-white font-bold py-2 px-4 rounded-full text-sm cursor-not-allowed"
                 disabled
               >
                 내 공고
               </button>
-              {% elif current_user.user_type == 0 %}
-              {% if status.applied %}
+              {% elif current_user.user_type == 0 %} {% if status.applied %}
               <button
-                class="bg-green-500 text-white font-bold py-2 px-6 rounded-full"
+                class="bg-green-500 text-white font-bold py-2 px-4 rounded-full text-sm"
                 onclick="event.stopPropagation(); goToChat({{ job.id }})"
               >
                 채팅하기
               </button>
               {% else %}
               <button
-                class="bg-blue-900 text-white font-bold py-2 px-6 rounded-full"
+                class="text-white font-bold py-2 px-4 rounded-full text-sm"
+                style="background-color: #023591"
                 onclick="event.stopPropagation(); applyJob({{ job.id }})"
               >
                 지원하기
               </button>
-              {% endif %} {% else %}
-              <button
-                class="bg-gray-400 text-white font-bold py-2 px-6 rounded-full cursor-not-allowed"
-                disabled
-              >
-                기업 회원 전용
-              </button>
-              {% endif %}
-            </div>
-
-            <div class="text-center text-xs text-gray-500 mt-3">
-              조회 {{ job.view_count }} | 찜 {{ job.bookmark_count }} | 지원 {{
-              job.application_count }}
+              {% endif %} {% endif %}
             </div>
           </div>
           {% endfor %} {% else %}
@@ -294,21 +365,43 @@
           {% endif %}
         </section>
 
-
-        {% if pagination and pagination.has_next %}
-        <div class="mt-6 text-center">
-          <button
-            id="load-more-btn"
-            data-next-page="{{ pagination.next_num }}"
-            data-total-pages="{{ pagination.pages }}"
-            class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg transition-colors"
+        <!-- 페이지네이션 -->
+        {% if pagination and pagination.pages > 1 %}
+        <div class="mt-6 flex justify-center items-center gap-3">
+          <!-- 이전 버튼 -->
+          {% if pagination.has_prev %}
+          <a
+            href="{{ url_for('company.company_list', page=pagination.prev_num, sort=current_sort, region1=current_filters.region_1depth_name, region2=current_filters.region_2depth_name, region3=current_filters.region_3depth_name) }}"
+            class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium"
           >
-            더 보기 ({{ pagination.next_num }} / {{ pagination.pages }})
-          </button>
+            이전
+          </a>
+          {% else %}
+          <span class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed font-medium">
+            이전
+          </span>
+          {% endif %}
+
+          <!-- 현재 페이지 / 총 페이지 -->
+          <div class="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg">
+            {{ pagination.page }} / {{ pagination.pages }}
+          </div>
+
+          <!-- 다음 버튼 -->
+          {% if pagination.has_next %}
+          <a
+            href="{{ url_for('company.company_list', page=pagination.next_num, sort=current_sort, region1=current_filters.region_1depth_name, region2=current_filters.region_2depth_name, region3=current_filters.region_3depth_name) }}"
+            class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium"
+          >
+            다음
+          </a>
+          {% else %}
+          <span class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed font-medium">
+            다음
+          </span>
+          {% endif %}
         </div>
         {% endif %}
-
-
       </main>
 
       <footer
@@ -382,323 +475,6 @@
       </footer>
     </div>
 
-    <script>
-
-      const filterModal = document.getElementById('filterModal');
-        const filterForm = document.getElementById('filterForm');
-
-        function toggleSortDropdown() {
-            const dropdown = document.getElementById("sortDropdown");
-            dropdown.classList.toggle("show");
-        }
-
-        function openFilterModal() { filterModal.classList.add('show'); }
-        function closeFilterModal() { filterModal.classList.remove('show'); }
-
-        // 정렬 순서 변경 함수
-        function changeSortOrder(sortBy) {
-            const currentUrl = new URL(window.location.href);
-            currentUrl.searchParams.set("sort", sortBy);
-            currentUrl.searchParams.set("page", 1);
-            window.location.href = currentUrl.toString();
-        }
-
-        // 필터 초기화 함수
-        function resetFilters() {
-            const currentUrl = new URL(window.location.href);
-            currentUrl.searchParams.delete('region1');
-            currentUrl.searchParams.delete('region2');
-            currentUrl.searchParams.delete('region3');
-            currentUrl.searchParams.delete('page'); // 페이지 리셋
-            window.location.href = currentUrl.pathname + '?' + currentUrl.searchParams.toString();
-        }
-
-        // 필터 적용 폼 제출 이벤트
-        filterForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const formData = new FormData(filterForm);
-            const currentUrl = new URL(window.location.href);
-            const params = currentUrl.searchParams;
-
-            // 지역 필터 파라미터 업데이트
-            ['region1', 'region2', 'region3'].forEach(key => {
-                const value = formData.get(key).trim();
-                if (value) {
-                    params.set(key, value);
-                } else {
-                    params.delete(key);
-                }
-            });
-
-            params.set("page", 1); // 필터 적용 시 1페이지로 리셋
-
-            window.location.href = currentUrl.pathname + '?' + params.toString();
-        });
-
-        // 외부 클릭 시 드롭다운 닫기 (기존 로직 유지)
-        document.addEventListener("click", function (event) {
-            const sortBtn = event.target.closest(".relative");
-            const dropdown = document.getElementById("sortDropdown");
-            const filterModalElement = document.getElementById("filterModal");
-
-            // 정렬 드롭다운 닫기
-            if (dropdown && !sortBtn && dropdown.classList.contains("show")) {
-                dropdown.classList.remove("show");
-            }
-            // 모달 외부 클릭 시 닫기 (단, 모달 콘텐츠 내부 클릭은 제외)
-            if (event.target === filterModalElement) {
-                closeFilterModal();
-            }
-        });
-
-
-      // 공고 지원하기 함수
-      async function applyJob(jobId) {
-        if (
-          !confirm(
-            "이 공고에 지원하시겠습니까?\n지원하면 자동으로 채팅방이 생성됩니다."
-          )
-        ) {
-          return;
-        }
-
-        try {
-          const response = await fetch(`/jobs/${jobId}/apply`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: "" }),
-          });
-
-          const data = await response.json();
-
-          if (data.success) {
-            alert(data.message);
-
-            // 채팅방으로 이동할지 묻기
-            if (data.chat_room_id && confirm("채팅방으로 이동하시겠습니까?")) {
-              window.location.href = `/chat/${data.chat_room_id}`;
-            } else {
-              // 페이지 새로고침하여 버튼 상태 업데이트
-              location.reload();
-            }
-          } else {
-            alert(data.message || "지원 중 오류가 발생했습니다.");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          alert("지원 중 오류가 발생했습니다.");
-        }
-      }
-
-      // 채팅방으로 이동하는 함수
-      async function goToChat(jobId) {
-        try {
-          // 해당 공고와 관련된 채팅방 찾기
-          const response = await fetch(`/chat/find-room/${jobId}`, {
-            method: "GET",
-          });
-
-          const data = await response.json();
-
-          if (data.success && data.room_id) {
-            window.location.href = `/chat/${data.room_id}`;
-          } else {
-            alert("채팅방을 찾을 수 없습니다.");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          alert("채팅방 이동 중 오류가 발생했습니다.");
-        }
-      }
-
-      // 정렬 드롭다운 토글
-      function toggleSortDropdown() {
-        const dropdown = document.getElementById("sortDropdown");
-        dropdown.classList.toggle("show");
-      }
-
-      // 정렬 순서 변경
-      function changeSortOrder(sortBy) {
-        const currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.set("sort", sortBy);
-        // 페이지네이션을 1페이지로 리셋
-        currentUrl.searchParams.set("page", 1);
-        window.location.href = currentUrl.toString();
-      }
-
-      // 외부 클릭 시 드롭다운 닫기
-      document.addEventListener("click", function (event) {
-        const sortBtn = event.target.closest(".relative");
-        const dropdown = document.getElementById("sortDropdown");
-        if (dropdown && !sortBtn && dropdown.classList.contains("show")) {
-          dropdown.classList.remove("show");
-        }
-      });
-
-
-      /**
-       * 공고 데이터를 기반으로 HTML 카드 문자열을 생성하는 함수
-       * 백엔드 company/jobs/json 엔드포인트의 JSON 응답에 맞게 작성되었습니다.
-       */
-      function createJobCardHTML(job, current_user_id, current_user_type) {
-
-        const isAuthor = current_user_id === job.author_id;
-        const isUser = current_user_type === 0;
-        const isCompany = current_user_type === 1;
-        const isApplied = job.is_applied;
-
-        let buttonHTML;
-
-        if (isCompany && isAuthor) {
-          // 본인이 작성한 기업 공고인 경우
-          buttonHTML = `
-            <button
-              class="bg-gray-400 text-white font-bold py-2 px-6 rounded-full cursor-not-allowed"
-              disabled
-            >
-              내 공고
-            </button>
-          `;
-        } else if (isUser) {
-          // 일반 사용자인 경우
-          if (isApplied) {
-            buttonHTML = `
-              <button
-                class="bg-green-500 text-white font-bold py-2 px-6 rounded-full"
-                onclick="event.stopPropagation(); goToChat(${job.id})"
-              >
-                채팅하기
-              </button>
-            `;
-          } else {
-            buttonHTML = `
-              <button
-                class="bg-blue-900 text-white font-bold py-2 px-6 rounded-full"
-                onclick="event.stopPropagation(); applyJob(${job.id})"
-              >
-                지원하기
-              </button>
-            `;
-          }
-        } else {
-          // 다른 기업 회원인 경우 (또는 권한 없는 사용자)
-          buttonHTML = `
-            <button
-              class="bg-gray-400 text-white font-bold py-2 px-6 rounded-full cursor-not-allowed"
-              disabled
-            >
-              기업 회원 전용
-            </button>
-          `;
-        }
-
-        const detailUrl = `{{ url_for('company.company_job_detail', job_id=0) }}`.replace('0', job.id);
-        const companyInitial = job.company ? job.company[0] : '기';
-
-        return `
-          <div
-            class="bg-white p-4 rounded-lg border cursor-pointer relative"
-            onclick="location.href='${detailUrl}'"
-          >
-            <div class="absolute top-3 right-3">
-              <span
-                class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full"
-              >
-                기업
-              </span>
-            </div>
-
-            <div class="flex items-start justify-between mb-4">
-              <div class="flex items-start">
-                <div
-                  class="w-10 h-10 bg-gray-200 rounded-full mr-3 flex-shrink-0 flex items-center justify-center text-gray-600 font-bold"
-                >
-                  ${companyInitial}
-                </div>
-                <div>
-                  <p class="text-sm text-gray-600">${job.company || ''}</p>
-                  <h3 class="font-bold text-lg">${job.title}</h3>
-                  <p class="text-blue-800 font-semibold">
-                    ${job.salary || '급여 협의'}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between mt-4">
-              <div class="flex space-x-2">
-                ${job.recruitment_type ? `<span class="bg-gray-200 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full">${job.recruitment_type}</span>` : ''}
-                ${job.work_period ? `<span class="bg-gray-200 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full">${job.work_period}</span>` : ''}
-              </div>
-
-              ${buttonHTML}
-            </div>
-
-            <div class="text-center text-xs text-gray-500 mt-3">
-              조회 ${job.view_count} | 찜 ${job.bookmark_count} | 지원 ${job.application_count}
-            </div>
-          </div>
-        `;
-      }
-
-      // 더 보기 기능 (JSON API 사용)
-      document.addEventListener("DOMContentLoaded", function () {
-        const loadMoreBtn = document.getElementById("load-more-btn");
-        const jobListSection = document.getElementById("job-list-section");
-
-        if (loadMoreBtn) {
-          loadMoreBtn.addEventListener("click", async function () {
-            const nextPage = loadMoreBtn.getAttribute("data-next-page");
-            const totalPages = loadMoreBtn.getAttribute("data-total-pages");
-
-            // JSON API URL 구성
-            // /company/jobs/json 엔드포인트를 사용합니다.
-            const url = new URL('{{ url_for('company.company_jobs_json') }}', window.location.origin);
-            const currentSearchParams = new URLSearchParams(window.location.search);
-
-            // 정렬 조건 유지
-            const currentSort = currentSearchParams.get("sort") || 'latest';
-            url.searchParams.set("sort", currentSort);
-            url.searchParams.set("page", nextPage);
-
-            // 로딩 상태 표시
-            loadMoreBtn.innerText = "로딩 중...";
-            loadMoreBtn.disabled = true;
-
-            try {
-              const response = await fetch(url.toString());
-              const data = await response.json(); // JSON 응답 파싱
-
-              if (data.success) {
-                // 1. 새 공고 항목들을 현재 목록에 추가
-                data.jobs.forEach(job => {
-                  const jobCardHTML = createJobCardHTML(job, data.current_user_id, data.current_user_type);
-                  jobListSection.insertAdjacentHTML('beforeend', jobCardHTML);
-                });
-
-                // 2. '더 보기' 버튼 상태 업데이트
-                if (data.has_next) {
-                  loadMoreBtn.setAttribute("data-next-page", data.next_num);
-                  loadMoreBtn.innerText = `더 보기 (${data.next_num} / ${totalPages})`;
-                  loadMoreBtn.disabled = false;
-                } else {
-                  // 다음 페이지가 없으면 버튼 제거
-                  loadMoreBtn.remove();
-                }
-              } else {
-                alert("공고 로드에 실패했습니다: " + data.message);
-              }
-            } catch (error) {
-              console.error("공고 로드 중 오류 발생:", error);
-              alert("공고 로드에 실패했습니다.");
-              // 에러 발생 시 버튼을 다시 활성화
-              loadMoreBtn.innerText = `더 보기 (${nextPage} / ${totalPages})`;
-              loadMoreBtn.disabled = false;
-            }
-          });
-        }
-      });
-    </script>
+    <script src="{{ url_for('static', filename='js/company_list.js') }}"></script>
   </body>
 </html>

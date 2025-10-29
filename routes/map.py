@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template,current_app, request, jsonify
-from flask_login import login_required
-from models import db, JobPost
+from flask_login import login_required, current_user
+from models import db, JobPost, JobBookmark, JobApplication
 import requests
 from services.job_service import JobService
 
@@ -45,14 +45,37 @@ def jobs_all():
     
     jobs = query.all()
 
+    # 현재 사용자의 북마크와 지원 정보 조회
+    user_bookmarks = set()
+    user_applications = set()
+    
+    if current_user.is_authenticated:
+        bookmarks = JobBookmark.query.filter_by(user_id=current_user.id).all()
+        user_bookmarks = {b.job_id for b in bookmarks}
+        
+        applications = JobApplication.query.filter_by(user_id=current_user.id).all()
+        user_applications = {a.job_id for a in applications}
+
     job_locations = [
         {
+            'id': job.id,
             'title': job.title, 
             'lat': job.latitude, 
             'company': job.company,
             'salary': job.salary, 
             'lng': job.longitude,
-            'type': 'company' if (job.job_category or job.source) else 'people'
+            'type': 'company' if (job.job_category or job.source) else 'people',
+            'created_at': job.created_at.isoformat() if job.created_at else None,
+            'recruitment_end_date': job.recruitment_end_date.isoformat() if job.recruitment_end_date else None,
+            'recruitment_type': job.recruitment_type,
+            'work_period': job.work_period,
+            'author': {
+                'user_type': job.author.user_type if job.author else None,
+                'nickname': job.author.nickname if job.author else None,
+                'id': job.author.id if job.author else None
+            } if job.author else None,
+            'bookmarked': job.id in user_bookmarks,
+            'applied': job.id in user_applications
         }
         for job in jobs
     ]

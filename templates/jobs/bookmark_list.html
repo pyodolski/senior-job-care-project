@@ -9,18 +9,10 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <style>
-      /* 사용자 정의 폰트 및 스타일 */
-      body {
-        font-family: "Noto Sans KR", sans-serif;
-      }
-      .sort-dropdown {
-        display: none;
-      }
-      .sort-dropdown.show {
-        display: block;
-      }
-    </style>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/bookmark.css') }}"
+    />
   </head>
   <body class="bg-gray-100">
     <div class="w-full bg-white shadow-lg min-h-screen">
@@ -96,7 +88,11 @@
                   clip-rule="evenodd"
                 />
               </svg>
-              <span class="text-lg font-medium">경상북도 경산시 조영동</span>
+              <span class="text-lg font-medium">
+                {% if current_user.sido %} {{ current_user.sido }} {{
+                current_user.sigungu }} {{ current_user.dong }} {% else %}
+                주소를 설정해주세요 {% endif %}
+              </span>
             </div>
             <svg
               class="w-4 h-4 text-gray-400"
@@ -210,54 +206,87 @@
           set job = job_data.job %} {% set status = job_data.application_status
           %}
           <div
-            class="bg-white p-4 rounded-lg border cursor-pointer"
-            onclick="location.href='{{ url_for('jobs.job_detail', job_id=job.id) }}'"
+            class="bg-white rounded-2xl p-4 shadow-sm border mb-3 cursor-pointer"
+            onclick="location.href='{% if job.author.user_type == 1 %}{{ url_for('company.company_job_detail', job_id=job.id) }}{% else %}{{ url_for('jobs.job_detail', job_id=job.id) }}{% endif %}'"
           >
-            <!-- 첫 번째 줄: 프로필 아이콘 - 회사명 - 마감 기한 -->
-            <div class="flex items-start justify-between mb-1">
-              <div class="flex items-start">
+            <!-- 행[0]: 프로필사진, 회사명/작성자명, 마감일 -->
+            <div class="flex items-center justify-between mb-1">
+              <div class="flex items-center gap-2">
                 <div
-                  class="w-10 h-10 bg-gray-200 rounded-full mr-3 flex-shrink-0"
-                ></div>
-                <p class="text-sm text-gray-600 mt-2">
-                  {% if job.author.user_type == 1 %}
-                    {{ job.company }}
-                  {% else %}
-                    {{ job.author.nickname or '익명' }}
-                  {% endif %}
+                  class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-sm font-bold"
+                >
+                  {% if job.author.user_type == 1 %} {{ job.company[0] if
+                  job.company else '기' }} {% else %} {{ job.author.nickname[0]
+                  if job.author.nickname else '사' }} {% endif %}
+                </div>
+                <p class="text-sm text-gray-600">
+                  {% if job.author.user_type == 1 %} {{ job.company }} {% else
+                  %} {{ job.author.nickname or '익명' }} {% endif %}
                 </p>
               </div>
-              <p class="text-xs text-gray-400">
-                {% if job.deadline %}~{{ job.deadline.strftime('%m/%d (%a)') }}{% else %}-10/4 (금){% endif %}
+              <p class="text-xs text-gray-500">
+                {% if job.author.user_type == 1 %} ~{{
+                job.created_at.strftime('%m/%d') }} ({% set day_map = {'Mon':
+                '월', 'Tue': '화', 'Wed': '수', 'Thu': '목', 'Fri': '금', 'Sat':
+                '토', 'Sun': '일'} %}{{ day_map[job.created_at.strftime('%a')]
+                }}) {% else %} {{ job.created_at|time_ago }} {% endif %}
               </p>
             </div>
 
-            <!-- 두 번째 줄: 공고 제목 - 즐겨찾기 아이콘 -->
-            <div class="flex items-start justify-between mb-1">
-              <h3 class="font-bold text-lg flex-1">{{ job.title }}</h3>
-              <button class="ml-2" onclick="event.stopPropagation();">
-                <svg class="w-6 h-6 text-red-500" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+            <!-- 행[1]: 공고명, 하트 버튼 -->
+            <div class="flex items-center justify-between mb-1">
+              <h3 class="font-bold text-lg">{{ job.title }}</h3>
+              <button
+                class="text-red-500 hover:text-red-500"
+                onclick="event.stopPropagation(); toggleBookmarkInList({{ job.id }}, this);"
+              >
+                <svg
+                  class="w-6 h-6"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
+                  />
                 </svg>
               </button>
             </div>
 
-            <!-- 세 번째 줄: 급여 -->
-            <p class="text-blue-900 font-bold text-base mb-2">
-              {% if job.salary %}월급 {{ job.salary }}{% else %}급여 협의{% endif %}
-            </p>
+            <!-- 행[2]: 급여 -->
+            <div class="mb-2">
+              <p class="text-blue-600 font-bold">
+                {% if job.author.user_type == 1 %} 월급 {{ job.salary or
+                '3,000,000원' }} {% else %} {{ job.salary or '50,000원' }} {%
+                endif %}
+              </p>
+            </div>
 
-            <!-- 네 번째 줄: 카테고리 - 지원하기 버튼 -->
+            <!-- 행[3]: 카테고리, 지원하기 버튼 -->
             <div class="flex items-center justify-between">
               <div class="flex space-x-2">
-                {% if job.recruitment_type %}<span
-                  class="bg-gray-200 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full"
-                  >{{ job.recruitment_type }}</span
-                >{% endif %}
-                {% if job.work_period %}<span
-                  class="bg-gray-200 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full"
-                  >{{ job.work_period }}</span
-                >{% endif %}
+                {% if job.author.user_type == 1 %}
+                <span
+                  class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
+                  >{{ job.recruitment_type or '정직원' }}</span
+                >
+                <span
+                  class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
+                  >{{ job.work_period or '상주직' }}</span
+                >
+                {% else %}
+                <span
+                  class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
+                  >오늘</span
+                >
+                <span
+                  class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
+                  >{{ job.work_period or '시간대별' }}</span
+                >
+                {% endif %}
               </div>
               {% if current_user.id == job.author_id %}
               <button
@@ -371,113 +400,6 @@
       </footer>
     </div>
 
-    <script>
-      let currentCategory = "people"; // 기본값: 사람 이음
-
-      // 페이지 로드시 초기 카테고리 활성화
-      document.addEventListener("DOMContentLoaded", function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const category = urlParams.get("category") || "people";
-        currentCategory = category;
-        updateActiveTab(category);
-      });
-
-      function updateActiveTab(category) {
-        const tabs = document.querySelectorAll(".bookmark-tab");
-
-        tabs.forEach((tab, index) => {
-          if (tab.dataset.category === category) {
-            tab.classList.add("bg-blue-900", "text-white");
-            tab.classList.remove("bg-gray-200", "text-gray-500");
-            // 선택된 탭은 하단 패딩을 4px 더 줘서 파란색 선을 덮음
-            tab.style.paddingBottom = "16px";
-          } else {
-            tab.classList.add("bg-gray-200", "text-gray-500");
-            tab.classList.remove("bg-blue-900", "text-white");
-            // 선택되지 않은 탭은 하단 패딩을 줄여서 파란색 선이 보이게 함
-            tab.style.paddingBottom = "12px";
-          }
-        });
-      }
-
-      function changeBookmarkCategory(category) {
-        currentCategory = category;
-        const currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.set("category", category);
-        window.location.href = currentUrl.toString();
-      }
-
-      // 공고 지원하기 함수
-      async function applyJob(jobId) {
-        if (
-          !confirm(
-            "이 공고에 지원하시겠습니까?\n지원하면 자동으로 채팅방이 생성됩니다."
-          )
-        ) {
-          return;
-        }
-        try {
-          const response = await fetch(`/jobs/${jobId}/apply`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: "" }),
-          });
-          const data = await response.json();
-          if (data.success) {
-            alert(data.message);
-            if (data.chat_room_id && confirm("채팅방으로 이동하시겠습니까?")) {
-              window.location.href = `/chat/${data.chat_room_id}`;
-            } else {
-              location.reload();
-            }
-          } else {
-            alert(data.message || "지원 중 오류가 발생했습니다.");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          alert("지원 중 오류가 발생했습니다.");
-        }
-      }
-
-      // 채팅방으로 이동하는 함수
-      async function goToChat(jobId) {
-        try {
-          const response = await fetch(`/chat/find-room/${jobId}`, {
-            method: "GET",
-          });
-          const data = await response.json();
-          if (data.success && data.room_id) {
-            window.location.href = `/chat/${data.room_id}`;
-          } else {
-            alert("채팅방을 찾을 수 없습니다.");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          alert("채팅방 이동 중 오류가 발생했습니다.");
-        }
-      }
-
-      // 정렬 드롭다운 토글
-      function toggleSortDropdown() {
-        const dropdown = document.getElementById("sortDropdown");
-        dropdown.classList.toggle("show");
-      }
-
-      // 정렬 순서 변경
-      function changeSortOrder(sortBy) {
-        const currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.set("sort", sortBy);
-        window.location.href = currentUrl.toString();
-      }
-
-      // 외부 클릭 시 드롭다운 닫기
-      document.addEventListener("click", function (event) {
-        const sortBtn = event.target.closest(".relative");
-        const dropdown = document.getElementById("sortDropdown");
-        if (dropdown && !sortBtn && dropdown.classList.contains("show")) {
-          dropdown.classList.remove("show");
-        }
-      });
-    </script>
+    <script src="{{ url_for('static', filename='js/bookmark.js') }}"></script>
   </body>
 </html>

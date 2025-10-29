@@ -39,7 +39,7 @@ def job_list():
     - 전체 공고 목록 조회
     - 검색어로 공고 검색 (제목, 회사명, 설명 검색)
     - 지역, 모집형태, 근무기간으로 필터링
-    - 페이지네이션 지원 (기본 20개씩)
+    - 페이지네이션 지원 (기본 10개씩)
 
     URL: GET /jobs
     템플릿: jobs/job_list.html
@@ -49,11 +49,17 @@ def job_list():
     - region: 지역 필터 (선택)
     - recruitment_type: 모집형태 필터 (선택)
     - work_period: 근무기간 필터 (선택)
+    - page: 페이지 번호 (선택, 기본값: 1)
 
     반환값:
     - jobs: 공고 목록
     - current_region: 현재 선택된 지역
+    - pagination: 페이지네이션 정보
     """
+
+    # 페이지네이션 설정
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
 
     # URL 쿼리 파라미터에서 검색 및 필터 조건 추출
     query = request.args.get('q', '')  # 검색어
@@ -70,14 +76,15 @@ def job_list():
 
     # LIKE 검색 조건 (부분 일치용)
     conditions = []
-    if request.args.get('region1'):
-        region1 = request.args.get('region1')
+    region1 = request.args.get('region1')
+    region2 = request.args.get('region2')
+    region3 = request.args.get('region3')
+
+    if region1:
         conditions.append(JobPost.region_1depth_name.like(f"{region1}%"))
-    if request.args.get('region2'):
-        region2 = request.args.get('region2')
+    if region2:
         conditions.append(JobPost.region_2depth_name.like(f"{region2}%"))
-    if request.args.get('region3'):
-        region3 = request.args.get('region3')
+    if region3:
         conditions.append(JobPost.region_3depth_name.like(f"{region3}%"))
 
     # 사람이음 공고만 필터링 (job_category가 없는 공고)
@@ -86,12 +93,13 @@ def job_list():
         conditions.append(people_condition)
     else:
         conditions = [people_condition]
-    
+
     # 검색어나 필터가 있으면 검색 실행, 없으면 전체 목록 조회
     if query or filters or len(conditions) > 1:  # people_condition 외에 다른 조건이 있으면
         jobs = JobService.search_jobs(query, filters, conditions, sort_by)
+        jobs_pagination = None  # search_jobs는 페이지네이션을 반환하지 않음
     else:
-        jobs_pagination = JobService.get_all_jobs(page=1, per_page=20, sort_by=sort_by, conditions=conditions)
+        jobs_pagination = JobService.get_all_jobs(page=page, per_page=per_page, sort_by=sort_by, conditions=conditions)
         jobs = jobs_pagination.items
 
     # 각 공고의 지원 상태 및 북마크 상태 확인
@@ -111,10 +119,14 @@ def job_list():
     current_filters = filters.copy()
     current_filters['q'] = query
     current_filters['sort'] = sort_by
+    current_filters['region_1depth_name'] = region1
+    current_filters['region_2depth_name'] = region2
+    current_filters['region_3depth_name'] = region3
 
     return render_template("jobs/job_list.html",
                            jobs_with_status=jobs_with_status,
-                           current_filters=current_filters
+                           current_filters=current_filters,
+                           pagination=jobs_pagination
                            )
 
 
@@ -548,6 +560,7 @@ def toggle_bookmark(job_id):
         if request.headers.get('Content-Type') == 'application/json':
             return jsonify({
                 'success': True,
+                'bookmarked': is_bookmarked,
                 'is_bookmarked': is_bookmarked,
                 'bookmark_count': job.bookmark_count,
                 'message': message

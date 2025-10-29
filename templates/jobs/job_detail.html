@@ -270,73 +270,106 @@
           </h3>
           <div class="space-y-3">
             {% for related_job in related_jobs %}
-            <a
-              href="{{ url_for('jobs.job_detail', job_id=related_job.id) }}"
-              class="block bg-white rounded-xl p-4 border border-gray-200 hover:shadow-md transition-shadow relative"
+            <div
+              class="bg-white rounded-2xl p-4 shadow-sm border cursor-pointer"
+              onclick="location.href='{{ url_for('jobs.job_detail', job_id=related_job.id) }}'"
             >
-              <div class="flex items-start justify-between mb-2">
-                <h4 class="font-bold text-gray-900 flex-1 pr-2">
-                  {{ related_job.title }}
-                </h4>
+              <!-- 행[0]: 프로필사진, 작성자명, 시간 -->
+              <div class="flex items-center justify-between mb-1">
                 <div class="flex items-center gap-2">
-                  {% if related_job.salary %}
-                  <span
-                    class="text-blue-600 font-semibold text-sm whitespace-nowrap"
+                  <div
+                    class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-sm font-bold"
                   >
-                    {{ related_job.salary }}
-                  </span>
-                  {% endif %}
-                  <!-- 즐겨찾기 버튼 -->
-                  <button
-                    onclick="toggleRelatedBookmark(event, {{ related_job.id }})"
-                    class="related-bookmark-btn-{{ related_job.id }} p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-                    data-job-id="{{ related_job.id }}"
-                  >
-                    <svg
-                      class="w-5 h-5 transition-colors {% if related_bookmarks.get(related_job.id) %}text-red-500{% else %}text-gray-400{% endif %}"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                  </button>
+                    {{ related_job.author.nickname[0] if related_job.author and
+                    related_job.author.nickname else '사' }}
+                  </div>
+                  <p class="text-sm text-gray-600">
+                    {{ related_job.author.nickname if related_job.author else
+                    '익명' }}
+                  </p>
                 </div>
+                <p class="text-xs text-gray-500">
+                  {{ related_job.created_at|time_ago }}
+                </p>
               </div>
-              <p class="text-sm text-gray-600 mb-2">
-                {{ related_job.company }}
-              </p>
-              <div class="flex flex-wrap gap-2 mb-2">
-                {% if related_job.people_category %}
-                <span
-                  class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full"
+
+              <!-- 행[1]: 공고명, 하트 버튼 -->
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="font-bold text-lg">{{ related_job.title }}</h3>
+                <button
+                  class="{% if related_bookmarks.get(related_job.id) %}text-red-500{% else %}text-gray-400{% endif %} hover:text-red-500"
+                  onclick="event.stopPropagation(); toggleRelatedBookmark(event, {{ related_job.id }})"
+                  data-job-id="{{ related_job.id }}"
                 >
-                  {{ related_job.people_category }}
-                </span>
-                {% endif %} {% if related_job.work_period %}
-                <span
-                  class="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-full"
-                >
-                  {{ related_job.work_period }}
-                </span>
-                {% endif %} {% if related_job.region %}
-                <span
-                  class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full"
-                >
-                  📍 {{ related_job.region }}
-                </span>
-                {% endif %}
+                  <svg
+                    class="w-6 h-6"
+                    fill="{% if related_bookmarks.get(related_job.id) %}currentColor{% else %}none{% endif %}"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
+                    />
+                  </svg>
+                </button>
               </div>
-              <div class="flex gap-3 text-xs text-gray-400">
-                <span>조회 {{ related_job.view_count }}</span>
-                <span>•</span>
-                <span>찜 {{ related_job.bookmark_count }}</span>
+
+              <!-- 행[2]: 급여 -->
+              <div class="mb-2">
+                <p class="text-blue-600 font-bold">
+                  {{ related_job.salary or '50,000원' }}
+                </p>
               </div>
-            </a>
+
+              <!-- 행[3]: 카테고리, 지원하기 버튼 -->
+              <div class="flex items-center justify-between">
+                <div class="flex space-x-2">
+                  <span
+                    class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
+                    >오늘</span
+                  >
+                  <span
+                    class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
+                    >{{ related_job.work_period or '시간대별' }}</span
+                  >
+                </div>
+                {% if current_user.is_authenticated and current_user.user_type
+                == 0 %} {% if current_user.id == related_job.author_id %}
+                <button
+                  class="bg-gray-400 text-white font-bold py-2 px-4 rounded-full text-sm cursor-not-allowed"
+                  disabled
+                  onclick="event.stopPropagation();"
+                >
+                  내 공고
+                </button>
+                {% else %}
+                <button
+                  class="text-white font-bold py-2 px-4 rounded-full text-sm"
+                  style="background-color: #023591"
+                  onclick="event.stopPropagation(); applyJob({{ related_job.id }})"
+                >
+                  지원하기
+                </button>
+                {% endif %} {% endif %}
+              </div>
+            </div>
             {% endfor %}
+          </div>
+
+          <!-- 더 많은 공고 보기 링크 -->
+          <div
+            class="text-center mt-4 pb-2"
+            style="box-shadow: 0 4px 6px -4px rgba(0, 0, 0, 0.25)"
+          >
+            <a
+              href="{{ url_for('jobs.job_list') }}"
+              class="text-gray-600 text-base font-medium inline-block py-1"
+            >
+              더 많은 공고 보기 →
+            </a>
           </div>
         </div>
         {% endif %}
