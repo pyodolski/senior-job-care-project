@@ -1,0 +1,320 @@
+/* 지도 페이지 스타일 */
+
+/* 사용자 정의 폰트 및 스타일 */
+body {
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+.laundry-gothic {
+  font-family: "LaundryGothic", "Noto Sans KR", sans-serif;
+}
+
+/* 지도 관련 스타일 */
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+.info-window {
+  padding: 16px;
+  width: 280px;
+  text-align: left;
+  line-height: 1.6;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.info-window .title {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: #1a1a1a;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.info-window .details {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.info-window .details strong {
+  color: #333;
+  font-weight: 600;
+  min-width: 50px;
+  margin-right: 8px;
+}
+
+.info-window .salary {
+  color: #023591;
+  font-weight: 600;
+}
+
+.info-window button {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 0;
+  background: linear-gradient(135deg, #023591 0%, #2d71eb 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(2, 53, 145, 0.3);
+}
+
+.info-window button:hover {
+  background: linear-gradient(135deg, #012a6e 0%, #1d4ed8 100%);
+  box-shadow: 0 4px 12px rgba(2, 53, 145, 0.4);
+  transform: translateY(-1px);
+}
+
+.info-window button:active {
+  transform: translateY(0);
+}
+
+/* 현재 위치 마커 애니메이션 */
+.current-location-marker {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 필터 버튼 스타일 */
+.filter-btn {
+  background-color: white;
+  color: #6b7280;
+  border: 2px solid #e5e7eb;
+  cursor: pointer;
+  flex-shrink: 0;
+  min-width: fit-content;
+}
+
+.filter-btn:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.filter-btn.active {
+  background-color: #023591;
+  color: white;
+  border-color: #023591;
+}
+
+/* 작은 화면에서 필터 버튼 크기 조정 */
+@media (max-width: 375px) {
+  .filter-btn {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+}
+
+/* 매우 작은 화면에서 필터 버튼 추가 조정 */
+@media (max-width: 320px) {
+  .filter-btn {
+    font-size: 10px;
+    padding: 5px 8px;
+  }
+}
+
+/* 클러스터 마커 스타일 */
+.cluster-marker {
+  background-color: #023591;
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 3px solid white;
+}
+
+.cluster-marker.small {
+  width: 40px;
+  height: 40px;
+  font-size: 12px;
+}
+
+.cluster-marker.medium {
+  width: 50px;
+  height: 50px;
+  font-size: 14px;
+  background-color: #2d71eb;
+}
+
+.cluster-marker.large {
+  width: 60px;
+  height: 60px;
+  font-size: 16px;
+  background-color: #1d4ed8;
+}
+
+/* 얼굴 토글 스위치 스타일 */
+:root {
+  --toggle-bg: #ffffff;
+  --face-color: #64748b;
+}
+
+body.toggle-active {
+  --toggle-bg: #c1e1c1;
+  --face-color: #4a5568;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggle-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1e3a8a;
+  transition: color 0.3s;
+}
+
+.toggle-container.active .toggle-text {
+  color: #059669;
+}
+
+/* 복잡한 토글 애니메이션 */
+#face-toggle:checked + label .toggle-handle {
+  transform: translateX(24px);
+}
+
+#face-toggle:checked + label .roller {
+  transform: rotate(360deg);
+}
+
+#face-toggle:checked + label .face-front {
+  opacity: 0;
+  transition: opacity 0.1s linear 0.5s;
+}
+
+#face-toggle:checked + label .face-back {
+  opacity: 1;
+  transition: opacity 0.1s linear 0.5s;
+}
+
+/* 얼굴 표정 세부사항 */
+.face-front .eye {
+  width: 3px;
+  height: 2px;
+  top: 10px;
+}
+
+.face-front .eye.left {
+  left: 6px;
+}
+
+.face-front .eye.right {
+  right: 6px;
+}
+
+.face-front .mouth {
+  width: 3.5px;
+  height: 3px;
+  bottom: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.face-back .eye {
+  width: 2.5px;
+  height: 2.5px;
+  top: 10px;
+}
+
+.face-back .eye.left {
+  left: 6.5px;
+}
+
+.face-back .eye.right {
+  right: 6.5px;
+}
+
+.face-back .mouth {
+  width: 3.5px;
+  height: 3px;
+  bottom: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-bottom: 1px solid var(--face-color);
+  border-radius: 50%;
+  position: absolute;
+}
+
+/* 하단 공고 목록 패널 */
+.job-list-panel {
+  position: fixed;
+  bottom: 65px;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  max-height: 30vh;
+  transition: max-height 0.3s ease;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+}
+
+.job-list-panel.expanded {
+  max-height: 70vh;
+}
+
+.drag-handle {
+  padding: 12px 0 8px 0;
+  display: flex;
+  justify-content: center;
+  cursor: grab;
+  pointer-events: auto;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-bar {
+  width: 40px;
+  height: 4px;
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+.job-list-content {
+  overflow-y: auto;
+  flex: 1;
+  padding: 0 16px 16px 16px;
+  pointer-events: auto;
+}
+
+/* 공고 카드 스타일은 Tailwind CSS로 처리 */

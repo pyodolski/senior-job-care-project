@@ -188,9 +188,17 @@ class ApplicationService:
             job_id: 공고 ID
             
         Returns:
-            dict: 지원 상태 정보
+            dict: 지원 상태 정보 (찜 상태 포함)
         """
+        from models import JobBookmark
+        
         application = JobApplication.query.filter_by(
+            user_id=user_id,
+            job_id=job_id
+        ).first()
+        
+        # 찜 상태 확인
+        bookmark = JobBookmark.query.filter_by(
             user_id=user_id,
             job_id=job_id
         ).first()
@@ -198,12 +206,14 @@ class ApplicationService:
         if not application:
             return {
                 'applied': False,
-                'status': None
+                'status': None,
+                'bookmarked': bookmark is not None
             }
         
         return {
             'applied': True,
             'status': application.status,
             'application_id': application.id,
-            'applied_at': application.created_at
+            'applied_at': application.created_at,
+            'bookmarked': bookmark is not None
         }

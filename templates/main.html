@@ -9,115 +9,10 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <style>
-      /* 폰트 로드 */
-      @font-face {
-        font-family: "LotteriaChwapttaenggyeo";
-        src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/LOTTERIACHAB.woff2")
-          format("woff2");
-        font-weight: normal;
-        font-display: swap;
-      }
-
-      /* 사용자 정의 폰트 및 스타일 */
-      body {
-        font-family: "Noto Sans KR", sans-serif;
-      }
-      .laundry-gothic {
-        font-family: "LaundryGothic", "Noto Sans KR", sans-serif; /* 'LaundryGothic' 폰트가 없을 경우 Noto Sans KR로 대체 */
-      }
-      /* 얼굴 토글 스위치 스타일 */
-      :root {
-        --toggle-bg: #ffffff;
-        --face-color: #64748b;
-      }
-
-      body.toggle-active {
-        --toggle-bg: #c1e1c1;
-        --face-color: #4a5568;
-      }
-
-      .toggle-container {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .toggle-text {
-        font-family: "LotteriaChwapttaenggyeo", "Noto Sans KR", sans-serif;
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #1e3a8a;
-        transition: color 0.3s;
-      }
-
-      .toggle-container.active .toggle-text {
-        color: #059669;
-      }
-
-      /* 복잡한 토글 애니메이션 */
-      #face-toggle:checked + label .toggle-handle {
-        transform: translateX(24px);
-      }
-
-      #face-toggle:checked + label .roller {
-        transform: rotate(360deg);
-      }
-
-      #face-toggle:checked + label .face-front {
-        opacity: 0;
-        transition: opacity 0.1s linear 0.5s;
-      }
-
-      #face-toggle:checked + label .face-back {
-        opacity: 1;
-        transition: opacity 0.1s linear 0.5s;
-      }
-
-      /* 얼굴 표정 세부사항 */
-      .face-front .eye {
-        width: 3px;
-        height: 2px;
-        top: 10px;
-      }
-      .face-front .eye.left {
-        left: 6px;
-      }
-      .face-front .eye.right {
-        right: 6px;
-      }
-
-      .face-front .mouth {
-        width: 3.5px;
-        height: 3px;
-        bottom: 7px;
-        left: 50%;
-        transform: translateX(-50%);
-      }
-
-      .face-back .eye {
-        width: 2.5px;
-        height: 2.5px;
-        top: 10px;
-      }
-      .face-back .eye.left {
-        left: 6.5px;
-      }
-      .face-back .eye.right {
-        right: 6.5px;
-      }
-
-      .face-back .mouth {
-        width: 3.5px;
-        height: 3px;
-        bottom: 7px;
-        left: 50%;
-        transform: translateX(-50%);
-        border-bottom: 1px solid var(--face-color);
-        border-radius: 50%;
-        position: absolute;
-      }
-    </style>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
   </head>
   <body class="bg-gray-50">
     <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto">
@@ -213,12 +108,12 @@
         <nav class="flex border-b">
           <a
             href="#"
-            class="flex-1 text-center py-3 border-b-4 border-blue-900 text-blue-900 font-bold"
+            class="flex-1 text-center py-3 border-b-4 border-blue-900 text-blue-900 font-bold text-lg"
             >나의 이음</a
           >
           <a
             href="{{ url_for('company.company_list') }}"
-            class="flex-1 text-center py-3 text-gray-500"
+            class="flex-1 text-center py-3 text-gray-500 text-lg"
             >기업 이음</a
           >
           <!-- 로그인한 유저의 타입에 따라 '사람 이음' 링크를 다르게 표시 -->
@@ -226,14 +121,14 @@
           <!-- 기업 회원(user_type=1)일 경우: 공개 이력서 목록으로 링크 -->
           <a
             href="{{ url_for('resumes.resume_list') }}"
-            class="flex-1 text-center py-3 text-gray-500"
+            class="flex-1 text-center py-3 text-gray-500 text-lg"
             >이력서 쪽</a
           >
           {% else %}
           <!-- 일반 회원이거나 비로그인 상태일 경우: 구인글 목록으로 링크 -->
           <a
             href="{{ url_for('jobs.job_list') }}"
-            class="flex-1 text-center py-3 text-gray-500"
+            class="flex-1 text-center py-3 text-gray-500 text-lg"
             >사람 이음</a
           >
           {% endif %}
@@ -290,7 +185,7 @@
             <!-- 이력서 검색 -->
             <a
               href="{{ url_for('resumes.resume_list') }}"
-              class="rounded-2xl p-4 text-white flex items-center"
+              class="rounded-2xl py-2 px-3 text-white flex items-center"
               style="background-color: #023591"
             >
               <div
@@ -308,7 +203,7 @@
             <!-- 기업 공고 작성 -->
             <a
               href="{{ url_for('jobs.create_company_job') }}"
-              class="rounded-2xl p-4 text-white flex items-center"
+              class="rounded-2xl py-2 px-3 text-white flex items-center"
               style="background-color: #2d71eb"
             >
               <div
@@ -326,7 +221,7 @@
             <!-- 기업 공고 검색 -->
             <a
               href="{{ url_for('company.company_list') }}"
-              class="rounded-2xl p-4 text-white flex items-center"
+              class="rounded-2xl py-2 px-3 text-white flex items-center"
               style="background-color: #2d71eb"
             >
               <div
@@ -346,7 +241,7 @@
             <!-- 이력서 작성 -->
             <a
               href="{{ url_for('auth.profile') }}"
-              class="rounded-2xl p-4 text-white flex items-center"
+              class="rounded-2xl py-2 px-3 text-white flex items-center"
               style="background-color: #023591"
             >
               <div
@@ -364,7 +259,7 @@
             <!-- 구인글 작성 -->
             <a
               href="{{ url_for('jobs.create_job') }}"
-              class="rounded-2xl p-4 text-white flex items-center"
+              class="rounded-2xl py-2 px-3 text-white flex items-center"
               style="background-color: #2d71eb"
             >
               <div
@@ -382,7 +277,7 @@
             <!-- 공고 검색 -->
             <a
               href="{{ url_for('jobs.job_list') }}"
-              class="rounded-2xl p-4 text-white flex items-center"
+              class="rounded-2xl py-2 px-3 text-white flex items-center"
               style="background-color: #2d71eb"
             >
               <div
@@ -401,7 +296,7 @@
             <!-- 이음 뉴스 (공통) -->
             <a
               href="{{ url_for('news.news_list') }}"
-              class="rounded-2xl p-4 text-white flex items-center"
+              class="rounded-2xl py-2 px-3 text-white flex items-center"
               style="background-color: #023591"
             >
               <div
@@ -446,66 +341,80 @@
         <section class="mb-8">
           <div class="flex items-center mb-1">
             <span
-              class="bg-blue-100 text-blue-800 text-sm font-bold px-3 py-1 rounded-full mr-3"
+              class="bg-transparent text-blue-800 text-sm font-bold px-3 py-1 rounded-full mr-3 border-2 border-blue-800"
               >AI 추천</span
             >
           </div>
           <div class="mb-2">
-            <span class="text-red-500 text-lg mr-2">📌</span>
-            <span class="font-bold text-gray-800"
+            <span class="text-red-500 text-2xl mr-2">📌</span>
+            <span class="font-bold text-gray-800 text-xl"
               >{{ user.nickname }}님이 찾으실만한 공고예요!</span
             >
           </div>
-          <div class="bg-white rounded-2xl p-4 shadow-sm border">
-            <div class="flex items-center mb-3"></div>
+          <div>
             {% if company_jobs %} {% for job_data in company_jobs[:2] %} {% set
             job = job_data.job %} {% set status = job_data.application_status %}
             <div
-              class="border-b border-gray-100 pb-4 mb-4 last:border-b-0 last:pb-0 last:mb-0 cursor-pointer"
+              class="bg-white rounded-2xl p-4 shadow-sm border mb-3 cursor-pointer"
               onclick="location.href='{{ url_for('company.company_job_detail', job_id=job.id) }}'"
             >
-              <div class="flex items-start justify-between mb-2">
-                <div class="flex items-start">
+              <!-- 행[0]: 프로필사진, 회사명, 마감일, 요일 -->
+              <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-2">
                   <div
-                    class="w-8 h-8 bg-gray-200 rounded-full mr-3 flex items-center justify-center text-gray-600 text-sm font-bold"
+                    class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-sm font-bold"
                   >
                     {{ job.company[0] if job.company else '기' }}
                   </div>
-                  <div>
-                    <p class="text-sm text-gray-600">{{ job.company }}</p>
-                    <h3 class="font-bold text-base">{{ job.title }}</h3>
-                    <p class="text-blue-600 font-bold">
-                      월급 {{ job.salary or '3,000,000원' }}
-                    </p>
-                  </div>
+                  <p class="text-sm text-gray-600">{{ job.company }}</p>
                 </div>
-                <div class="text-right">
-                  <p class="text-xs text-gray-500">
-                    {{ job.created_at.strftime('~%m/%d (%a)') }}
-                  </p>
-                  <button class="mt-1 text-gray-400 hover:text-red-500">
-                    <svg
-                      class="w-5 h-5"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                </div>
+                <p class="text-xs text-gray-500">
+                  ~{{ job.created_at.strftime('%m/%d') }} ({% set day_map =
+                  {'Mon': '월', 'Tue': '화', 'Wed': '수', 'Thu': '목', 'Fri':
+                  '금', 'Sat': '토', 'Sun': '일'} %}{{
+                  day_map[job.created_at.strftime('%a')] }})
+                </p>
               </div>
+
+              <!-- 행[1]: 공고명, 하트 버튼 -->
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="font-bold text-lg">{{ job.title }}</h3>
+                <button
+                  class="{% if status.bookmarked %}text-red-500{% else %}text-gray-400{% endif %} hover:text-red-500"
+                  onclick="event.stopPropagation(); toggleBookmark({{ job.id }}, this);"
+                >
+                  <svg
+                    class="w-6 h-6"
+                    fill="{% if status.bookmarked %}currentColor{% else %}none{% endif %}"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- 행[2]: 급여 -->
+              <div class="mb-2">
+                <p class="text-blue-600 font-bold">
+                  월급 {{ job.salary or '3,000,000원' }}
+                </p>
+              </div>
+
+              <!-- 행[3]: 카테고리, 지원하기 버튼 -->
               <div class="flex items-center justify-between">
                 <div class="flex space-x-2">
                   <span
-                    class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
+                    class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
                     >{{ job.recruitment_type or '정직원' }}</span
                   >
                   <span
-                    class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
+                    class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
                     >{{ job.work_period or '상주직' }}</span
                   >
                 </div>
@@ -533,10 +442,13 @@
             </p>
             {% endif %}
 
-            <div class="text-center mt-4">
+            <div
+              class="text-center mt-2 pb-2"
+              style="box-shadow: 0 4px 6px -4px rgba(0, 0, 0, 0.25)"
+            >
               <a
                 href="{{ url_for('company.company_list') }}"
-                class="text-blue-600 text-sm font-medium"
+                class="text-gray-600 text-base font-medium inline-block py-1"
               >
                 더 많은 공고 보기 →
               </a>
@@ -544,74 +456,85 @@
           </div>
         </section>
 
-        <!-- 시간대별 공고 -->
+        <!-- 실시간별 공고 -->
         <section>
           <div class="flex items-center mb-1">
             <span
-              class="bg-yellow-100 text-yellow-800 text-sm font-bold px-3 py-1 rounded-full mr-3"
-              >시간대</span
+              class="bg-transparent text-blue-800 text-sm font-bold px-3 py-1 rounded-full mr-3 border-2 border-blue-800"
+              >실시간</span
             >
           </div>
           <div class="mb-2">
-            <span class="text-yellow-500 text-lg mr-2">👑</span>
-            <span class="font-bold text-gray-800"
+            <span class="text-yellow-500 text-2xl mr-2">👑</span>
+            <span class="font-bold text-gray-800 text-xl"
               >{% if user and user.dong %}{{ user.dong }}{% else %}우리 동{%
               endif %}의 실시간 공고예요!</span
             >
           </div>
-          <div class="bg-white rounded-2xl p-4 shadow-sm border">
-            <div class="flex items-center mb-3"></div>
+          <div>
             {% if people_jobs %} {% for job_data in people_jobs[:2] %} {% set
             job = job_data.job %} {% set status = job_data.application_status %}
             <div
-              class="border-b border-gray-100 pb-4 mb-4 last:border-b-0 last:pb-0 last:mb-0 cursor-pointer"
+              class="bg-white rounded-2xl p-4 shadow-sm border mb-3 cursor-pointer"
               onclick="location.href='{{ url_for('jobs.job_detail', job_id=job.id) }}'"
             >
-              <div class="flex items-start justify-between mb-2">
-                <div class="flex items-start">
+              <!-- 행[0]: 프로필사진, 작성자명, 마감일, 요일 -->
+              <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-2">
                   <div
-                    class="w-8 h-8 bg-gray-200 rounded-full mr-3 flex items-center justify-center text-gray-600 text-sm font-bold"
+                    class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-sm font-bold"
                   >
                     {{ job.author.nickname[0] if job.author.nickname else '사'
                     }}
                   </div>
-                  <div>
-                    <p class="text-sm text-gray-600">
-                      {{ job.author.nickname or '익명' }}
-                    </p>
-                    <h3 class="font-bold text-base">{{ job.title }}</h3>
-                    <p class="text-blue-600 font-bold">
-                      {{ job.salary or '50,000원' }}
-                    </p>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <p class="text-xs text-gray-500">
-                    {{ job.created_at.strftime('%m월 %d일') }}
+                  <p class="text-sm text-gray-600">
+                    {{ job.author.nickname or '익명' }}
                   </p>
-                  <button class="mt-1 text-gray-400 hover:text-red-500">
-                    <svg
-                      class="w-5 h-5"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                  </button>
                 </div>
+                <p class="text-xs text-gray-500">
+                  {{ job.created_at|time_ago }}
+                </p>
               </div>
+
+              <!-- 행[1]: 공고명, 하트 버튼 -->
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="font-bold text-lg">{{ job.title }}</h3>
+                <button
+                  class="{% if status.bookmarked %}text-red-500{% else %}text-gray-400{% endif %} hover:text-red-500"
+                  onclick="event.stopPropagation(); toggleBookmark({{ job.id }}, this);"
+                >
+                  <svg
+                    class="w-6 h-6"
+                    fill="{% if status.bookmarked %}currentColor{% else %}none{% endif %}"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- 행[2]: 급여 -->
+              <div class="mb-2">
+                <p class="text-blue-600 font-bold">
+                  {{ job.salary or '50,000원' }}
+                </p>
+              </div>
+
+              <!-- 행[3]: 카테고리, 지원하기 버튼 -->
               <div class="flex items-center justify-between">
                 <div class="flex space-x-2">
                   <span
-                    class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
+                    class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
                     >오늘</span
                   >
                   <span
-                    class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
+                    class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
                     >{{ job.work_period or '시간대별' }}</span
                   >
                 </div>
@@ -647,10 +570,13 @@
             </p>
             {% endif %}
 
-            <div class="text-center mt-4">
+            <div
+              class="text-center mt-2 pb-2"
+              style="box-shadow: 0 4px 6px -4px rgba(0, 0, 0, 0.25)"
+            >
               <a
                 href="{{ url_for('jobs.job_list') }}"
-                class="text-blue-600 text-sm font-medium"
+                class="text-gray-600 text-base font-medium inline-block py-1"
               >
                 더 많은 공고 보기 →
               </a>
@@ -660,22 +586,20 @@
 
         <!-- 최근 시니어 일자리 뉴스 -->
         <section class="mt-8">
-          <div class="flex items-center mb-4">
-            <span
-              class="bg-green-100 text-green-800 text-sm font-bold px-3 py-1 rounded-full mr-3"
+          <div class="mb-4">
+            <span class="text-green-500 text-2xl mr-2">📰</span>
+            <span class="font-bold text-gray-800 text-xl"
               >최근 시니어 일자리 뉴스</span
             >
           </div>
-          <div class="bg-white rounded-2xl p-4 shadow-sm border">
+          <div>
             {% if news_list %} {% for news in news_list %}
             <div
-              class="border-b border-gray-100 pb-4 mb-4 last:border-b-0 last:pb-0 last:mb-0 cursor-pointer flex gap-3 items-center"
+              class="pb-4 mb-4 last:pb-0 last:mb-0 cursor-pointer flex gap-3 items-center"
               onclick="window.open('{{ news.link }}', '_blank')"
             >
               <div class="flex-1">
-                <h3 class="font-bold text-base mb-2">
-                  {{ news.title | safe }}
-                </h3>
+                <h3 class="font-bold text-lg mb-2">{{ news.title | safe }}</h3>
                 <p class="text-xs text-gray-500 mb-2">{{ news.pub_date }}</p>
                 <div
                   class="flex items-center text-blue-600 text-sm font-medium"
@@ -731,10 +655,13 @@
             </p>
             {% endif %}
 
-            <div class="text-center mt-4">
+            <div
+              class="text-center mt-2 pb-2"
+              style="box-shadow: 0 4px 6px -4px rgba(0, 0, 0, 0.25)"
+            >
               <a
                 href="{{ url_for('news.news_list') }}"
-                class="text-blue-600 text-sm font-medium"
+                class="text-gray-600 text-base font-medium inline-block py-1"
               >
                 더 많은 뉴스 보기 →
               </a>
@@ -820,100 +747,6 @@
       </footer>
       {% endif %}
     </div>
-    <script>
-      // 공고 지원하기 함수
-      async function applyJob(jobId) {
-        if (
-          !confirm(
-            "이 공고에 지원하시겠습니까?\n지원하면 자동으로 채팅방이 생성됩니다."
-          )
-        ) {
-          return;
-        }
-        try {
-          const response = await fetch(`/jobs/${jobId}/apply`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: "" }),
-          });
-          const data = await response.json();
-          if (data.success) {
-            alert(data.message);
-            if (data.chat_room_id && confirm("채팅방으로 이동하시겠습니까?")) {
-              window.location.href = `/chat/${data.chat_room_id}`;
-            } else {
-              location.reload();
-            }
-          } else {
-            alert(data.message || "지원 중 오류가 발생했습니다.");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          alert("지원 중 오류가 발생했습니다.");
-        }
-      }
-
-      // 채팅방으로 이동하는 함수
-      async function goToChat(jobId) {
-        try {
-          const response = await fetch(`/chat/find-room/${jobId}`, {
-            method: "GET",
-          });
-          const data = await response.json();
-          if (data.success && data.room_id) {
-            window.location.href = `/chat/${data.room_id}`;
-          } else {
-            alert("채팅방을 찾을 수 없습니다.");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          alert("채팅방 이동 중 오류가 발생했습니다.");
-        }
-      }
-
-      // 얼굴 토글 스위치 상태 관리
-      let isToggleActive = false;
-
-      // 토글 스위치 기능
-      function updateToggleTheme() {
-        const toggle = document.getElementById("face-toggle");
-        const body = document.body;
-        const container = document.getElementById("toggleContainer");
-        const toggleText = document.getElementById("toggleText");
-
-        if (toggle.checked) {
-          body.classList.add("toggle-active");
-          container.classList.add("active");
-          isToggleActive = true;
-
-          // 1초 후에 토글 페이지로 이동 (애니메이션 완료 후)
-          setTimeout(() => {
-            window.location.href = "/toggle-page";
-          }, 1000);
-        } else {
-          body.classList.remove("toggle-active");
-          container.classList.remove("active");
-          isToggleActive = false;
-        }
-      }
-
-      // 페이지 로드 시 초기화
-      document.addEventListener("DOMContentLoaded", function () {
-        const toggle = document.getElementById("face-toggle");
-        const urlParams = new URLSearchParams(window.location.search);
-
-        // reset_toggle 파라미터가 있으면 토글을 비활성화 상태로 설정
-        if (urlParams.get("reset_toggle") === "true") {
-          toggle.checked = false;
-          updateToggleTheme();
-        }
-
-        // 토글 변경 이벤트 리스너 추가
-        toggle.addEventListener("change", updateToggleTheme);
-
-        // 초기 상태 설정
-        updateToggleTheme();
-      });
-    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   </body>
 </html>
