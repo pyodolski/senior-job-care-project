@@ -1,0 +1,18 @@
+/* 사용자 정의 폰트 및 스타일 */
+body {
+  font-family: "Noto Sans KR", sans-serif;
+}
+.sort-dropdown {
+  display: none;
+}
+.sort-dropdown.show {
+  display: block;
+}
+#filterModal {
+  display: none;
+}
+#filterModal.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

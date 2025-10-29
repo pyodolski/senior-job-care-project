@@ -56,7 +56,7 @@ def company_list():
     """
 
     page = request.args.get('page', 1, type=int)
-    per_page = 20
+    per_page = 10
 
     # URL 쿼리 파라미터에서 검색 및 필터 조건 추출
     query = request.args.get('q', '')
@@ -108,6 +108,9 @@ def company_list():
             application_status = ApplicationService.check_application_status(current_user.id, job.id)
         else:
             application_status = {'applied': False, 'status': None}
+
+        # 북마크 상태 추가
+        application_status['bookmarked'] = JobService.is_bookmarked(current_user.id, job.id)
 
         job_data = {
             'job': job,
@@ -327,7 +330,7 @@ def company_jobs_json():
     """
 
     page = request.args.get('page', 1, type=int)
-    per_page = 20
+    per_page = 10
     query = request.args.get('q', '')
     region = request.args.get('region', '')
     recruitment_type = request.args.get('recruitment_type', '')
@@ -377,6 +380,8 @@ def company_jobs_json():
             if current_user.user_type == 0:
                 application_status = ApplicationService.check_application_status(current_user.id, job.id)
 
+            # 북마크 상태 확인
+            is_bookmarked = JobService.is_bookmarked(current_user.id, job.id)
 
             jobs_data.append({
                 'id': job.id,
@@ -389,7 +394,9 @@ def company_jobs_json():
                 'bookmark_count': job.bookmark_count,
                 'application_count': job.application_count,
                 'author_id': job.author_id,  # author_id를 사용하여 클라이언트에서 '내 공고' 구분
-                'is_applied': application_status['applied']
+                'is_applied': application_status['applied'],
+                'is_bookmarked': is_bookmarked,
+                'created_at': job.created_at.isoformat()
             })
 
         return jsonify({

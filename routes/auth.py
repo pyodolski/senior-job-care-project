@@ -173,13 +173,11 @@ def main():
         company_jobs = [job for job in jobs_pagination.items if job.author.user_type == 1][:3]
         people_jobs = [job for job in jobs_pagination.items if job.author.user_type == 0][:3]
         
-        # 각 공고에 대한 지원 상태 확인
+        # 각 공고에 대한 지원 상태 및 북마크 상태 확인
         company_jobs_with_status = []
         for job in company_jobs:
-            if current_user.user_type == 0:  # 일반 사용자인 경우만 지원 상태 확인
-                application_status = ApplicationService.check_application_status(current_user.id, job.id)
-            else:
-                application_status = {'applied': False, 'status': None}
+            # 모든 사용자에 대해 지원 상태와 북마크 상태 확인
+            application_status = ApplicationService.check_application_status(current_user.id, job.id)
             
             job_data = {
                 'job': job,
@@ -187,13 +185,11 @@ def main():
             }
             company_jobs_with_status.append(job_data)
 
-        # 각 사람 이음 공고에 대한 지원 상태 확인
+        # 각 사람 이음 공고에 대한 지원 상태 및 북마크 상태 확인
         person_jobs_with_status = []
         for job in people_jobs:
-            if current_user.user_type == 0 and current_user.id == job.author.id:  # 일반 사용자인 경우만 지원 상태 확인
-                application_status = ApplicationService.check_application_status(current_user.id, job.id)
-            else:
-                application_status = {'applied': False, 'status': None}
+            # 모든 사용자에 대해 지원 상태와 북마크 상태 확인
+            application_status = ApplicationService.check_application_status(current_user.id, job.id)
             
             job_data = {
                 'job': job,

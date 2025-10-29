@@ -1,0 +1,14 @@
+/* 찜 목록 페이지 스타일 */
+
+/* 사용자 정의 폰트 및 스타일 */
+body {
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+.sort-dropdown {
+  display: none;
+}
+
+.sort-dropdown.show {
+  display: block;
+}
