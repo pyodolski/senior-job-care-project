@@ -58,15 +58,19 @@
 
       <main class="p-4">
         <div class="mb-4">
-          <span class="font-semibold text-gray-700">
-            총 {{ suggestions|length }}건
-          </span>
+    <span class="font-semibold text-gray-700">
+      총 {{ suggestions|length }}건
+    </span>
         </div>
 
         {% if suggestions %}
-        <div class="space-y-4">
+        <div class="space-y-4" id="suggestion-list">
           {% for suggestion in suggestions %}
-          <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+          <div
+                  class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
+                  id="suggestion-card-{{ suggestion.id }}"
+                  onclick="window.location.href='{{ url_for('company.company_job_detail', job_id=suggestion.job.id) }}'"
+          >
             <p class="text-xs text-gray-400 mb-3">
               {{ suggestion.created_at|format_datetime }}
             </p>
@@ -79,60 +83,41 @@
                   {{ suggestion.job.title }}
                 </h2>
               </div>
-              {% if suggestion.status == 'sent' %}
               <span class="text-xs font-semibold text-red-500">응답대기중</span>
-              {% endif %}
             </div>
             <div class="mt-2 flex items-center gap-2">
-              <span
-                class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
-              >
-                {{ suggestion.job.recruitment_type }}
-              </span>
-              <span
-                class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
-              >
-                {{ suggestion.job.job_category or '기타' }}
-              </span>
+        <span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
+          {{ suggestion.job.recruitment_type }}
+        </span>
+              <span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
+          {{ suggestion.job.job_category or '기타' }}
+        </span>
             </div>
+
             {% if suggestion.job.recruitment_end_date %}
             <div class="mt-4 flex items-center text-xs text-gray-500">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 mr-1.5"
-                fill="none"
-                viewBox="0 0 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24"
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
               </svg>
-              제안에 대한 답변은
-              {{ suggestion.job.recruitment_end_date|format_date }}까지 응답할
-              수 있습니다.
+              제안에 대한 답변은 {{ suggestion.job.recruitment_end_date|format_date }}까지 응답할 수 있습니다.
             </div>
             {% endif %}
 
-            <div class="mt-4">
-              {% if suggestion.status == 'sent' %}
+            <div class="mt-4 flex gap-2">
               <button
-                class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700"
-                onclick="acceptSuggestion({{ suggestion.id }}, this)"
+                      class="w-1/2 bg-gray-200 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-300"
+                      onclick="rejectSuggestion({{ suggestion.id }}, event)"
               >
-                응답하기
+                거절
               </button>
-              {% else %}
               <button
-                class="w-full bg-gray-300 text-gray-500 font-bold py-3 rounded-lg cursor-not-allowed"
-                disabled
+                      class="w-1/2 bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700"
+                      onclick="acceptSuggestion({{ suggestion.id }}, event)"
               >
-                응답완료
+                수락
               </button>
-              {% endif %}
             </div>
           </div>
           {% endfor %}
@@ -146,43 +131,50 @@
     </div>
 
     <script>
-      function acceptSuggestion(suggestionId, button) {
-        // 중복 클릭을 막기 위해 버튼을 비활성화하고 텍스트를 변경합니다.
+      function acceptSuggestion(suggestionId, event) {
+        event.stopPropagation();
+
+        const card = document.getElementById(`suggestion-card-${suggestionId}`);
+        const button = card.querySelector("button.bg-blue-600");
         button.disabled = true;
         button.textContent = "처리 중...";
-        button.classList.add("bg-gray-400");
-        button.classList.remove("bg-blue-600");
-
-        // 서버의 API 주소로 '제안을 수락하겠다'는 POST 요청을 보냅니다.
-        fetch(`/api/suggestions/${suggestionId}/accept`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            // 만약 CSRF 토큰을 사용한다면 여기에 헤더를 추가해야 합니다.
-          },
-        })
+        fetch(`/api/suggestions/${suggestionId}/accept`, { method: "POST", headers: { "Content-Type": "application/json" } })
           .then((response) => response.json())
           .then((data) => {
             if (data.success && data.chat_room_id) {
-              // 성공적으로 응답을 받으면, 알림을 띄우고 채팅방으로 이동합니다.
-              alert("제안을 수락했습니다. 채팅방으로 이동합니다.");
               window.location.href = `/chat/${data.chat_room_id}`;
             } else {
-              // 실패하면 사용자에게 오류 메시지를 보여주고 버튼을 원래 상태로 되돌립니다.
-              alert(data.message || "오류가 발생했습니다. 다시 시도해주세요.");
+              alert(data.message || "오류가 발생했습니다.");
               button.disabled = false;
-              button.textContent = "응답하기";
-              button.classList.remove("bg-gray-400");
-              button.classList.add("bg-blue-600");
+              button.textContent = "수락";
             }
           })
           .catch((error) => {
-            console.error("Error:", error);
-            alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+            alert("네트워크 오류가 발생했습니다.");
             button.disabled = false;
-            button.textContent = "응답하기";
-            button.classList.remove("bg-gray-400");
-            button.classList.add("bg-blue-600");
+            button.textContent = "수락";
+          });
+      }
+
+      function rejectSuggestion(suggestionId, event) {
+        event.stopPropagation();
+
+        const card = document.getElementById(`suggestion-card-${suggestionId}`);
+        const buttons = card.querySelectorAll("button");
+        buttons.forEach((btn) => (btn.disabled = true));
+        fetch(`/api/suggestions/${suggestionId}/reject`, { method: "POST", headers: { "Content-Type": "application/json" } })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              card.remove(); // 화면에서 즉시 제거
+            } else {
+              alert(data.message || "거절 처리 중 오류가 발생했습니다.");
+              buttons.forEach((btn) => (btn.disabled = false));
+            }
+          })
+          .catch((error) => {
+            alert("네트워크 오류가 발생했습니다.");
+            buttons.forEach((btn) => (btn.disabled = false));
           });
       }
     </script>
