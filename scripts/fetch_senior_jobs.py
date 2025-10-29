@@ -6,6 +6,21 @@ from datetime import datetime
 import xml.etree.ElementTree as ET
 import os
 
+EMPLOYMENT_TYPE_MAP = {
+    'CM0101': '정규직',
+    'CM0102': '계약직',
+    'CM0103': '시간제일자리',
+    'CM0104': '일당직',
+    'CM0105': '기타',
+}
+
+APPLICATION_METHOD_MAP = {
+    'CM0801': '온라인',
+    'CM0802': '이메일',
+    'CM0803': '팩스',
+    'CM0804': '방문',
+}
+
 
 # API 정보
 API_URL_LIST = "http://apis.data.go.kr/B552474/SenuriService/getJobList"
@@ -132,7 +147,8 @@ def fetch_job_detail(job_id):
                 'full_address': get_text(detail_item, 'plDetAddr'),
                 'contact_phone': get_text(detail_item, 'clerkContt'),
                 'contact_name': get_text(detail_item, 'clerk'),
-                'job_detail_desc': get_text(detail_item, 'detCnts')  # 상세 설명 태그
+                'job_detail_desc': get_text(detail_item, 'detCnts'),  # 상세 설명 태그
+                'application_code': get_text(detail_item, 'acptMthdCd')
             }
         return {}
 
@@ -193,17 +209,12 @@ def fetch_and_store_jobs(page_number=1):
             # 1. 상세 정보 API 호출 (공고마다 개별 호출)
             detail_data = fetch_job_detail(job_id)
 
-            full_addr = detail_data.get('full_address')
-            depth_data = {}
-            if full_addr:
-                # 카카오 REST API를 호출하여 주소를 시/도/군/구로 분해
-                depth_data = convert_full_address_to_depths(full_addr)
-                #  변환 결과 디버깅
-                if not depth_data:
-                    print(f"*** 주소 변환 실패! (입력 주소: {full_addr}) ***")
-                else:
-                    print(
-                        f"*** 주소 변환 성공: {depth_data.get('region_1depth_name')} {depth_data.get('region_2depth_name')} ***")
+            employment_code = get_text(item, 'emplymShp')
+            application_code = detail_data.get('application_code')
+
+            recruitment_type_korean = EMPLOYMENT_TYPE_MAP.get(employment_code, '기타')
+            application_method_korean = APPLICATION_METHOD_MAP.get(application_code, '기타')
+
 
             # 2. 데이터 매핑
             full_address = detail_data.get('full_address')
@@ -222,8 +233,8 @@ def fetch_and_store_jobs(page_number=1):
             job_data = {
                 'title': get_text(item, 'recrtTitle'),
                 'company': get_text(item, 'oranNm'),
-                'recruitment_type': get_text(item, 'emplymShpNm'),
-                'application_method': get_text(item, 'acptMthd'),
+                'recruitment_type': recruitment_type_korean,  # 변환된 값 사용
+                'application_method': application_method_korean,
                 'region': get_text(item, 'workPlcNm'),
                 'recruitment_start_date': datetime.strptime(get_text(item, 'frDd'), '%Y%m%d').date() if get_text(item,
                                                                                                                  'frDd') else None,
@@ -238,9 +249,9 @@ def fetch_and_store_jobs(page_number=1):
                 'contact_phone': detail_data.get('contact_phone'),
                 'contact_name': detail_data.get('contact_name'),
 
-                'region_1depth_name': depth_data.get('region_1depth_name'),
-                'region_2depth_name': depth_data.get('region_2depth_name'),
-                'region_3depth_name': depth_data.get('region_3depth_name'),
+                'region_1depth_name': '',
+                'region_2depth_name': '',
+                'region_3depth_name': '',
 
                 'author_id': system_user.id,
                 'source': 'K-Senior',
