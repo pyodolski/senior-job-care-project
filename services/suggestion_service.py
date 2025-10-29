@@ -1,4 +1,4 @@
-from models import db, JobSuggestion, User, Resume
+from models import db, JobSuggestion, User, Resume, JobPost
 from flask_login import current_user
 from services.chat_service import ChatService
 
@@ -20,7 +20,8 @@ class SuggestionService:
         existing_suggestions = JobSuggestion.query.filter(
             JobSuggestion.suggester_id == suggester_id,
             JobSuggestion.resume_id == resume_id,
-            JobSuggestion.job_id.in_(job_ids)
+            JobSuggestion.job_id.in_(job_ids),
+            JobSuggestion.status.in_(['sent', 'accepted'])
         ).all()
         existing_job_ids = {str(s.job_id) for s in existing_suggestions}
 
@@ -31,7 +32,8 @@ class SuggestionService:
                     suggester_id=suggester_id,
                     suggestee_id=resume.user_id,
                     job_id=int(job_id),
-                    resume_id=resume.id
+                    resume_id=resume.id,
+                    status='sent'
                 )
                 db.session.add(suggestion)
                 new_suggestions_count += 1
@@ -46,9 +48,10 @@ class SuggestionService:
         """
         - '받은 제안' 페이지에서 사용됩니다.
         """
-        return JobSuggestion.query.filter_by(suggestee_id=user_id)\
-            .order_by(JobSuggestion.created_at.desc())\
-            .all()
+        return JobSuggestion.query.filter_by(
+            suggestee_id=user_id,
+            status='sent'
+        ).order_by(JobSuggestion.created_at.desc()).all()
 
     @staticmethod
     def update_suggestion_status(suggestion_id, user_id, new_status):
@@ -95,3 +98,36 @@ class SuggestionService:
         )
 
         return chat_room.id
+
+    @staticmethod
+    def get_jobs_for_suggestion(suggester_id, resume_id):
+        """
+        [읽기 기능] 특정 이력서에 제안할 수 있는 공고 목록을 상태 정보와 함께 반환합니다.
+        'accepted' 상태인 공고는 목록에서 제외됩니다.
+        """
+        # 1. 현재 기업이 올린 모든 공고 목록을 가져옵니다.
+        my_jobs = JobPost.query.filter_by(author_id=suggester_id) \
+            .order_by(JobPost.created_at.desc()) \
+            .all()
+
+        # 2. 이 이력서에 대해 이미 보낸 제안들의 상태를 미리 조회합니다.
+        existing_suggestions = JobSuggestion.query.filter_by(
+            suggester_id=suggester_id,
+            resume_id=resume_id
+        ).all()
+        # (효율적인 조회를 위해 {공고ID: 상태} 딕셔너리로 변환)
+        suggestion_statuses = {s.job_id: s.status for s in existing_suggestions}
+
+        # 3. 공고 목록을 재구성하여 상태 정보를 추가하고, 'accepted' 상태는 제외합니다.
+        jobs_for_suggestion = []
+        for job in my_jobs:
+            status = suggestion_statuses.get(job.id)  # 이 공고의 제안 상태를 확인
+
+            # 제안이 수락(accepted)된 상태가 아니라면 목록에 추가
+            if status != 'accepted':
+                jobs_for_suggestion.append({
+                    'job': job,
+                    'status': status  # 상태 정보 추가 (값이 없으면 None)
+                })
+
+        return jobs_for_suggestion

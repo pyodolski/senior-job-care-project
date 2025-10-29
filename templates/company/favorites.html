@@ -124,7 +124,7 @@
                 </div>
                 <span
                   class="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg"
-                  >제안하기</span
+                  >확인하기</span
                 >
               </div>
             </a>
@@ -154,7 +154,8 @@
           <div class="space-y-4">
             {% for resume in favorited_resumes %}
             <div
-              class="bg-white rounded-2xl p-4 shadow-sm border border-gray-200"
+              class="bg-white rounded-2xl p-4 shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+              onclick="window.location.href='{{ url_for('resumes.view_resume', resume_id=resume.id) }}'"
             >
               <div class="flex items-start justify-between mb-2">
                 <div class="flex-1">
@@ -177,7 +178,7 @@
                   </div>
                 </div>
                 <button
-                  onclick="toggleFavorite({{ resume.id }}, this)"
+                  onclick="toggleFavorite({{ resume.id }}, this,event)"
                   class="text-red-500 hover:text-red-600"
                 >
                   <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -211,9 +212,9 @@
                   >{{ resume.updated_at|time_ago }} 업데이트</span
                 >
                 <a
-                  href="{{ url_for('resumes.view_resume', resume_id=resume.id) }}"
+                  href="{{ url_for('company.suggest_job', resume_id=resume.id) }}"
                   class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
-                  >상세보기</a
+                  >제안하기</a
                 >
               </div>
             </div>
@@ -267,7 +268,8 @@
       }
 
       // 좋아요 토글 함수
-      function toggleFavorite(resumeId, button) {
+      function toggleFavorite(resumeId, button, event) {
+        event.stopPropagation();
         fetch(`/api/resume/${resumeId}/favorite`, {
           method: "POST",
           headers: {

@@ -435,15 +435,17 @@ def suggest_job(resume_id):
             job_ids=selected_job_ids
         )
 
-        flash(f"{new_count}개의 공고를 성공적으로 제안했습니다.", "success")
         return redirect(url_for("company.resume_list"))
 
     # 3. GET 요청 처리 (제안할 공고 선택 페이지를 보여줄 때)
     resume = SuggestionService.get_resume_for_suggestion_page(resume_id)
     # 현재 기업이 올린 공고 목록
-    my_jobs = JobPost.query.filter_by(author_id=current_user.id).order_by(JobPost.created_at.desc()).all()
+    jobs_for_suggestion = SuggestionService.get_jobs_for_suggestion(
+        suggester_id=current_user.id,
+        resume_id=resume_id
+    )
 
-    return render_template("company/suggest_job.html", resume=resume, my_jobs=my_jobs)
+    return render_template("company/suggest_job.html", resume=resume, jobs_for_suggestion=jobs_for_suggestion)
 
 
 # 일반 사용자가 받은 제안 목록을 보는 페이지
@@ -488,4 +490,30 @@ def accept_suggestion(suggestion_id):
         return jsonify({'success': False, 'message': '권한이 없습니다.'}), 403
     except Exception as e:
         print(f"제안 수락 오류: {e}")
+        return jsonify({'success': False, 'message': '오류가 발생했습니다.'}), 500
+
+
+@company_bp.route("/api/suggestions/<int:suggestion_id>/reject", methods=["POST"])
+@login_required
+def reject_suggestion(suggestion_id):
+    """
+    제안을 거절 상태로 변경
+    """
+    try:
+        # 상태 rejected로 변경
+        SuggestionService.update_suggestion_status(
+            suggestion_id=suggestion_id,
+            user_id=current_user.id,
+            new_status='rejected'
+        )
+
+        return jsonify({
+            'success': True,
+            'message': '제안을 거절했습니다.'
+        })
+
+    except PermissionError:
+        return jsonify({'success': False, 'message': '권한이 없습니다.'}), 403
+    except Exception as e:
+        print(f"제안 거절 오류: {e}")
         return jsonify({'success': False, 'message': '오류가 발생했습니다.'}), 500

@@ -45,56 +45,58 @@
           님에게 제안할 공고를 선택해주세요.
         </p>
 
-        <form
-          action="{{ url_for('company.suggest_job', resume_id=resume.id) }}"
-          method="POST"
-        >
-          <div class="space-y-3">
-            {% if my_jobs %} {% for job in my_jobs %}
-            <label
-              class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-            >
-              <input
-                type="checkbox"
-                name="job_ids"
-                value="{{ job.id }}"
-                class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-              />
-              <div class="ml-4 flex-1">
-                <p class="font-semibold text-gray-800">{{ job.title }}</p>
-                <p class="text-sm text-gray-500 mt-0.5">{{ job.company }}</p>
-              </div>
-            </label>
-            {% endfor %} {% else %}
-            <div class="text-center text-gray-500 py-16">
-              <p>제안할 수 있는 공고가 없습니다.</p>
-              <a
-                href="{{ url_for('jobs.create_company_job') }}"
-                class="mt-4 inline-block text-blue-600 font-semibold"
-              >
-                공고 등록하러 가기 &rarr;
-              </a>
+        <div class="space-y-3">
+          {% if jobs_for_suggestion %}
+          {% for item in jobs_for_suggestion %}
+          <div class="flex items-center p-4 border border-gray-200 rounded-lg">
+            <div class="flex-1">
+              <p class="font-semibold text-gray-800">{{ item.job.title }}</p>
+              <p class="text-sm text-gray-500 mt-0.5">{{ item.job.company }}</p>
             </div>
-            {% endif %}
-          </div>
 
-          <div class="mt-8">
-            {% if my_jobs %}
-            <button
-              type="submit"
-              class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors"
-            >
-              선택한 공고 제안하기
-            </button>
-            {% endif %}
+            <div class="ml-4">
+              {% if item.status == 'sent' %}
+              <button
+                      class="bg-gray-200 text-gray-500 font-bold py-2 px-4 rounded-lg text-sm cursor-not-allowed"
+                      disabled
+              >
+                응답 대기 중
+              </button>
+              {% else %}
+              <form action="{{ url_for('company.suggest_job', resume_id=resume.id) }}" method="POST" class="m-0">
+                <input type="hidden" name="job_ids" value="{{ item.job.id }}">
+                <button
+                        type="submit"
+                        class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                >
+                  제안하기
+                </button>
+              </form>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+          {% else %}
+          <div class="text-center text-gray-500 py-16">
+            <p>제안할 수 있는 공고가 없습니다.</p>
             <a
-              href="{{ url_for('company.resume_list') }}"
-              class="block w-full text-center mt-3 text-gray-600 font-medium py-3 rounded-lg hover:bg-gray-200 transition-colors"
+                    href="{{ url_for('jobs.create_company_job') }}"
+                    class="mt-4 inline-block text-blue-600 font-semibold"
             >
-              취소
+              공고 등록하러 가기 &rarr;
             </a>
           </div>
-        </form>
+          {% endif %}
+        </div>
+
+        <div class="mt-8">
+          <a
+                  href="{{ url_for('company.resume_list') }}"
+                  class="block w-full text-center text-gray-600 font-medium py-3 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            취소
+          </a>
+        </div>
       </main>
     </div>
   </body>

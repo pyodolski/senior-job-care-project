@@ -412,10 +412,5 @@ class JobSuggestion(db.Model):
     job = db.relationship('JobPost', backref=db.backref('suggestions', lazy=True))
     resume = db.relationship('Resume', backref=db.backref('suggestions', lazy=True))
 
-    # 유니크 제약: 한 기업이 같은 이력서에 동일한 공고를 중복 제안 불가
-    __table_args__ = (
-        db.UniqueConstraint('suggester_id', 'resume_id', 'job_id', name='uq_job_suggestion'),
-    )
-
     def __repr__(self):
         return f"<JobSuggestion suggester={self.suggester_id} resume={self.resume_id} job={self.job_id}>"
