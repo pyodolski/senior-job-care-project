@@ -70,7 +70,7 @@
 
         <!-- 총 게시글 수 -->
         <div class="text-sm text-gray-600 font-medium mb-4">
-          총 {{ total_count }}건
+          총 <span id="displayCount">{{ total_count }}</span>건
         </div>
 
         <!-- 내가 올린 글 리스트 -->
@@ -79,58 +79,76 @@
           class="bg-white rounded-xl p-5 mb-3 shadow-sm border border-gray-100"
           data-job-id="{{ job.id }}"
         >
-          <!-- 상단: 채용 상태 아이콘 -->
-          <div class="flex items-start justify-start mb-3">
+          <!-- [0]행: 프로필사진, 닉네임, 채용중 -->
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"
+              >
+                {% if job.author.profile_image %}
+                <img
+                  src="{{ job.author.profile_image }}"
+                  alt="프로필"
+                  class="w-full h-full object-cover"
+                />
+                {% else %}
+                <svg
+                  class="w-6 h-6 text-gray-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                {% endif %}
+              </div>
+              <span class="text-sm font-medium text-gray-700"
+                >{{ job.author.nickname or job.author.username }}</span
+              >
+            </div>
             <span
-              class="inline-flex items-center justify-center w-14 h-6 bg-gray-100 text-gray-600 text-xs font-medium rounded-full"
+              class="inline-flex items-center justify-center px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full"
             >
               채용중
             </span>
           </div>
 
-          <!-- 제목 -->
+          <!-- [1]행: 공고 제목 -->
           <h3 class="text-lg font-bold text-gray-900 mb-2">{{ job.title }}</h3>
 
-          <!-- 급여 -->
-          <p class="text-blue-900 font-bold text-base mb-3">
+          <!-- [2]행: 급여 -->
+          <p class="text-blue-900 font-bold text-base mb-2">
             {% if job.salary %}{{ job.salary }}{% else %}급여 협의{% endif %}
           </p>
 
-          <!-- 위치 및 작성일 -->
+          <!-- [3]행: 시간 정보 -->
           <div class="flex items-center text-sm text-gray-600 mb-4">
-            <svg
-              class="w-4 h-4 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-              />
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
-            <span>{{ job.time_ago }} | {{ job.category or '시간알이' }}</span>
+            <span>{{ job.time_ago }}</span>
+            <span class="mx-2">|</span>
+            <span>
+              {% if job.is_time_negotiable %} 시간 협의 가능 {% else %} {{
+              job.work_days_text or '요일 협의' }} {% if job.work_start_time and
+              job.work_end_time %} · {{ job.work_start_time }} ~ {{
+              job.work_end_time }} {% endif %} {% endif %}
+            </span>
           </div>
 
           <!-- 하단 버튼들 -->
-          <div class="flex items-center justify-between pt-3 border-t">
+          <div class="grid grid-cols-6 gap-2 pt-3 border-t">
             <button
               onclick="event.stopPropagation(); deletePost({{ job.id }})"
-              class="text-sm text-gray-500 hover:text-gray-700 font-medium"
+              class="col-span-3 text-gray-500 hover:text-gray-700 font-medium border-r border-gray-200"
+              style="font-size: 1rem; padding: 0"
             >
               삭제
             </button>
             <button
               onclick="event.stopPropagation(); editPost({{ job.id }})"
-              class="text-sm text-blue-900 hover:text-blue-800 font-semibold"
+              class="col-span-3 text-blue-900 hover:text-blue-800 font-semibold"
+              style="font-size: 1rem; padding: 0"
             >
               수정하기
             </button>
@@ -288,15 +306,23 @@
         ?.addEventListener("input", function (e) {
           const searchTerm = e.target.value.toLowerCase();
           const jobCards = document.querySelectorAll("[data-job-id]");
+          let visibleCount = 0;
 
           jobCards.forEach((card) => {
             const title = card.querySelector("h3").textContent.toLowerCase();
             if (title.includes(searchTerm)) {
               card.style.display = "block";
+              visibleCount++;
             } else {
               card.style.display = "none";
             }
           });
+
+          // 검색 결과 개수 업데이트
+          const displayCountElement = document.getElementById("displayCount");
+          if (displayCountElement) {
+            displayCountElement.textContent = visibleCount;
+          }
         });
     </script>
   </body>

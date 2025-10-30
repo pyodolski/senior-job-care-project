@@ -86,7 +86,8 @@ def google_login_callback():
 
     # 로그인 처리 후 프로필 완성 여부 확인
     login_user(user)
-    if not is_profile_complete(user):
+    # 관리자가 아닌 경우에만 프로필 완성 여부 확인
+    if user.user_type != 2 and not is_profile_complete(user):
         flash("추가 정보를 입력해주세요.", "info")
         return redirect(url_for("auth.onboarding"))
     return redirect(url_for("auth.main"))
@@ -152,7 +153,8 @@ def kakao_login_callback():
 
     # 로그인 처리 후 프로필 완성 여부 확인
     login_user(user)
-    if not is_profile_complete(user):
+    # 관리자가 아닌 경우에만 프로필 완성 여부 확인
+    if user.user_type != 2 and not is_profile_complete(user):
         flash("추가 정보를 입력해주세요.", "info")
         return redirect(url_for("auth.onboarding"))
     return redirect(url_for("auth.main"))
@@ -161,8 +163,8 @@ def kakao_login_callback():
 @auth_bp.route("/main")
 @login_required
 def main():
-    # 프로필 완성 여부 체크
-    if not is_profile_complete(current_user):
+    # 관리자가 아닌 경우에만 프로필 완성 여부 체크
+    if current_user.user_type != 2 and not is_profile_complete(current_user):
         flash("프로필 정보를 완성해주세요.", "warning")
         return redirect(url_for("auth.onboarding"))
 
@@ -467,12 +469,12 @@ def login():
             return redirect(url_for("auth.login"))
 
         login_user(user)
-        
-        # 프로필 완성 여부 확인
-        if not is_profile_complete(user):
+
+        # 관리자가 아닌 경우에만 프로필 완성 여부 확인
+        if user.user_type != 2 and not is_profile_complete(user):
             flash("추가 정보를 입력해주세요.", "info")
             return redirect(url_for("auth.onboarding"))
-        
+
         return redirect(url_for("auth.main"))
 
     return render_template("login.html")

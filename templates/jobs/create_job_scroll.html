@@ -10,65 +10,10 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <style>
-      body {
-        font-family: "Noto Sans KR", sans-serif;
-      }
-      .scroll-section {
-        opacity: 0;
-        max-height: 0;
-        overflow: hidden;
-        transition: opacity 0.5s ease, max-height 0.5s ease;
-        padding: 0 1rem;
-      }
-      .scroll-section.visible {
-        opacity: 1;
-        max-height: 3000px;
-        padding: 1rem 1rem;
-      }
-      .scroll-section.completed {
-        pointer-events: none;
-        opacity: 0.6;
-      }
-      .option-selected {
-        background-color: #1d4ed8 !important;
-        color: white !important;
-        border-color: #1d4ed8 !important;
-      }
-      .category-btn.option-selected,
-      .period-btn.option-selected {
-        background-color: #1d4ed8 !important;
-        color: white !important;
-        border-color: #1d4ed8 !important;
-      }
-      .radio-option {
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
-      .radio-option:hover {
-        background-color: #f3f4f6;
-      }
-      .radio-option.selected {
-        background-color: #eff6ff;
-        border-color: #3b82f6;
-      }
-      .radio-option.disabled {
-        pointer-events: none;
-        opacity: 0.6;
-      }
-      .next-btn-fixed {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        max-width: 28rem;
-        margin: 0 auto;
-        z-index: 50;
-      }
-      html {
-        scroll-behavior: smooth;
-      }
-    </style>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/create_job_scroll.css') }}"
+    />
   </head>
   <body class="bg-gray-50">
     <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto pb-24">
@@ -96,7 +41,7 @@
         </div>
       </header>
 
-      <section id="step1" class="scroll-section visible pt-20">
+      <section id="step1" class="scroll-section visible">
         <div class="mb-4">
           <h2 class="text-xl font-bold text-gray-900 mb-6">
             어떤 분을 찾고 계세요?
@@ -240,7 +185,7 @@
             어떤 제목으로 올려볼까요?
           </h2>
 
-          <div class="mb-8">
+          <div class="mb-4">
             <input
               type="text"
               id="jobTitle"
@@ -250,60 +195,85 @@
             />
           </div>
 
-          <div class="flex flex-wrap gap-2">
-            <button
-              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-              data-category="주방보조/설거지"
+          <div class="flex items-start gap-2 mb-8">
+            <div
+              id="categoryContainer"
+              class="flex flex-wrap gap-2 category-container flex-1"
             >
-              주방 보조 / 설거지
-            </button>
+              <button
+                class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                data-category="주방보조/설거지"
+              >
+                주방 보조 / 설거지
+              </button>
+              <button
+                class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                data-category="편의점"
+              >
+                편의점
+              </button>
+              <button
+                class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                data-category="서빙"
+              >
+                서빙
+              </button>
+              <button
+                class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                data-category="카페/베이커리"
+              >
+                카페 / 베이커리
+              </button>
+              <button
+                class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                data-category="아이돌봄"
+              >
+                아이돌봄
+              </button>
+              <button
+                class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                data-category="학원/과외"
+              >
+                학원/과외
+              </button>
+              <button
+                class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                data-category="집청소"
+              >
+                집 청소
+              </button>
+              <button
+                class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                data-category="전단지/홍보"
+              >
+                전단지 / 홍보
+              </button>
+              <button
+                class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                data-category="기타"
+              >
+                기타
+              </button>
+            </div>
             <button
-              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-              data-category="편의점"
+              id="categoryToggleBtn"
+              onclick="toggleCategories()"
+              class="flex items-center justify-center flex-shrink-0 w-10 h-10 rounded-full border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
             >
-              편의점
-            </button>
-            <button
-              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-              data-category="서빙"
-            >
-              서빙
-            </button>
-            <button
-              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-              data-category="카페/베이커리"
-            >
-              카페 / 베이커리
-            </button>
-            <button
-              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-              data-category="아이돌봄"
-            >
-              아이돌봄
-            </button>
-            <button
-              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-              data-category="학원/과외"
-            >
-              학원/과외
-            </button>
-            <button
-              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-              data-category="집청소"
-            >
-              집 청소
-            </button>
-            <button
-              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-              data-category="전단지/홍보"
-            >
-              전단지 / 홍보
-            </button>
-            <button
-              class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-              data-category="기타"
-            >
-              기타
+              <svg
+                id="categoryToggleIcon"
+                class="w-5 h-5 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
             </button>
           </div>
         </div>
@@ -418,8 +388,7 @@
                 </div>
               </div>
 
-              <div id="calendarGrid" class="grid grid-cols-7 gap-1 mb-3">
-                </div>
+              <div id="calendarGrid" class="grid grid-cols-7 gap-1 mb-3"></div>
             </div>
 
             <p class="text-sm text-gray-600 mt-3 text-center">
@@ -550,6 +519,72 @@
 
       <section id="step4" class="scroll-section">
         <div class="mb-4">
+          <h2 class="text-xl font-bold text-gray-900 mb-6">
+            급여를 적어주세요
+          </h2>
+
+          <div class="mb-6">
+            <div class="flex gap-2 mb-4">
+              <button
+                class="salary-type-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                data-type="시급"
+              >
+                시급
+              </button>
+              <button
+                class="salary-type-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                data-type="일급"
+              >
+                일급
+              </button>
+              <button
+                class="salary-type-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                data-type="월급"
+              >
+                월급
+              </button>
+              <button
+                class="salary-type-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                data-type="건당"
+              >
+                건당
+              </button>
+            </div>
+
+            <div class="relative mb-4">
+              <input
+                type="text"
+                id="salaryAmount"
+                placeholder="금액을 입력해주세요"
+                class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none pr-12"
+                inputmode="numeric"
+              />
+              <span
+                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium"
+                >원</span
+              >
+            </div>
+
+            <div class="bg-blue-50 rounded-2xl p-5 border border-blue-200">
+              <p class="text-base text-gray-800 mb-3 text-center">
+                <span class="font-bold text-lg"
+                  >2025년 최저시급은 10,030원이에요</span
+                >
+              </p>
+              <hr class="border-blue-300 my-3" />
+              <p
+                id="salaryCalculation"
+                class="text-base text-gray-800 text-center font-medium"
+              >
+                조건을 선택하면 최소 급여를 계산해드려요
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="step5" class="scroll-section">
+        <div class="mb-4">
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-bold text-gray-900">
               일에 대하여 참고할 사항을 적어주세요
@@ -564,11 +599,13 @@
             </button>
           </div>
 
-          <div class="bg-gray-50 rounded-2xl p-4 mb-4">
-            <p class="text-sm text-gray-600 mb-2">이런 내용을 적어보세요</p>
-            <ul class="space-y-1 text-sm text-gray-600">
+          <div class="bg-blue-50 rounded-2xl p-5 mb-4 border border-blue-200">
+            <p class="text-base text-gray-800 mb-3 text-center font-bold">
+              이런 내용을 적어보세요
+            </p>
+            <hr class="border-blue-300 mb-3" />
+            <ul class="space-y-2 text-base text-gray-800 text-center">
               <li>• 어떤 도움이 필요한가요?</li>
-              <li>• 급여는 얼마인가요?</li>
               <li>• 일을 위해 필요한 준비물이 있을까요?</li>
               <li>• 미리 협의해야 할 사항이 있나요?</li>
             </ul>
@@ -653,6 +690,76 @@
       </section>
 
       <section id="step6" class="scroll-section">
+        <div class="mb-4">
+          <h2 class="text-xl font-bold text-gray-900 mb-6">
+            일할 장소를 알려주세요
+          </h2>
+
+          <div class="space-y-4">
+            <div class="relative">
+              <input
+                type="text"
+                id="workLocation"
+                placeholder="지도에서 위치를 선택해주세요"
+                class="w-full px-4 py-4 text-lg border-2 border-gray-300 rounded-2xl focus:border-blue-600 focus:outline-none pr-12"
+                readonly
+                onclick="openAddressSearch()"
+              />
+              <button
+                onclick="openAddressSearch()"
+                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-600"
+              >
+                <svg
+                  class="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <input
+              type="text"
+              id="detailAddress"
+              placeholder="상세 주소를 입력해주세요 (예: 101동 502호, 2층)"
+              class="w-full px-4 py-4 text-base border-2 border-gray-300 rounded-2xl focus:border-blue-500 focus:outline-none"
+            />
+
+            <input type="hidden" id="latitude" name="latitude" />
+            <input type="hidden" id="longitude" name="longitude" />
+            <input
+              type="hidden"
+              id="region_1depth_name"
+              name="region_1depth_name"
+            />
+            <input
+              type="hidden"
+              id="region_2depth_name"
+              name="region_2depth_name"
+            />
+            <input
+              type="hidden"
+              id="region_3depth_name"
+              name="region_3depth_name"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section id="step7" class="scroll-section">
         <div class="mb-4">
           <h2 class="text-xl font-bold text-gray-900 mb-6">
             연락처를 알려주세요
@@ -909,630 +1016,12 @@
     </div>
 
     <script>
-      // AI 어시스턴트 함수
-      function openAIAssistant() {
-        const title = document.getElementById("jobTitle").value;
-        const description = document.getElementById("jobDescription").value;
-        document.getElementById("aiTitle").value = title;
-        document.getElementById("aiJobContent").value = description.substring(
-          0,
-          100
-        );
-        document.getElementById("aiModal").classList.remove("hidden");
-        document.getElementById("aiPreview").classList.add("hidden");
-        document.getElementById("aiApplyBtn").classList.add("hidden");
-      }
-
-      function closeAIModal() {
-        document.getElementById("aiModal").classList.add("hidden");
-        document.getElementById("aiPreview").classList.add("hidden");
-        document.getElementById("aiLoading").classList.add("hidden");
-        document.getElementById("aiApplyBtn").classList.add("hidden");
-      }
-
-      async function generateWithAI() {
-        const title = document.getElementById("aiTitle").value.trim();
-        const salary = document.getElementById("aiSalary").value.trim();
-        const jobContent = document.getElementById("aiJobContent").value.trim();
-        const requirements = document
-          .getElementById("aiRequirements")
-          .value.trim();
-        if (!title || !jobContent) {
-          alert("제목과 직무 내용은 필수입니다.");
-          return;
-        }
-        document.getElementById("aiLoading").classList.remove("hidden");
-        document.getElementById("aiPreview").classList.add("hidden");
-        try {
-          const response = await fetch(
-            "{{ url_for('jobs.ai_generate_description') }}",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                title,
-                salary,
-                job_content: jobContent,
-                requirements,
-              }),
-            }
-          );
-          if (!response.ok) throw new Error("AI 생성 실패");
-          const data = await response.json();
-          const generatedText = data.description;
-          document.getElementById("aiPreviewContent").textContent =
-            generatedText;
-          document.getElementById("aiPreview").classList.remove("hidden");
-          document.getElementById("aiApplyBtn").classList.remove("hidden");
-          window.aiGeneratedText = generatedText;
-        } catch (error) {
-          console.error("Error:", error);
-          alert("AI 작성 중 오류가 발생했습니다: " + error.message);
-        } finally {
-          document.getElementById("aiLoading").classList.add("hidden");
-        }
-      }
-
-      function applyAIText() {
-        if (window.aiGeneratedText) {
-          document.getElementById("jobDescription").value =
-            window.aiGeneratedText;
-          selectedData.description = window.aiGeneratedText;
-          alert("내용이 적용되었습니다.");
-          closeAIModal();
-          updateNextButton();
-        }
-      }
-
-      let currentStep = 1;
-      let maxStep = 6;
-      let selectedData = {
-        category: "",
-        title: "",
-        categories: [],
-        workPeriod: "",
-        selectedDates: [],
-        days: [],
-        startTime: "",
-        endTime: "",
-        salaryType: "",
-        salaryAmount: "",
-        location: "",
-        detailAddress: "",
-        phone: "",
-        description: "",
-      };
-
-      let geocodeResult = null;
-
-      let currentCalendarDate = new Date();
-      const today = new Date();
-
-      function goToNextStep() {
-        if (currentStep < maxStep) {
-          const currentSection = document.getElementById(`step${currentStep}`);
-          if (currentSection) {
-            currentSection.classList.add("completed");
-            if (currentStep === 1) {
-              document
-                .querySelectorAll("#step1 .radio-option")
-                .forEach((opt) => opt.classList.add("disabled"));
-            }
-            const inputs = currentSection.querySelectorAll(
-              "input:not([type='checkbox']):not([type='radio']), textarea, select"
-            );
-            inputs.forEach((input) => {
-              input.readOnly = true;
-              input.disabled = true;
-            });
-            const buttons = currentSection.querySelectorAll(
-              "button:not(#nextBtn)"
-            );
-            buttons.forEach((btn) => (btn.disabled = true));
-          }
-          currentStep++;
-          const nextSection = document.getElementById(`step${currentStep}`);
-          if (nextSection) {
-            nextSection.classList.add("visible");
-            document.getElementById("nextBtn").disabled = true;
-            setTimeout(() => {
-              nextSection.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-              });
-            }, 100);
-            updateNextButton();
-          }
-        } else {
-          submitJob();
-        }
-      }
-
-      function goBack() {
-        if (currentStep > 1) {
-          currentStep--;
-          const prevSection = document.getElementById(`step${currentStep}`);
-          if (prevSection) {
-            prevSection.scrollIntoView({ behavior: "smooth" });
-            updateNextButton();
-          }
-        } else {
-          window.location.href = "{{ url_for('auth.main') }}";
-        }
-      }
-
-      function updateNextButton() {
-        const nextBtn = document.getElementById("nextBtn");
-        let isValid = false;
-        switch (currentStep) {
-          case 1:
-            isValid = selectedData.category !== "";
-            break;
-          case 2:
-            isValid =
-              selectedData.title.length > 0 &&
-              selectedData.categories.length > 0;
-            break;
-          case 3:
-            if (selectedData.workPeriod === "단기") {
-              isValid = selectedData.selectedDates.length > 0;
-            } else {
-              isValid = selectedData.workPeriod !== "";
-            }
-            break;
-          case 4:
-            isValid = selectedData.description.length > 0;
-            break;
-          case 5:
-            isValid = selectedData.location.length > 0;
-            break;
-          case 6:
-            const agreeTerms = document.getElementById("agreeTerms")?.checked;
-            isValid = selectedData.phone.length > 0 && agreeTerms;
-            nextBtn.textContent = "AI가 작성한 공고 보기";
-            break;
-        }
-        nextBtn.disabled = !isValid;
-      }
-
-      document.querySelectorAll(".radio-option").forEach((option) => {
-        option.addEventListener("click", function () {
-          document.querySelectorAll(".radio-option").forEach((opt) => {
-            opt.classList.remove("selected");
-            opt.querySelector(".radio-dot").classList.add("hidden");
-          });
-          this.classList.add("selected");
-          this.querySelector(".radio-dot").classList.remove("hidden");
-          selectedData.category = this.dataset.value;
-          updateNextButton();
-        });
-      });
-
-      document
-        .getElementById("jobTitle")
-        ?.addEventListener("input", function () {
-          selectedData.title = this.value;
-          updateNextButton();
-        });
-
-      document.querySelectorAll(".category-btn").forEach((btn) => {
-        btn.addEventListener("click", function () {
-          this.classList.toggle("option-selected");
-          const selectedCategories = [];
-          document
-            .querySelectorAll(".category-btn.option-selected")
-            .forEach((b) => selectedCategories.push(b.dataset.category));
-          selectedData.categories = selectedCategories;
-          updateNextButton();
-        });
-      });
-
-      document.querySelectorAll(".period-btn").forEach((btn) => {
-        btn.addEventListener("click", function () {
-          document
-            .querySelectorAll(".period-btn")
-            .forEach((b) => b.classList.remove("option-selected"));
-          this.classList.add("option-selected");
-          selectedData.workPeriod = this.dataset.period;
-          const calendar = document.getElementById("shortTermCalendar");
-          const schedule = document.getElementById("longTermSchedule");
-          if (this.dataset.period === "단기") {
-            calendar.classList.remove("hidden");
-            schedule.classList.add("hidden");
-            generateCalendar();
-          } else {
-            calendar.classList.add("hidden");
-            schedule.classList.remove("hidden");
-          }
-          updateNextButton();
-        });
-      });
-
-      function generateCalendar() {
-        const year = currentCalendarDate.getFullYear();
-        const month = currentCalendarDate.getMonth();
-        document.getElementById("currentMonth").textContent = `${year}년 ${
-          month + 1
-        }월`;
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
-        const startDayOfWeek = firstDay.getDay();
-        const calendarGrid = document.getElementById("calendarGrid");
-        calendarGrid.innerHTML = "";
-        for (let i = 0; i < startDayOfWeek; i++) {
-          const emptyCell = document.createElement("div");
-          emptyCell.className = "text-center py-2";
-          calendarGrid.appendChild(emptyCell);
-        }
-        for (let day = 1; day <= lastDay.getDate(); day++) {
-          const dateCell = document.createElement("button");
-          const currentDate = new Date(year, month, day);
-          const dateString = `${year}-${String(month + 1).padStart(
-            2,
-            "0"
-          )}-${String(day).padStart(2, "0")}`;
-          const dayOfWeek = (startDayOfWeek + day - 1) % 7;
-          dateCell.className =
-            "text-center py-2 rounded-full hover:bg-gray-100 transition-colors text-sm font-medium w-9 h-9 flex items-center justify-center mx-auto";
-          dateCell.textContent = day;
-          dateCell.type = "button";
-          dateCell.onclick = () => toggleDateSelection(dateString, dateCell);
-          if (currentDate.toDateString() === today.toDateString()) {
-            dateCell.classList.add("font-bold", "border", "border-blue-500");
-          }
-          if (selectedData.selectedDates.includes(dateString)) {
-            dateCell.classList.add("bg-blue-600", "text-white", "font-bold");
-            dateCell.classList.remove("hover:bg-gray-100");
-          } else {
-            if (dayOfWeek === 0) dateCell.classList.add("text-red-500");
-            else if (dayOfWeek === 6)
-              dateCell.classList.add("text-blue-500");
-          }
-          calendarGrid.appendChild(dateCell);
-        }
-        updateSelectedDatesDisplay();
-      }
-
-      function toggleDateSelection(dateString, element) {
-        const index = selectedData.selectedDates.indexOf(dateString);
-        if (index > -1) {
-          selectedData.selectedDates.splice(index, 1);
-          element.classList.remove("bg-blue-600", "text-white", "font-bold");
-          element.classList.add("hover:bg-gray-100");
-          const date = new Date(dateString);
-          const dayOfWeek = date.getDay();
-          if (dayOfWeek === 0) element.classList.add("text-red-500");
-          else if (dayOfWeek === 6) element.classList.add("text-blue-500");
-        } else {
-          selectedData.selectedDates.push(dateString);
-          element.classList.add("bg-blue-600", "text-white", "font-bold");
-          element.classList.remove(
-            "hover:bg-gray-100",
-            "text-red-500",
-            "text-blue-500"
-          );
-        }
-        updateSelectedDatesDisplay();
-        updateNextButton();
-      }
-
-      function updateSelectedDatesDisplay() {
-        const count = selectedData.selectedDates.length;
-        document.getElementById("selectedDatesCount").textContent = count;
-        if (count > 0) {
-          const sortedDates = selectedData.selectedDates.sort();
-          const firstDate = sortedDates[0].replace(/-/g, ".");
-          const lastDate = sortedDates[sortedDates.length - 1].replace(
-            /-/g,
-            "."
-          );
-          if (count === 1) {
-            document.getElementById("selectedDatesDisplay").textContent =
-              firstDate;
-          } else {
-            document.getElementById(
-              "selectedDatesDisplay"
-            ).textContent = `${firstDate} - ${lastDate}`;
-          }
-        } else {
-          document.getElementById("selectedDatesDisplay").textContent =
-            "날짜를 선택해주세요";
-        }
-      }
-
-      function changeMonth(delta) {
-        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
-        generateCalendar();
-      }
-      window.changeMonth = changeMonth;
-
-      document.querySelectorAll(".day-btn").forEach((btn) => {
-        btn.addEventListener("click", function () {
-          this.classList.toggle("option-selected");
-          const selectedDays = [];
-          document
-            .querySelectorAll(".day-btn.option-selected")
-            .forEach((b) => selectedDays.push(b.dataset.day));
-          selectedData.days = selectedDays;
-        });
-      });
-
-      document
-        .getElementById("detailAddress")
-        .addEventListener("input", function () {
-          selectedData.detailAddress = this.value;
-        });
-
-      document
-        .getElementById("contactPhone")
-        .addEventListener("input", function (e) {
-          let value = e.target.value.replace(/[^0-9]/g, "");
-          if (value.length > 3 && value.length <= 7) {
-            value = value.slice(0, 3) + "-" + value.slice(3);
-          } else if (value.length > 7) {
-            value =
-              value.slice(0, 3) +
-              "-" +
-              value.slice(3, 7) +
-              "-" +
-              value.slice(7, 11);
-          }
-          e.target.value = value;
-          selectedData.phone = value;
-          updateNextButton();
-        });
-
-      document
-        .getElementById("agreeTerms")
-        ?.addEventListener("change", function () {
-          updateNextButton();
-        });
-
-      let addressMap = null;
-      let addressMarker = null;
-      let selectedAddress = null;
-
-      function openAddressSearch() {
-        document.getElementById("addressModal").classList.remove("hidden");
-        if (!addressMap) {
-          setTimeout(() => {
-            initAddressMap();
-          }, 100);
-        }
-      }
-      window.openAddressSearch = openAddressSearch;
-
-      function initAddressMap() {
-        const container = document.getElementById("addressMap");
-        const options = {
-          center: new kakao.maps.LatLng(35.8242, 128.7569),
-          level: 5,
-        };
-        addressMap = new kakao.maps.Map(container, options);
-        kakao.maps.event.addListener(
-          addressMap,
-          "click",
-          function (mouseEvent) {
-            const latlng = mouseEvent.latLng;
-            if (addressMarker) addressMarker.setMap(null);
-            addressMarker = new kakao.maps.Marker({
-              position: latlng,
-              map: addressMap,
-            });
-            const geocoder = new kakao.maps.services.Geocoder();
-            geocoder.coord2Address(
-              latlng.getLng(),
-              latlng.getLat(),
-              function (result, status) {
-                if (status === kakao.maps.services.Status.OK) {
-                  const address = result[0].address;
-                  const roadAddress = result[0].road_address;
-                  selectedAddress = {
-                    address: roadAddress
-                      ? roadAddress.address_name
-                      : address.address_name,
-                    lat: latlng.getLat(),
-                    lng: latlng.getLng(),
-                  };
-                  document.getElementById("selectedAddressText").textContent =
-                    selectedAddress.address;
-                  document.getElementById("confirmAddressBtn").disabled = false;
-                }
-              }
-            );
-          }
-        );
-      }
-
-      function searchAddress() {
-        const query = document.getElementById("addressSearch").value.trim();
-        if (!query) {
-          alert("주소를 입력해주세요");
-          return;
-        }
-        const geocoder = new kakao.maps.services.Geocoder();
-        geocoder.addressSearch(query, function (result, status) {
-          if (status === kakao.maps.services.Status.OK) {
-            const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-            addressMap.setCenter(coords);
-            addressMap.setLevel(3);
-            if (addressMarker) addressMarker.setMap(null);
-            addressMarker = new kakao.maps.Marker({
-              position: coords,
-              map: addressMap,
-            });
-            selectedAddress = {
-              address:
-                result[0].address_name || result[0].road_address?.address_name,
-              lat: parseFloat(result[0].y),
-              lng: parseFloat(result[0].x),
-            };
-            document.getElementById("selectedAddressText").textContent =
-              selectedAddress.address;
-            document.getElementById("confirmAddressBtn").disabled = false;
-          } else {
-            alert("주소를 찾을 수 없습니다. 다시 시도해주세요.");
-          }
-        });
-      }
-      window.searchAddress = searchAddress;
-
-      function closeAddressModal() {
-        document.getElementById("addressModal").classList.add("hidden");
-        selectedAddress = null;
-        document.getElementById("selectedAddressText").textContent =
-          "지도에서 위치를 클릭하거나 검색해주세요";
-        document.getElementById("confirmAddressBtn").disabled = true;
-        document.getElementById("addressSearch").value = "";
-      }
-      window.closeAddressModal = closeAddressModal;
-
-
-      async function confirmAddress() {
-        if (selectedAddress) {
-          document.getElementById("workLocation").value =
-            selectedAddress.address;
-          selectedData.location = selectedAddress.address;
-          selectedData.latitude = selectedAddress.lat;
-          selectedData.longitude = selectedAddress.lng;
-          const geocoder = new kakao.maps.services.Geocoder();
-          try {
-            const regionResult = await new Promise((resolve, reject) => {
-              geocoder.coord2RegionCode(
-                selectedAddress.lng,
-                selectedAddress.lat,
-                (result, status) => {
-                  if (status === kakao.maps.services.Status.OK) {
-                    resolve(result);
-                  } else {
-                    reject(new Error("주소 변환 실패"));
-                  }
-                }
-              );
-            });
-            const legalRegion =
-              regionResult.find((r) => r.region_type === "B") ||
-              regionResult[0];
-            geocodeResult = {
-              lat: selectedAddress.lat,
-              lng: selectedAddress.lng,
-              region1: legalRegion.region_1depth_name,
-              region2: legalRegion.region_2depth_name,
-              region3: legalRegion.region_3depth_name,
-            };
-            document.getElementById("latitude").value = selectedAddress.lat;
-            document.getElementById("longitude").value = selectedAddress.lng;
-            document.getElementById("region_1depth_name").value =
-              legalRegion.region_1depth_name;
-            document.getElementById("region_2depth_name").value =
-              legalRegion.region_2depth_name;
-            document.getElementById("region_3depth_name").value =
-              legalRegion.region_3depth_name;
-          } catch (error) {
-            console.error("주소 변환 중 오류 발생:", error);
-            geocodeResult = null;
-            alert(
-              "주소 정보를 가져오는 데 실패했습니다. 다른 위치를 선택해주세요."
-            );
-          } finally {
-            updateNextButton();
-            closeAddressModal();
-          }
-        }
-      }
-      window.confirmAddress = confirmAddress;
-
-      document
-        .getElementById("jobDescription")
-        .addEventListener("input", function () {
-          selectedData.description = this.value;
-          updateNextButton();
-        });
-
-      async function submitJob() {
-        console.log("제출 데이터:", selectedData);
-        try {
-          const formData = new FormData();
-          formData.append("title", selectedData.title);
-          formData.append("company", "{{ current_user.nickname }}");
-          formData.append("people_category", selectedData.category);
-          formData.append(
-            "description",
-            selectedData.description || "상세 설명 없음"
-          );
-          formData.append(
-            "recruitment_type",
-            selectedData.categories.join(", ")
-          );
-          formData.append("work_period", selectedData.workPeriod);
-          formData.append("salary", "임의 급여"); // 급여 부분이 없으므로 임시값
-          formData.append("region", selectedData.location);
-          formData.append("contact_phone", selectedData.phone);
-          if (selectedData.detailAddress) {
-            formData.append("detail_address", selectedData.detailAddress);
-          }
-          if (geocodeResult && geocodeResult.lat && geocodeResult.lng) {
-            formData.append("latitude", geocodeResult.lat);
-            formData.append("longitude", geocodeResult.lng);
-            formData.append("region_1depth_name", geocodeResult.region1 || "");
-            formData.append("region_2depth_name", geocodeResult.region2 || "");
-            formData.append("region_3depth_name", geocodeResult.region3 || "");
-          }
-          formData.append(
-            "work_monday",
-            selectedData.days.includes("월") ? "true" : "false"
-          );
-          formData.append(
-            "work_tuesday",
-            selectedData.days.includes("화") ? "true" : "false"
-          );
-          formData.append(
-            "work_wednesday",
-            selectedData.days.includes("수") ? "true" : "false"
-          );
-          formData.append(
-            "work_thursday",
-            selectedData.days.includes("목") ? "true" : "false"
-          );
-          formData.append(
-            "work_friday",
-            selectedData.days.includes("금") ? "true" : "false"
-          );
-          formData.append(
-            "work_saturday",
-            selectedData.days.includes("토") ? "true" : "false"
-          );
-          formData.append(
-            "work_sunday",
-            selectedData.days.includes("일") ? "true" : "false"
-          );
-          const startTimeSelect = document.getElementById("startTimeSelect");
-          const endTimeSelect = document.getElementById("endTimeSelect");
-          if (startTimeSelect && startTimeSelect.value) {
-            formData.append("work_start_time", startTimeSelect.value);
-          }
-          if (endTimeSelect && endTimeSelect.value) {
-            formData.append("work_end_time", endTimeSelect.value);
-          }
-          const response = await fetch("{{ url_for('jobs.create_job') }}", {
-            method: "POST",
-            body: formData,
-          });
-          if (response.ok) {
-            alert("공고가 성공적으로 작성되었습니다!");
-            window.location.href = "{{ url_for('jobs.job_list') }}";
-          } else {
-            const text = await response.text();
-            console.error("서버 응답:", text);
-            alert("공고 작성 중 오류가 발생했습니다.");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          alert("공고 작성 중 오류가 발생했습니다: " + error.message);
-        }
-      }
-
-      updateNextButton();
+      window.AI_GENERATE_URL = "{{ url_for('jobs.ai_generate_description') }}";
+      window.MAIN_URL = "{{ url_for('auth.main') }}";
+      window.CURRENT_USER_NICKNAME = "{{ current_user.nickname }}";
+      window.CREATE_JOB_URL = "{{ url_for('jobs.create_job') }}";
+      window.JOB_LIST_URL = "{{ url_for('jobs.job_list') }}";
     </script>
+    <script src="{{ url_for('static', filename='js/create_job_scroll.js') }}"></script>
   </body>
 </html>

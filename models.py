@@ -13,9 +13,11 @@ def get_kst_now():
     return datetime.now(KST)
 
 class WorkType(enum.Enum):
-    LONG_TERM = "장기"
     SHORT_TERM = "단기"
+    FULL_TIME = "정직원"
     PART_TIME = "파트타임"
+    FULL_TIME_HOURS = "풀타임"
+    ETC = "기타"
 
 class Category(enum.Enum):
     SAFETY_MANAGEMENT = "안전·관리"
@@ -332,6 +334,10 @@ class Resume(db.Model):
     # --- 경력, 자기소개 ---
     experience = db.Column(db.Text, nullable=True)
     self_introduction = db.Column(db.Text, nullable=True)
+
+    # --- 통화가능 시간 및 동의 ---
+    call_available_time = db.Column(db.String(255), nullable=True)  # 통화가능 시간
+    privacy_consent = db.Column(db.Boolean, default=False, nullable=False)  # 개인정보 제3자 제공동의
 
     # --- 개인 특성 ---
     strengths = db.Column(db.Text, nullable=True)

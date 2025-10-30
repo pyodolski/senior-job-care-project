@@ -1,0 +1,78 @@
+body {
+  font-family: "Noto Sans KR", sans-serif;
+}
+.scroll-section {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 0.5s ease, max-height 0.5s ease;
+  padding: 0 1rem;
+}
+.scroll-section.visible {
+  opacity: 1;
+  max-height: 3000px;
+  padding: 1.5rem 1rem;
+}
+.scroll-section:first-of-type {
+  padding-top: 5.5rem;
+}
+.scroll-section:first-of-type.visible {
+  padding-top: 5.5rem;
+}
+.scroll-section.completed {
+  pointer-events: none;
+  opacity: 0.6;
+}
+.option-selected {
+  background-color: #1d4ed8 !important;
+  color: white !important;
+  border-color: #1d4ed8 !important;
+}
+.category-btn.option-selected,
+.period-btn.option-selected {
+  background-color: #1d4ed8 !important;
+  color: white !important;
+  border-color: #1d4ed8 !important;
+}
+.radio-option {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.radio-option:hover {
+  background-color: #f3f4f6;
+}
+.radio-option.selected {
+  background-color: #eff6ff;
+  border-color: #3b82f6;
+}
+.radio-option.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+.next-btn-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 28rem;
+  margin: 0 auto;
+  z-index: 50;
+}
+html {
+  scroll-behavior: smooth;
+}
+.category-container {
+  max-height: 3rem;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.category-container.expanded {
+  max-height: 500px;
+}
+.day-btn.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  background-color: #e5e7eb !important;
+  color: #9ca3af !important;
+  border-color: #d1d5db !important;
+}

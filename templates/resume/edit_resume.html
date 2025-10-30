@@ -9,261 +9,10 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <style>
-      body {
-        font-family: "Noto Sans KR", sans-serif;
-        background-color: #f9f9f9;
-        margin: 0;
-        padding: 0;
-      }
-      .form-container {
-        max-width: 600px;
-        margin: 0 auto;
-        background-color: white;
-        min-height: 100vh;
-        position: relative;
-        padding-top: 70px;
-        padding-bottom: 80px;
-      }
-      .main-content {
-        padding: 20px 30px;
-      }
-      .header-fixed {
-        position: fixed;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100%;
-        max-width: 600px;
-        background-color: white;
-        border-bottom: 1px solid #e5e7eb;
-        z-index: 50;
-      }
-      .footer-fixed {
-        position: fixed;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100%;
-        max-width: 600px;
-        background-color: white;
-        border-top: 1px solid #e5e7eb;
-        padding: 16px 20px;
-        z-index: 50;
-      }
-      .step-container {
-        border: 1px solid #ddd;
-        padding: 20px;
-        margin-top: 20px;
-        border-radius: 8px;
-      }
-      h1 {
-        text-align: center;
-        color: #333;
-      }
-      h2 {
-        border-bottom: 2px solid #eee;
-        padding-bottom: 10px;
-        color: #444;
-      }
-      h4 {
-        color: #555;
-        margin-top: 20px;
-      }
-      label {
-        display: block;
-        margin: 15px 0 5px;
-        font-weight: bold;
-      }
-      input[type="text"],
-      input[type="time"],
-      input[type="number"],
-      textarea {
-        width: 100%;
-        padding: 10px;
-        box-sizing: border-box;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-      }
-      textarea {
-        min-height: 120px;
-        resize: vertical;
-      }
-      .button-group {
-        margin-top: 25px;
-        display: flex;
-        justify-content: space-between;
-      }
-      button {
-        padding: 12px 25px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: bold;
-      }
-      button[type="submit"] {
-        background-color: #007bff;
-        color: white;
-        width: 100%;
-      }
-      .prev-btn {
-        background-color: #6c757d;
-        color: white;
-      }
-      .next-btn {
-        background-color: #28a745;
-        color: white;
-      }
-      .certificate-entry {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        margin-bottom: 10px;
-      }
-      .checkbox-group label {
-        display: inline-block;
-        margin-right: 15px;
-        font-weight: normal;
-      }
-      .alert {
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 5px;
-      }
-      .alert-success {
-        background-color: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-      }
-      .alert-error {
-        background-color: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-      }
-
-      /* 카테고리 카드 스타일 */
-      .category-card {
-        transition: all 0.2s ease;
-      }
-      .category-card input[type="radio"]:checked ~ .card-content {
-        border-color: #1e40af;
-        background-color: #eff6ff;
-      }
-      .category-card input[type="radio"]:checked ~ .card-content .radio-circle {
-        background-color: #1e40af;
-        border-color: #1e40af;
-      }
-      .category-card
-        input[type="radio"]:checked
-        ~ .card-content
-        .radio-circle
-        .check-icon {
-        display: block;
-      }
-      .check-icon {
-        display: none;
-      }
-      .button-group {
-        display: none;
-      }
-
-      /* 요일 버튼 스타일 */
-      .day-btn {
-        display: inline-block;
-        width: 48px;
-        height: 48px;
-        line-height: 48px;
-        text-align: center;
-        border: 2px solid #d1d5db;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: all 0.2s;
-        font-weight: 500;
-        color: #4b5563;
-      }
-      .day-checkbox:checked + .day-btn {
-        background-color: #2563eb;
-        border-color: #2563eb;
-        color: white;
-      }
-
-      /* 근무 형태 버튼 스타일 */
-      .work-type-btn {
-        display: inline-block;
-        padding: 10px 20px;
-        border: 2px solid #d1d5db;
-        border-radius: 24px;
-        cursor: pointer;
-        transition: all 0.2s;
-        font-weight: 500;
-        color: #4b5563;
-      }
-      .work-type-radio:checked + .work-type-btn {
-        background-color: #2563eb;
-        border-color: #2563eb;
-        color: white;
-      }
-
-      /* 성격 및 강점 버튼 스타일 */
-      .strength-btn {
-        display: inline-block;
-        padding: 10px 20px;
-        border: 2px solid #d1d5db;
-        border-radius: 24px;
-        cursor: pointer;
-        transition: all 0.2s;
-        font-weight: 500;
-        color: #4b5563;
-      }
-      .strength-checkbox:checked + .strength-btn {
-        background-color: #2563eb;
-        border-color: #2563eb;
-        color: white;
-      }
-
-      /* 슬라이더 스타일 */
-      .walkable-slider,
-      .commute-slider {
-        -webkit-appearance: none;
-        appearance: none;
-        height: 8px;
-        background: #e5e7eb;
-        outline: none;
-        border-radius: 4px;
-      }
-
-      .walkable-slider::-webkit-slider-thumb,
-      .commute-slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 32px;
-        height: 32px;
-        background: #2563eb;
-        cursor: pointer;
-        border-radius: 50%;
-        border: 4px solid white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      }
-
-      .walkable-slider::-moz-range-thumb,
-      .commute-slider::-moz-range-thumb {
-        width: 32px;
-        height: 32px;
-        background: #2563eb;
-        cursor: pointer;
-        border-radius: 50%;
-        border: 4px solid white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      }
-
-      .walkable-slider::-webkit-slider-thumb::before,
-      .commute-slider::-webkit-slider-thumb::before {
-        content: "👤";
-        position: absolute;
-        font-size: 16px;
-      }
-    </style>
+    <link
+      href="{{ url_for('static', filename='css/edit_resume.css') }}"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div class="form-container">
@@ -727,7 +476,20 @@
                 </label>
               </div>
               <label class="flex items-center text-sm text-gray-600">
-                <input type="checkbox" id="day_negotiable" class="mr-2" />
+                <input
+                  type="checkbox"
+                  id="day_negotiable"
+                  name="is_day_negotiable"
+                  class="mr-2"
+                  {%
+                  if
+                  resume
+                  and
+                  resume.is_day_negotiable
+                  %}checked{%
+                  endif
+                  %}
+                />
                 <span>요일 협의 가능</span>
               </label>
             </div>
@@ -826,7 +588,7 @@
           <div
             id="time-modal"
             class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center"
-            style="z-index: 9999"
+            style="z-index: 9999; display: none"
             onclick="closeTimeModal(event)"
           >
             <div
@@ -1091,7 +853,10 @@
                   </svg>
                   자격증 사진 첨부 (선택)
                 </button>
-                <span id="certificate-file-name" class="ml-3 text-sm text-gray-600"></span>
+                <span
+                  id="certificate-file-name"
+                  class="ml-3 text-sm text-gray-600"
+                ></span>
               </div>
 
               <input
@@ -1151,7 +916,7 @@
           <!-- Step 5: 개인 특성 및 신체 정보 -->
           <div id="step-5" class="step-container" style="display: none">
             <h2 class="text-xl font-bold text-gray-900 mb-4">
-              나의 성격및 강점을 골라주세요 (1/3)
+              나의 성격 및 강점을 골라주세요
             </h2>
 
             <!-- 성격 및 강점 버튼들 -->
@@ -1198,7 +963,7 @@
                   name="walkable_minutes"
                   min="0"
                   max="60"
-                  value="{{ resume.walkable_minutes or 20 }}"
+                  value="{% if resume and resume.walkable_minutes is not none %}{{ resume.walkable_minutes }}{% else %}0{% endif %}"
                   step="10"
                   class="w-full walkable-slider"
                 />
@@ -1214,14 +979,14 @@
             <!-- 신체적 특성 입력 -->
             <div class="mb-6">
               <h3 class="text-base font-semibold text-gray-900 mb-3">
-                나의 신체적 특성이 있다면요 적어주세요
+                나의 신체적 특성이 있다면 적어주세요
               </h3>
 
               <div class="bg-gray-50 rounded-lg p-4 mb-4 text-sm text-gray-700">
                 <ul class="list-disc list-inside space-y-1">
                   <li>장경과 단장 모두 가능해도 괜찮습니다.</li>
                   <li>한 문장에 하나의 특성을 적어주세요</li>
-                  <li>없다면 작지 않아도 괜찮습니다.</li>
+                  <li>없다면 적지 않아도 괜찮습니다.</li>
                 </ul>
               </div>
 
@@ -1298,7 +1063,7 @@
                   name="commute_time"
                   min="0"
                   max="60"
-                  value="{{ resume.commute_time or 20 }}"
+                  value="{% if resume and resume.commute_time is not none %}{{ resume.commute_time }}{% else %}0{% endif %}"
                   step="10"
                   class="w-full commute-slider"
                 />
@@ -1313,7 +1078,14 @@
 
             <div class="mb-6">
               <label class="flex items-center text-sm text-gray-600">
-                <input type="checkbox" id="commute-negotiable" class="mr-2" />
+                <input type="checkbox" id="commute-negotiable" name="is_commute_impossible" class="mr-2" {%
+                  if
+                  resume
+                  and
+                  resume.is_commute_impossible
+                  %}checked{%
+                  endif
+                  %} />
                 <span>교통 수단 불가</span>
               </label>
             </div>
@@ -1356,6 +1128,23 @@
               >
             </div>
 
+            <!-- 통화가능 시간 (선택) -->
+            <div class="mb-6">
+              <label class="block text-sm font-semibold text-gray-900 mb-2">
+                통화가능 시간 (선택)
+              </label>
+              <input
+                type="text"
+                name="call_available_time"
+                placeholder="예: 평일 오전 9시~오후 6시, 주말 제외"
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                value="{{ resume.call_available_time or '' }}"
+              />
+              <p class="text-xs text-gray-500 mt-1">
+                기업에서 연락 가능한 시간대를 입력해주세요
+              </p>
+            </div>
+
             <div class="mb-6">
               <label class="flex items-start space-x-3">
                 <input
@@ -1378,6 +1167,35 @@
                   <span class="block text-xs text-gray-500 mt-1">
                     체크하시면 구인 중인 기업들이 회원님의 이력서를 열람할 수
                     있습니다
+                  </span>
+                </div>
+              </label>
+            </div>
+
+            <!-- 개인정보 제3자 제공동의 (필수) -->
+            <div class="mb-6">
+              <label class="flex items-start space-x-3">
+                <input
+                  type="checkbox"
+                  name="privacy_consent"
+                  id="privacy-consent"
+                  class="mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  required
+                  {%
+                  if
+                  resume
+                  and
+                  resume.privacy_consent
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <div>
+                  <span class="block text-sm font-medium text-gray-900">
+                    개인정보 제3자 제공동의 (필수)
+                  </span>
+                  <span class="block text-xs text-gray-500 mt-1">
+                    구인 기업이 이력서 내용을 열람하고 채용 목적으로 사용하는 것에 동의합니다
                   </span>
                 </div>
               </label>
@@ -1579,6 +1397,36 @@
                 ></p>
               </div>
 
+              <!-- 통화가능 시간 -->
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-semibold text-gray-900">통화가능 시간</h3>
+                  <button
+                    type="button"
+                    onclick="editStep(6)"
+                    class="text-xs text-blue-600 hover:text-blue-800"
+                  >
+                    수정
+                  </button>
+                </div>
+                <p id="preview-call-time" class="text-sm text-gray-700"></p>
+              </div>
+
+              <!-- 개인정보 제3자 제공동의 -->
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-semibold text-gray-900">개인정보 제3자 제공동의</h3>
+                  <button
+                    type="button"
+                    onclick="editStep(6)"
+                    class="text-xs text-blue-600 hover:text-blue-800"
+                  >
+                    수정
+                  </button>
+                </div>
+                <p id="preview-privacy" class="text-sm text-gray-700"></p>
+              </div>
+
               <!-- 이력서 공개 설정 -->
               <div class="bg-white border border-gray-200 rounded-lg p-4">
                 <div class="flex items-center justify-between">
@@ -1626,636 +1474,9 @@
     </div>
 
     <script>
-      let currentStep = 1;
-      const totalSteps = 6;
-
-      function showStep(step) {
-        document
-          .querySelectorAll(".step-container")
-          .forEach((el) => (el.style.display = "none"));
-
-        const stepId =
-          typeof step === "string" ? `step-${step}` : `step-${step}`;
-        const stepElement = document.getElementById(stepId);
-
-        if (stepElement) {
-          stepElement.style.display = "block";
-          currentStep = step;
-          updateFooterButton();
-        }
-      }
-
-      function updateFooterButton() {
-        const footerBtn = document.getElementById("footer-next-btn");
-        const isLastStep = currentStep === 7 || currentStep === "7";
-
-        if (isLastStep) {
-          footerBtn.textContent = "제출하기";
-          footerBtn.classList.remove("bg-blue-600", "hover:bg-blue-700");
-          footerBtn.classList.add("bg-green-600", "hover:bg-green-700");
-        } else {
-          footerBtn.textContent = "다음";
-          footerBtn.classList.remove("bg-green-600", "hover:bg-green-700");
-          footerBtn.classList.add("bg-blue-600", "hover:bg-blue-700");
-        }
-      }
-
-      function handleFooterNext() {
-        if (currentStep === 7 || currentStep === "7") {
-          // 마지막 단계(미리보기)에서는 form submit
-          document.querySelector("form").submit();
-        } else {
-          // 다음 단계로 이동
-          let nextStepValue;
-          if (currentStep === 1) nextStepValue = 2;
-          else if (currentStep === 2) nextStepValue = 3;
-          else if (currentStep === 3) nextStepValue = 4;
-          else if (currentStep === 4) nextStepValue = 5;
-          else if (currentStep === 5) nextStepValue = "5-2";
-          else if (currentStep === "5-2") nextStepValue = "5-3";
-          else if (currentStep === "5-3") nextStepValue = 6;
-          else if (currentStep === 6) nextStepValue = 7;
-          else nextStepValue = currentStep + 1;
-
-          nextStep(nextStepValue);
-        }
-      }
-
-      // 미리보기 표시
-      function showPreview() {
-        updatePreview();
-        nextStep(7);
-      }
-
-      // 특정 단계 수정
-      function editStep(step) {
-        prevStep(step);
-      }
-
-      // 미리보기 업데이트
-      function updatePreview() {
-        // 1. 희망 직무분야
-        const category = document.querySelector(
-          'input[name="categories"]:checked'
-        );
-        document.getElementById("preview-category").textContent = category
-          ? category.value
-          : "미선택";
-
-        // 2. 희망 근무 형태
-        const workType = document.querySelector(
-          'input[name="desired_work_type"]:checked'
-        );
-        document.getElementById("preview-work-type").textContent = workType
-          ? workType.nextElementSibling.textContent
-          : "미선택";
-
-        // 3. 희망 근무 요일
-        const days = [];
-        const dayNames = {
-          monday: "월",
-          tuesday: "화",
-          wednesday: "수",
-          thursday: "목",
-          friday: "금",
-          saturday: "토",
-          sunday: "일",
-        };
-        for (let day in dayNames) {
-          const checkbox = document.querySelector(`input[name="work_${day}"]`);
-          if (checkbox && checkbox.checked) {
-            days.push(dayNames[day]);
-          }
-        }
-        document.getElementById("preview-days").textContent =
-          days.length > 0 ? days.join(", ") : "미선택";
-
-        // 4. 희망 근무 시간
-        const startTime = document.getElementById("start_time").value;
-        const endTime = document.getElementById("end_time").value;
-        const timeNegotiable =
-          document.getElementById("time_negotiable").checked;
-        let timeText = "";
-        if (startTime && endTime) {
-          const startPeriod =
-            parseInt(startTime.split(":")[0]) < 12 ? "오전" : "오후";
-          const endPeriod =
-            parseInt(endTime.split(":")[0]) < 12 ? "오전" : "오후";
-          timeText = `${startPeriod} ${startTime} ~ ${endPeriod} ${endTime}`;
-        }
-        if (timeNegotiable) timeText += " (협의 가능)";
-        document.getElementById("preview-time").textContent =
-          timeText || "미설정";
-
-        // 5. 경력 및 경험
-        const experienceContainer =
-          document.getElementById("preview-experience");
-        experienceContainer.innerHTML = "";
-        if (experienceItems.length > 0) {
-          experienceItems.forEach((item) => {
-            const p = document.createElement("p");
-            p.textContent = "• " + item;
-            experienceContainer.appendChild(p);
-          });
-        } else {
-          experienceContainer.textContent = "등록된 경력이 없습니다";
-        }
-
-        // 6. 보유 기술 및 재능
-        const certsContainer = document.getElementById("preview-certificates");
-        certsContainer.innerHTML = "";
-        const existingCerts = document.querySelectorAll(
-          "#existing-certificates-list .border-blue-600"
-        );
-        const newCerts = document.querySelectorAll(
-          "#certificates-container .certificate-entry"
-        );
-        const totalCerts = existingCerts.length + newCerts.length;
-
-        if (totalCerts > 0) {
-          existingCerts.forEach((cert) => {
-            const p = document.createElement("p");
-            p.textContent = "• " + cert.querySelector("span").textContent;
-            certsContainer.appendChild(p);
-          });
-          newCerts.forEach((cert) => {
-            const p = document.createElement("p");
-            p.textContent = "• " + cert.querySelector("span").textContent;
-            certsContainer.appendChild(p);
-          });
-        } else {
-          certsContainer.textContent = "등록된 자격증이 없습니다";
-        }
-
-        // 7. 성격 및 강점
-        const strengths = [];
-        document
-          .querySelectorAll('input[name="strengths"]:checked')
-          .forEach((input) => {
-            strengths.push(input.value);
-          });
-        document.getElementById("preview-strengths").textContent =
-          strengths.length > 0 ? strengths.join(", ") : "미선택";
-
-        // 8. 신체적 활동 가능 범위
-        const walkableMinutes =
-          document.getElementById("walkable-slider").value;
-        let walkableText = "";
-        if (walkableMinutes == 0) walkableText = "못함";
-        else if (walkableMinutes <= 20) walkableText = "20분";
-        else if (walkableMinutes <= 40) walkableText = "40분";
-        else walkableText = "1시간";
-        document.getElementById(
-          "preview-walkable"
-        ).textContent = `쉬지 않고 걸을 수 있는 시간: ${walkableText}`;
-
-        const physicalContainer = document.getElementById("preview-physical");
-        physicalContainer.innerHTML = "";
-        if (physicalNotes.length > 0) {
-          physicalNotes.forEach((item) => {
-            const p = document.createElement("p");
-            p.textContent = "• " + item;
-            physicalContainer.appendChild(p);
-          });
-        }
-
-        // 9. 이동 가능 범위
-        const commuteTime = document.getElementById("commute-slider").value;
-        let commuteText = "";
-        if (commuteTime == 0) commuteText = "집";
-        else if (commuteTime <= 20) commuteText = "20분";
-        else if (commuteTime <= 40) commuteText = "40분";
-        else commuteText = "1시간";
-        document.getElementById(
-          "preview-commute"
-        ).textContent = `대중교통 또는 자차로 가능한 이동시간: ${commuteText}`;
-
-        // 10. 자기소개
-        const introduction = document.querySelector(
-          'textarea[name="self_introduction"]'
-        ).value;
-        document.getElementById("preview-introduction").textContent =
-          introduction || "작성되지 않았습니다";
-
-        // 11. 이력서 공개 설정
-        const isPublic = document.querySelector(
-          'input[name="is_public"]'
-        ).checked;
-        document.getElementById("preview-public").textContent = isPublic
-          ? "기업에게 공개됨"
-          : "비공개";
-      }
-
-      function handleBackButton() {
-        if (currentStep === 1) {
-          // 첫 단계에서는 프로필 페이지로 이동
-          window.location.href = "{{ url_for('auth.profile') }}";
-        } else {
-          // 이전 단계로 이동
-          let prevStepValue;
-          if (currentStep === 2) prevStepValue = 1;
-          else if (currentStep === 3) prevStepValue = 2;
-          else if (currentStep === 4) prevStepValue = 3;
-          else if (currentStep === 5) prevStepValue = 4;
-          else if (currentStep === "5-2") prevStepValue = 5;
-          else if (currentStep === "5-3") prevStepValue = "5-2";
-          else if (currentStep === 6) prevStepValue = "5-3";
-          else if (currentStep === 7) prevStepValue = 6;
-          else prevStepValue = currentStep - 1;
-
-          prevStep(prevStepValue);
-        }
-      }
-
-      function nextStep(step) {
-        currentStep = step;
-        showStep(step);
-      }
-
-      function prevStep(step) {
-        currentStep = step;
-        showStep(step);
-      }
-
-      // 초기화
-      document.addEventListener("DOMContentLoaded", function () {
-        showStep(1);
-        initTimeSelectors();
-        updateTimeDisplay();
-        initExperienceList();
-        initPhysicalNotesList();
-      });
-
-      // 신체적 특성 관련 함수
-      let physicalNotes = [];
-
-      function initPhysicalNotesList() {
-        const physicalHidden = document.getElementById("physical-notes-hidden");
-        const physicalText = physicalHidden.value.trim();
-
-        if (physicalText) {
-          physicalNotes = physicalText
-            .split("\n")
-            .filter((item) => item.trim());
-          updatePhysicalNotesDisplay();
-        }
-      }
-
-      function addPhysicalNote() {
-        const input = document.getElementById("physical-input");
-        const value = input.value.trim();
-
-        if (value) {
-          physicalNotes.push(value);
-          updatePhysicalNotesDisplay();
-          updatePhysicalNotesHidden();
-          input.value = "";
-        }
-      }
-
-      function removePhysicalNote(index) {
-        physicalNotes.splice(index, 1);
-        updatePhysicalNotesDisplay();
-        updatePhysicalNotesHidden();
-      }
-
-      function updatePhysicalNotesDisplay() {
-        const list = document.getElementById("physical-notes-list");
-        list.innerHTML = "";
-
-        physicalNotes.forEach((item, index) => {
-          const div = document.createElement("div");
-          div.className =
-            "border-2 border-blue-600 rounded-lg px-4 py-3 flex items-center justify-between";
-          div.innerHTML = `
-            <span class="text-gray-900 flex-1">${item}</span>
-            <button
-              type="button"
-              class="text-gray-400 hover:text-gray-600 ml-2"
-              onclick="removePhysicalNote(${index})"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          `;
-          list.appendChild(div);
-        });
-      }
-
-      function updatePhysicalNotesHidden() {
-        const hidden = document.getElementById("physical-notes-hidden");
-        hidden.value = physicalNotes.join("\n");
-      }
-
-      // Enter 키로 신체적 특성 추가
-      document.addEventListener("DOMContentLoaded", function () {
-        const physicalInput = document.getElementById("physical-input");
-        if (physicalInput) {
-          physicalInput.addEventListener("keypress", function (e) {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              addPhysicalNote();
-            }
-          });
-        }
-      });
-
-      // 경력/경험 관련 함수
-      let experienceItems = [];
-
-      function initExperienceList() {
-        const experienceHidden = document.getElementById("experience-hidden");
-        const experienceText = experienceHidden.value.trim();
-
-        if (experienceText) {
-          // 줄바꿈으로 구분된 경험들을 배열로 변환
-          experienceItems = experienceText
-            .split("\n")
-            .filter((item) => item.trim());
-          updateExperienceDisplay();
-        }
-      }
-
-      function addExperience() {
-        const input = document.getElementById("experience-input");
-        const value = input.value.trim();
-
-        if (value) {
-          experienceItems.push(value);
-          updateExperienceDisplay();
-          updateExperienceHidden();
-          input.value = "";
-        }
-      }
-
-      function removeExperience(index) {
-        experienceItems.splice(index, 1);
-        updateExperienceDisplay();
-        updateExperienceHidden();
-      }
-
-      function updateExperienceDisplay() {
-        const list = document.getElementById("experience-list");
-        list.innerHTML = "";
-
-        experienceItems.forEach((item, index) => {
-          const div = document.createElement("div");
-          div.className =
-            "border-2 border-blue-600 rounded-lg px-4 py-3 flex items-center justify-between";
-          div.innerHTML = `
-            <span class="text-gray-900 flex-1">${item}</span>
-            <button
-              type="button"
-              class="text-gray-400 hover:text-gray-600 ml-2"
-              onclick="removeExperience(${index})"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          `;
-          list.appendChild(div);
-        });
-      }
-
-      function updateExperienceHidden() {
-        const hidden = document.getElementById("experience-hidden");
-        hidden.value = experienceItems.join("\n");
-      }
-
-      // Enter 키로 경력 추가
-      document.addEventListener("DOMContentLoaded", function () {
-        const experienceInput = document.getElementById("experience-input");
-        if (experienceInput) {
-          experienceInput.addEventListener("keypress", function (e) {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              addExperience();
-            }
-          });
-        }
-      });
-
-      // 자격증 관련 함수 (새 디자인용)
-      // 파일 선택 시 파일 이름 표시
-      function updateFileName() {
-        const fileInput = document.getElementById("certificate-file");
-        const fileNameSpan = document.getElementById("certificate-file-name");
-
-        if (fileInput.files.length > 0) {
-          fileNameSpan.textContent = fileInput.files[0].name;
-        } else {
-          fileNameSpan.textContent = "";
-        }
-      }
-
-      function addCertificateWithFile() {
-        const input = document.getElementById("certificate-input");
-        const fileInput = document.getElementById("certificate-file");
-        const certName = input.value.trim();
-        const file = fileInput.files[0];
-
-        if (!certName) {
-          alert("자격증 이름을 입력해주세요.");
-          return;
-        }
-
-        // 새 자격증 항목 추가
-        const container = document.getElementById("certificates-container");
-        const div = document.createElement("div");
-        div.className =
-          "border-2 border-blue-600 rounded-lg px-4 py-3 flex items-center justify-between certificate-entry mb-2";
-
-        let certDisplayText = certName;
-        if (file) {
-          certDisplayText += ` <span class="text-xs text-gray-500">(사진 첨부됨)</span>`;
-        }
-
-        div.innerHTML = `
-          <span class="text-gray-900">${certDisplayText}</span>
-          <button
-            type="button"
-            class="text-gray-400 hover:text-gray-600"
-            onclick="this.parentElement.remove()"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-          <input type="hidden" name="certificate_names" value="${certName}">
-        `;
-
-        container.appendChild(div);
-
-        // 파일이 선택된 경우 파일도 추가
-        if (file) {
-          const fileContainer = document.createElement("div");
-          fileContainer.style.display = "none";
-          const fileInputClone = document.createElement("input");
-          fileInputClone.type = "file";
-          fileInputClone.name = "certificate_images";
-
-          // FileList를 전달하기 위해 DataTransfer 사용
-          const dataTransfer = new DataTransfer();
-          dataTransfer.items.add(file);
-          fileInputClone.files = dataTransfer.files;
-
-          div.appendChild(fileInputClone);
-        }
-
-        // 입력 필드 초기화
-        input.value = "";
-        fileInput.value = "";
-        document.getElementById("certificate-file-name").textContent = "";
-      }
-
-      // Enter 키로 자격증 추가
-      document.addEventListener("DOMContentLoaded", function () {
-        const certInput = document.getElementById("certificate-input");
-        if (certInput) {
-          certInput.addEventListener("keypress", function (e) {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              addCertificateWithFile();
-            }
-          });
-        }
-      });
-
-      // 시간 선택 모달 관련 함수
-      function initTimeSelectors() {
-        const startHourSelect = document.getElementById("start-hour");
-        const endHourSelect = document.getElementById("end-hour");
-
-        // 시간 옵션 생성 (00:00 ~ 23:30, 30분 단위)
-        const timeOptions = [];
-        for (let h = 0; h < 24; h++) {
-          for (let m = 0; m < 60; m += 30) {
-            const hour = String(h).padStart(2, "0");
-            const minute = String(m).padStart(2, "0");
-            timeOptions.push(`${hour}:${minute}`);
-          }
-        }
-
-        timeOptions.forEach((time) => {
-          const option1 = document.createElement("option");
-          option1.value = time;
-          option1.textContent = time;
-          startHourSelect.appendChild(option1);
-
-          const option2 = document.createElement("option");
-          option2.value = time;
-          option2.textContent = time;
-          endHourSelect.appendChild(option2);
-        });
-      }
-
-      function openTimeModal() {
-        const modal = document.getElementById("time-modal");
-        modal.classList.remove("hidden");
-        modal.classList.add("flex");
-
-        // 현재 설정된 시간 가져오기
-        const startTime =
-          document.getElementById("start_time").value || "09:00";
-        const endTime = document.getElementById("end_time").value || "18:00";
-
-        // 시작 시간 설정
-        const [startHour, startMin] = startTime.split(":");
-        const startH = parseInt(startHour);
-        document.getElementById("start-period").value =
-          startH < 12 ? "오전" : "오후";
-        document.getElementById("start-hour").value = startTime;
-
-        // 종료 시간 설정
-        const [endHour, endMin] = endTime.split(":");
-        const endH = parseInt(endHour);
-        document.getElementById("end-period").value =
-          endH < 12 ? "오전" : "오후";
-        document.getElementById("end-hour").value = endTime;
-      }
-
-      function closeTimeModal(event) {
-        if (event.target.id === "time-modal") {
-          const modal = document.getElementById("time-modal");
-          modal.classList.add("hidden");
-          modal.classList.remove("flex");
-        }
-      }
-
-      function confirmTime() {
-        const startPeriod = document.getElementById("start-period").value;
-        const startHour = document.getElementById("start-hour").value;
-        const endPeriod = document.getElementById("end-period").value;
-        const endHour = document.getElementById("end-hour").value;
-
-        // hidden input에 24시간 형식으로 저장
-        document.getElementById("start_time").value = startHour;
-        document.getElementById("end_time").value = endHour;
-
-        // 디스플레이 업데이트
-        updateTimeDisplay();
-
-        // 모달 닫기
-        const modal = document.getElementById("time-modal");
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
-      }
-
-      function updateTimeDisplay() {
-        const startTime =
-          document.getElementById("start_time").value || "09:00";
-        const endTime = document.getElementById("end_time").value || "18:00";
-
-        const startPeriod =
-          parseInt(startTime.split(":")[0]) < 12 ? "오전" : "오후";
-        const endPeriod =
-          parseInt(endTime.split(":")[0]) < 12 ? "오전" : "오후";
-
-        const display = `${startPeriod} ${startTime} ~ ${endPeriod} ${endTime}`;
-        document.getElementById("time-display").textContent = display;
-      }
-
-      const timeNegotiable = document.getElementById("time_negotiable"),
-        startTime = document.getElementById("start_time"),
-        endTime = document.getElementById("end_time");
-      function toggleTime() {
-        const d = timeNegotiable.checked;
-        startTime.disabled = d;
-        endTime.disabled = d;
-        if (d) {
-          startTime.value = "";
-          endTime.value = "";
-        }
-      }
-      timeNegotiable.addEventListener("change", toggleTime);
-      document.addEventListener("DOMContentLoaded", () => {
-        showStep(1);
-        toggleTime();
-      });
-      function deleteCertificate(certId, buttonElement) {
-        if (!confirm("정말로 이 자격증을 영구적으로 삭제하시겠습니까?")) {
-          return;
-        }
-
-        fetch(`/resume/certificate/delete/${certId}`, {
-          method: "DELETE",
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.success) {
-              buttonElement.closest(".existing-cert-item").remove();
-              alert("자격증이 성공적으로 삭제되었습니다.");
-            } else {
-              alert("삭제에 실패했습니다: " + (data.message || "서버 오류"));
-            }
-          })
-          .catch((error) => {
-            console.error("삭제 요청 중 오류 발생:", error);
-            alert("삭제 처리 중 오류가 발생했습니다.");
-          });
-      }
+      // 템플릿 변수를 전역 변수로 전달
+      const profileUrl = "{{ url_for('auth.profile') }}";
     </script>
+    <script src="{{ url_for('static', filename='js/edit_resume.js') }}"></script>
   </body>
 </html>

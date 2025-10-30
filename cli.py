@@ -25,10 +25,19 @@ def register_cli(app):
             return
 
         hashed_pw = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+        # 관리자는 추가정보 없이 기본값으로 설정
+        from datetime import date
         admin_user = User(
             username=username,
             password=hashed_pw.decode("utf-8"),
             nickname="관리자",
+            name="관리자",
+            gender="male",
+            birth_date=date(1970, 1, 1),
+            sido="서울특별시",
+            sigungu="중구",
+            dong="중구",
+            phone="010-0000-0000",
             user_type=2
         )
         db.session.add(admin_user)

@@ -103,7 +103,6 @@
                 <p class="font-semibold text-gray-900">
                   {{ job.author.nickname }}
                 </p>
-                <p class="text-sm text-gray-500">{{ job.company }}</p>
               </div>
             </div>
             <span class="text-xs text-gray-400">{{ time_ago }}</span>
@@ -215,7 +214,7 @@
         <div class="px-6 py-4 border-b">
           <h3 class="text-sm font-semibold text-gray-700 mb-3">상세 설명</h3>
           <div class="text-gray-700 whitespace-pre-wrap leading-relaxed">
-            {{ job.description }}
+            {{- job.description -}}
           </div>
           <!-- 조회, 찜, 지원 -->
           <div class="flex justify-end gap-4 text-sm text-gray-500 mt-4">
@@ -230,7 +229,6 @@
         <!-- 7. 지도, 주소, 상세주소 -->
         {% if job.latitude and job.longitude %}
         <div class="px-6 py-4 border-b">
-          <h3 class="text-sm font-semibold text-gray-700 mb-3">📍 근무 장소</h3>
           <div
             id="map"
             class="w-full h-64 rounded-lg border border-gray-200 mb-3"
@@ -483,12 +481,6 @@
           position: markerPosition
         });
         marker.setMap(map);
-
-        // 인포윈도우 표시
-        const infowindow = new kakao.maps.InfoWindow({
-          content: '<div style="padding:10px;font-size:14px;font-weight:bold;">{{ job.title }}</div>'
-        });
-        infowindow.open(map, marker);
       });
       {% endif %}
 
