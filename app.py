@@ -19,6 +19,7 @@ from cli import register_cli  # ⬅ cli.py에서 만든 함수 import
 from routes.admin.admin import admin_bp
 from routes.map import map_bp
 from routes.news import news_bp
+from routes.recommendations import recommendations_bp
 from flask_socketio import SocketIO
 
 socketio = SocketIO(cors_allowed_origins="*", manage_session=False)
@@ -95,6 +96,7 @@ app.register_blueprint(resumes_bp,url_prefix='/')
 app.register_blueprint(job_assistant_bp)
 app.register_blueprint(news_bp)
 app.register_blueprint(map_bp)
+app.register_blueprint(recommendations_bp)
 
 # CLI 명령어 등록
 register_cli(app)

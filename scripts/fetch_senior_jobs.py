@@ -200,10 +200,13 @@ def fetch_and_store_jobs(page_number=1):
 
         new_jobs_count = 0
         updated_jobs_count = 0
+        ai_analyzed_count = 0
+        AI_ANALYSIS_LIMIT = 5  # AI 분석 제한 (토큰 절약)
 
         print(f"총 {len(items)}개의 공고 상세 정보를 조회합니다.")
+        print(f"⚠️  AI 분석은 상위 {AI_ANALYSIS_LIMIT}개만 수행합니다.")
 
-        for item in items:
+        for idx, item in enumerate(items, 1):
             job_id = get_text(item, 'jobId')
 
             # 1. 상세 정보 API 호출 (공고마다 개별 호출)
@@ -274,13 +277,49 @@ def fetch_and_store_jobs(page_number=1):
                 for key, value in job_data.items():
                     setattr(existing_job, key, value)
                 updated_jobs_count += 1
+                job_to_analyze = existing_job
             else:
                 new_job = JobPost(**job_data)
                 db.session.add(new_job)
                 new_jobs_count += 1
+                job_to_analyze = new_job
+
+            # DB에 먼저 저장 (ID 생성을 위해)
+            db.session.flush()
+
+            # AI 자동 분석 (상위 5개만)
+            if ai_analyzed_count < AI_ANALYSIS_LIMIT:
+                try:
+                    from services.ai_analyzer_service import AIAnalyzerService
+                    import json
+                    
+                    print(f"  🤖 AI 분석 중... ({ai_analyzed_count + 1}/{AI_ANALYSIS_LIMIT})")
+                    
+                    result = AIAnalyzerService.analyze_job_post(
+                        title=job_to_analyze.title,
+                        description=job_to_analyze.description,
+                        company=job_to_analyze.company
+                    )
+                    
+                    job_to_analyze.ai_category = result['category']
+                    job_to_analyze.ai_keywords = json.dumps(result['keywords'], ensure_ascii=False)
+                    job_to_analyze.ai_skills = json.dumps(result['skills'], ensure_ascii=False)
+                    job_to_analyze.ai_summary = result['summary']
+                    job_to_analyze.ai_difficulty = result['difficulty']
+                    job_to_analyze.ai_analyzed_at = datetime.now()
+                    
+                    ai_analyzed_count += 1
+                    print(f"  ✅ AI 분석 완료: {result['category']} - {', '.join(result['keywords'][:3])}")
+                except Exception as e:
+                    print(f"  ⚠️ AI 분석 실패: {e}")
+            else:
+                print(f"  ⏭️  AI 분석 건너뜀 (제한: {AI_ANALYSIS_LIMIT}개)")
 
         db.session.commit()
-        print(f"✅ 성공: {new_jobs_count}개 신규 추가, {updated_jobs_count}개 업데이트 완료. (상세 정보 포함)")
+        print(f"\n{'='*60}")
+        print(f"✅ 성공: {new_jobs_count}개 신규 추가, {updated_jobs_count}개 업데이트 완료")
+        print(f"🤖 AI 분석: {ai_analyzed_count}개 완료 (제한: {AI_ANALYSIS_LIMIT}개)")
+        print(f"{'='*60}")
 
     except requests.exceptions.RequestException as e:
         print(f"❌ API 호출 중 네트워크 오류 발생: {e}")

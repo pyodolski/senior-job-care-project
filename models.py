@@ -201,6 +201,14 @@ class JobPost(db.Model):
     full_address = db.Column(db.String(255), nullable=True)  # 상세 API 전체 주소 (plDetAddr)
     contact_name = db.Column(db.String(50), nullable=True)  # 담당자 이름 (clerk)
 
+    # AI 분석 필드
+    ai_category = db.Column(db.String(100), nullable=True)  # AI 분석 카테고리
+    ai_keywords = db.Column(db.Text, nullable=True)  # AI 추출 키워드 (JSON)
+    ai_skills = db.Column(db.Text, nullable=True)  # AI 추출 스킬 (JSON)
+    ai_summary = db.Column(db.String(500), nullable=True)  # AI 요약
+    ai_difficulty = db.Column(db.String(20), nullable=True)  # 난이도 (초급/중급/고급)
+    ai_analyzed_at = db.Column(db.DateTime, nullable=True)  # AI 분석 시간
+
     def __repr__(self):
         return f"<JobPost id={self.id} title={self.title} company={self.company}>"
 
@@ -335,6 +343,12 @@ class Resume(db.Model):
 
     created_at = db.Column(db.DateTime, default=get_kst_now)
     updated_at = db.Column(db.DateTime, default=get_kst_now, onupdate=get_kst_now)
+
+    # AI 분석 필드
+    ai_keywords = db.Column(db.Text, nullable=True)  # AI 추출 키워드 (JSON)
+    ai_skills = db.Column(db.Text, nullable=True)  # AI 추출 스킬 (JSON)
+    ai_career_level = db.Column(db.String(20), nullable=True)  # 경력 레벨 (신입/경력/전문가)
+    ai_analyzed_at = db.Column(db.DateTime, nullable=True)  # AI 분석 시간
 
     # --- 관계 설정 ---
     user = db.relationship('User', backref=db.backref('resume', lazy=True))

@@ -222,6 +222,30 @@ def create_job():
             db.session.add(new_job)
             db.session.commit()
             
+            # AI 자동 분석 (백그라운드)
+            try:
+                from services.ai_analyzer_service import AIAnalyzerService
+                import json
+                from datetime import datetime
+                
+                result = AIAnalyzerService.analyze_job_post(
+                    title=new_job.title,
+                    description=new_job.description,
+                    company=new_job.company
+                )
+                
+                new_job.ai_category = result['category']
+                new_job.ai_keywords = json.dumps(result['keywords'], ensure_ascii=False)
+                new_job.ai_skills = json.dumps(result['skills'], ensure_ascii=False)
+                new_job.ai_summary = result['summary']
+                new_job.ai_difficulty = result['difficulty']
+                new_job.ai_analyzed_at = datetime.now()
+                
+                db.session.commit()
+                print(f"✅ AI 분석 완료: {result['category']}")
+            except Exception as e:
+                print(f"⚠️ AI 분석 실패 (공고는 정상 등록됨): {e}")
+            
             flash("공고가 성공적으로 등록되었습니다!", "success")
             return redirect(url_for("jobs.job_list"))
             
@@ -331,6 +355,30 @@ def create_company_job():
             db.session.commit()
             
             print(f"✅ 기업이음 공고 저장 완료 - ID: {new_job.id}, job_category: '{new_job.job_category}'")
+            
+            # AI 자동 분석 (실시간)
+            try:
+                from services.ai_analyzer_service import AIAnalyzerService
+                import json
+                from datetime import datetime
+                
+                result = AIAnalyzerService.analyze_job_post(
+                    title=new_job.title,
+                    description=new_job.description,
+                    company=new_job.company
+                )
+                
+                new_job.ai_category = result['category']
+                new_job.ai_keywords = json.dumps(result['keywords'], ensure_ascii=False)
+                new_job.ai_skills = json.dumps(result['skills'], ensure_ascii=False)
+                new_job.ai_summary = result['summary']
+                new_job.ai_difficulty = result['difficulty']
+                new_job.ai_analyzed_at = datetime.now()
+                
+                db.session.commit()
+                print(f"✅ AI 분석 완료: {result['category']}")
+            except Exception as e:
+                print(f"⚠️ AI 분석 실패 (공고는 정상 등록됨): {e}")
             
             flash("기업 공고가 성공적으로 등록되었습니다!", "success")
             return redirect(url_for("company.company_list"))

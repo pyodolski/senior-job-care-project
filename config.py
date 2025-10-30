@@ -114,6 +114,9 @@ class Config:
     # 한국 노인인력개발원 공공데이터 API키
     SENIOR_API_KEY = os.getenv("SENIOR_API_KEY")
 
+    # OpenAI API 키 (AI 추천 시스템용)
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
     # 세션 저장 방식
     SESSION_TYPE = os.getenv("SESSION_TYPE", "filesystem")
 

@@ -166,6 +166,29 @@ def main():
         flash("프로필 정보를 완성해주세요.", "warning")
         return redirect(url_for("auth.onboarding"))
 
+    # AI 추천 공고 가져오기 (일반 회원만)
+    ai_recommended_jobs = []
+    if current_user.user_type == 0:  # 일반 회원
+        try:
+            from services.recommendation_service import RecommendationService
+            recommendations = RecommendationService.get_recommendations(
+                user_id=current_user.id,
+                limit=2  # 2개만
+            )
+            
+            # 추천 공고에 지원 상태 추가
+            for job, score, reasons in recommendations:
+                application_status = ApplicationService.check_application_status(current_user.id, job.id)
+                ai_recommended_jobs.append({
+                    'job': job,
+                    'score': round(score, 1),
+                    'reasons': reasons,
+                    'application_status': application_status
+                })
+        except Exception as e:
+            print(f"AI 추천 오류: {e}")
+            ai_recommended_jobs = []
+
     # 기업 공고 데이터 가져오기 (최신순으로 최대 3개)
     try:
         jobs_pagination = JobService.get_all_jobs(page=1, per_page=10, sort_by='latest')
@@ -211,7 +234,7 @@ def main():
         print(f"Error getting news: {e}")
         news_list = []
 
-    return render_template("main.html", user=current_user, company_jobs=company_jobs_with_status, people_jobs=person_jobs_with_status, news_list=news_list)
+    return render_template("main.html", user=current_user, ai_recommended_jobs=ai_recommended_jobs, company_jobs=company_jobs_with_status, people_jobs=person_jobs_with_status, news_list=news_list)
 
 # 로그인한 사용자의 프로필 페이지
 @auth_bp.route("/profile")
