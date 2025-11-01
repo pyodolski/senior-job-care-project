@@ -226,7 +226,6 @@ def create_job():
             try:
                 from services.ai_analyzer_service import AIAnalyzerService
                 import json
-                from datetime import datetime
                 
                 result = AIAnalyzerService.analyze_job_post(
                     title=new_job.title,

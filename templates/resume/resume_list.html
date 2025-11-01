@@ -6,11 +6,7 @@
     <title>사람 이음 - 공개 이력서 목록</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
-    <style>
-        body {
-            font-family: "Noto Sans KR", sans-serif;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume/resume_list.css') }}" />
 </head>
 <body class="bg-gray-50">
     <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto">
@@ -94,33 +90,9 @@
     </div>
 
     <script>
-        let currentPage = {{ pagination.page }};
-        const loadMoreBtn = document.getElementById('load-more-btn');
-
-        if (loadMoreBtn) {
-            loadMoreBtn.addEventListener('click', async () => {
-                currentPage++;
-                loadMoreBtn.textContent = '불러오는 중...';
-                loadMoreBtn.disabled = true;
-
-                try {
-                    const response = await fetch(`/resume/api/resumes?page=${currentPage}`);
-                    const data = await response.json();
-                    if (data.html) {
-                        const container = document.getElementById('resume-container');
-                        container.insertAdjacentHTML('beforeend', data.html);
-                    }
-                    if (!data.has_next) {
-                        loadMoreBtn.style.display = 'none';
-                    }
-                } catch (error) {
-                    console.error('Error loading more resumes:', error);
-                } finally {
-                    loadMoreBtn.textContent = '더 보기';
-                    loadMoreBtn.disabled = false;
-                }
-            });
-        }
+        // Flask 템플릿 변수를 JavaScript로 전달
+        window.initialPage = {{ pagination.page }};
     </script>
+    <script src="{{ url_for('static', filename='js/resume/resume_list.js') }}"></script>
 </body>
 </html>

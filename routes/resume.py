@@ -2,7 +2,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from services.resume_service import ResumeService
 from models import Category, WorkType, Strength
-from datetime import time
+from datetime import time, datetime
+from utils.files_handler import generate_presigned_get_url
 
 resumes_bp = Blueprint("resumes", __name__)
 
@@ -39,9 +40,6 @@ def my_resume_detail(resume_id):
 
     if not is_owner:
         return redirect(url_for('resumes.my_view_resume'))
-
-    from datetime import datetime
-    from utils.files_handler import generate_presigned_get_url
 
     # 프로필 이미지 URL 생성
     profile_url = None
@@ -197,6 +195,139 @@ def edit_resume(resume_id):
         all_work_types=list(WorkType),
         all_strengths=list(Strength)
     )
+
+
+# ==================== 이력서 미리보기 ====================
+@resumes_bp.route("/resume/preview", methods=["POST"])
+@login_required
+def resume_preview():
+    """
+    이력서 작성 완료 후 미리보기 페이지
+    """
+    import json
+    from flask import session
+    
+    # 폼 데이터를 세션에 저장
+    form_data = request.form.to_dict(flat=False)
+    session['resume_draft'] = json.dumps(form_data)
+    
+    # 디버깅: 폼 데이터 출력
+    print("=== 폼 데이터 ===")
+    for key, value in request.form.items():
+        print(f"{key}: {value}")
+    print("================")
+    
+    # 요일 데이터 처리
+    work_days = []
+    if request.form.get('work_monday'): work_days.append('월')
+    if request.form.get('work_tuesday'): work_days.append('화')
+    if request.form.get('work_wednesday'): work_days.append('수')
+    if request.form.get('work_thursday'): work_days.append('목')
+    if request.form.get('work_friday'): work_days.append('금')
+    if request.form.get('work_saturday'): work_days.append('토')
+    if request.form.get('work_sunday'): work_days.append('일')
+    
+    days_text = '요일 협의 가능' if request.form.get('is_day_negotiable') else (', '.join(work_days) if work_days else '선택 안 함')
+    time_text = '시간 협의 가능' if request.form.get('is_time_negotiable') else f"{request.form.get('start_time', '09:00')} ~ {request.form.get('end_time', '18:00')}"
+    
+    # 미리보기 데이터 생성
+    preview_data = {
+        'category': request.form.get('categories', '선택 안 함'),
+        'work_type': request.form.get('desired_work_type', '선택 안 함'),
+        'days': days_text,
+        'time': time_text,
+        'experience': [exp.strip() for exp in request.form.get('experience', '').split('\n') if exp.strip()] or ['작성 안 함'],
+        'certificates': request.form.getlist('certificate_names') or ['없음'],
+        'strengths': ', '.join(request.form.getlist('strengths')) or '선택 안 함',
+        'walkable': f"{request.form.get('walkable_minutes', '0')}분",
+        'physical': [note.strip() for note in request.form.get('physical_notes', '').split('\n') if note.strip()] or ['작성 안 함'],
+        'commute': f"{request.form.get('commute_time', '0')}분",
+        'introduction': request.form.get('self_introduction', '작성 안 함'),
+        'call_time': request.form.get('call_available_time', '언제든지'),
+        'privacy': '동의함' if request.form.get('privacy_consent') else '미동의',
+        'public': '공개' if request.form.get('is_public') else '비공개'
+    }
+    
+    print("=== 미리보기 데이터 ===")
+    print(preview_data)
+    print("=====================")
+    
+    return render_template(
+        "resume/resume_preview.html",
+        preview_data=preview_data,
+        resume_data_json=session.get('resume_draft', '{}')
+    )
+
+
+# ==================== 이력서 제출 ====================
+@resumes_bp.route("/resume/submit", methods=["POST"])
+@login_required
+def submit_resume():
+    """
+    미리보기에서 제출하기 버튼 클릭 시 실제 저장
+    """
+    import json
+    from flask import session
+    
+    # 세션에서 저장된 데이터 가져오기
+    resume_draft = session.get('resume_draft')
+    if not resume_draft:
+        flash("세션이 만료되었습니다. 다시 작성해주세요.", "error")
+        return redirect(url_for('resumes.create_resume'))
+    
+    form_data = json.loads(resume_draft)
+    
+    # 시간 파싱 헬퍼 함수
+    def parse_time(time_str):
+        if not time_str:
+            return None
+        try:
+            hour, minute = map(int, time_str.split(':'))
+            return time(hour, minute)
+        except ValueError:
+            return None
+    
+    # 데이터 변환
+    resume_data = {
+        'is_public': 'is_public' in form_data,
+        'desired_categories': ",".join(form_data.get('categories', [])),
+        'desired_work_type': form_data.get('desired_work_type', [None])[0],
+        'work_monday': 'work_monday' in form_data,
+        'work_tuesday': 'work_tuesday' in form_data,
+        'work_wednesday': 'work_wednesday' in form_data,
+        'work_thursday': 'work_thursday' in form_data,
+        'work_friday': 'work_friday' in form_data,
+        'work_saturday': 'work_saturday' in form_data,
+        'work_sunday': 'work_sunday' in form_data,
+        'is_time_negotiable': 'is_time_negotiable' in form_data,
+        'desired_start_time': parse_time(form_data.get('start_time', [None])[0]),
+        'desired_end_time': parse_time(form_data.get('end_time', [None])[0]),
+        'experience': form_data.get('experience', [None])[0],
+        'self_introduction': form_data.get('self_introduction', [None])[0],
+        'call_available_time': form_data.get('call_available_time', [None])[0],
+        'privacy_consent': 'privacy_consent' in form_data,
+        'strengths': ",".join(form_data.get('strengths', [])),
+        'commute_time': int(form_data.get('commute_time', [0])[0]) if form_data.get('commute_time') else None,
+        'walkable_minutes': int(form_data.get('walkable_minutes', [0])[0]) if form_data.get('walkable_minutes') else None,
+        'physical_notes': form_data.get('physical_notes', [None])[0],
+    }
+    
+    # 이력서 생성
+    new_resume = ResumeService.create_resume(
+        user_id=current_user.id,
+        resume_data=resume_data,
+        certificate_names=form_data.get('certificate_names', []),
+        certificate_images=[]  # 파일은 세션에 저장할 수 없으므로 빈 리스트
+    )
+    
+    if new_resume:
+        # 세션 정리
+        session.pop('resume_draft', None)
+        flash("이력서가 성공적으로 등록되었습니다!", "success")
+        return redirect(url_for('resumes.my_view_resume'))
+    else:
+        flash("이력서 등록 중 오류가 발생했습니다.", "error")
+        return redirect(url_for('resumes.create_resume'))
 
 
 # ==================== 자격증 삭제 (AJAX) ====================
