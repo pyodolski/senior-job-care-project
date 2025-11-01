@@ -9,7 +9,10 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/profile.css') }}"
+    />
     {% block extra_css %}{% endblock %}
   </head>
   <body class="bg-gray-50">
@@ -331,7 +334,7 @@
           <!-- 공지사항 -->
           <div
             class="menu-item border-b border-gray-100"
-            onclick="window.location.href='#';"
+            onclick="window.location.href='{{ url_for('auth.notice') }}';"
           >
             <span class="text-gray-800 font-medium">공지사항</span>
             <svg
@@ -351,7 +354,10 @@
           </div>
 
           <!-- 문의하기 -->
-          <div class="menu-item" onclick="window.location.href='#';">
+          <div
+            class="menu-item border-b border-gray-100"
+            onclick="window.location.href='{{ url_for('auth.inquiry') }}';"
+          >
             <span class="text-gray-800 font-medium">문의하기</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -368,7 +374,6 @@
               />
             </svg>
           </div>
-        </div>
 
         <!-- 간격 -->
         <div class="h-2 bg-gray-50"></div>

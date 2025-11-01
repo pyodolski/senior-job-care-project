@@ -48,7 +48,12 @@
         <div class="alert alert-{{ category }}">{{ message }}</div>
         {% endfor %} {% endif %} {% endwith %}
 
-        <form id="resumeForm" method="POST" action="{{ url_for('resumes.resume_preview') }}" enctype="multipart/form-data"></form>
+        <form
+          id="resumeForm"
+          method="POST"
+          action="{{ url_for('resumes.resume_preview') }}"
+          enctype="multipart/form-data"
+        >
           <!-- 단계 1: 희망 직무 분야 및 형태 -->
           <div id="step-1" class="step-container">
             <h2 class="text-xl font-bold text-gray-900 mb-2">

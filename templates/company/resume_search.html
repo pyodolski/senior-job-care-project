@@ -9,7 +9,10 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/company/resume_search.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/company/resume_search.css') }}"
+    />
   </head>
   <body class="bg-gray-50">
     <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto pb-20">
@@ -105,7 +108,7 @@
                   <div class="flex items-center text-sm text-gray-600">
                     {% if resume.user.birth_date %}
                     <span class="mr-3"
-                      >{{ (2024 - resume.user.birth_date.year) }}세</span
+                      >{{ (now.year - resume.user.birth_date.year) }}세</span
                     >
                     {% endif %} {% if resume.user.gender %}
                     <span>{{ resume.user.gender }}</span>

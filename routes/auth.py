@@ -177,7 +177,7 @@ def main():
                 user_id=current_user.id,
                 limit=2  # 2개만
             )
-            
+
             # 추천 공고에 지원 상태 추가
             for job, score, reasons in recommendations:
                 application_status = ApplicationService.check_application_status(current_user.id, job.id)
@@ -191,19 +191,62 @@ def main():
             print(f"AI 추천 오류: {e}")
             ai_recommended_jobs = []
 
+    # 기업 회원 전용 데이터
+    my_company_jobs_with_status = []
+    public_resumes_with_status = []
+
+    if current_user.user_type == 1:  # 기업 회원
+        # 내가 올린 공고들 (최신순 2개)
+        try:
+            from models import JobPost
+            my_jobs = JobPost.query.filter_by(author_id=current_user.id) \
+                .order_by(JobPost.created_at.desc()) \
+                .limit(2) \
+                .all()
+
+            for job in my_jobs:
+                application_status = ApplicationService.check_application_status(current_user.id, job.id)
+                my_company_jobs_with_status.append({
+                    'job': job,
+                    'application_status': application_status
+                })
+        except Exception as e:
+            print(f"내 공고 가져오기 오류: {e}")
+            my_company_jobs_with_status = []
+
+        # 등록된 이력서들 (최신순 2개)
+        try:
+            from models import ResumeFavorite
+            resumes_pagination = ResumeService.get_public_resumes_paginated(page=1, per_page=2)
+
+            for resume in resumes_pagination.items:
+                # 좋아요 상태 확인
+                is_favorited = ResumeFavorite.query.filter_by(
+                    user_id=current_user.id,
+                    resume_id=resume.id
+                ).first() is not None
+
+                public_resumes_with_status.append({
+                    'resume': resume,
+                    'is_favorited': is_favorited
+                })
+        except Exception as e:
+            print(f"공개 이력서 가져오기 오류: {e}")
+            public_resumes_with_status = []
+
     # 기업 공고 데이터 가져오기 (최신순으로 최대 3개)
     try:
         jobs_pagination = JobService.get_all_jobs(page=1, per_page=10, sort_by='latest')
         # 기업 회원이 작성한 공고만 필터링
         company_jobs = [job for job in jobs_pagination.items if job.author.user_type == 1][:3]
         people_jobs = [job for job in jobs_pagination.items if job.author.user_type == 0][:3]
-        
+
         # 각 공고에 대한 지원 상태 및 북마크 상태 확인
         company_jobs_with_status = []
         for job in company_jobs:
             # 모든 사용자에 대해 지원 상태와 북마크 상태 확인
             application_status = ApplicationService.check_application_status(current_user.id, job.id)
-            
+
             job_data = {
                 'job': job,
                 'application_status': application_status
@@ -215,7 +258,7 @@ def main():
         for job in people_jobs:
             # 모든 사용자에 대해 지원 상태와 북마크 상태 확인
             application_status = ApplicationService.check_application_status(current_user.id, job.id)
-            
+
             job_data = {
                 'job': job,
                 'application_status': application_status
@@ -236,7 +279,10 @@ def main():
         print(f"Error getting news: {e}")
         news_list = []
 
-    return render_template("main.html", user=current_user, ai_recommended_jobs=ai_recommended_jobs, company_jobs=company_jobs_with_status, people_jobs=person_jobs_with_status, news_list=news_list)
+    return render_template("main.html", user=current_user, ai_recommended_jobs=ai_recommended_jobs,
+                         company_jobs=company_jobs_with_status, people_jobs=person_jobs_with_status,
+                         news_list=news_list, my_company_jobs=my_company_jobs_with_status,
+                         public_resumes=public_resumes_with_status)
 
 # 로그인한 사용자의 프로필 페이지
 @auth_bp.route("/profile")
@@ -253,15 +299,25 @@ def profile():
     
     # 기업 회원과 일반 회원 분리
     if current_user.user_type == 1:
-        # 기업 회원 - 작성한 공고 수 및 좋아요한 이력서 수 조회
-        from models import JobPost, ResumeFavorite
+        # 기업 회원 - 통계 데이터 조회
+        from models import JobPost, JobSuggestion, JobApplication
+        
+        # 내 구인글 수
         job_count = JobPost.query.filter_by(author_id=current_user.id).count()
-        favorite_resume_count = ResumeFavorite.query.filter_by(user_id=current_user.id).count()
+        
+        # 보낸 제안 수
+        sent_suggestions_count = JobSuggestion.query.filter_by(suggester_id=current_user.id).count()
+        
+        # 받은 이력서 수 (내 공고에 지원한 사람들)
+        my_job_ids = [job.id for job in JobPost.query.filter_by(author_id=current_user.id).all()]
+        received_applications_count = JobApplication.query.filter(JobApplication.job_id.in_(my_job_ids)).count() if my_job_ids else 0
+        
         return render_template("company/company_profile.html", 
                              user=current_user, 
                              profile_url=profile_url, 
                              job_count=job_count,
-                             favorite_resume_count=favorite_resume_count)
+                             sent_suggestions_count=sent_suggestions_count,
+                             received_applications_count=received_applications_count)
     else:
         # 일반 회원 - 이력서 수 조회
         resume_count = ResumeService.get_resume_count_by_user(current_user.id)
@@ -504,6 +560,162 @@ def edit_profile():
 
     kakao_key = current_app.config.get("KAKAO_MAP_API_KEY")
     return render_template('edit_profile.html', user=user, kakao_key=kakao_key)
+
+
+@auth_bp.route('/notice')
+@login_required
+def notice():
+    """공지사항 페이지"""
+    return render_template('notice.html')
+
+
+@auth_bp.route('/inquiry')
+@login_required
+def inquiry():
+    """문의 목록 페이지 (관리자는 전체 문의, 일반 사용자는 본인 문의만)"""
+    # 관리자인 경우 관리자용 페이지로 리다이렉트
+    if current_user.user_type == 2:
+        return redirect(url_for('auth.admin_inquiry_list'))
+    
+    from models import Inquiry
+    
+    # 사용자의 문의 내역 조회 (최신순)
+    inquiries = Inquiry.query.filter_by(user_id=current_user.id).order_by(Inquiry.created_at.desc()).all()
+    
+    return render_template('inquiry_list.html', inquiries=inquiries)
+
+
+@auth_bp.route('/admin/inquiry')
+@login_required
+def admin_inquiry_list():
+    """관리자 전용 문의 관리 페이지"""
+    if current_user.user_type != 2:
+        flash("관리자만 접근할 수 있습니다.", "error")
+        return redirect(url_for('auth.profile'))
+    
+    from models import Inquiry
+    
+    # 전체 문의 내역 조회 (최신순)
+    inquiries = Inquiry.query.order_by(Inquiry.created_at.desc()).all()
+    
+    # 통계 계산
+    total_count = len(inquiries)
+    pending_count = sum(1 for i in inquiries if i.status == 'pending')
+    answered_count = sum(1 for i in inquiries if i.status == 'answered')
+    
+    return render_template('admin_inquiry_list.html', 
+                         inquiries=inquiries,
+                         total_count=total_count,
+                         pending_count=pending_count,
+                         answered_count=answered_count)
+
+
+@auth_bp.route('/admin/inquiry/<int:inquiry_id>')
+@login_required
+def admin_inquiry_detail(inquiry_id):
+    """관리자 전용 문의 상세 페이지"""
+    if current_user.user_type != 2:
+        flash("관리자만 접근할 수 있습니다.", "error")
+        return redirect(url_for('auth.profile'))
+    
+    from models import Inquiry
+    
+    # 문의 상세 조회
+    inquiry = Inquiry.query.get_or_404(inquiry_id)
+    
+    return render_template('admin_inquiry_detail.html', inquiry=inquiry)
+
+
+@auth_bp.route('/admin/inquiry/<int:inquiry_id>/answer', methods=['POST'])
+@login_required
+def admin_inquiry_answer(inquiry_id):
+    """관리자 전용 문의 답변 등록"""
+    if current_user.user_type != 2:
+        flash("관리자만 접근할 수 있습니다.", "error")
+        return redirect(url_for('auth.profile'))
+    
+    from models import Inquiry, db
+    from datetime import datetime
+    
+    inquiry = Inquiry.query.get_or_404(inquiry_id)
+    answer = request.form.get('answer')
+    
+    try:
+        inquiry.answer = answer
+        inquiry.status = 'answered'
+        inquiry.answered_at = datetime.now()
+        inquiry.answered_by = current_user.id
+        
+        db.session.commit()
+        flash('답변이 등록되었습니다.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash('답변 등록 중 오류가 발생했습니다.', 'error')
+        print(f"Answer creation error: {e}")
+    
+    return redirect(url_for('auth.admin_inquiry_list'))
+
+
+@auth_bp.route('/inquiry/form', methods=['GET', 'POST'])
+@login_required
+def inquiry_form():
+    """문의 작성 페이지"""
+    if request.method == 'POST':
+        from models import Inquiry, db
+        
+        # 문의 생성
+        inquiry = Inquiry(
+            user_id=current_user.id,
+            inquiry_type=request.form.get('inquiry_type'),
+            title=request.form.get('title'),
+            content=request.form.get('content'),
+            contact=request.form.get('contact'),
+            email=request.form.get('email'),
+            privacy_consent='privacy_consent' in request.form,
+            status='pending'
+        )
+        
+        try:
+            db.session.add(inquiry)
+            db.session.commit()
+            flash('문의가 접수되었습니다. 빠른 시일 내에 답변 드리겠습니다.', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash('문의 접수 중 오류가 발생했습니다.', 'error')
+            print(f"Inquiry creation error: {e}")
+        
+        return redirect(url_for('auth.inquiry'))
+    
+    return render_template('inquiry_form.html', user=current_user)
+
+
+@auth_bp.route('/edit_company_profile', methods=['GET', 'POST'])
+@login_required
+def edit_company_profile():
+    """기업 회원 프로필 수정"""
+    if current_user.user_type != 1:
+        flash("기업 회원만 접근할 수 있습니다.", "error")
+        return redirect(url_for('auth.profile'))
+    
+    if request.method == 'POST':
+        current_user.name = request.form.get('name')
+        current_user.representative_name = request.form.get('representative_name')
+        current_user.business_number = request.form.get('business_number')
+        current_user.phone = request.form.get('phone')
+        current_user.address = request.form.get('address')
+        current_user.description = request.form.get('description')
+        
+        try:
+            db.session.commit()
+            flash("프로필이 수정되었습니다.", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash("프로필 수정 중 오류가 발생했습니다.", "error")
+            print("Company profile update failed:", e)
+        
+        return redirect(url_for('auth.profile'))
+    
+    return render_template('company/edit_company_profile.html', user=current_user)
 
 
 @auth_bp.route('/edit_profile_image', methods=['GET', 'POST'])
