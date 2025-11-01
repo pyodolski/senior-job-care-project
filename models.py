@@ -434,3 +434,52 @@ class JobSuggestion(db.Model):
 
     def __repr__(self):
         return f"<JobSuggestion suggester={self.suggester_id} resume={self.resume_id} job={self.job_id}>"
+
+
+class Inquiry(db.Model):
+    """문의 모델"""
+    __tablename__ = 'inquiry'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # 문의 정보
+    inquiry_type = db.Column(db.String(50), nullable=False)  # account, job, resume, payment, technical, suggestion, other
+    title = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    contact = db.Column(db.String(20), nullable=False)
+    email = db.Column(db.String(100))
+    
+    # 상태 및 답변
+    status = db.Column(db.String(20), default='pending', nullable=False)  # pending, answered
+    answer = db.Column(db.Text)
+    answered_at = db.Column(db.DateTime)
+    answered_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+    
+    # 개인정보 동의
+    privacy_consent = db.Column(db.Boolean, default=False)
+    
+    # 타임스탬프
+    created_at = db.Column(db.DateTime, default=get_kst_now)
+    updated_at = db.Column(db.DateTime, default=get_kst_now, onupdate=get_kst_now)
+    
+    # 관계 설정
+    user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('inquiries', lazy=True))
+    answerer = db.relationship('User', foreign_keys=[answered_by], backref=db.backref('answered_inquiries', lazy=True))
+    
+    @property
+    def inquiry_type_display(self):
+        """문의 유형 한글 표시"""
+        type_map = {
+            'account': '계정 관련',
+            'job': '공고 관련',
+            'resume': '이력서 관련',
+            'payment': '결제 관련',
+            'technical': '기술 문제',
+            'suggestion': '제안 및 건의',
+            'other': '기타'
+        }
+        return type_map.get(self.inquiry_type, '기타')
+    
+    def __repr__(self):
+        return f"<Inquiry id={self.id} user={self.user_id} status={self.status}>"

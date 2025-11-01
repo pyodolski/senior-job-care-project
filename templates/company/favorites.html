@@ -47,23 +47,42 @@
       </header>
 
       <!-- 탭 네비게이션 -->
-      <div class="bg-white border-b sticky top-0 z-10">
-        <div class="flex">
+      <div class="relative bg-white sticky top-0 z-10">
+        <nav class="flex relative px-4">
           <button
             onclick="switchTab('jobs')"
             id="tab-jobs"
-            class="flex-1 text-center py-4 font-bold transition-colors {% if current_tab == 'jobs' %}text-blue-600 border-b-4 border-blue-600{% else %}text-gray-500{% endif %}"
+            class="flex-1 text-center font-bold transition-colors relative {% if current_tab == 'jobs' %}text-white{% else %}text-gray-500{% endif %}"
+            style="
+              border-top-left-radius: 20px;
+              border-top-right-radius: 20px;
+              padding-top: 12px;
+              padding-bottom: 16px;
+              {% if current_tab == 'jobs' %}background-color: #023591;{% endif %}
+            "
           >
             올린 모집공고
           </button>
           <button
             onclick="switchTab('resumes')"
             id="tab-resumes"
-            class="flex-1 text-center py-4 font-bold transition-colors {% if current_tab == 'resumes' %}text-blue-600 border-b-4 border-blue-600{% else %}text-gray-500{% endif %}"
+            class="flex-1 text-center font-bold transition-colors relative {% if current_tab == 'resumes' %}text-white{% else %}text-gray-500{% endif %}"
+            style="
+              border-top-left-radius: 20px;
+              border-top-right-radius: 20px;
+              padding-top: 12px;
+              padding-bottom: 16px;
+              {% if current_tab == 'resumes' %}background-color: #023591;{% endif %}
+            "
           >
             이력서
           </button>
-        </div>
+        </nav>
+        <!-- 파란색 선 (항상 표시) -->
+        <div
+          class="absolute bottom-0 left-0 right-0 h-1 bg-blue-900"
+          style="z-index: 0"
+        ></div>
       </div>
 
       <!-- 올린 모집공고 탭 -->
@@ -73,61 +92,91 @@
       >
         <div class="p-4">
           {% if my_jobs %}
-          <div class="space-y-4">
+          <div class="space-y-3">
             {% for job in my_jobs %}
-            <a
-              href="{{ url_for('company.company_job_detail', job_id=job.id) }}"
-              class="block bg-white rounded-2xl p-4 shadow-sm border border-gray-200"
+            <div
+              class="bg-white rounded-2xl p-4 shadow-sm border mb-3 cursor-pointer"
+              onclick="location.href='{{ url_for('company.company_job_detail', job_id=job.id) }}'"
             >
-              <div class="flex items-start justify-between mb-2">
-                <div class="flex-1">
-                  <div class="flex items-center mb-1">
-                    <span
-                      class="inline-block px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded mr-2"
-                    >
-                      {{ job.job_category or '일반' }}
-                    </span>
-                    <span class="text-xs text-gray-500"
-                      >{{ job.created_at|time_ago }}</span
-                    >
+              <!-- 행[0]: 프로필사진, 회사명, 작성시간 -->
+              <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-2">
+                  <div
+                    class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-sm font-bold"
+                  >
+                    {{ job.company[0] if job.company else '기' }}
                   </div>
-                  <h3 class="font-bold text-lg text-gray-900 mb-1">
-                    {{ job.title }}
-                  </h3>
-                  <p class="text-sm text-gray-600 mb-2">{{ job.company }}</p>
+                  <p class="text-sm text-gray-600">{{ job.company }}</p>
                 </div>
-                <button class="text-blue-600">
-                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <p class="text-xs text-gray-500">
+                  {{ job.created_at|time_ago }}
+                </p>
+              </div>
+
+              <!-- 행[1]: 공고명, 하트 버튼 -->
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="font-bold text-lg">{{ job.title }}</h3>
+                <button
+                  class="text-blue-600 hover:text-blue-700"
+                  onclick="event.stopPropagation();"
+                >
+                  <svg
+                    class="w-6 h-6"
+                    fill="currentColor"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
                     <path
-                      fill-rule="evenodd"
-                      d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                      clip-rule="evenodd"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
                     />
                   </svg>
                 </button>
               </div>
 
-              <div class="flex items-center text-sm text-gray-600 mb-2">
-                <span class="mr-3">💰 {{ job.salary or '협의' }}</span>
-                {% if job.region %}
-                <span>📍 {{ job.region }}</span>
-                {% endif %}
+              <!-- 행[2]: 급여 -->
+              <div class="mb-2">
+                <p class="text-blue-600 font-bold">
+                  {% if job.salary %}{{ job.salary }}{% else %}급여 협의{% endif
+                  %}
+                </p>
               </div>
 
-              <div class="flex items-center justify-between mt-3 pt-3 border-t">
-                <div class="flex items-center text-xs text-gray-500">
-                  <span class="mr-3">👁️ {{ job.view_count or 0 }}</span>
-                  <span class="mr-3"
-                    >📋 {{ job.application_count or 0 }}명 지원</span
+              <!-- 행[3]: 카테고리, 지원자 수, 확인하기 버튼 -->
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                  {% if job.recruitment_type %}
+                  <span
+                    class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
                   >
-                  <span>❤️ {{ job.bookmark_count or 0 }}</span>
+                    {{ job.recruitment_type }}
+                  </span>
+                  {% endif %} {% if job.work_period %}
+                  <span
+                    class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
+                  >
+                    {{ job.work_period }}
+                  </span>
+                  {% endif %}
                 </div>
-                <span
-                  class="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg"
-                  >확인하기</span
-                >
+                <div class="flex items-center gap-3">
+                  <span class="text-sm text-gray-600">
+                    지원자
+                    <span class="font-bold text-blue-600"
+                      >{{ job.application_count or 0 }}</span
+                    >명
+                  </span>
+                  <span
+                    class="text-white font-bold py-2 px-4 rounded-full text-sm"
+                    style="background-color: #023591"
+                  >
+                    확인하기
+                  </span>
+                </div>
               </div>
-            </a>
+            </div>
             {% endfor %}
           </div>
           {% else %}
@@ -151,71 +200,83 @@
       >
         <div class="p-4">
           {% if favorited_resumes %}
-          <div class="space-y-4">
+          <div class="space-y-3">
             {% for resume in favorited_resumes %}
-            <div
-              class="bg-white rounded-2xl p-4 shadow-sm border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
-              onclick="window.location.href='{{ url_for('resumes.view_resume', resume_id=resume.id) }}'"
-            >
-              <div class="flex items-start justify-between mb-2">
-                <div class="flex-1">
-                  <div class="flex items-center mb-2">
-                    <div
-                      class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mr-3"
-                    >
-                      <span class="text-xl">👤</span>
-                    </div>
-                    <div class="flex-1">
-                      <h3 class="font-bold text-lg text-gray-900">
-                        {{ resume.user.name }}
-                      </h3>
-                      <p class="text-sm text-gray-600">
-                        {% if resume.user.birth_date %} {{ (2024 -
-                        resume.user.birth_date.year) }}세 {% else %} 나이 미공개
-                        {% endif %}
-                      </p>
-                    </div>
+            <div class="bg-white rounded-2xl p-4 shadow-sm border mb-3">
+              <!-- 행[0]: 프로필사진, 이름, 생성시간 -->
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <div
+                    class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-sm font-bold"
+                  >
+                    {{ resume.user.name[0] if resume.user.name else '👤' }}
                   </div>
+                  <p class="text-sm text-gray-600">
+                    {{ resume.user.name }} {% if resume.user.birth_date %}
+                    <span class="text-xs"
+                      >({{ (now.year - resume.user.birth_date.year) }}세)</span
+                    >
+                    {% endif %}
+                  </p>
                 </div>
+                <p class="text-xs text-gray-500">
+                  {{ resume.updated_at|time_ago }}
+                </p>
+              </div>
+
+              <!-- 행[1]: 이력서 제목, 즐겨찾기 버튼 -->
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="font-bold text-lg text-gray-900">
+                  {{ resume.desired_categories or '이력서' }}
+                </h3>
                 <button
-                  onclick="toggleFavorite({{ resume.id }}, this,event)"
-                  class="text-red-500 hover:text-red-600"
+                  onclick="event.stopPropagation(); toggleFavorite({{ resume.id }}, this, event)"
+                  class="favorite-btn text-red-500 hover:text-red-500"
+                  data-resume-id="{{ resume.id }}"
                 >
-                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <svg
+                    class="w-6 h-6"
+                    fill="currentColor"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
                     <path
-                      fill-rule="evenodd"
-                      d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                      clip-rule="evenodd"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
                     />
                   </svg>
                 </button>
               </div>
 
-              {% if resume.desired_categories %}
+              <!-- 행[2]: 희망 근무 형태 -->
               <div class="mb-2">
-                {% for category in resume.desired_categories.split(',') %}
-                <span
-                  class="inline-block px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded mr-1"
-                >
-                  {{ category.strip() }}
-                </span>
-                {% endfor %}
+                <p class="text-blue-600 font-bold">
+                  {{ resume.desired_work_type or '근무 형태 협의' }}
+                </p>
               </div>
-              {% endif %} {% if resume.user.sido %}
-              <div class="flex items-center text-sm text-gray-600 mb-2">
-                <span>📍 {{ resume.user.sido }} {{ resume.user.sigungu }}</span>
-              </div>
-              {% endif %}
 
-              <div class="flex items-center justify-between mt-3 pt-3 border-t">
-                <span class="text-xs text-gray-500"
-                  >{{ resume.updated_at|time_ago }} 업데이트</span
-                >
+              <!-- 행[3]: 카테고리, 제안하기 버튼 -->
+              <div class="flex items-center justify-between">
+                <div class="flex space-x-2">
+                  {% if resume.desired_categories %} {% for category in
+                  resume.desired_categories.split(',')[:2] %}
+                  <span
+                    class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
+                  >
+                    {{ category.strip() }}
+                  </span>
+                  {% endfor %} {% endif %}
+                </div>
                 <a
                   href="{{ url_for('company.suggest_job', resume_id=resume.id) }}"
-                  class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
-                  >제안하기</a
+                  class="text-white font-bold py-2 px-4 rounded-full text-sm"
+                  style="background-color: #023591"
+                  onclick="event.stopPropagation()"
                 >
+                  제안하기
+                </a>
               </div>
             </div>
             {% endfor %}
@@ -241,18 +302,15 @@
       function switchTab(tab) {
         // 탭 버튼 스타일 변경
         document.querySelectorAll('[id^="tab-"]').forEach((btn) => {
-          btn.classList.remove(
-            "text-blue-600",
-            "border-b-4",
-            "border-blue-600"
-          );
+          btn.classList.remove("text-white");
           btn.classList.add("text-gray-500");
+          btn.style.backgroundColor = "";
         });
 
-        document.getElementById("tab-" + tab).classList.remove("text-gray-500");
-        document
-          .getElementById("tab-" + tab)
-          .classList.add("text-blue-600", "border-b-4", "border-blue-600");
+        const activeTab = document.getElementById("tab-" + tab);
+        activeTab.classList.remove("text-gray-500");
+        activeTab.classList.add("text-white");
+        activeTab.style.backgroundColor = "#023591";
 
         // 컨텐츠 표시/숨김
         document.querySelectorAll('[id^="content-"]').forEach((content) => {

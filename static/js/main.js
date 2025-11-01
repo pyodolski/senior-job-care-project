@@ -81,6 +81,37 @@ async function toggleBookmark(jobId, button) {
   }
 }
 
+// 이력서 좋아요 토글 함수
+async function toggleResumeFavorite(resumeId, button) {
+  try {
+    const response = await fetch(`/api/resume/${resumeId}/favorite`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await response.json();
+
+    if (data.success) {
+      const svg = button.querySelector("svg");
+      if (data.favorited) {
+        // 좋아요 추가됨
+        button.classList.remove("text-gray-400");
+        button.classList.add("text-red-500");
+        svg.setAttribute("fill", "currentColor");
+      } else {
+        // 좋아요 제거됨
+        button.classList.remove("text-red-500");
+        button.classList.add("text-gray-400");
+        svg.setAttribute("fill", "none");
+      }
+    } else {
+      alert(data.message || "좋아요 중 오류가 발생했습니다.");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("좋아요 중 오류가 발생했습니다.");
+  }
+}
+
 // 얼굴 토글 스위치 상태 관리
 let isToggleActive = false;
 

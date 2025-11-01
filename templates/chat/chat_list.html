@@ -186,6 +186,8 @@
       </main>
 
       <!-- 하단 네비게이션 -->
+      {% if current_user.user_type == 1 %} {% include
+      'components/company_footer.html' %} {% else %}
       <footer
         class="fixed bottom-0 left-0 right-0 w-full bg-gray-50 border-t flex justify-around"
       >
@@ -255,6 +257,7 @@
           <span class="text-xs">내정보</span>
         </a>
       </footer>
+      {% endif %}
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}"></script>

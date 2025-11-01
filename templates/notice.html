@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>공지사항 - 이음</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <div class="w-full bg-white shadow-lg min-h-screen pb-20">
+      <!-- 상단 헤더 -->
+      <div class="sticky top-0 z-10 bg-white border-b">
+        <div class="px-4 py-4 flex items-center justify-between">
+          <button type="button" onclick="history.back()" class="text-gray-600">
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <h2 class="text-xl font-semibold text-gray-800">공지사항</h2>
+          <div class="w-6"></div>
+        </div>
+      </div>
+
+      <!-- 공지사항 목록 -->
+      <div class="px-4 py-6">
+        <!-- 공지사항 1 -->
+        <div class="bg-white border rounded-lg p-4 mb-4 shadow-sm">
+          <div class="flex items-start justify-between mb-2">
+            <span
+              class="bg-blue-100 text-blue-600 text-xs font-bold px-2 py-1 rounded"
+            >
+              중요
+            </span>
+            <span class="text-xs text-gray-500">2025.11.01</span>
+          </div>
+          <h3 class="font-bold text-lg text-gray-800 mb-2">
+            이음 서비스 이용 안내
+          </h3>
+          <p class="text-sm text-gray-600 mb-3">
+            안녕하세요, 이음입니다. 시니어 일자리 매칭 서비스 이음을 이용해
+            주셔서 감사합니다.
+          </p>
+          <button
+            onclick="toggleContent('notice1')"
+            class="text-blue-600 text-sm font-medium"
+          >
+            자세히 보기 →
+          </button>
+          <div id="notice1" class="hidden mt-3 pt-3 border-t">
+            <p class="text-sm text-gray-700 leading-relaxed">
+              이음은 시니어 분들의 경력과 경험을 활용하여 적합한 일자리를 찾을
+              수 있도록 돕는 플랫폼입니다.
+              <br /><br />
+              <strong>주요 기능:</strong><br />
+              • AI 기반 맞춤 공고 추천<br />
+              • 실시간 채팅을 통한 빠른 소통<br />
+              • 지역 기반 일자리 검색<br />
+              • 이력서 작성 및 관리<br />
+              <br />
+              궁금하신 사항은 문의하기를 통해 연락 주시기 바랍니다.
+            </p>
+          </div>
+        </div>
+
+        <!-- 공지사항 2 -->
+        <div class="bg-white border rounded-lg p-4 mb-4 shadow-sm">
+          <div class="flex items-start justify-between mb-2">
+            <span
+              class="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded"
+            >
+              일반
+            </span>
+            <span class="text-xs text-gray-500">2025.10.28</span>
+          </div>
+          <h3 class="font-bold text-lg text-gray-800 mb-2">
+            개인정보 처리방침 업데이트 안내
+          </h3>
+          <p class="text-sm text-gray-600 mb-3">
+            이음의 개인정보 처리방침이 2025년 11월 1일부로 일부 변경됩니다.
+          </p>
+          <button
+            onclick="toggleContent('notice2')"
+            class="text-blue-600 text-sm font-medium"
+          >
+            자세히 보기 →
+          </button>
+          <div id="notice2" class="hidden mt-3 pt-3 border-t">
+            <p class="text-sm text-gray-700 leading-relaxed">
+              <strong>주요 변경 사항:</strong><br />
+              1. 개인정보 수집 항목 명확화<br />
+              2. 개인정보 보유 기간 구체화<br />
+              3. 제3자 제공 관련 내용 추가<br />
+              <br />
+              변경된 개인정보 처리방침은 2024년 11월 1일부터 적용되며, 이전
+              버전은 홈페이지에서 확인하실 수 있습니다.
+              <br /><br />
+              회원님의 개인정보 보호를 위해 최선을 다하겠습니다.
+            </p>
+          </div>
+        </div>
+
+        <!-- 공지사항이 없을 때 (현재는 더미 데이터가 있으므로 표시 안 됨) -->
+        <!-- <div class="text-center py-20">
+          <p class="text-gray-500">등록된 공지사항이 없습니다</p>
+        </div> -->
+      </div>
+    </div>
+
+    <script>
+      function toggleContent(id) {
+        const content = document.getElementById(id);
+        const button = content.previousElementSibling;
+
+        if (content.classList.contains("hidden")) {
+          content.classList.remove("hidden");
+          button.textContent = "접기 ↑";
+        } else {
+          content.classList.add("hidden");
+          button.textContent = "자세히 보기 →";
+        }
+      }
+    </script>
+  </body>
+</html>

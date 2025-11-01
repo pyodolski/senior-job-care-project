@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>문의 작성 - 이음</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <div class="w-full bg-white shadow-lg min-h-screen pb-20">
+      <!-- 상단 헤더 -->
+      <div class="sticky top-0 z-10 bg-white border-b">
+        <div class="px-4 py-4 flex items-center justify-between">
+          <button type="button" onclick="history.back()" class="text-gray-600">
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <h2 class="text-xl font-semibold text-gray-800">문의 작성</h2>
+          <div class="w-6"></div>
+        </div>
+      </div>
+
+      <!-- 안내 문구 -->
+      <div class="px-6 py-6 bg-blue-50 border-b">
+        <div class="flex items-start">
+          <svg
+            class="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <div>
+            <p class="text-sm text-gray-700 leading-relaxed">
+              문의사항을 남겨주시면 빠른 시일 내에 답변 드리겠습니다.
+              <br />
+              평일 09:00 ~ 18:00 (주말 및 공휴일 제외)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 문의 양식 -->
+      <form
+        method="POST"
+        action="{{ url_for('auth.inquiry_form') }}"
+        class="px-6 py-6"
+      >
+        <!-- 문의 유형 -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            문의 유형 <span class="text-red-500">*</span>
+          </label>
+          <select
+            name="inquiry_type"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">선택해주세요</option>
+            <option value="account">계정 관련</option>
+            <option value="job">공고 관련</option>
+            <option value="resume">이력서 관련</option>
+            <option value="payment">결제 관련</option>
+            <option value="technical">기술 문제</option>
+            <option value="suggestion">제안 및 건의</option>
+            <option value="other">기타</option>
+          </select>
+        </div>
+
+        <!-- 제목 -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            제목 <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            name="title"
+            placeholder="문의 제목을 입력하세요"
+            required
+            maxlength="100"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <!-- 문의 내용 -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            문의 내용 <span class="text-red-500">*</span>
+          </label>
+          <textarea
+            name="content"
+            rows="8"
+            placeholder="문의 내용을 상세히 입력해주세요"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          ></textarea>
+          <p class="text-xs text-gray-500 mt-1">최소 10자 이상 입력해주세요</p>
+        </div>
+
+        <!-- 연락처 -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            연락처 <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="tel"
+            name="contact"
+            value="{{ user.phone if user.phone else '' }}"
+            placeholder="010-0000-0000"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <!-- 이메일 -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            이메일
+          </label>
+          <input
+            type="email"
+            name="email"
+            value="{{ user.email if user.email else '' }}"
+            placeholder="example@email.com"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <p class="text-xs text-gray-500 mt-1">
+            답변 받으실 이메일 주소를 입력해주세요
+          </p>
+        </div>
+
+        <!-- 개인정보 수집 동의 -->
+        <div class="mb-6">
+          <label class="flex items-start">
+            <input
+              type="checkbox"
+              name="privacy_consent"
+              required
+              class="mt-1 mr-2"
+            />
+            <span class="text-sm text-gray-700">
+              개인정보 수집 및 이용에 동의합니다.
+              <span class="text-red-500">*</span>
+              <br />
+              <span class="text-xs text-gray-500">
+                문의 처리를 위해 필요한 최소한의 개인정보를 수집합니다.
+              </span>
+            </span>
+          </label>
+        </div>
+
+        <!-- 제출 버튼 -->
+        <div class="mt-8">
+          <button
+            type="submit"
+            class="w-full text-white font-semibold py-4 px-4 rounded-lg transition-colors"
+            style="background-color: #023591"
+          >
+            문의하기
+          </button>
+        </div>
+      </form>
+
+      <!-- 자주 묻는 질문 -->
+      <div class="px-6 py-6 bg-gray-50 border-t">
+        <h3 class="font-bold text-gray-800 mb-4">자주 묻는 질문</h3>
+        <div class="space-y-3">
+          <div class="bg-white p-4 rounded-lg border">
+            <p class="font-medium text-gray-800 mb-1">
+              Q. 회원가입은 어떻게 하나요?
+            </p>
+            <p class="text-sm text-gray-600">
+              A. 홈 화면에서 '회원가입' 버튼을 클릭하여 이메일 또는 소셜
+              로그인으로 가입할 수 있습니다.
+            </p>
+          </div>
+          <div class="bg-white p-4 rounded-lg border">
+            <p class="font-medium text-gray-800 mb-1">
+              Q. 이력서는 어떻게 작성하나요?
+            </p>
+            <p class="text-sm text-gray-600">
+              A. 내정보 > 이력서 등록하기를 통해 간편하게 작성할 수 있습니다.
+            </p>
+          </div>
+          <div class="bg-white p-4 rounded-lg border">
+            <p class="font-medium text-gray-800 mb-1">
+              Q. 공고 지원은 어떻게 하나요?
+            </p>
+            <p class="text-sm text-gray-600">
+              A. 원하는 공고를 선택한 후 '지원하기' 버튼을 클릭하면 자동으로
+              채팅방이 생성됩니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 폼 제출 시 유효성 검사
+      document.querySelector("form").addEventListener("submit", function (e) {
+        const content = document.querySelector(
+          'textarea[name="content"]'
+        ).value;
+        if (content.length < 10) {
+          e.preventDefault();
+          alert("문의 내용을 10자 이상 입력해주세요.");
+          return false;
+        }
+      });
+    </script>
+  </body>
+</html>

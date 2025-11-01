@@ -82,6 +82,12 @@ def inject_profile_url():
         url = None
     return dict(profile_url=url)
 
+# 전역 변수로 현재 날짜/시간 제공
+@app.context_processor
+def inject_now():
+    from datetime import datetime
+    return dict(now=datetime.now())
+
 # 블루프린트 등록
 app.register_blueprint(auth_bp, url_prefix="/auth")
 app.register_blueprint(google_bp, url_prefix="/login")

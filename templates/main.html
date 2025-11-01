@@ -15,7 +15,7 @@
     />
   </head>
   <body class="bg-gray-50">
-    <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto">
+    <div class="w-full bg-white shadow-lg min-h-screen">
       <!-- 상단 고정 영역 -->
       <div class="sticky top-0 z-10 bg-white shadow-sm">
         <!-- 상단 바 -->
@@ -337,8 +337,9 @@
         </section>
         {% endif %}
 
-        <!-- AI 추천 (일반 회원만) -->
+        <!-- AI 추천 (일반 회원만) / 내가 올린 공고 (기업 회원) -->
         {% if current_user.user_type == 0 %}
+        <!-- 일반 회원: AI 추천 -->
         <section class="mb-8">
           <div class="flex items-center mb-1">
             <span
@@ -476,9 +477,106 @@
             </div>
           </div>
         </section>
+        {% elif current_user.user_type == 1 %}
+        <!-- 기업 회원: 내가 올린 공고 -->
+        <section class="mb-8">
+          <div class="flex items-center mb-1">
+            <span
+              class="bg-transparent text-blue-800 text-sm font-bold px-3 py-1 rounded-full mr-3 border-2 border-blue-800"
+              >내 공고</span
+            >
+          </div>
+          <div class="mb-2">
+            <span class="text-purple-500 text-2xl mr-2">📌</span>
+            <span class="font-bold text-gray-800 text-xl"
+              >내가 올린 공고들이에요!</span
+            >
+          </div>
+          <div>
+            {% if my_company_jobs %} {% for job_data in my_company_jobs %} {%
+            set job = job_data.job %} {% set status =
+            job_data.application_status %}
+            <div
+              class="bg-white rounded-2xl p-4 shadow-sm border mb-3 cursor-pointer"
+              onclick="location.href='{{ url_for('company.company_job_detail', job_id=job.id) }}'"
+            >
+              <!-- 행[0]: 프로필사진, 회사명, 작성일 -->
+              <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-2">
+                  <div
+                    class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-sm font-bold"
+                  >
+                    {{ job.company[0] if job.company else
+                    (job.author.nickname[0] if job.author else '공') }}
+                  </div>
+                  <p class="text-sm text-gray-600">
+                    {{ job.company or (job.author.nickname if job.author else
+                    '익명') }}
+                  </p>
+                </div>
+                <p class="text-xs text-gray-500">
+                  {{ job.created_at|time_ago }}
+                </p>
+              </div>
+
+              <!-- 행[1]: 공고명 -->
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="font-bold text-lg">{{ job.title }}</h3>
+              </div>
+
+              <!-- 행[2]: 급여 -->
+              <div class="mb-2">
+                <p class="text-blue-600 font-bold">
+                  {{ job.salary or '50,000원' }}
+                </p>
+              </div>
+
+              <!-- 행[3]: 카테고리 -->
+              <div class="flex items-center justify-between">
+                <div class="flex space-x-2">
+                  {% if job.recruitment_type %}
+                  <span
+                    class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
+                  >
+                    {{ job.recruitment_type }}
+                  </span>
+                  {% endif %} {% if job.work_period %}
+                  <span
+                    class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
+                  >
+                    {{ job.work_period }}
+                  </span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% endfor %} {% else %}
+            <div class="bg-gray-50 rounded-2xl p-6 text-center">
+              <p class="text-gray-600 mb-2">아직 등록한 공고가 없어요</p>
+              <p class="text-sm text-gray-500">
+                공고를 작성하여 인재를 찾아보세요!
+              </p>
+            </div>
+            {% endif %}
+
+            <div
+              class="text-center mt-2 pb-2"
+              style="box-shadow: 0 4px 6px -4px rgba(0, 0, 0, 0.25)"
+            >
+              <a
+                href="{{ url_for('jobs.my_posts') }}"
+                class="text-gray-600 text-base font-medium inline-block py-1"
+              >
+                내 공고 관리하기 →
+              </a>
+            </div>
+          </div>
+        </section>
         {% endif %}
 
-        <!-- 실시간별 공고 -->
+        <!-- 실시간별 공고 (일반 회원) / 등록된 이력서 (기업 회원) -->
+        {% if current_user.user_type == 0 %}
+        <!-- 일반 회원: 실시간 공고 -->
         <section>
           <div class="flex items-center mb-1">
             <span
@@ -560,8 +658,7 @@
                     >{{ job.work_period or '시간대별' }}</span
                   >
                 </div>
-                {% if current_user.user_type == 0 %} {% if current_user.id ==
-                job.author_id %}
+                {% if current_user.id == job.author_id %}
                 <button
                   class="bg-gray-400 text-white font-bold py-2 px-4 rounded-full text-sm cursor-not-allowed"
                   disabled
@@ -583,7 +680,7 @@
                 >
                   지원하기
                 </button>
-                {% endif %} {% endif %}
+                {% endif %}
               </div>
             </div>
             {% endfor %} {% else %}
@@ -605,6 +702,124 @@
             </div>
           </div>
         </section>
+        {% elif current_user.user_type == 1 %}
+        <!-- 기업 회원: 등록된 이력서 -->
+        <section>
+          <div class="flex items-center mb-1">
+            <span
+              class="bg-transparent text-blue-800 text-sm font-bold px-3 py-1 rounded-full mr-3 border-2 border-blue-800"
+              >등록된 이력서</span
+            >
+          </div>
+          <div class="mb-2">
+            <span class="text-yellow-500 text-2xl mr-2">✊</span>
+            <span class="font-bold text-gray-800 text-xl"
+              >최근 등록된 이력서예요!</span
+            >
+          </div>
+          <div>
+            {% if public_resumes %} {% for resume_data in public_resumes %} {%
+            set resume = resume_data.resume %} {% set is_favorited =
+            resume_data.is_favorited %}
+            <div
+              class="bg-white rounded-2xl p-4 shadow-sm border mb-3 cursor-pointer"
+              onclick="location.href='{{ url_for('resumes.view_resume', resume_id=resume.id) }}'"
+            >
+              <!-- 행[0]: 프로필사진, 작성자명, 업데이트 날짜 -->
+              <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-2">
+                  <div
+                    class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-sm font-bold"
+                  >
+                    {{ resume.user.nickname[0] if resume.user.nickname else '이'
+                    }}
+                  </div>
+                  <p class="text-sm text-gray-600">
+                    {{ resume.user.nickname or '익명' }}
+                  </p>
+                </div>
+                <p class="text-xs text-gray-500">
+                  {{ resume.updated_at.strftime('%Y-%m-%d') }}
+                </p>
+              </div>
+
+              <!-- 행[1]: 희망 카테고리, 좋아요 버튼 -->
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="font-bold text-lg">
+                  {% if resume.desired_categories %} {{
+                  resume.desired_categories.split(',')[0] }} {% else %} 일반
+                  이력서 {% endif %}
+                </h3>
+                <button
+                  class="{% if is_favorited %}text-red-500{% else %}text-gray-400{% endif %} hover:text-red-500"
+                  onclick="event.stopPropagation(); toggleResumeFavorite({{ resume.id }}, this);"
+                >
+                  <svg
+                    class="w-6 h-6"
+                    fill="{% if is_favorited %}currentColor{% else %}none{% endif %}"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- 행[2]: 자기소개 미리보기 -->
+              <div class="mb-2">
+                <p class="text-gray-600 text-sm line-clamp-2">
+                  {% if resume.self_introduction %} {{
+                  resume.self_introduction[:100] }}{% if
+                  resume.self_introduction|length > 100 %}...{% endif %} {% else
+                  %} 자기소개가 없습니다. {% endif %}
+                </p>
+              </div>
+
+              <!-- 행[3]: 희망 근무 타입 -->
+              <div class="flex items-center justify-between">
+                <div class="flex space-x-2">
+                  {% if resume.desired_work_type %}
+                  <span
+                    class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
+                  >
+                    {{ resume.desired_work_type }}
+                  </span>
+                  {% endif %} {% if resume.desired_categories %}
+                  <span
+                    class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
+                  >
+                    카테고리 {{ resume.desired_categories.split(',') | length
+                    }}개
+                  </span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% endfor %} {% else %}
+            <p class="text-gray-500 text-center py-4">
+              등록된 이력서가 없습니다.
+            </p>
+            {% endif %}
+
+            <div
+              class="text-center mt-2 pb-2"
+              style="box-shadow: 0 4px 6px -4px rgba(0, 0, 0, 0.25)"
+            >
+              <a
+                href="{{ url_for('company.resume_list') }}"
+                class="text-gray-600 text-base font-medium inline-block py-1"
+              >
+                더 많은 이력서 보기 →
+              </a>
+            </div>
+          </div>
+        </section>
+        {% endif %}
 
         <!-- 최근 시니어 일자리 뉴스 -->
         <section class="mt-8">
@@ -699,7 +914,7 @@
       {% include 'components/company_footer.html' %} {% else %}
       <!-- 일반 회원 네비게이션 -->
       <footer
-        class="fixed bottom-0 left-0 right-0 w-full bg-gray-50 border-t flex justify-around max-w-md mx-auto"
+        class="fixed bottom-0 left-0 right-0 w-full bg-gray-50 border-t flex justify-around"
       >
         <a
           href="{{ url_for('map.show_map') }}"

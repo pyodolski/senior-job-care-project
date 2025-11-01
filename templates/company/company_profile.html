@@ -126,6 +126,12 @@
           <div class="text-center mb-2">
             <h2 class="text-xl font-bold text-gray-800">{{ user.name }}</h2>
             <p class="text-sm text-gray-500 mt-1">기업 회원</p>
+            <a
+              href="{{ url_for('auth.edit_company_profile') }}"
+              class="inline-block mt-2 text-sm text-gray-500 hover:text-gray-600 border border-gray-500 px-4 py-1 rounded-full"
+            >
+              프로필 수정
+            </a>
           </div>
 
           <!-- 구인글 작성하기 버튼 -->
@@ -141,18 +147,20 @@
           <!-- 통계 -->
           <div class="flex justify-around mt-6 pt-6 border-t border-gray-200">
             <div class="text-center">
-              <p class="text-sm text-gray-500 mb-1">올린 공고</p>
-              <p class="text-2xl font-bold text-blue-600">{{ job_count }}</p>
-            </div>
-            <div class="text-center">
-              <p class="text-sm text-gray-500 mb-1">좋아요한 이력서</p>
-              <p class="text-2xl font-bold text-red-500">
-                {{ favorite_resume_count }}
+              <p class="text-sm text-gray-500 mb-1">보낸 제안</p>
+              <p class="text-2xl font-bold text-blue-600">
+                {{ sent_suggestions_count }}
               </p>
             </div>
             <div class="text-center">
-              <p class="text-sm text-gray-500 mb-1">채팅</p>
-              <p class="text-2xl font-bold text-blue-600">0</p>
+              <p class="text-sm text-gray-500 mb-1">받은 이력서</p>
+              <p class="text-2xl font-bold text-green-600">
+                {{ received_applications_count }}
+              </p>
+            </div>
+            <div class="text-center">
+              <p class="text-sm text-gray-500 mb-1">내 구인글</p>
+              <p class="text-2xl font-bold text-purple-600">{{ job_count }}</p>
             </div>
           </div>
         </div>
@@ -235,7 +243,10 @@
           </div>
 
           <!-- 공지사항 -->
-          <a href="#" class="menu-item border-b border-gray-100">
+          <a
+            href="{{ url_for('auth.notice') }}"
+            class="menu-item border-b border-gray-100"
+          >
             <span class="text-base font-medium text-gray-800">공지사항</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -254,7 +265,10 @@
           </a>
 
           <!-- 문의하기 -->
-          <a href="#" class="menu-item border-b border-gray-100">
+          <a
+            href="{{ url_for('auth.inquiry') }}"
+            class="menu-item border-b border-gray-100"
+          >
             <span class="text-base font-medium text-gray-800">문의하기</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
