@@ -5,25 +5,25 @@ function confirmWithdrawal() {
     )
   ) {
     // 회원탈퇴 API 호출
-    fetch('/withdraw', {
-      method: 'POST',
+    fetch("/auth/withdraw", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-      }
+        "Content-Type": "application/json",
+      },
     })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        alert(data.message);
-        // 홈 페이지로 리다이렉트
-        window.location.href = '/';
-      } else {
-        alert(data.message || '회원탈퇴에 실패했습니다.');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('회원탈퇴 처리 중 오류가 발생했습니다.');
-    });
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          alert(data.message);
+          // 홈 페이지로 리다이렉트
+          window.location.href = "/";
+        } else {
+          alert(data.message || "회원탈퇴에 실패했습니다.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("회원탈퇴 처리 중 오류가 발생했습니다.");
+      });
   }
 }
