@@ -600,3 +600,104 @@ def update_user_info():
 def logout():
     logout_user()
     return redirect(url_for("auth.home"))
+
+
+# 회원탈퇴 처리
+@auth_bp.route("/withdraw", methods=["POST"])
+@login_required
+def withdraw():
+    """회원탈퇴 처리 - 사용자와 관련된 모든 데이터 삭제"""
+    from flask import jsonify
+    from models import JobPost, JobBookmark, JobApplication, ChatRoom, ChatMessage, Resume, Certificate, ResumeFavorite, JobSuggestion
+
+    try:
+        user_id = current_user.id
+
+        # 1. 사용자가 작성한 공고 삭제
+        JobPost.query.filter_by(author_id=user_id).delete()
+
+        # 2. 사용자의 북마크 삭제
+        JobBookmark.query.filter_by(user_id=user_id).delete()
+
+        # 3. 사용자의 지원내역 삭제
+        JobApplication.query.filter_by(user_id=user_id).delete()
+
+        # 4. 사용자가 보내거나 받은 공고 제안 삭제
+        JobSuggestion.query.filter(
+            (JobSuggestion.suggester_id == user_id) |
+            (JobSuggestion.suggestee_id == user_id)
+        ).delete(synchronize_session=False)
+
+        # 5. 사용자가 좋아요한 이력서 삭제
+        ResumeFavorite.query.filter_by(user_id=user_id).delete()
+
+        # 6. 사용자의 채팅 메시지 삭제
+        chat_rooms = ChatRoom.query.filter(
+            (ChatRoom.applicant_id == user_id) |
+            (ChatRoom.employer_id == user_id)
+        ).all()
+
+        for room in chat_rooms:
+            ChatMessage.query.filter_by(room_id=room.id).delete()
+
+        # 7. 사용자의 채팅방 삭제
+        ChatRoom.query.filter(
+            (ChatRoom.applicant_id == user_id) |
+            (ChatRoom.employer_id == user_id)
+        ).delete(synchronize_session=False)
+
+        # 8. 사용자의 이력서와 자격증 삭제 (cascade로 자동 삭제됨)
+        Resume.query.filter_by(user_id=user_id).delete()
+
+        # 9. 프로필 이미지가 있으면 S3에서 삭제 (선택사항)
+        if current_user.profile_image:
+            try:
+                s3_client = boto3.client(
+                    's3',
+                    aws_access_key_id=current_app.config.get('AWS_ACCESS_KEY_ID'),
+                    aws_secret_access_key=current_app.config.get('AWS_SECRET_ACCESS_KEY'),
+                    region_name=current_app.config.get('AWS_S3_REGION')
+                )
+                bucket_name = current_app.config.get('AWS_S3_BUCKET_NAME')
+                s3_client.delete_object(Bucket=bucket_name, Key=current_user.profile_image)
+                print(f"✅ S3에서 프로필 이미지 삭제: {current_user.profile_image}")
+            except Exception as e:
+                print(f"⚠️ S3 프로필 이미지 삭제 실패: {e}")
+
+        # 10. 사업자등록증 파일이 있으면 S3에서 삭제 (기업 회원)
+        if current_user.business_registration_file:
+            try:
+                s3_client = boto3.client(
+                    's3',
+                    aws_access_key_id=current_app.config.get('AWS_ACCESS_KEY_ID'),
+                    aws_secret_access_key=current_app.config.get('AWS_SECRET_ACCESS_KEY'),
+                    region_name=current_app.config.get('AWS_S3_REGION')
+                )
+                bucket_name = current_app.config.get('AWS_S3_BUCKET_NAME')
+                # S3 URL에서 키 추출
+                from urllib.parse import urlparse
+                parsed_url = urlparse(current_user.business_registration_file)
+                key = parsed_url.path.lstrip('/')
+                s3_client.delete_object(Bucket=bucket_name, Key=key)
+                print(f"✅ S3에서 사업자등록증 삭제: {key}")
+            except Exception as e:
+                print(f"⚠️ S3 사업자등록증 삭제 실패: {e}")
+
+        # 11. 로그아웃 처리 (User 삭제 전에 해야 함)
+        logout_user()
+
+        # 12. 마지막으로 사용자 삭제
+        User.query.filter_by(id=user_id).delete()
+
+        # 모든 변경사항 커밋
+        db.session.commit()
+
+        print(f"✅ 회원탈퇴 완료: user_id={user_id}")
+        return jsonify({"success": True, "message": "회원탈퇴가 완료되었습니다."})
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ 회원탈퇴 실패: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"success": False, "message": "회원탈퇴 처리 중 오류가 발생했습니다."}), 500

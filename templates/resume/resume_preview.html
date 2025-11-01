@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>이력서 미리보기 - 사람이음</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='css/edit_resume.css') }}"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="form-container">
+      <div class="header-fixed">
+        <header class="px-4 py-4 flex items-center justify-between">
+          <button onclick="history.back()" class="focus:outline-none">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-6 h-6 text-gray-700"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <h1 class="text-lg font-bold text-gray-800">이력서 미리보기</h1>
+          <div class="w-6"></div>
+        </header>
+      </div>
+
+      <div class="main-content">
+        <form method="POST" action="{{ url_for('resumes.submit_resume') }}">
+          <input
+            type="hidden"
+            name="resume_data"
+            value="{{ resume_data_json }}"
+          />
+
+          <div class="step-container" style="display: block">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+              작성하신 내용을 확인해주세요
+            </h2>
+
+            <div class="space-y-4 mb-6">
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-base font-semibold text-gray-800">
+                    희망 직무분야
+                  </h3>
+                </div>
+                <p class="text-sm text-gray-700">{{ preview_data.category }}</p>
+              </div>
+
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-base font-semibold text-gray-800">
+                    희망 근무 형태
+                  </h3>
+                </div>
+                <p class="text-sm text-gray-700">
+                  {{ preview_data.work_type }}
+                </p>
+              </div>
+
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-base font-semibold text-gray-800">
+                    희망 근무 요일
+                  </h3>
+                </div>
+                <p class="text-sm text-gray-700">{{ preview_data.days }}</p>
+              </div>
+
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-base font-semibold text-gray-800">
+                    희망 근무 시간
+                  </h3>
+                </div>
+                <p class="text-sm text-gray-700">{{ preview_data.time }}</p>
+              </div>
+
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-base font-semibold text-gray-800">
+                    경력 및 경험
+                  </h3>
+                </div>
+                <div class="text-sm text-gray-700 space-y-1">
+                  {% for exp in preview_data.experience %}
+                  <p>• {{ exp }}</p>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-base font-semibold text-gray-800">
+                    보유 기술 및 자격증
+                  </h3>
+                </div>
+                <div class="text-sm text-gray-700 space-y-1">
+                  {% for cert in preview_data.certificates %}
+                  <p>• {{ cert }}</p>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-base font-semibold text-gray-800">
+                    성격 및 강점
+                  </h3>
+                </div>
+                <p class="text-sm text-gray-700">
+                  {{ preview_data.strengths }}
+                </p>
+              </div>
+
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-base font-semibold text-gray-800">
+                    신체적 활동 가능 범위
+                  </h3>
+                </div>
+                <p class="text-sm text-gray-700 mb-2">
+                  {{ preview_data.walkable }}
+                </p>
+                <div class="text-sm text-gray-700 space-y-1">
+                  {% for activity in preview_data.physical %}
+                  <p>• {{ activity }}</p>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-base font-semibold text-gray-800">
+                    이동 가능 범위
+                  </h3>
+                </div>
+                <p class="text-sm text-gray-700">{{ preview_data.commute }}</p>
+              </div>
+
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-base font-semibold text-gray-800">
+                    자기소개
+                  </h3>
+                </div>
+                <p class="text-sm text-gray-700 whitespace-pre-wrap">
+                  {{ preview_data.introduction }}
+                </p>
+              </div>
+
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-base font-semibold text-gray-800">
+                    연락 가능 시간
+                  </h3>
+                </div>
+                <p class="text-sm text-gray-700">
+                  {{ preview_data.call_time }}
+                </p>
+              </div>
+
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-base font-semibold text-gray-800">
+                    개인정보 공개 범위
+                  </h3>
+                </div>
+                <p class="text-sm text-gray-700">{{ preview_data.privacy }}</p>
+              </div>
+
+              <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                  <div class="flex items-center">
+                    <svg
+                      class="w-5 h-5 text-blue-600 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                    <div>
+                      <h3 class="text-sm font-semibold text-gray-800">
+                        이력서 공개 여부
+                      </h3>
+                      <p class="text-sm text-gray-600 mt-1">
+                        {{ preview_data.public }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t p-4 flex gap-2"
+            >
+              <button
+                type="button"
+                class="flex-1 py-3 px-4 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-xl transition-colors"
+                onclick="history.back()"
+              >
+                수정하기
+              </button>
+              <button
+                type="submit"
+                class="flex-1 py-3 px-4 bg-blue-900 hover:bg-blue-800 text-white font-semibold rounded-xl transition-colors"
+              >
+                제출하기
+              </button>
+            </div>
+            <div class="h-20"></div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

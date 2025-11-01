@@ -1,0 +1,18 @@
+/* Noto Sans KR 폰트 (기본) */
+body {
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+/* LOTTERIA CHAB 폰트 (로고용) */
+@font-face {
+  font-family: "LOTTERIACHAB";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/LOTTERIACHAB.woff2")
+    format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Tailwind에서 사용할 수 있도록 폰트 클래스 정의 */
+.font-lotteria {
+  font-family: "LOTTERIACHAB", sans-serif;
+}

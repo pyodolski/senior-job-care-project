@@ -1,0 +1,38 @@
+body {
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+.step-content {
+  display: none;
+}
+
+.step-content.active {
+  display: block;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.progress-bar {
+  transition: width 0.3s ease;
+}
+
+.gender-button {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gender-button.selected {
+  background-color: #1e3a8a;
+  color: white;
+  border-color: #1e3a8a;
+}

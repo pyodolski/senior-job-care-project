@@ -9,30 +9,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <style>
-      body {
-        font-family: "Noto Sans KR", sans-serif;
-      }
-      .info-row {
-        display: flex;
-        padding: 12px 16px;
-        border-bottom: 1px solid #f3f4f6;
-      }
-      .info-row:last-child {
-        border-bottom: none;
-      }
-      .info-label {
-        min-width: 100px;
-        font-weight: 500;
-        color: #6b7280;
-        font-size: 14px;
-      }
-      .info-value {
-        flex: 1;
-        color: #1f2937;
-        font-size: 14px;
-      }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume/my_resume_detail.css') }}" />
   </head>
   <body class="bg-gray-50">
     <div class="max-w-md mx-auto bg-white min-h-screen flex flex-col">
@@ -595,57 +572,9 @@
     </div>
 
     <script>
-      async function deleteResume(url) {
-        if (!confirm("정말 이력서를 삭제하시겠습니까?")) return;
-        try {
-          const res = await fetch(url, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Requested-With": "XMLHttpRequest",
-            },
-            credentials: "same-origin",
-          });
-          const data = await res.json();
-          if (data.success) {
-            alert("삭제되었습니다.");
-            location.href = "{{ url_for('resumes.my_view_resume') }}";
-          } else {
-            alert(data.message || "삭제에 실패했습니다.");
-          }
-        } catch (e) {
-          console.error("Error:", e);
-          alert("요청 중 오류가 발생했습니다.");
-        }
-      }
-
-      async function togglePublic(url, isPublic, resumeId) {
-        try {
-          const res = await fetch(url, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Requested-With": "XMLHttpRequest",
-            },
-            credentials: "same-origin",
-            body: JSON.stringify({ ispublic: isPublic }),
-          });
-          const data = await res.json();
-
-          if (data.success) {
-            location.reload();
-          } else {
-            alert(data.message || "공개 설정 변경에 실패했습니다.");
-            const input = document.querySelector(`#toggle-${resumeId}`);
-            if (input) input.checked = !isPublic;
-          }
-        } catch (e) {
-          console.error("Error:", e);
-          alert("요청 중 오류가 발생했습니다.");
-          const input = document.querySelector(`#toggle-${resumeId}`);
-          if (input) input.checked = !isPublic;
-        }
-      }
+      // Flask 템플릿 변수를 JavaScript로 전달
+      window.myViewResumeUrl = "{{ url_for('resumes.my_view_resume') }}";
     </script>
+    <script src="{{ url_for('static', filename='js/resume/my_resume_detail.js') }}"></script>
   </body>
 </html>

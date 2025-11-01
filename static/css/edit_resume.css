@@ -100,9 +100,13 @@ button {
   font-weight: bold;
 }
 button[type="submit"] {
-  background-color: #007bff;
+  background-color: #1e40af;
   color: white;
   width: 100%;
+  font-weight: 600;
+}
+button[type="submit"]:hover {
+  background-color: #1e3a8a;
 }
 .prev-btn {
   background-color: #6c757d;
@@ -266,7 +270,13 @@ button[type="submit"] {
   -webkit-appearance: none;
   appearance: none;
   height: 8px;
-  background: linear-gradient(to right, #2563eb 0%, #2563eb 0%, #e5e7eb 0%, #e5e7eb 100%);
+  background: linear-gradient(
+    to right,
+    #2563eb 0%,
+    #2563eb 0%,
+    #e5e7eb 0%,
+    #e5e7eb 100%
+  );
   outline: none;
   border-radius: 4px;
 }

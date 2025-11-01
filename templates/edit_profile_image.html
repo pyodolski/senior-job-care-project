@@ -9,12 +9,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap"
       rel="stylesheet"
     />
-    <style>
-      body {
-        font-family: "Noto Sans KR", sans-serif;
-        background: #f9fafb;
-      }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/edit_profile_image.css') }}" />
   </head>
   <body>
     <div class="max-w-md mx-auto bg-white mt-8 shadow rounded-lg p-6">
@@ -100,23 +95,6 @@
       </form>
     </div>
 
-    <script>
-      // 이미지 미리보기 기능
-      document
-        .getElementById("profileImageInput")
-        .addEventListener("change", function (e) {
-          const file = e.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-              document.getElementById("previewImg").src = e.target.result;
-              document
-                .getElementById("imagePreview")
-                .classList.remove("hidden");
-            };
-            reader.readAsDataURL(file);
-          }
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/edit_profile_image.js') }}"></script>
   </body>
 </html>

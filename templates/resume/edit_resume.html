@@ -48,7 +48,7 @@
         <div class="alert alert-{{ category }}">{{ message }}</div>
         {% endfor %} {% endif %} {% endwith %}
 
-        <form method="POST" enctype="multipart/form-data">
+        <form id="resumeForm" method="POST" action="{{ url_for('resumes.resume_preview') }}" enctype="multipart/form-data"></form>
           <!-- 단계 1: 희망 직무 분야 및 형태 -->
           <div id="step-1" class="step-container">
             <h2 class="text-xl font-bold text-gray-900 mb-2">
@@ -1078,14 +1078,20 @@
 
             <div class="mb-6">
               <label class="flex items-center text-sm text-gray-600">
-                <input type="checkbox" id="commute-negotiable" name="is_commute_impossible" class="mr-2" {%
+                <input
+                  type="checkbox"
+                  id="commute-negotiable"
+                  name="is_commute_impossible"
+                  class="mr-2"
+                  {%
                   if
                   resume
                   and
                   resume.is_commute_impossible
                   %}checked{%
                   endif
-                  %} />
+                  %}
+                />
                 <span>교통 수단 불가</span>
               </label>
             </div>
@@ -1195,7 +1201,8 @@
                     개인정보 제3자 제공동의 (필수)
                   </span>
                   <span class="block text-xs text-gray-500 mt-1">
-                    구인 기업이 이력서 내용을 열람하고 채용 목적으로 사용하는 것에 동의합니다
+                    구인 기업이 이력서 내용을 열람하고 채용 목적으로 사용하는
+                    것에 동의합니다
                   </span>
                 </div>
               </label>
@@ -1205,256 +1212,7 @@
               <button type="button" class="prev-btn" onclick="prevStep('5-3')">
                 이전
               </button>
-              <button type="button" onclick="showPreview()">작성 완료</button>
-            </div>
-          </div>
-
-          <!-- Step 7: 미리보기 및 제출 -->
-          <div id="step-7" class="step-container" style="display: none">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">
-              작성하신 내용을 확인해주세요
-            </h2>
-
-            <div class="space-y-4 mb-6">
-              <!-- 희망 직무분야 -->
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-900">
-                    희망 직무분야
-                  </h3>
-                  <button
-                    type="button"
-                    onclick="editStep(1)"
-                    class="text-xs text-blue-600 hover:text-blue-800"
-                  >
-                    수정
-                  </button>
-                </div>
-                <p id="preview-category" class="text-sm text-gray-700"></p>
-              </div>
-
-              <!-- 희망 근무 형태 -->
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-900">
-                    희망 근무 형태
-                  </h3>
-                  <button
-                    type="button"
-                    onclick="editStep(2)"
-                    class="text-xs text-blue-600 hover:text-blue-800"
-                  >
-                    수정
-                  </button>
-                </div>
-                <p id="preview-work-type" class="text-sm text-gray-700"></p>
-              </div>
-
-              <!-- 희망 근무 요일 -->
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-900">
-                    희망 근무 요일
-                  </h3>
-                  <button
-                    type="button"
-                    onclick="editStep(2)"
-                    class="text-xs text-blue-600 hover:text-blue-800"
-                  >
-                    수정
-                  </button>
-                </div>
-                <p id="preview-days" class="text-sm text-gray-700"></p>
-              </div>
-
-              <!-- 희망 근무 시간 -->
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-900">
-                    희망 근무 시간
-                  </h3>
-                  <button
-                    type="button"
-                    onclick="editStep(2)"
-                    class="text-xs text-blue-600 hover:text-blue-800"
-                  >
-                    수정
-                  </button>
-                </div>
-                <p id="preview-time" class="text-sm text-gray-700"></p>
-              </div>
-
-              <!-- 경력 및 경험 -->
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-900">
-                    경력 및 경험
-                  </h3>
-                  <button
-                    type="button"
-                    onclick="editStep(3)"
-                    class="text-xs text-blue-600 hover:text-blue-800"
-                  >
-                    수정
-                  </button>
-                </div>
-                <div
-                  id="preview-experience"
-                  class="text-sm text-gray-700 space-y-1"
-                ></div>
-              </div>
-
-              <!-- 보유 기술 및 재능 -->
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-900">
-                    보유 기술 및 재능
-                  </h3>
-                  <button
-                    type="button"
-                    onclick="editStep(4)"
-                    class="text-xs text-blue-600 hover:text-blue-800"
-                  >
-                    수정
-                  </button>
-                </div>
-                <div
-                  id="preview-certificates"
-                  class="text-sm text-gray-700 space-y-1"
-                ></div>
-              </div>
-
-              <!-- 성격 및 강점 -->
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-900">
-                    성격 및 강점
-                  </h3>
-                  <button
-                    type="button"
-                    onclick="editStep(5)"
-                    class="text-xs text-blue-600 hover:text-blue-800"
-                  >
-                    수정
-                  </button>
-                </div>
-                <p id="preview-strengths" class="text-sm text-gray-700"></p>
-              </div>
-
-              <!-- 신체적 활동 가능 범위 -->
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-900">
-                    신체적 활동 가능 범위
-                  </h3>
-                  <button
-                    type="button"
-                    onclick="editStep('5-2')"
-                    class="text-xs text-blue-600 hover:text-blue-800"
-                  >
-                    수정
-                  </button>
-                </div>
-                <p id="preview-walkable" class="text-sm text-gray-700 mb-2"></p>
-                <div
-                  id="preview-physical"
-                  class="text-sm text-gray-700 space-y-1"
-                ></div>
-              </div>
-
-              <!-- 이동 가능 범위 -->
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-900">
-                    이동 가능 범위
-                  </h3>
-                  <button
-                    type="button"
-                    onclick="editStep('5-3')"
-                    class="text-xs text-blue-600 hover:text-blue-800"
-                  >
-                    수정
-                  </button>
-                </div>
-                <p id="preview-commute" class="text-sm text-gray-700"></p>
-              </div>
-
-              <!-- 자기소개 -->
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-900">자기소개</h3>
-                  <button
-                    type="button"
-                    onclick="editStep(6)"
-                    class="text-xs text-blue-600 hover:text-blue-800"
-                  >
-                    수정
-                  </button>
-                </div>
-                <p
-                  id="preview-introduction"
-                  class="text-sm text-gray-700 whitespace-pre-wrap"
-                ></p>
-              </div>
-
-              <!-- 통화가능 시간 -->
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-900">통화가능 시간</h3>
-                  <button
-                    type="button"
-                    onclick="editStep(6)"
-                    class="text-xs text-blue-600 hover:text-blue-800"
-                  >
-                    수정
-                  </button>
-                </div>
-                <p id="preview-call-time" class="text-sm text-gray-700"></p>
-              </div>
-
-              <!-- 개인정보 제3자 제공동의 -->
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-900">개인정보 제3자 제공동의</h3>
-                  <button
-                    type="button"
-                    onclick="editStep(6)"
-                    class="text-xs text-blue-600 hover:text-blue-800"
-                  >
-                    수정
-                  </button>
-                </div>
-                <p id="preview-privacy" class="text-sm text-gray-700"></p>
-              </div>
-
-              <!-- 이력서 공개 설정 -->
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <h3 class="text-sm font-semibold text-gray-900">
-                      이력서 공개 설정
-                    </h3>
-                    <p
-                      id="preview-public"
-                      class="text-sm text-gray-600 mt-1"
-                    ></p>
-                  </div>
-                  <button
-                    type="button"
-                    onclick="editStep(6)"
-                    class="text-xs text-blue-600 hover:text-blue-800"
-                  >
-                    수정
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div class="button-group">
-              <button type="button" class="prev-btn" onclick="prevStep(6)">
-                이전
-              </button>
-              <button type="submit">제출하기</button>
+              <button type="submit">작성 완료</button>
             </div>
           </div>
         </form>
@@ -1477,6 +1235,6 @@
       // 템플릿 변수를 전역 변수로 전달
       const profileUrl = "{{ url_for('auth.profile') }}";
     </script>
-    <script src="{{ url_for('static', filename='js/edit_resume.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/resume/edit_resume.js') }}"></script>
   </body>
 </html>
