@@ -15,35 +15,45 @@
     />
   </head>
   <body class="bg-gray-50">
-    <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto pb-20">
-      <!-- 상단 헤더 -->
-      <header class="bg-white border-b px-4 py-4 sticky top-0 z-20">
-        <div class="flex items-center justify-between">
-          <a href="{{ url_for('auth.main') }}">
-            <img
-              src="{{ url_for('static', filename='images/header/logo.png') }}"
-              alt="이음 로고"
-              class="h-8"
-            />
-          </a>
-          <div class="flex items-center gap-4">
-            <button class="text-gray-600">
+    <div class="w-full bg-white shadow-lg min-h-screen pb-20">
+      <!-- 상단 고정 영역 -->
+      <div class="sticky top-0 z-10 bg-white shadow-sm">
+        <!-- 상단 바 -->
+        <header class="px-4 py-3 sm:px-6 flex justify-between items-center">
+          <div class="flex items-center">
+            <div class="w-8 h-8 mr-2 flex items-center justify-center">
+              <img
+                src="{{ url_for('static', filename='images/header/logo.png') }}"
+                alt="로고"
+                class="max-w-full max-h-full object-contain"
+              />
+            </div>
+            <span class="text-xl font-bold text-blue-900">이음</span>
+          </div>
+          <div class="flex items-center space-x-3 sm:space-x-4">
+            <!-- 음성 검색 버튼 -->
+            <button
+              onclick="startVoiceSearch()"
+              id="voiceBtn"
+              class="w-6 h-6 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
+              title="음성으로 검색하기"
+            >
               <img
                 src="{{ url_for('static', filename='images/header/mic.png') }}"
-                alt="음성검색"
-                class="w-6 h-6"
+                alt="마이크"
+                class="max-w-full max-h-full object-contain"
               />
             </button>
-            <button class="text-gray-600">
+            <div class="w-6 h-6 flex items-center justify-center">
               <img
                 src="{{ url_for('static', filename='images/header/search.png') }}"
                 alt="검색"
-                class="w-6 h-6"
+                class="max-w-full max-h-full object-contain"
               />
-            </button>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      </div>
 
       <!-- 필터 영역 -->
       <div class="bg-white px-4 py-3 border-b">
@@ -382,6 +392,7 @@
       {% include 'components/company_footer.html' %}
     </div>
 
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/company/resume_list.js') }}"></script>
   </body>
 </html>

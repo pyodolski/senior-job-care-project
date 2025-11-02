@@ -9,10 +9,13 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume/my_view_resume.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/resume/my_view_resume.css') }}"
+    />
   </head>
   <body class="bg-gray-50">
-    <div class="max-w-md mx-auto bg-gray-50 min-h-screen flex flex-col">
+    <div class="w-full bg-gray-50 min-h-screen flex flex-col">
       <!-- 상단 헤더 -->
       <div class="sticky top-0 z-10 bg-white">
         <header class="px-4 py-4 flex items-center">
@@ -199,75 +202,7 @@
       </main>
 
       <!-- 하단 네비게이션 -->
-      <footer
-        class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t flex justify-around"
-      >
-        <a
-          href="{{ url_for('map.show_map') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/map.png') }}"
-              alt="지도"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">지도</span>
-        </a>
-        <a
-          href="{{ url_for('jobs.bookmark_list') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/favorite.png') }}"
-              alt="찜"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">찜</span>
-        </a>
-        <a
-          href="{{ url_for('auth.main') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/home.png') }}"
-              alt="홈"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">홈</span>
-        </a>
-        <a
-          href="{{ url_for('chat.chat_list') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/chatting.png') }}"
-              alt="채팅"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">채팅</span>
-        </a>
-        <a
-          href="{{ url_for('auth.profile') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/profile.png') }}"
-              alt="내정보"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">내정보</span>
-        </a>
-      </footer>
+      {% include 'components/footer.html' %}
     </div>
 
     <script src="{{ url_for('static', filename='js/resume/my_view_resume.js') }}"></script>

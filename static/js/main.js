@@ -155,3 +155,148 @@ document.addEventListener("DOMContentLoaded", function () {
   // 초기 상태 설정
   updateToggleTheme();
 });
+
+// ==================== 음성 검색 기능 ====================
+
+// 음성 인식 지원 확인
+const SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
+
+function startVoiceSearch() {
+  if (!SpeechRecognition) {
+    alert(
+      "죄송합니다. 이 브라우저는 음성 인식을 지원하지 않습니다.\nChrome 또는 Edge 브라우저를 사용해주세요."
+    );
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = "ko-KR";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  const voiceBtn = document.getElementById("voiceBtn");
+
+  // 음성 인식 시작
+  recognition.start();
+
+  // 버튼 상태 변경 (듣는 중)
+  voiceBtn.style.opacity = "0.5";
+  voiceBtn.style.animation = "pulse 1s infinite";
+
+  // 음성 인식 성공
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    console.log("인식된 음성:", transcript);
+
+    // 음성 피드백
+    speak("검색 중입니다");
+
+    // 공고 검색 페이지로 이동 (파라미터: q)
+    window.location.href = `/jobs?q=${encodeURIComponent(transcript)}`;
+  };
+
+  // 음성 인식 종료
+  recognition.onend = () => {
+    voiceBtn.style.opacity = "1";
+    voiceBtn.style.animation = "";
+  };
+
+  // 음성 인식 오류
+  recognition.onerror = (event) => {
+    console.error("음성 인식 오류:", event.error);
+    voiceBtn.style.opacity = "1";
+    voiceBtn.style.animation = "";
+
+    let errorMsg = "음성 인식에 실패했습니다.";
+
+    switch (event.error) {
+      case "no-speech":
+        errorMsg = "음성이 감지되지 않았습니다. 다시 시도해주세요.";
+        break;
+      case "audio-capture":
+        errorMsg = "마이크를 찾을 수 없습니다.";
+        break;
+      case "not-allowed":
+        errorMsg =
+          "마이크 권한이 필요합니다. 브라우저 설정에서 마이크 권한을 허용해주세요.";
+        break;
+    }
+
+    alert(errorMsg);
+  };
+
+  // 음성 인식 시작 알림
+  speak("말씀해주세요");
+}
+
+// 음성 합성 (TTS)
+function speak(text) {
+  if ("speechSynthesis" in window) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "ko-KR";
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+    window.speechSynthesis.speak(utterance);
+  }
+}
+
+// 펄스 애니메이션 추가
+const style = document.createElement("style");
+style.textContent = `
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+`;
+document.head.appendChild(style);
+
+// ==================== 관리자 전용: 공공데이터 동기화 ====================
+
+async function syncPublicData() {
+  const btn = document.getElementById("syncBtn");
+  const result = document.getElementById("syncResult");
+
+  if (!btn || !result) return;
+
+  btn.disabled = true;
+  btn.textContent = "⏳ 수집 중...";
+  result.innerHTML =
+    '<div class="text-white text-center">공공데이터를 가져오는 중입니다...</div>';
+
+  try {
+    const response = await fetch("/admin/fetch-senior-jobs", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      result.innerHTML =
+        '<div class="text-white text-center font-bold">✅ ' +
+        data.message +
+        "</div>";
+
+      // 3초 후 페이지 새로고침
+      setTimeout(() => {
+        location.reload();
+      }, 3000);
+    } else {
+      result.innerHTML =
+        '<div class="text-red-200 text-center">❌ ' + data.message + "</div>";
+    }
+  } catch (error) {
+    result.innerHTML =
+      '<div class="text-red-200 text-center">❌ 오류: ' +
+      error.message +
+      "</div>";
+  } finally {
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = "🔄 공공데이터 최신화";
+    }, 3000);
+  }
+}
