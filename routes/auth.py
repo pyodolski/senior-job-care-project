@@ -6,7 +6,6 @@ import requests
 from config import Config
 import os
 from flask import current_app, flash
-from werkzeug.utils import secure_filename #필요 없을지도모름 ?
 import uuid
 import bcrypt
 from flask import request, flash
@@ -88,7 +87,6 @@ def google_login_callback():
     login_user(user)
     # 관리자가 아닌 경우에만 프로필 완성 여부 확인
     if user.user_type != 2 and not is_profile_complete(user):
-        flash("추가 정보를 입력해주세요.", "info")
         return redirect(url_for("auth.onboarding"))
     return redirect(url_for("auth.main"))
 
@@ -101,11 +99,7 @@ def kakao_login_callback():
     print(f"Received state: {state}")
     print(f"Session state: {session_state}")
 
-    # 임시로 state 검증을 건너뛰고 진행
-    # if not state or state != session.get('oauth_state'):
-    #     return "Invalid state parameter", 400
 
-    # 인증 코드 확인
     code = request.args.get('code')
     if not code:
         return "Authorization code not found", 400
@@ -148,14 +142,12 @@ def kakao_login_callback():
         db.session.add(user)
         db.session.commit()
 
-    # 세션에서 state 제거
     session.pop('oauth_state', None)
 
-    # 로그인 처리 후 프로필 완성 여부 확인
+
     login_user(user)
     # 관리자가 아닌 경우에만 프로필 완성 여부 확인
     if user.user_type != 2 and not is_profile_complete(user):
-        flash("추가 정보를 입력해주세요.", "info")
         return redirect(url_for("auth.onboarding"))
     return redirect(url_for("auth.main"))
 
@@ -165,7 +157,6 @@ def kakao_login_callback():
 def main():
     # 관리자가 아닌 경우에만 프로필 완성 여부 체크
     if current_user.user_type != 2 and not is_profile_complete(current_user):
-        flash("프로필 정보를 완성해주세요.", "warning")
         return redirect(url_for("auth.onboarding"))
 
     # AI 추천 공고 가져오기 (일반 회원만)
