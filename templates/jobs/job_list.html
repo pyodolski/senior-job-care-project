@@ -44,15 +44,51 @@
                 class="max-w-full max-h-full object-contain"
               />
             </button>
-            <div class="w-6 h-6 flex items-center justify-center">
+            <!-- 텍스트 검색 버튼 -->
+            <button
+              onclick="toggleSearchBar()"
+              id="searchBtn"
+              class="w-6 h-6 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
+              title="검색하기"
+            >
               <img
                 src="{{ url_for('static', filename='images/header/search.png') }}"
                 alt="검색"
                 class="max-w-full max-h-full object-contain"
               />
-            </div>
+            </button>
           </div>
         </header>
+
+        <!-- 검색창 (숨김/표시) -->
+        <div
+          id="searchBar"
+          class="hidden bg-white border-b px-4 py-3 shadow-sm"
+        >
+          <form action="/jobs" method="GET" class="flex gap-2">
+            <input
+              type="text"
+              name="q"
+              id="searchInput"
+              placeholder="검색어를 입력하세요 (예: 청소, 경비)"
+              value="{{ request.args.get('q', '') }}"
+              class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              type="submit"
+              class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors"
+            >
+              검색
+            </button>
+            <button
+              type="button"
+              onclick="toggleSearchBar()"
+              class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+            >
+              취소
+            </button>
+          </form>
+        </div>
 
         <!-- 네비게이션 탭 -->
         <nav class="flex border-b">
