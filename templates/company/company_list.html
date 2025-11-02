@@ -29,13 +29,19 @@
             <span class="text-2xl font-bold text-blue-900">이음</span>
           </div>
           <div class="flex items-center space-x-4">
-            <div class="w-6 h-6 flex items-center justify-center">
+            <!-- 음성 검색 버튼 -->
+            <button
+              onclick="startVoiceSearchCompany()"
+              id="voiceBtn"
+              class="w-6 h-6 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
+              title="음성으로 검색하기"
+            >
               <img
                 src="{{ url_for('static', filename='images/header/mic.png') }}"
                 alt="마이크"
                 class="max-w-full max-h-full object-contain"
               />
-            </div>
+            </button>
             <div class="w-6 h-6 flex items-center justify-center">
               <img
                 src="{{ url_for('static', filename='images/header/search.png') }}"
@@ -479,5 +485,8 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/company_list.js') }}"></script>
+
+    <!-- 음성 검색 기능 -->
+    <script src="{{ url_for('static', filename='js/voice_search.js') }}"></script>
   </body>
 </html>

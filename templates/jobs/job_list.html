@@ -31,13 +31,19 @@
             <span class="text-2xl font-bold text-blue-900">이음</span>
           </div>
           <div class="flex items-center space-x-4">
-            <div class="w-6 h-6 flex items-center justify-center">
+            <!-- 음성 검색 버튼 -->
+            <button
+              onclick="startVoiceSearch()"
+              id="voiceBtn"
+              class="w-6 h-6 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
+              title="음성으로 검색하기"
+            >
               <img
                 src="{{ url_for('static', filename='images/header/mic.png') }}"
                 alt="마이크"
                 class="max-w-full max-h-full object-contain"
               />
-            </div>
+            </button>
             <div class="w-6 h-6 flex items-center justify-center">
               <img
                 src="{{ url_for('static', filename='images/header/search.png') }}"
@@ -268,9 +274,8 @@
                   class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-sm font-bold"
                 >
                   {% if job.author.user_type == 1 %} {{ job.company[0] if
-                  job.company else '기' }} {% else %} {{
-                  job.author.nickname[0] if job.author.nickname else '사' }} {%
-                  endif %}
+                  job.company else '기' }} {% else %} {{ job.author.nickname[0]
+                  if job.author.nickname else '사' }} {% endif %}
                 </div>
                 <p class="text-sm text-gray-600">
                   {% if job.author.user_type == 1 %} {{ job.company }} {% else
@@ -368,7 +373,9 @@
             이전
           </a>
           {% else %}
-          <span class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed font-medium">
+          <span
+            class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed font-medium"
+          >
             이전
           </span>
           {% endif %}
@@ -387,7 +394,9 @@
             다음
           </a>
           {% else %}
-          <span class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed font-medium">
+          <span
+            class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed font-medium"
+          >
             다음
           </span>
           {% endif %}
@@ -468,5 +477,8 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/job_list.js') }}"></script>
+
+    <!-- 음성 검색 기능 -->
+    <script src="{{ url_for('static', filename='js/voice_search.js') }}"></script>
   </body>
 </html>
