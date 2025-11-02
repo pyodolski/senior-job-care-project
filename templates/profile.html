@@ -195,7 +195,7 @@
           <!-- 통계 카드 -->
           <div class="flex justify-around text-center border-t pt-4">
             <div>
-              <div class="text-blue-900 font-bold text-sm mb-1">발문개선</div>
+              <div class="text-blue-900 font-bold text-sm mb-1">받은제안</div>
               <div class="text-2xl font-bold text-gray-800">
                 {{ received_offers if received_offers else 0 }}
               </div>
@@ -288,12 +288,12 @@
             </svg>
           </div>
 
-          <!-- 최근 본 글 -->
+          <!-- 내가 지원한 공고 -->
           <div
             class="menu-item border-b border-gray-100"
-            onclick="window.location.href='#';"
+            onclick="window.location.href='{{ url_for('jobs.my_applications') }}';"
           >
-            <span class="text-gray-800 font-medium">최근 본 글</span>
+            <span class="text-gray-800 font-medium">내가 지원한 공고</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="w-5 h-5 text-gray-400"
