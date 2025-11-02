@@ -16,9 +16,9 @@
     />
   </head>
   <body class="bg-gray-50">
-    <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto pb-24">
+    <div class="w-full bg-white shadow-lg min-h-screen pb-24">
       <header
-        class="bg-white border-b px-4 py-4 fixed top-0 left-0 right-0 max-w-md mx-auto z-40"
+        class="bg-white border-b px-4 py-4 fixed top-0 left-0 right-0 w-full z-40"
       >
         <div class="flex items-center justify-between">
           <button onclick="goBack()" class="text-gray-600">
@@ -513,6 +513,28 @@
                 >
               </div>
             </div>
+
+            <!-- 장기 근무 기간 선택 -->
+            <div class="mb-8">
+              <h3 class="text-lg font-medium text-gray-800 mb-4">
+                근무 기간을 선택해 주세요
+              </h3>
+              <div class="flex gap-3 mb-2">
+                <input
+                  type="date"
+                  id="longTermStartDate"
+                  class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-gray-700"
+                  placeholder="시작일"
+                />
+                <input
+                  type="date"
+                  id="longTermEndDate"
+                  class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-gray-700"
+                  placeholder="종료일"
+                />
+              </div>
+              <p class="text-sm text-gray-500 mt-2">시작일과 종료일을 선택해주세요 (선택사항)</p>
+            </div>
           </div>
         </div>
       </section>
@@ -616,76 +638,6 @@
             placeholder="나중에 AI로 정리하여 보여드리니 구체적이고 자유롭게 작성해 주세요."
             class="w-full px-4 py-4 text-base border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none resize-none"
           ></textarea>
-        </div>
-      </section>
-
-      <section id="step5" class="scroll-section">
-        <div class="mb-4">
-          <h2 class="text-xl font-bold text-gray-900 mb-6">
-            일할 장소를 알려주세요
-          </h2>
-
-          <div class="space-y-4">
-            <div class="relative">
-              <input
-                type="text"
-                id="workLocation"
-                placeholder="지도에서 위치를 선택해주세요"
-                class="w-full px-4 py-4 text-lg border-2 border-gray-300 rounded-2xl focus:border-blue-600 focus:outline-none pr-12"
-                readonly
-                onclick="openAddressSearch()"
-              />
-              <button
-                onclick="openAddressSearch()"
-                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-600"
-              >
-                <svg
-                  class="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            <input
-              type="text"
-              id="detailAddress"
-              placeholder="상세 주소를 입력해주세요 (예: 101동 502호, 2층)"
-              class="w-full px-4 py-4 text-base border-2 border-gray-300 rounded-2xl focus:border-blue-500 focus:outline-none"
-            />
-
-            <input type="hidden" id="latitude" name="latitude" />
-            <input type="hidden" id="longitude" name="longitude" />
-            <input
-              type="hidden"
-              id="region_1depth_name"
-              name="region_1depth_name"
-            />
-            <input
-              type="hidden"
-              id="region_2depth_name"
-              name="region_2depth_name"
-            />
-            <input
-              type="hidden"
-              id="region_3depth_name"
-              name="region_3depth_name"
-            />
-          </div>
         </div>
       </section>
 
