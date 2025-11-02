@@ -87,8 +87,11 @@ def job_list():
     if region3:
         conditions.append(JobPost.region_3depth_name.like(f"{region3}%"))
 
-    # 사람이음 공고만 필터링 (job_category가 없는 공고)
-    people_condition = JobPost.job_category.is_(None)
+    # 사람이음 공고만 필터링 (job_category가 없고 외부 데이터가 아닌 공고)
+    people_condition = db.and_(
+        JobPost.job_category.is_(None),
+        JobPost.source.is_(None)  # 외부 데이터(K-Senior 등) 제외
+    )
     if conditions:
         conditions.append(people_condition)
     else:

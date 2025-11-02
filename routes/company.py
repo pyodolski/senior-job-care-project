@@ -78,8 +78,12 @@ def company_list():
     # 지역 필터 조건 및 기업 공고 조건을 위한 리스트
     conditions = []
 
-    # 1. 기업 공고 조건을 user_type으로 추가
-    conditions.append(User.user_type == 1)  # 기업이 작성한 공고만 조회
+    # 1. 기업 공고 조건: 기업이 작성했거나 외부 데이터(K-Senior 등)
+    company_condition = db.or_(
+        User.user_type == 1,  # 기업이 작성한 공고
+        JobPost.source.isnot(None)  # 외부 데이터 (K-Senior 등)
+    )
+    conditions.append(company_condition)
 
     # 2. 지역 필터링 조건 추가
     if region1:
@@ -89,8 +93,8 @@ def company_list():
     if region3:
         conditions.append(JobPost.region_3depth_name.like(f"{region3}%"))
 
-    # 기업이음 공고만 조회
-    base_query = JobPost.query.join(User)
+    # 기업이음 공고만 조회 (LEFT JOIN으로 변경 - 외부 데이터는 author가 없을 수 있음)
+    base_query = JobPost.query.outerjoin(User)
 
     if query or filters or len(conditions) > 1:  # 기업 조건 외에 다른 필터가 있는 경우
         jobs = JobService.search_jobs(query, filters, conditions, sort_by, base_query=base_query)
