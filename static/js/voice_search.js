@@ -105,7 +105,7 @@ function startVoiceSearchCompany() {
     speak("검색 중입니다");
 
     // 기업이음 공고 검색 페이지로 이동
-    window.location.href = `/company/list?q=${encodeURIComponent(transcript)}`;
+    window.location.href = `/company?q=${encodeURIComponent(transcript)}`;
   };
 
   // 음성 인식 종료
@@ -177,4 +177,24 @@ if (!document.getElementById("voice-search-style")) {
     }
   `;
   document.head.appendChild(style);
+}
+
+/**
+ * 검색창 토글
+ */
+function toggleSearchBar() {
+  const searchBar = document.getElementById("searchBar");
+  const searchInput = document.getElementById("searchInput");
+
+  if (searchBar) {
+    if (searchBar.classList.contains("hidden")) {
+      searchBar.classList.remove("hidden");
+      // 검색창이 나타나면 입력창에 포커스
+      if (searchInput) {
+        setTimeout(() => searchInput.focus(), 100);
+      }
+    } else {
+      searchBar.classList.add("hidden");
+    }
+  }
 }
