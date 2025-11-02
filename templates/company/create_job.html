@@ -910,8 +910,15 @@
     </div>
 
     <script>
-      // AI 어시스턴트 함수
-      function openAIAssistant() {
+      // Flask 템플릿 변수를 JavaScript로 전달
+      window.AI_GENERATE_URL = "{{ url_for('jobs.ai_generate_description') }}";
+      window.COMPANY_LIST_URL = "{{ url_for('company.company_list') }}";
+      window.CREATE_COMPANY_JOB_URL = "{{ url_for('company.create_company_job') }}";
+      window.CURRENT_USER_NICKNAME = "{{ current_user.nickname }}";
+    </script>
+    <script src="{{ url_for('static', filename='js/company/create_job.js') }}"></script>
+  </body>
+</html>
         // 현재 입력된 값들을 AI 모달에 미리 채우기
         const title = document.getElementById("jobTitle").value;
         const description = document.getElementById("jobDescription").value;

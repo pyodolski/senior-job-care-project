@@ -36,3 +36,11 @@ body {
   color: white;
   border-color: #1e3a8a;
 }
+
+.gender-button.selected svg {
+  color: white;
+}
+
+.gender-button.selected p {
+  color: white;
+}

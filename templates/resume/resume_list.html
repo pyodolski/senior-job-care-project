@@ -1,98 +1,121 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>사람 이음 - 공개 이력서 목록</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume/resume_list.css') }}" />
-</head>
-<body class="bg-gray-50">
-    <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto">
-        <!-- 상단 고정 영역 -->
-        <div class="sticky top-0 z-10 bg-white shadow-sm">
-            <!-- 상단 바 -->
-            <header class="px-4 py-3 sm:px-6 flex justify-between items-center">
-                <div class="flex items-center">
-                    <div class="w-8 h-8 mr-2 flex items-center justify-center">
-                        <img src="{{ url_for('static', filename='images/header/logo.png') }}" alt="로고" class="max-w-full max-h-full object-contain" />
-                    </div>
-                    <span class="text-xl font-bold text-blue-900">이음</span>
-                </div>
-                <div class="flex items-center space-x-3 sm:space-x-4">
-                    <div class="w-6 h-6 flex items-center justify-center">
-                        <img src="{{ url_for('static', filename='images/header/mic.png') }}" alt="마이크" class="max-w-full max-h-full object-contain" />
-                    </div>
-                    <div class="w-6 h-6 flex items-center justify-center">
-                        <img src="{{ url_for('static', filename='images/header/search.png') }}" alt="검색" class="max-w-full max-h-full object-contain" />
-                    </div>
-                </div>
-            </header>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/resume/resume_list.css') }}"
+    />
+  </head>
+  <body class="bg-gray-50">
+    <div class="w-full bg-white shadow-lg min-h-screen">
+      <!-- 상단 고정 영역 -->
+      <div class="sticky top-0 z-10 bg-white shadow-sm">
+        <!-- 상단 바 -->
+        <header class="px-4 py-3 sm:px-6 flex justify-between items-center">
+          <div class="flex items-center">
+            <div class="w-8 h-8 mr-2 flex items-center justify-center">
+              <img
+                src="{{ url_for('static', filename='images/header/logo.png') }}"
+                alt="로고"
+                class="max-w-full max-h-full object-contain"
+              />
+            </div>
+            <span class="text-xl font-bold text-blue-900">이음</span>
+          </div>
+          <div class="flex items-center space-x-3 sm:space-x-4">
+            <div class="w-6 h-6 flex items-center justify-center">
+              <img
+                src="{{ url_for('static', filename='images/header/mic.png') }}"
+                alt="마이크"
+                class="max-w-full max-h-full object-contain"
+              />
+            </div>
+            <div class="w-6 h-6 flex items-center justify-center">
+              <img
+                src="{{ url_for('static', filename='images/header/search.png') }}"
+                alt="검색"
+                class="max-w-full max-h-full object-contain"
+              />
+            </div>
+          </div>
+        </header>
 
-            <!-- 네비게이션 탭 -->
-            <nav class="flex border-b text-center">
-                <a href="{{ url_for('jobs.job_list') }}" class="flex-1 py-3 text-gray-500 font-medium">올린 모집 지원</a>
-                <a href="{{ url_for('resumes.resume_list') }}" class="flex-1 py-3 border-b-4 border-blue-900 text-blue-900 font-bold">이력서</a>
-            </nav>
+        <!-- 네비게이션 탭 -->
+        <nav class="flex border-b text-center">
+          <a
+            href="{{ url_for('jobs.job_list') }}"
+            class="flex-1 py-3 text-gray-500 font-medium"
+            >올린 모집 지원</a
+          >
+          <a
+            href="{{ url_for('resumes.resume_list') }}"
+            class="flex-1 py-3 border-b-4 border-blue-900 text-blue-900 font-bold"
+            >이력서</a
+          >
+        </nav>
+      </div>
+
+      <!-- 메인 컨텐츠: 이력서 목록 -->
+      <main class="px-4 py-4 sm:px-6 bg-gray-50 pb-24">
+        <div id="resume-container" class="space-y-4">
+          {% if resumes %}
+          <!-- 초기 이력서 목록 렌더링 -->
+          {% include 'resume/_resume_cards.html' %} {% else %}
+          <div class="text-center py-16">
+            <svg
+              class="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                vector-effect="non-scaling-stroke"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+              />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">
+              공개된 이력서가 없습니다
+            </h3>
+            <p class="mt-1 text-sm text-gray-500">
+              아직 일자리를 찾는 시니어가 이력서를 공개하지 않았어요.
+            </p>
+          </div>
+          {% endif %}
         </div>
 
-        <!-- 메인 컨텐츠: 이력서 목록 -->
-        <main class="px-4 py-4 sm:px-6 bg-gray-50 pb-24">
-            <div id="resume-container" class="space-y-4">
-                {% if resumes %}
-                    <!-- 초기 이력서 목록 렌더링 -->
-                    {% include 'resume/_resume_cards.html' %}
-                {% else %}
-                    <div class="text-center py-16">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                        </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">공개된 이력서가 없습니다</h3>
-                        <p class="mt-1 text-sm text-gray-500">아직 일자리를 찾는 시니어가 이력서를 공개하지 않았어요.</p>
-                    </div>
-                {% endif %}
-            </div>
+        <!-- '더 보기' 버튼 -->
+        {% if pagination.has_next %}
+        <div class="mt-6 text-center">
+          <button
+            id="load-more-btn"
+            class="bg-white text-gray-700 font-bold py-3 px-8 rounded-full shadow-md border border-gray-200 hover:bg-gray-100 transition-colors"
+          >
+            더 보기
+          </button>
+        </div>
+        {% endif %}
+      </main>
 
-            <!-- '더 보기' 버튼 -->
-            {% if pagination.has_next %}
-            <div class="mt-6 text-center">
-                <button id="load-more-btn" class="bg-white text-gray-700 font-bold py-3 px-8 rounded-full shadow-md border border-gray-200 hover:bg-gray-100 transition-colors">
-                    더 보기
-                </button>
-            </div>
-            {% endif %}
-        </main>
-
-        <!-- 하단 네비게이션 -->
-        <footer class="fixed bottom-0 left-0 right-0 w-full bg-white border-t flex justify-around max-w-md mx-auto">
-            <a href="{{ url_for('map.show_map') }}" class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500">
-                <img src="{{ url_for('static', filename='images/footer/map.png') }}" alt="지도" class="w-6 h-6 mb-1">
-                <span class="text-xs">지도</span>
-            </a>
-            <a href="{{ url_for('jobs.bookmark_list') }}" class="flex-1 flex flex-col items-center justify-center p-2 text-blue-900">
-                <img src="{{ url_for('static', filename='images/footer/favorite_filled.png') }}" alt="찜" class="w-6 h-6 mb-1">
-                <span class="text-xs font-bold">찜</span>
-            </a>
-            <a href="{{ url_for('auth.main') }}" class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500">
-                <img src="{{ url_for('static', filename='images/footer/home.png') }}" alt="홈" class="w-6 h-6 mb-1">
-                <span class="text-xs">홈</span>
-            </a>
-            <a href="{{ url_for('chat.chat_list') }}" class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500">
-                <img src="{{ url_for('static', filename='images/footer/chatting.png') }}" alt="채팅" class="w-6 h-6 mb-1">
-                <span class="text-xs">채팅</span>
-            </a>
-            <a href="{{ url_for('auth.profile') }}" class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500">
-                <img src="{{ url_for('static', filename='images/footer/profile.png') }}" alt="내정보" class="w-6 h-6 mb-1">
-                <span class="text-xs">내정보</span>
-            </a>
-        </footer>
+      <!-- 하단 네비게이션 -->
+      {% include 'components/footer.html' %}
     </div>
 
     <script>
-        // Flask 템플릿 변수를 JavaScript로 전달
-        window.initialPage = {{ pagination.page }};
+      // Flask 템플릿 변수를 JavaScript로 전달
+      window.initialPage = {{ pagination.page }};
     </script>
     <script src="{{ url_for('static', filename='js/resume/resume_list.js') }}"></script>
-</body>
+  </body>
 </html>
