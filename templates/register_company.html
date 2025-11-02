@@ -94,6 +94,8 @@
             placeholder="아이디를 입력하세요"
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+
+          <p id="username-error" class="text-red-500 text-sm mt-2 hidden"></p>
         </div>
 
         <!-- Step 2: 비밀번호 & 비밀번호 확인 -->
@@ -331,6 +333,9 @@
     <script>
       // 템플릿 변수를 JavaScript 전역 변수로 설정
       const FIRST_LOGIN_URL = "{{ url_for('auth.first_login_page') }}";
+
+      const CHECK_USERNAME_URL = "{{ url_for('auth.check_username') }}";
+
     </script>
     <script src="{{ url_for('static', filename='js/register_company.js') }}"></script>
   </body>

@@ -124,12 +124,69 @@ function updateNextButton() {
 }
 
 // 다음 단계로
-function nextStep() {
+async function nextStep() {
   // 현재 단계 데이터 저장
   switch (currentStep) {
     case 1:
-      formData.username = document.getElementById("username").value;
-      break;
+      const username = document.getElementById("username").value;
+      const errorEl = document.getElementById("username-error");
+      const button = document.getElementById("next-button");
+
+      if (!username || username.trim() === "") {
+        errorEl.textContent = '아이디를 입력해주세요.';
+        errorEl.classList.remove('hidden', 'text-green-500');
+        errorEl.classList.add('text-red-500');
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "확인 중...";
+
+      try {
+        const response = await fetch(CHECK_USERNAME_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: username }),
+        });
+
+        const data = await response.json();
+
+        if (data.available) {
+          // 아이디 사용 가능
+          errorEl.textContent = data.message;
+          errorEl.classList.remove('hidden', 'text-red-500');
+          errorEl.classList.add('text-green-500');
+
+          formData.username = username; // formData에 아이디 저장
+
+          // 1초 후 다음 단계로 이동
+          setTimeout(() => {
+            currentStep++;
+            showStep(currentStep);
+            errorEl.classList.add('hidden'); // 다음 단계로 가면 메시지 숨김
+            button.textContent = "다음"; // 버튼 텍스트 복원
+          }, 1000);
+
+        } else {
+          // 아이디 중복 또는 오류
+          errorEl.textContent = data.message;
+          errorEl.classList.remove('hidden', 'text-green-500');
+          errorEl.classList.add('text-red-500');
+          button.disabled = false; // 다시 시도할 수 있도록 버튼 활성화
+          button.textContent = "다음";
+          // 1단계에 머무름
+        }
+
+      } catch (error) {
+        console.error('아이디 확인 중 오류:', error);
+        errorEl.textContent = '아이디 확인 중 오류가 발생했습니다.';
+        errorEl.classList.remove('hidden', 'text-green-500');
+        errorEl.classList.add('text-red-500');
+        button.disabled = false;
+        button.textContent = "다음";
+      }
+
+      return;
     case 2:
       formData.password = document.getElementById("password").value;
       formData.confirmPassword =

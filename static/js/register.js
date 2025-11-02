@@ -437,13 +437,69 @@ function useMyName(event) {
   }
 }
 
-// 다음 단계로
-function nextStep() {
-  // 현재 단계 데이터 저장
+
+async function nextStep() {
+
   switch (currentStep) {
     case 1:
-      formData.username = document.getElementById("username").value;
-      break;
+      const username = document.getElementById("username").value;
+      const errorEl = document.getElementById("username-error");
+      const button = document.getElementById("next-button");
+
+      if (!username || username.trim() === "") {
+        errorEl.textContent = '아이디를 입력해주세요.';
+        errorEl.classList.remove('hidden', 'text-green-500');
+        errorEl.classList.add('text-red-500');
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "확인 중...";
+
+      try {
+        const checkUrl = document.body.dataset.checkUsernameUrl;
+
+        const response = await fetch(checkUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: username }),
+        });
+
+        const data = await response.json();
+
+        if (data.available) {
+          errorEl.textContent = data.message;
+          errorEl.classList.remove('hidden', 'text-red-500');
+          errorEl.classList.add('text-green-500');
+
+          formData.username = username;
+
+          setTimeout(() => {
+            currentStep++;
+            showStep(currentStep);
+            errorEl.classList.add('hidden');
+            button.textContent = "다음";
+          }, 1000);
+
+        } else {
+          // 아이디 중복 또는 오류
+          errorEl.textContent = data.message;
+          errorEl.classList.remove('hidden', 'text-green-500');
+          errorEl.classList.add('text-red-500');
+          button.disabled = false;
+          button.textContent = "다음";
+        }
+
+      } catch (error) {
+        console.error('아이디 확인 중 오류:', error);
+        errorEl.textContent = '아이디 확인 중 오류가 발생했습니다.';
+        errorEl.classList.remove('hidden', 'text-green-500');
+        errorEl.classList.add('text-red-500');
+        button.disabled = false;
+        button.textContent = "다음";
+      }
+
+      return;
     case 2:
       formData.password = document.getElementById("password").value;
       formData.confirmPassword =
@@ -531,6 +587,15 @@ document.getElementById("nickname").addEventListener("input", updateNextButton);
 document.getElementById("sido").addEventListener("change", updateNextButton);
 document.getElementById("sigungu").addEventListener("change", updateNextButton);
 document.getElementById("dong").addEventListener("change", updateNextButton);
+
+document.getElementById("username").addEventListener("input", function() {
+  const errorEl = document.getElementById("username-error");
+  if (errorEl && !errorEl.classList.contains('hidden')) {
+    errorEl.classList.add('hidden');
+    errorEl.classList.remove('text-green-500', 'text-red-500');
+  }
+});
+
 
 // Enter 키로 다음 단계
 document.querySelectorAll("input").forEach((input) => {
