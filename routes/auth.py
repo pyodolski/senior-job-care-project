@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request, session
+from flask import Blueprint, render_template, redirect, url_for, request, session, jsonify
 from flask_login import login_required, login_user, logout_user, current_user
 from flask_dance.contrib.google import google
 from models import db, User
@@ -33,6 +33,22 @@ def home():
     if current_user.is_authenticated:
         return redirect(url_for("auth.main"))
     return render_template("home.html")
+
+@auth_bp.route("/check_username", methods=["POST"])
+def check_username():
+    """AJAX 아이디 중복 확인 엔드포인트"""
+    data = request.get_json()
+    username = data.get("username")
+
+    if not username:
+        return jsonify({"available": False, "message": "아이디를 입력해주세요."}), 400
+
+    if User.query.filter_by(username=username).first():
+        # 아이디가 이미 존재함
+        return jsonify({"available": False, "message": "이미 존재하는 아이디입니다."})
+    else:
+        # 아이디 사용 가능
+        return jsonify({"available": True, "message": "사용 가능한 아이디입니다."})
 
 # 첫 로그인 페이지 (회원가입/로그인 선택 화면)
 @auth_bp.route("/first_login_page")

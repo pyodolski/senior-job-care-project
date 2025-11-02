@@ -51,6 +51,18 @@
         </div>
       </div>
 
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="px-4 py-2">
+            {% for category, message in messages %}
+              <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline">{{ message }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
       <!-- 회원가입 폼 -->
       <form
         method="POST"
@@ -89,6 +101,8 @@
             placeholder="아이디를 입력하세요"
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+
+          <p id="username-error" class="text-red-500 text-sm mt-2 hidden"></p>
         </div>
 
         <!-- Step 2: 비밀번호 & 비밀번호 확인 (통합) -->
@@ -433,6 +447,10 @@
       // URL을 body의 data 속성에 저장
       document.body.dataset.firstLoginUrl =
         "{{ url_for('auth.first_login_page') }}";
+
+      document.body.dataset.checkUsernameUrl =
+        "{{ url_for('auth.check_username') }}";
+
     </script>
     <script src="{{ url_for('static', filename='js/register.js') }}"></script>
   </body>
