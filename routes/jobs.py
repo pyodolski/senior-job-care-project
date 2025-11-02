@@ -628,6 +628,41 @@ def toggle_bookmark(job_id):
         flash("오류가 발생했습니다.", "error")
         return redirect(url_for("jobs.job_detail", job_id=job_id))
 
+@jobs_bp.route("/jobs/<int:job_id>/bookmark/status", methods=["GET"])
+@login_required
+def get_bookmark_status(job_id):
+    """
+    즐겨찾기 상태 확인
+    ==================
+
+    기능:
+    - 현재 사용자의 해당 공고 즐겨찾기 상태 확인
+    - 페이지 로드 시 즐겨찾기 상태 동기화에 사용
+
+    URL: GET /jobs/<job_id>/bookmark/status
+
+    매개변수:
+    - job_id: 확인할 공고의 ID
+
+    반환값:
+    - success: 성공 여부 (boolean)
+    - is_bookmarked: 찜 상태 (boolean)
+    """
+    try:
+        # JobService를 통해 즐겨찾기 상태 확인
+        is_bookmarked = JobService.is_bookmarked(current_user.id, job_id)
+
+        return jsonify({
+            'success': True,
+            'is_bookmarked': is_bookmarked
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': '오류가 발생했습니다.'
+        }), 500
+
 @jobs_bp.route("/bookmarks")
 @login_required
 def bookmark_list():

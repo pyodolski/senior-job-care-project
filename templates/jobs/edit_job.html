@@ -16,7 +16,7 @@
     />
   </head>
   <body class="bg-gray-50">
-    <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto">
+    <div class="w-full bg-white shadow-lg min-h-screen">
       <!-- 상단 헤더 -->
       <header class="bg-white border-b px-4 py-4 sticky top-0 z-10">
         <div class="flex items-center justify-between">
@@ -162,6 +162,32 @@
               id="work_period"
               value="{{ job.work_period or '' }}"
             />
+          </div>
+
+          <!-- 근무 기간 날짜 선택 -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-3">
+              근무 기간 날짜 (선택사항)
+            </label>
+            <div class="flex gap-3">
+              <input
+                type="date"
+                name="recruitment_start_date"
+                id="recruitment_start_date"
+                value="{% if job.recruitment_start_date %}{{ job.recruitment_start_date.strftime('%Y-%m-%d') }}{% endif %}"
+                class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-gray-700"
+                placeholder="시작일"
+              />
+              <input
+                type="date"
+                name="recruitment_end_date"
+                id="recruitment_end_date"
+                value="{% if job.recruitment_end_date %}{{ job.recruitment_end_date.strftime('%Y-%m-%d') }}{% endif %}"
+                class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-gray-700"
+                placeholder="종료일"
+              />
+            </div>
+            <p class="text-sm text-gray-500 mt-2">시작일과 종료일을 선택해주세요</p>
           </div>
 
           <!-- 근무 요일 -->
@@ -448,7 +474,7 @@
 
       <!-- 하단 고정 푸터 -->
       <footer
-        class="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t px-4 py-4"
+        class="fixed bottom-0 left-0 right-0 w-full bg-white border-t px-4 py-4"
       >
         <button
           type="submit"

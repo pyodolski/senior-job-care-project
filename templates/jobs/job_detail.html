@@ -13,12 +13,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/jobs/job_detail.css') }}" />
   </head>
   <body class="bg-gray-50">
-    <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto">
+    <div class="w-full bg-white shadow-lg min-h-screen">
       <!-- 상단 헤더 -->
       <header
         class="sticky top-0 z-10 px-4 py-3 flex justify-between items-center bg-white border-b"
       >
-        <button class="p-2" onclick="history.back()">
+        <button class="p-2" onclick="goBackWithRefresh()">
           <svg
             class="w-6 h-6"
             fill="none"
@@ -177,6 +177,19 @@
             <div class="flex-1">
               <div class="text-white text-base font-semibold">
                 {{ job.work_period }}
+                {% if job.recruitment_start_date and job.recruitment_end_date %}
+                <span class="text-sm font-normal ml-2">
+                  ({{ job.recruitment_start_date.strftime('%Y.%m.%d') }} ~ {{ job.recruitment_end_date.strftime('%Y.%m.%d') }})
+                </span>
+                {% elif job.recruitment_start_date %}
+                <span class="text-sm font-normal ml-2">
+                  ({{ job.recruitment_start_date.strftime('%Y.%m.%d') }}부터)
+                </span>
+                {% elif job.recruitment_end_date %}
+                <span class="text-sm font-normal ml-2">
+                  (~{{ job.recruitment_end_date.strftime('%Y.%m.%d') }})
+                </span>
+                {% endif %}
               </div>
             </div>
           </div>
@@ -404,7 +417,7 @@
 
       <!-- 하단 고정 버튼 -->
       <div
-        class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t p-4 z-20"
+        class="fixed bottom-0 left-0 right-0 w-full bg-white border-t p-4 z-20"
       >
         <div class="flex gap-2">
           <!-- 즐겨찾기 버튼 -->
@@ -463,6 +476,17 @@
       window.jobLatitude = {{ job.latitude }};
       window.jobLongitude = {{ job.longitude }};
       {% endif %}
+
+      // 뒤로가기 시 새로고침 함수
+      function goBackWithRefresh() {
+        if (document.referrer) {
+          // 이전 페이지가 있으면 해당 페이지로 이동 (새로고침 효과)
+          window.location.href = document.referrer;
+        } else {
+          // 이전 페이지가 없으면 기본 뒤로가기
+          history.back();
+        }
+      }
     </script>
     <script src="{{ url_for('static', filename='js/jobs/job_detail.js') }}"></script>
   </body>

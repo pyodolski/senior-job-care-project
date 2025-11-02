@@ -1,0 +1,119 @@
+<!-- 일반 회원 전용 하단 네비게이션 -->
+<footer
+  class="fixed bottom-0 left-0 right-0 w-full bg-gray-50 border-t flex justify-around"
+>
+  <!-- 지도 -->
+  <a
+    href="{{ url_for('map.show_map') }}"
+    class="flex-1 flex flex-col items-center justify-center p-2 {% if request.endpoint == 'map.show_map' %}text-blue-900{% else %}text-gray-500{% endif %}"
+  >
+    <div class="w-6 h-6 mb-1 flex items-center justify-center">
+      {% if request.endpoint == 'map.show_map' %}
+      <img
+        src="{{ url_for('static', filename='images/footer/map_filled.png') }}"
+        alt="지도"
+        class="max-w-full max-h-full object-contain"
+      />
+      {% else %}
+      <img
+        src="{{ url_for('static', filename='images/footer/map.png') }}"
+        alt="지도"
+        class="max-w-full max-h-full object-contain"
+      />
+      {% endif %}
+    </div>
+    <span class="text-xs {% if request.endpoint == 'map.show_map' %}font-bold{% endif %}">지도</span>
+  </a>
+
+  <!-- 찜 -->
+  <a
+    href="{{ url_for('jobs.bookmark_list') }}"
+    class="flex-1 flex flex-col items-center justify-center p-2 {% if request.endpoint == 'jobs.bookmark_list' %}text-blue-900{% else %}text-gray-500{% endif %}"
+  >
+    <div class="w-6 h-6 mb-1 flex items-center justify-center">
+      {% if request.endpoint == 'jobs.bookmark_list' %}
+      <img
+        src="{{ url_for('static', filename='images/footer/favorite_filled.png') }}"
+        alt="찜"
+        class="max-w-full max-h-full object-contain"
+      />
+      {% else %}
+      <img
+        src="{{ url_for('static', filename='images/footer/favorite.png') }}"
+        alt="찜"
+        class="max-w-full max-h-full object-contain"
+      />
+      {% endif %}
+    </div>
+    <span class="text-xs {% if request.endpoint == 'jobs.bookmark_list' %}font-bold{% endif %}">찜</span>
+  </a>
+
+  <!-- 홈 -->
+  <a
+    href="{{ url_for('auth.main') }}"
+    class="flex-1 flex flex-col items-center justify-center p-2 {% if request.endpoint == 'auth.main' %}text-blue-900{% else %}text-gray-500{% endif %}"
+  >
+    <div class="w-6 h-6 mb-1 flex items-center justify-center">
+      {% if request.endpoint == 'auth.main' %}
+      <img
+        src="{{ url_for('static', filename='images/footer/home_filled.png') }}"
+        alt="홈"
+        class="max-w-full max-h-full object-contain"
+      />
+      {% else %}
+      <img
+        src="{{ url_for('static', filename='images/footer/home.png') }}"
+        alt="홈"
+        class="max-w-full max-h-full object-contain"
+      />
+      {% endif %}
+    </div>
+    <span class="text-xs {% if request.endpoint == 'auth.main' %}font-bold{% endif %}">홈</span>
+  </a>
+
+  <!-- 채팅 -->
+  <a
+    href="{{ url_for('chat.chat_list') }}"
+    class="flex-1 flex flex-col items-center justify-center p-2 {% if request.endpoint == 'chat.chat_list' %}text-blue-900{% else %}text-gray-500{% endif %}"
+  >
+    <div class="w-6 h-6 mb-1 flex items-center justify-center">
+      {% if request.endpoint == 'chat.chat_list' %}
+      <img
+        src="{{ url_for('static', filename='images/footer/chatting_filled.png') }}"
+        alt="채팅"
+        class="max-w-full max-h-full object-contain"
+      />
+      {% else %}
+      <img
+        src="{{ url_for('static', filename='images/footer/chatting.png') }}"
+        alt="채팅"
+        class="max-w-full max-h-full object-contain"
+      />
+      {% endif %}
+    </div>
+    <span class="text-xs {% if request.endpoint == 'chat.chat_list' %}font-bold{% endif %}">채팅</span>
+  </a>
+
+  <!-- 내정보 -->
+  <a
+    href="{{ url_for('auth.profile') }}"
+    class="flex-1 flex flex-col items-center justify-center p-2 {% if request.endpoint == 'auth.profile' %}text-blue-900{% else %}text-gray-500{% endif %}"
+  >
+    <div class="w-6 h-6 mb-1 flex items-center justify-center">
+      {% if request.endpoint == 'auth.profile' %}
+      <img
+        src="{{ url_for('static', filename='images/footer/profile_filled.png') }}"
+        alt="내정보"
+        class="max-w-full max-h-full object-contain"
+      />
+      {% else %}
+      <img
+        src="{{ url_for('static', filename='images/footer/profile.png') }}"
+        alt="내정보"
+        class="max-w-full max-h-full object-contain"
+      />
+      {% endif %}
+    </div>
+    <span class="text-xs {% if request.endpoint == 'auth.profile' %}font-bold{% endif %}">내정보</span>
+  </a>
+</footer>

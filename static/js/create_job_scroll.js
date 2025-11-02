@@ -71,6 +71,8 @@ let selectedData = {
   categories: [],
   workPeriod: "",
   selectedDates: [],
+  longTermStartDate: "",
+  longTermEndDate: "",
   days: [],
   startTime: "",
   endTime: "",
@@ -382,6 +384,20 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // 장기 근무 날짜 입력
+  const longTermStartDate = document.getElementById("longTermStartDate");
+  const longTermEndDate = document.getElementById("longTermEndDate");
+  if (longTermStartDate) {
+    longTermStartDate.addEventListener("change", function () {
+      selectedData.longTermStartDate = this.value;
+    });
+  }
+  if (longTermEndDate) {
+    longTermEndDate.addEventListener("change", function () {
+      selectedData.longTermEndDate = this.value;
+    });
+  }
+
   updateNextButton();
 });
 
@@ -661,7 +677,26 @@ async function confirmAddress() {
 }
 window.confirmAddress = confirmAddress;
 
+let isSubmitting = false; // 중복 제출 방지 플래그
+
 async function submitJob() {
+  // 이미 제출 중이면 리턴
+  if (isSubmitting) {
+    console.log("이미 제출 중입니다.");
+    return;
+  }
+
+  isSubmitting = true;
+
+  // 다음 버튼 비활성화 및 회색으로 변경
+  const nextBtn = document.getElementById("nextBtn");
+  if (nextBtn) {
+    nextBtn.disabled = true;
+    nextBtn.classList.add("bg-gray-400", "cursor-not-allowed");
+    nextBtn.classList.remove("bg-blue-600", "hover:bg-blue-700");
+    nextBtn.textContent = "제출 중...";
+  }
+
   console.log("제출 데이터:", selectedData);
   try {
     const formData = new FormData();
@@ -674,7 +709,47 @@ async function submitJob() {
     );
     formData.append("recruitment_type", selectedData.categories.join(", "));
     formData.append("work_period", selectedData.workPeriod);
-    formData.append("salary", "임의 급여");
+
+    // 단기 근무일 경우 선택된 날짜 전송
+    if (
+      selectedData.workPeriod === "단기" &&
+      selectedData.selectedDates.length > 0
+    ) {
+      const sortedDates = selectedData.selectedDates.sort();
+      formData.append("recruitment_start_date", sortedDates[0]);
+      formData.append(
+        "recruitment_end_date",
+        sortedDates[sortedDates.length - 1]
+      );
+    }
+    // 장기 근무일 경우 입력된 날짜 전송
+    else if (
+      selectedData.workPeriod !== "단기" &&
+      (selectedData.longTermStartDate || selectedData.longTermEndDate)
+    ) {
+      if (selectedData.longTermStartDate) {
+        formData.append(
+          "recruitment_start_date",
+          selectedData.longTermStartDate
+        );
+      }
+      if (selectedData.longTermEndDate) {
+        formData.append("recruitment_end_date", selectedData.longTermEndDate);
+      }
+    }
+
+    // 급여 정보 전송
+    if (selectedData.salaryType && selectedData.salaryAmount) {
+      formData.append(
+        "salary",
+        `${
+          selectedData.salaryType
+        } ${selectedData.salaryAmount.toLocaleString()}원`
+      );
+    } else {
+      formData.append("salary", "급여 협의");
+    }
+
     formData.append("region", selectedData.location);
     formData.append("contact_phone", selectedData.phone);
     if (selectedData.detailAddress) {
@@ -734,9 +809,29 @@ async function submitJob() {
       const text = await response.text();
       console.error("서버 응답:", text);
       alert("공고 작성 중 오류가 발생했습니다.");
+
+      // 오류 발생 시 버튼 다시 활성화
+      isSubmitting = false;
+      const nextBtn = document.getElementById("nextBtn");
+      if (nextBtn) {
+        nextBtn.disabled = false;
+        nextBtn.classList.remove("bg-gray-400", "cursor-not-allowed");
+        nextBtn.classList.add("bg-blue-600", "hover:bg-blue-700");
+        nextBtn.textContent = "다음";
+      }
     }
   } catch (error) {
     console.error("Error:", error);
     alert("공고 작성 중 오류가 발생했습니다: " + error.message);
+
+    // 오류 발생 시 버튼 다시 활성화
+    isSubmitting = false;
+    const nextBtn = document.getElementById("nextBtn");
+    if (nextBtn) {
+      nextBtn.disabled = false;
+      nextBtn.classList.remove("bg-gray-400", "cursor-not-allowed");
+      nextBtn.classList.add("bg-blue-600", "hover:bg-blue-700");
+      nextBtn.textContent = "다음";
+    }
   }
 }

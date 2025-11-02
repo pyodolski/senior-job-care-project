@@ -1,9 +1,13 @@
 const mainContainer = document.querySelector("main");
 const jobId = window.jobId;
 
-// 지도 초기화
-if (window.jobLatitude && window.jobLongitude) {
-  window.addEventListener('load', function() {
+// 페이지 로드 시 즐겨찾기 상태 확인
+window.addEventListener('load', function() {
+  // 즐겨찾기 상태 동기화
+  syncBookmarkStatus();
+
+  // 지도 초기화
+  if (window.jobLatitude && window.jobLongitude) {
     const container = document.getElementById('map');
     const options = {
       center: new kakao.maps.LatLng(window.jobLatitude, window.jobLongitude),
@@ -18,7 +22,39 @@ if (window.jobLatitude && window.jobLongitude) {
       position: markerPosition
     });
     marker.setMap(map);
-  });
+  }
+});
+
+// 즐겨찾기 상태 동기화 함수
+function syncBookmarkStatus() {
+  if (!jobId) return;
+
+  fetch(`/jobs/${jobId}/bookmark/status`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        const bookmarkBtnContainer = document.querySelector(".btn-bookmark");
+        const bookmarkBtn = bookmarkBtnContainer.querySelector("svg");
+
+        if (data.is_bookmarked) {
+          bookmarkBtn.classList.add("text-red-500");
+          bookmarkBtn.classList.remove("text-gray-400");
+          bookmarkBtnContainer.classList.add("border-red-500", "bg-red-50");
+          bookmarkBtnContainer.classList.remove("border-gray-300", "bg-white");
+        } else {
+          bookmarkBtn.classList.remove("text-red-500");
+          bookmarkBtn.classList.add("text-gray-400");
+          bookmarkBtnContainer.classList.remove("border-red-500", "bg-red-50");
+          bookmarkBtnContainer.classList.add("border-gray-300", "bg-white");
+        }
+      }
+    })
+    .catch((error) => {
+      console.error("즐겨찾기 상태 동기화 오류:", error);
+    });
 }
 
 function toggleBookmark() {
