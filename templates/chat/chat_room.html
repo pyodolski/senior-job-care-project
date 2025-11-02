@@ -22,7 +22,7 @@
     </style>
   </head>
   <body class="bg-gray-100">
-    <div class="w-full bg-white shadow-lg min-h-screen flex flex-col">
+    <div class="w-full bg-white shadow-lg h-screen flex flex-col overflow-hidden">
       <!-- 채팅방 헤더 -->
       <div class="chat-room-header">
         <button
@@ -69,7 +69,7 @@
       </div>
 
       <!-- 메시지 목록 -->
-      <div class="chat-messages" id="chatMessages">
+      <div class="chat-messages flex-1 overflow-y-auto" id="chatMessages">
         {% set last_date = namespace(value='') %} {% for message in
         messages_pagination.items|reverse %} {% set current_date =
         message.created_at.strftime('%Y-%m-%d') %} {% if current_date !=

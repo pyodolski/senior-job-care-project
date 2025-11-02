@@ -51,7 +51,7 @@ async function sendMessage(roomId) {
 
     // 입력창 비우고 스크롤
     messageInput.value = "";
-    scrollToBottom();
+
   } catch (error) {
     if (typeof showAlert === "function")
       showAlert("메시지 전송 중 오류가 발생했습니다.");
