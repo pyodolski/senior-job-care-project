@@ -17,7 +17,7 @@
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify,  current_app
 from flask_login import login_required, current_user
-from models import db, JobPost
+from models import db, JobPost, JobApplication
 from services.job_service import JobService
 from services.application_service import ApplicationService
 from utils.helpers import format_datetime, get_work_days, calculate_time_ago
@@ -981,3 +981,36 @@ def my_posts():
         current_app.logger.error(f"내가 올린 글 조회 중 오류: {e}")
         flash("글 목록을 불러오는 중 오류가 발생했습니다.", "error")
         return redirect(url_for('auth.profile'))
+
+@jobs_bp.route("/my-applications")
+@login_required
+def my_applications():
+    # 1. 현재 사용자의 모든 지원 내역을 찾습니다.
+    applications = JobApplication.query.filter_by(
+        user_id=current_user.id
+    ).order_by(JobApplication.created_at.desc()).all()
+
+    # 2. 지원 내역에서 공고(job) 객체만 추출합니다.
+    jobs_dict = {}
+    for app in applications:
+        if app.job:
+            jobs_dict[app.job_id] = app.job
+
+    jobs = list(jobs_dict.values())
+
+    jobs_with_status = []
+    for job in jobs:
+        application_status = ApplicationService.check_application_status(current_user.id, job.id)
+        # 북마크 상태 추가
+        application_status['bookmarked'] = JobService.is_bookmarked(current_user.id, job.id)
+        # 시간 경과 계산 추가
+        job.time_ago = calculate_time_ago(job.created_at)
+        job_data = {
+            'job': job,
+            'application_status': application_status
+        }
+        jobs_with_status.append(job_data)
+
+    return render_template("jobs/my_applications.html",
+                           jobs_with_status=jobs_with_status,
+                           total_count=len(jobs_with_status))

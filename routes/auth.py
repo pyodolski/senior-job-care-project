@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, session, jsonify
 from flask_login import login_required, login_user, logout_user, current_user
 from flask_dance.contrib.google import google
-from models import db, User
+from models import db, User, JobApplication, JobSuggestion, JobPost
 import requests
 from config import Config
 import os
@@ -307,7 +307,6 @@ def profile():
     # 기업 회원과 일반 회원 분리
     if current_user.user_type == 1:
         # 기업 회원 - 통계 데이터 조회
-        from models import JobPost, JobSuggestion, JobApplication
         
         # 내 구인글 수
         job_count = JobPost.query.filter_by(author_id=current_user.id).count()
@@ -328,7 +327,23 @@ def profile():
     else:
         # 일반 회원 - 이력서 수 조회
         resume_count = ResumeService.get_resume_count_by_user(current_user.id)
-        return render_template("profile.html", user=current_user, profile_url=profile_url, resume_count=resume_count)
+
+        my_apps = JobApplication.query.filter_by(user_id=current_user.id).all()
+        jobs_dict = {}
+        for app in my_apps:
+            if app.job:  # 삭제된 공고는 제외
+                jobs_dict[app.job_id] = app.job
+        applications_count = len(jobs_dict)
+
+        received_offers_count = JobSuggestion.query.filter_by(suggestee_id=current_user.id).count()
+
+        return render_template("profile.html",
+                               user=current_user,
+                               profile_url=profile_url,
+                               resume_count=resume_count,
+                               applications=applications_count,
+                               received_offers=received_offers_count
+                               )
 
 @auth_bp.route("/profile/detail")
 @login_required

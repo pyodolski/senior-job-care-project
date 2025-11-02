@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>내가 지원한 공고 - 사람이음</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/chat.css') }}"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+      }
+      /* chat_list.html의 스타일을 일부 재사용/수정 */
+      .job-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      .job-item:hover {
+        background-color: #f9f9f9;
+      }
+      .job-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .job-info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+      }
+      .job-title {
+        font-weight: 600;
+        color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .job-company {
+        font-size: 0.875rem;
+        color: #666;
+      }
+      .job-status {
+        font-size: 0.875rem;
+      }
+      .job-time {
+        font-size: 0.75rem;
+        color: #999;
+        flex-shrink: 0;
+        margin-left: 8px;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <div class="w-full bg-white shadow-lg min-h-screen">
+      <div class="sticky top-0 z-10 bg-white shadow-sm">
+        <header class="px-4 py-3 sm:px-6 flex justify-between items-center">
+          <button
+            onclick="goBack()"
+            class="p-1 rounded-full hover:bg-gray-100 transition-colors"
+          >
+            <svg
+              class="w-6 h-6 text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              ></path>
+            </svg>
+          </button>
+          <div class="text-lg font-bold text-gray-800">
+            내가 지원한 공고
+          </div>
+          <div class="w-6 h-6"></div>
+          </header>
+      </div>
+
+      <main class="bg-white pb-24">
+        <div class="px-4 py-3 sm:px-6 border-t border-b bg-gray-50">
+          <h2 class="text-base font-semibold text-gray-800 flex items-center">
+            총 {{ total_count }}건
+          </h2>
+        </div>
+
+        <div class="job-list">
+          {% if jobs_with_status %}
+            {% for job_data in jobs_with_status %}
+            <div
+              class="job-item"
+              data-job-id="{{ job_data.job.id }}"
+              onclick="window.location.href='{{ url_for('jobs.job_detail', job_id=job_data.job.id) }}'"
+            >
+              <div class="job-info">
+                <div class="job-info-row">
+                  <div class="job-title">{{ job_data.job.title }}</div>
+                  <div class="job-time">{{ job_data.job.time_ago }}</div>
+                </div>
+                <div class="job-info-row">
+                  <div class="job-company">{{ job_data.job.company }}</div>
+                  <div class="job-status">
+                    {% if job_data.application_status.status == 'APPLIED' %}
+                    <span class="font-semibold text-blue-600">지원 완료</span>
+                    {% elif job_data.application_status.status == 'ACCEPTED' %}
+                    <span class="font-semibold text-green-600">채용 완료</span>
+                    {% elif job_data.application_status.status == 'REJECTED' %}
+                    <span class="font-semibold text-red-600">미채용</span>
+                    {% else %}
+                    <span class="font-semibold text-gray-500">상태 확인 불가</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="chat-empty-state" style="padding: 4rem 1rem; text-align: center;">
+              <h3>지원한 공고가 없습니다</h3>
+              <p class="mt-2 text-gray-600">
+                관심있는 공고에 지원해보세요!
+              </p>
+              <a
+                href="{{ url_for('jobs.job_list') }}"
+                class="mt-4 inline-block px-6 py-2 bg-blue-900 text-white font-semibold rounded-lg shadow-md hover:bg-blue-800 transition-colors"
+                >공고 둘러보기</a
+              >
+            </div>
+          {% endif %}
+        </div>
+      </main>
+
+      {% include 'components/footer.html' %}
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <script>
+        // common.js에 goBack() 함수가 있다고 가정합니다.
+        // 없다면 common.js에 추가해주세요.
+        /*
+        function goBack() {
+            window.history.back();
+        }
+        */
+    </script>
+  </body>
+</html>

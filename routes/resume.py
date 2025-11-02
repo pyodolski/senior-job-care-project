@@ -323,10 +323,8 @@ def submit_resume():
     if new_resume:
         # 세션 정리
         session.pop('resume_draft', None)
-        flash("이력서가 성공적으로 등록되었습니다!", "success")
         return redirect(url_for('resumes.my_view_resume'))
     else:
-        flash("이력서 등록 중 오류가 발생했습니다.", "error")
         return redirect(url_for('resumes.create_resume'))
 
 
