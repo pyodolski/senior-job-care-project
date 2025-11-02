@@ -329,10 +329,18 @@
             </div>
             <a
               href="{{ url_for('admin.pending_companies') }}"
-              class="block bg-white bg-opacity-20 rounded-xl p-3 text-center font-bold hover:bg-opacity-30 transition-all"
+              class="block bg-white bg-opacity-20 rounded-xl p-3 mb-3 text-center font-bold hover:bg-opacity-30 transition-all"
             >
               기업회원 승인/거부 페이지
             </a>
+            <button
+              onclick="syncPublicData()"
+              id="syncBtn"
+              class="block w-full bg-white bg-opacity-20 rounded-xl p-3 text-center font-bold hover:bg-opacity-30 transition-all disabled:opacity-50"
+            >
+              🔄 공공데이터 최신화
+            </button>
+            <div id="syncResult" class="mt-2 text-sm"></div>
           </div>
         </section>
         {% endif %}
@@ -985,5 +993,60 @@
       {% endif %}
     </div>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <!-- 관리자 전용: 공공데이터 동기화 -->
+    {% if current_user.user_type == 2 %}
+    <script>
+      async function syncPublicData() {
+        const btn = document.getElementById("syncBtn");
+        const result = document.getElementById("syncResult");
+
+        if (!btn || !result) return;
+
+        btn.disabled = true;
+        btn.textContent = "⏳ 수집 중...";
+        result.innerHTML =
+          '<div class="text-white text-center">공공데이터를 가져오는 중입니다...</div>';
+
+        try {
+          const response = await fetch("/admin/fetch-senior-jobs", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            result.innerHTML =
+              '<div class="text-white text-center font-bold">✅ ' +
+              data.message +
+              "</div>";
+
+            // 3초 후 페이지 새로고침
+            setTimeout(() => {
+              location.reload();
+            }, 3000);
+          } else {
+            result.innerHTML =
+              '<div class="text-red-200 text-center">❌ ' +
+              data.message +
+              "</div>";
+          }
+        } catch (error) {
+          result.innerHTML =
+            '<div class="text-red-200 text-center">❌ 오류: ' +
+            error.message +
+            "</div>";
+        } finally {
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.textContent = "🔄 공공데이터 최신화";
+          }, 3000);
+        }
+      }
+    </script>
+    {% endif %}
   </body>
 </html>
