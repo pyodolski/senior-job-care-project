@@ -13,7 +13,10 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/register_company.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/register_company.css') }}"
+    />
   </head>
   <body class="bg-gray-100">
     <div class="w-full max-w-md mx-auto px-4 bg-white shadow-lg min-h-screen">
@@ -240,7 +243,13 @@
         <!-- Step 8: 완료 -->
         <div class="step-content" data-step="8">
           <div class="text-center py-12">
-            <div class="text-6xl mb-6">🏢</div>
+            <div class="mb-6 flex justify-center">
+              <img
+                src="{{ url_for('static', filename='images/header/logo.png') }}"
+                alt="이음 로고"
+                class="w-24 h-24 object-contain"
+              />
+            </div>
             <h2 class="text-3xl font-bold text-blue-900 mb-4">이음</h2>
             <p class="text-xl font-semibold text-gray-800 mb-2">
               기업 회원가입 신청 완료!
@@ -335,7 +344,6 @@
       const FIRST_LOGIN_URL = "{{ url_for('auth.first_login_page') }}";
 
       const CHECK_USERNAME_URL = "{{ url_for('auth.check_username') }}";
-
     </script>
     <script src="{{ url_for('static', filename='js/register_company.js') }}"></script>
   </body>

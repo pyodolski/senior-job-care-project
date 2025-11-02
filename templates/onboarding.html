@@ -5,12 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>추가 정보 입력 - 사람이음</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_key }}&libraries=services"></script>
+    <script
+      type="text/javascript"
+      src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_key }}&libraries=services"
+    ></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/onboarding.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/onboarding.css') }}"
+    />
   </head>
   <body class="bg-gray-100">
     <div class="w-full max-w-md mx-auto px-4 bg-white shadow-lg min-h-screen">
@@ -18,8 +24,18 @@
       <div class="pt-6 pb-4">
         <div class="flex items-center justify-between mb-4">
           <button type="button" onclick="goBack()" class="text-gray-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
           <h2 class="text-xl font-semibold text-gray-800">추가 정보 입력</h2>
@@ -27,12 +43,21 @@
         </div>
         <!-- 진행바 -->
         <div class="w-full bg-gray-200 h-1 rounded-full">
-          <div id="progress-bar" class="progress-bar bg-blue-900 h-1 rounded-full" style="width: 20%"></div>
+          <div
+            id="progress-bar"
+            class="progress-bar bg-blue-900 h-1 rounded-full"
+            style="width: 20%"
+          ></div>
         </div>
       </div>
 
       <!-- 폼 -->
-      <form method="POST" action="{{ url_for('auth.onboarding') }}" id="onboarding-form" class="px-4 py-8">
+      <form
+        method="POST"
+        action="{{ url_for('auth.onboarding') }}"
+        id="onboarding-form"
+        class="px-4 py-8"
+      >
         <!-- Hidden inputs for form data -->
         <input type="hidden" name="birth_date" id="final-birth-date" />
         <input type="hidden" name="gender" id="final-gender" />
@@ -63,8 +88,7 @@
               id="year-picker"
               class="hidden absolute z-50 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1"
               style="max-height: 200px; overflow-y: auto"
-            >
-            </div>
+            ></div>
           </div>
 
           <!-- 월 선택 -->
@@ -80,8 +104,7 @@
               id="month-picker"
               class="hidden absolute z-50 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1"
               style="max-height: 200px; overflow-y: auto"
-            >
-            </div>
+            ></div>
           </div>
 
           <!-- 일 선택 -->
@@ -97,8 +120,7 @@
               id="day-picker"
               class="hidden absolute z-50 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1"
               style="max-height: 200px; overflow-y: auto"
-            >
-            </div>
+            ></div>
           </div>
 
           <input type="hidden" id="birth-year" />
@@ -112,17 +134,41 @@
             성별을 입력해주세요
           </h3>
           <div class="flex gap-4">
-            <div class="gender-button flex-1 py-8 border-2 border-gray-300 rounded-lg text-center" onclick="selectGender('여자', this)">
-              <svg class="w-12 h-12 mx-auto mb-2 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C8.134 2 5 5.134 5 9c0 3.5 2.577 6.422 5.962 6.925V18.5H8.5v2h2.462V23h2v-2.5H15.5v-2h-2.462v-2.575C16.423 15.422 19 12.5 19 9c0-3.866-3.134-7-7-7zm0 12c-2.761 0-5-2.239-5-5s2.239-5 5-5 5 2.239 5 5-2.239 5-5 5z"/>
+            <div
+              class="gender-button flex-1 py-6 rounded-lg text-center shadow-md"
+              onclick="selectGender('여자', this)"
+            >
+              <svg
+                class="w-12 h-12 mx-auto mb-2 text-gray-400"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M12 2C8.134 2 5 5.134 5 9c0 3.5 2.577 6.422 5.962 6.925V18.5H8.5v2h2.462V23h2v-2.5H15.5v-2h-2.462v-2.575C16.423 15.422 19 12.5 19 9c0-3.866-3.134-7-7-7zm0 12c-2.761 0-5-2.239-5-5s2.239-5 5-5 5 2.239 5 5-2.239 5-5 5z"
+                />
               </svg>
-              <p class="text-gray-700 font-medium">여자</p>
+              <p class="text-gray-700 font-semibold text-lg">여자</p>
             </div>
-            <div class="gender-button flex-1 py-8 border-2 border-gray-300 rounded-lg text-center" onclick="selectGender('남자', this)">
-              <svg class="w-12 h-12 mx-auto mb-2 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M15.5 2h6v6h-2V4.914l-4.793 4.793c.578.945.793 2.024.793 3.143C15.5 16.094 12.594 19 9.25 19S3 16.094 3 12.75 5.906 6.5 9.25 6.5c1.119 0 2.198.215 3.143.793l4.793-4.793H14V2h1.5zM9.25 17c2.481 0 4.5-2.019 4.5-4.5S11.731 8 9.25 8 4.75 10.019 4.75 12.5 6.769 17 9.25 17z"/>
+            <div
+              class="gender-button flex-1 py-6 rounded-lg text-center shadow-md"
+              onclick="selectGender('남자', this)"
+            >
+              <svg
+                class="w-12 h-12 mx-auto mb-2 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                viewBox="0 0 24 24"
+              >
+                <circle cx="9" cy="14" r="6" />
+                <path
+                  d="M19 5h-4M19 5v4M19 5l-5 5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                />
               </svg>
-              <p class="text-gray-700 font-medium">남자</p>
+              <p class="text-gray-700 font-semibold text-lg">남자</p>
             </div>
           </div>
         </div>
@@ -186,20 +232,31 @@
         <!-- Step 5: 완료 -->
         <div class="step-content" data-step="5">
           <div class="text-center py-12">
-            <div class="text-6xl mb-6">🤝</div>
+            <div class="mb-6 flex justify-center">
+              <img
+                src="{{ url_for('static', filename='images/header/logo.png') }}"
+                alt="이음 로고"
+                class="w-24 h-24 object-contain"
+              />
+            </div>
             <h2 class="text-3xl font-bold text-blue-900 mb-4">이음</h2>
             <p class="text-xl font-semibold text-gray-800 mb-2">환영합니다!</p>
             <p class="text-gray-600">이음으로 다시 사회활동을</p>
             <p class="text-gray-600">시작해보세요!</p>
             <div class="mt-8">
-              <div class="inline-block w-12 h-12 border-4 border-blue-900 border-t-transparent rounded-full animate-spin"></div>
+              <div
+                class="inline-block w-12 h-12 border-4 border-blue-900 border-t-transparent rounded-full animate-spin"
+              ></div>
             </div>
           </div>
         </div>
       </form>
 
       <!-- 하단 버튼 -->
-      <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white p-4 shadow-lg" id="next-button-container">
+      <div
+        class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white p-4 shadow-lg"
+        id="next-button-container"
+      >
         <button
           type="button"
           id="next-button"
@@ -217,7 +274,10 @@
       id="map-modal"
       class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
     >
-      <div class="bg-white rounded-lg overflow-hidden" style="width: 80%; max-width: 400px; height: 45vh">
+      <div
+        class="bg-white rounded-lg overflow-hidden"
+        style="width: 80%; max-width: 400px; height: 45vh"
+      >
         <!-- 모달 헤더 -->
         <div class="p-4 border-b flex items-center justify-between">
           <h3 class="text-lg font-semibold text-gray-800">거주지 선택</h3>
@@ -226,7 +286,12 @@
             onclick="closeMapModal()"
             class="text-gray-500 hover:text-gray-700"
           >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"

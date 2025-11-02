@@ -9,7 +9,10 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume/my_resume_detail.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/resume/my_resume_detail.css') }}"
+    />
   </head>
   <body class="bg-gray-50">
     <div class="max-w-md mx-auto bg-white min-h-screen flex flex-col">
@@ -98,9 +101,8 @@
                 {{ resume.user.name or resume.user.nickname }}
               </h2>
               <p class="text-sm text-gray-600">
-                {% if resume.user.birth_date %}
-                {{ (now.year - resume.user.birth_date.year) }}세
-                {% endif %}
+                {% if resume.user.birth_date %} {{ (now.year -
+                resume.user.birth_date.year) }}세 {% endif %}
               </p>
             </div>
           </div>
@@ -111,37 +113,32 @@
           <div class="info-row">
             <div class="info-label">성별</div>
             <div class="info-value">
-              {% if resume.user.gender == 'male' %}남성
-              {% elif resume.user.gender == 'female' %}여성
-              {% else %}미설정{% endif %}
+              {% if resume.user.gender == 'male' %}남성 {% elif
+              resume.user.gender == 'female' %}여성 {% else %}미설정{% endif %}
             </div>
           </div>
           <div class="info-row">
             <div class="info-label">생년월일</div>
             <div class="info-value">
-              {% if resume.user.birth_date %}
-              {{ resume.user.birth_date.strftime('%Y.%m.%d') }}
-              {% else %}미설정{% endif %}
+              {% if resume.user.birth_date %} {{
+              resume.user.birth_date.strftime('%Y.%m.%d') }} {% else %}미설정{%
+              endif %}
             </div>
           </div>
           <div class="info-row">
             <div class="info-label">전화번호</div>
-            <div class="info-value">
-              {{ resume.user.phone or '미설정' }}
-            </div>
+            <div class="info-value">{{ resume.user.phone or '미설정' }}</div>
           </div>
           <div class="info-row">
             <div class="info-label">이메일</div>
-            <div class="info-value">
-              {{ resume.user.email or '입력안함' }}
-            </div>
+            <div class="info-value">{{ resume.user.email or '입력안함' }}</div>
           </div>
           <div class="info-row">
             <div class="info-label">주소</div>
             <div class="info-value">
-              {% if resume.user.sido and resume.user.sigungu and resume.user.dong %}
-              {{ resume.user.sido }} {{ resume.user.sigungu }} {{ resume.user.dong }}
-              {% else %}미설정{% endif %}
+              {% if resume.user.sido and resume.user.sigungu and
+              resume.user.dong %} {{ resume.user.sido }} {{ resume.user.sigungu
+              }} {{ resume.user.dong }} {% else %}미설정{% endif %}
             </div>
           </div>
         </div>
@@ -190,15 +187,14 @@
             희망 직종
           </h3>
           <div class="flex flex-wrap gap-2">
-            {% if resume.desired_categories %}
-            {% for cat in resume.desired_categories.split(',') %}
+            {% if resume.desired_categories %} {% for cat in
+            resume.desired_categories.split(',') %}
             <span
               class="inline-block bg-blue-100 text-blue-900 text-sm px-3 py-1 rounded-full font-medium"
             >
               {{ cat.strip() }}
             </span>
-            {% endfor %}
-            {% else %}
+            {% endfor %} {% else %}
             <span class="text-sm text-gray-500">미설정</span>
             {% endif %}
           </div>
@@ -223,23 +219,21 @@
             근무 요일
           </h3>
           <div class="flex flex-wrap gap-2">
-            {% set days = [] %}
-            {% if resume.work_monday %}{% set _ = days.append('월') %}{% endif %}
-            {% if resume.work_tuesday %}{% set _ = days.append('화') %}{% endif %}
-            {% if resume.work_wednesday %}{% set _ = days.append('수') %}{% endif %}
-            {% if resume.work_thursday %}{% set _ = days.append('목') %}{% endif %}
-            {% if resume.work_friday %}{% set _ = days.append('금') %}{% endif %}
-            {% if resume.work_saturday %}{% set _ = days.append('토') %}{% endif %}
-            {% if resume.work_sunday %}{% set _ = days.append('일') %}{% endif %}
-            {% if days %}
-            {% for day in days %}
+            {% set days = [] %} {% if resume.work_monday %}{% set _ =
+            days.append('월') %}{% endif %} {% if resume.work_tuesday %}{% set _
+            = days.append('화') %}{% endif %} {% if resume.work_wednesday %}{%
+            set _ = days.append('수') %}{% endif %} {% if resume.work_thursday
+            %}{% set _ = days.append('목') %}{% endif %} {% if
+            resume.work_friday %}{% set _ = days.append('금') %}{% endif %} {%
+            if resume.work_saturday %}{% set _ = days.append('토') %}{% endif %}
+            {% if resume.work_sunday %}{% set _ = days.append('일') %}{% endif
+            %} {% if days %} {% for day in days %}
             <span
               class="inline-block bg-green-100 text-green-900 text-sm px-3 py-1 rounded-full font-medium"
             >
               {{ day }}
             </span>
-            {% endfor %}
-            {% else %}
+            {% endfor %} {% else %}
             <span class="text-sm text-gray-500">미설정</span>
             {% endif %}
           </div>
@@ -265,13 +259,11 @@
           </h3>
           <div class="bg-gray-50 rounded-lg p-3">
             <p class="text-sm text-gray-700">
-              {% if resume.is_time_negotiable %}
-              시간 협의 가능
-              {% elif resume.desired_start_time and resume.desired_end_time %}
-              {{ resume.desired_start_time.strftime('%H:%M') }} ~ {{ resume.desired_end_time.strftime('%H:%M') }}
-              {% else %}
-              미설정
-              {% endif %}
+              {% if resume.is_time_negotiable %} 시간 협의 가능 {% elif
+              resume.desired_start_time and resume.desired_end_time %} {{
+              resume.desired_start_time.strftime('%H:%M') }} ~ {{
+              resume.desired_end_time.strftime('%H:%M') }} {% else %} 미설정 {%
+              endif %}
             </p>
           </div>
         </div>
@@ -295,15 +287,14 @@
             나를 대표할 수 있는 키워드
           </h3>
           <div class="flex flex-wrap gap-2">
-            {% if resume.strengths %}
-            {% for strength in resume.strengths.split(',') %}
+            {% if resume.strengths %} {% for strength in
+            resume.strengths.split(',') %}
             <span
               class="inline-block bg-purple-100 text-purple-900 text-sm px-3 py-1 rounded-full font-medium"
             >
               {{ strength.strip() }}
             </span>
-            {% endfor %}
-            {% else %}
+            {% endfor %} {% else %}
             <span class="text-sm text-gray-500">미설정</span>
             {% endif %}
           </div>
@@ -358,7 +349,9 @@
             <div
               class="bg-gray-50 rounded-lg p-3 flex items-center justify-between"
             >
-              <span class="text-sm text-gray-800 font-medium">{{ cert.name }}</span>
+              <span class="text-sm text-gray-800 font-medium"
+                >{{ cert.name }}</span
+              >
               {% if cert.image_url %}
               <a
                 href="{{ cert.image_url }}"
@@ -412,7 +405,9 @@
             자기소개서
           </h3>
           <div class="bg-gray-50 rounded-lg p-4">
-            <p class="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+            <p
+              class="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed"
+            >
               {{ resume.self_introduction or '등록된 자기소개가 없습니다.' }}
             </p>
           </div>
@@ -451,15 +446,20 @@
             <div>
               <h3 class="font-semibold text-gray-900 mb-1">이력서 공개 설정</h3>
               <p class="text-xs text-gray-500">
-                {% if resume.is_public %}기업에게 공개되어 있습니다
-                {% else %}비공개 상태입니다{% endif %}
+                {% if resume.is_public %}기업에게 공개되어 있습니다 {% else
+                %}비공개 상태입니다{% endif %}
               </p>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
                 id="toggle-{{ resume.id }}"
-                {% if resume.is_public %}checked{% endif %}
+                {%
+                if
+                resume.is_public
+                %}checked{%
+                endif
+                %}
                 class="sr-only peer"
                 onchange="togglePublic('{{ url_for('resumes.toggle_public', resume_id=resume.id) }}', this.checked, {{ resume.id }})"
               />
@@ -500,75 +500,7 @@
       </main>
 
       <!-- 하단 네비게이션 -->
-      <footer
-        class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t flex justify-around"
-      >
-        <a
-          href="{{ url_for('map.show_map') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/map.png') }}"
-              alt="지도"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">지도</span>
-        </a>
-        <a
-          href="{{ url_for('jobs.bookmark_list') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/favorite.png') }}"
-              alt="찜"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">찜</span>
-        </a>
-        <a
-          href="{{ url_for('auth.main') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/home.png') }}"
-              alt="홈"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">홈</span>
-        </a>
-        <a
-          href="{{ url_for('chat.chat_list') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/chatting.png') }}"
-              alt="채팅"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">채팅</span>
-        </a>
-        <a
-          href="{{ url_for('auth.profile') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/profile.png') }}"
-              alt="내정보"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">내정보</span>
-        </a>
-      </footer>
+      {% include 'components/footer.html' %}
     </div>
 
     <script>
