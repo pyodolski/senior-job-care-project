@@ -1,0 +1,15 @@
+# Railway 설정 파일
+
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT app:app"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+# Cron Jobs - 매일 오전 3시에 공공데이터 수집
+[[cron]]
+schedule = "0 3 * * *"
+command = "flask fetch-senior-jobs"
+name = "공공데이터 수집"

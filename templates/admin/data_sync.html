@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>데이터 동기화 - 관리자</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50">
+    <div class="max-w-4xl mx-auto p-6">
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold mb-6">📊 데이터 동기화</h1>
+
+        <!-- 공공데이터 수집 -->
+        <div class="mb-6 p-4 border rounded-lg">
+          <h2 class="text-lg font-bold mb-2">🔄 공공데이터 수집</h2>
+          <p class="text-gray-600 mb-4">
+            한국노인인력개발원 API에서 최신 공고를 가져옵니다.
+          </p>
+          <button
+            onclick="fetchSeniorJobs()"
+            id="fetchBtn"
+            class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+          >
+            공공데이터 가져오기
+          </button>
+          <div id="fetchResult" class="mt-4"></div>
+        </div>
+
+        <!-- AI 분석 -->
+        <div class="mb-6 p-4 border rounded-lg">
+          <h2 class="text-lg font-bold mb-2">🤖 AI 분석</h2>
+          <p class="text-gray-600 mb-4">
+            분석되지 않은 공고를 AI로 분석합니다. (최대 10개)
+          </p>
+          <button
+            onclick="analyzeJobs()"
+            id="analyzeBtn"
+            class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 disabled:bg-gray-400"
+          >
+            AI 분석 실행
+          </button>
+          <div id="analyzeResult" class="mt-4"></div>
+        </div>
+
+        <!-- 뒤로가기 -->
+        <div class="mt-6">
+          <a
+            href="{{ url_for('auth.main') }}"
+            class="text-blue-600 hover:underline"
+          >
+            ← 메인으로 돌아가기
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      async function fetchSeniorJobs() {
+        const btn = document.getElementById("fetchBtn");
+        const result = document.getElementById("fetchResult");
+
+        btn.disabled = true;
+        btn.textContent = "수집 중...";
+        result.innerHTML =
+          '<div class="text-blue-600">⏳ 공공데이터를 가져오는 중입니다...</div>';
+
+        try {
+          const response = await fetch("/admin/fetch-senior-jobs", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            result.innerHTML = `<div class="text-green-600 font-bold">✅ ${data.message}</div>`;
+          } else {
+            result.innerHTML = `<div class="text-red-600">❌ ${data.message}</div>`;
+          }
+        } catch (error) {
+          result.innerHTML = `<div class="text-red-600">❌ 오류: ${error.message}</div>`;
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "공공데이터 가져오기";
+        }
+      }
+
+      async function analyzeJobs() {
+        const btn = document.getElementById("analyzeBtn");
+        const result = document.getElementById("analyzeResult");
+
+        btn.disabled = true;
+        btn.textContent = "분석 중...";
+        result.innerHTML =
+          '<div class="text-purple-600">⏳ AI 분석 중입니다...</div>';
+
+        try {
+          const response = await fetch("/admin/analyze-jobs", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            result.innerHTML = `<div class="text-green-600 font-bold">✅ ${data.message}</div>`;
+          } else {
+            result.innerHTML = `<div class="text-red-600">❌ ${data.message}</div>`;
+          }
+        } catch (error) {
+          result.innerHTML = `<div class="text-red-600">❌ 오류: ${error.message}</div>`;
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "AI 분석 실행";
+        }
+      }
+    </script>
+  </body>
+</html>

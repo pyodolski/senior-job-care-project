@@ -33,3 +33,4 @@ cryptography==43.0.3
 huggingface_hub==0.26.2
 beautifulsoup4==4.12.3
 openai==1.54.4
+APScheduler==3.10.4

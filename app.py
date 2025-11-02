@@ -20,6 +20,7 @@ from routes.admin.admin import admin_bp
 from routes.map import map_bp
 from routes.news import news_bp
 from routes.recommendations import recommendations_bp
+from routes.admin.data_sync import data_sync_bp
 from flask_socketio import SocketIO
 
 socketio = SocketIO(cors_allowed_origins="*", manage_session=False)
@@ -33,6 +34,12 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
     print("✅ 데이터베이스 테이블 초기화 완료")
+
+# 스케줄러 시작 (Railway 환경에서만)
+if Config.IS_RAILWAY:
+    from scheduler import start_scheduler
+    scheduler = start_scheduler()
+    print("⏰ 공공데이터 자동 수집 스케줄러 시작됨")
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -103,6 +110,7 @@ app.register_blueprint(job_assistant_bp)
 app.register_blueprint(news_bp)
 app.register_blueprint(map_bp)
 app.register_blueprint(recommendations_bp)
+app.register_blueprint(data_sync_bp)
 
 # CLI 명령어 등록
 register_cli(app)
