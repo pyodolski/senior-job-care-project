@@ -6,8 +6,7 @@ function showStep(step) {
     .querySelectorAll(".step-container")
     .forEach((el) => (el.style.display = "none"));
 
-  const stepId =
-    typeof step === "string" ? `step-${step}` : `step-${step}`;
+  const stepId = typeof step === "string" ? `step-${step}` : `step-${step}`;
   const stepElement = document.getElementById(stepId);
 
   if (stepElement) {
@@ -67,9 +66,7 @@ function editStep(step) {
 // 미리보기 업데이트
 function updatePreview() {
   // 1. 희망 직무분야
-  const category = document.querySelector(
-    'input[name="categories"]:checked'
-  );
+  const category = document.querySelector('input[name="categories"]:checked');
   document.getElementById("preview-category").textContent = category
     ? category.value
     : "미선택";
@@ -108,8 +105,7 @@ function updatePreview() {
   }
 
   // 4. 희망 근무 시간
-  const timeNegotiable =
-    document.getElementById("time_negotiable").checked;
+  const timeNegotiable = document.getElementById("time_negotiable").checked;
   if (timeNegotiable) {
     document.getElementById("preview-time").textContent = "시간 협의 가능";
   } else {
@@ -119,17 +115,14 @@ function updatePreview() {
     if (startTime && endTime) {
       const startPeriod =
         parseInt(startTime.split(":")[0]) < 12 ? "오전" : "오후";
-      const endPeriod =
-        parseInt(endTime.split(":")[0]) < 12 ? "오전" : "오후";
+      const endPeriod = parseInt(endTime.split(":")[0]) < 12 ? "오전" : "오후";
       timeText = `${startPeriod} ${startTime} ~ ${endPeriod} ${endTime}`;
     }
-    document.getElementById("preview-time").textContent =
-      timeText || "미설정";
+    document.getElementById("preview-time").textContent = timeText || "미설정";
   }
 
   // 5. 경력 및 경험
-  const experienceContainer =
-    document.getElementById("preview-experience");
+  const experienceContainer = document.getElementById("preview-experience");
   experienceContainer.innerHTML = "";
   if (experienceItems.length > 0) {
     experienceItems.forEach((item) => {
@@ -178,8 +171,7 @@ function updatePreview() {
     strengths.length > 0 ? strengths.join(", ") : "미선택";
 
   // 8. 신체적 활동 가능 범위
-  const walkableMinutes =
-    document.getElementById("walkable-slider").value;
+  const walkableMinutes = document.getElementById("walkable-slider").value;
   let walkableText = "";
   if (walkableMinutes == 0) walkableText = "못함";
   else if (walkableMinutes <= 20) walkableText = "20분";
@@ -200,11 +192,10 @@ function updatePreview() {
   }
 
   // 9. 이동 가능 범위
-  const commuteNegotiable = document.getElementById("commute-negotiable").checked;
+  const commuteNegotiable =
+    document.getElementById("commute-negotiable").checked;
   if (commuteNegotiable) {
-    document.getElementById(
-      "preview-commute"
-    ).textContent = "교통 수단 불가";
+    document.getElementById("preview-commute").textContent = "교통 수단 불가";
   } else {
     const commuteTime = document.getElementById("commute-slider").value;
     let commuteText = "";
@@ -240,9 +231,7 @@ function updatePreview() {
     : "미동의";
 
   // 13. 이력서 공개 설정
-  const isPublic = document.querySelector(
-    'input[name="is_public"]'
-  ).checked;
+  const isPublic = document.querySelector('input[name="is_public"]').checked;
   document.getElementById("preview-public").textContent = isPublic
     ? "기업에게 공개됨"
     : "비공개";
@@ -303,14 +292,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (walkableSlider) {
     updateSliderBackground(walkableSlider);
-    walkableSlider.addEventListener("input", function() {
+    walkableSlider.addEventListener("input", function () {
       updateSliderBackground(this);
     });
   }
 
   if (commuteSlider) {
     updateSliderBackground(commuteSlider);
-    commuteSlider.addEventListener("input", function() {
+    commuteSlider.addEventListener("input", function () {
       updateSliderBackground(this);
     });
   }
@@ -324,9 +313,7 @@ function initPhysicalNotesList() {
   const physicalText = physicalHidden.value.trim();
 
   if (physicalText) {
-    physicalNotes = physicalText
-      .split("\n")
-      .filter((item) => item.trim());
+    physicalNotes = physicalText.split("\n").filter((item) => item.trim());
     updatePhysicalNotesDisplay();
   }
 }
@@ -400,9 +387,7 @@ function initExperienceList() {
 
   if (experienceText) {
     // 줄바꿈으로 구분된 경험들을 배열로 변환
-    experienceItems = experienceText
-      .split("\n")
-      .filter((item) => item.trim());
+    experienceItems = experienceText.split("\n").filter((item) => item.trim());
     updateExperienceDisplay();
   }
 }
@@ -592,22 +577,19 @@ function openTimeModal() {
   }, 10);
 
   // 현재 설정된 시간 가져오기
-  const startTime =
-    document.getElementById("start_time").value || "09:00";
+  const startTime = document.getElementById("start_time").value || "09:00";
   const endTime = document.getElementById("end_time").value || "18:00";
 
   // 시작 시간 설정
   const [startHour, startMin] = startTime.split(":");
   const startH = parseInt(startHour);
-  document.getElementById("start-period").value =
-    startH < 12 ? "오전" : "오후";
+  document.getElementById("start-period").value = startH < 12 ? "오전" : "오후";
   document.getElementById("start-hour").value = startTime;
 
   // 종료 시간 설정
   const [endHour, endMin] = endTime.split(":");
   const endH = parseInt(endHour);
-  document.getElementById("end-period").value =
-    endH < 12 ? "오전" : "오후";
+  document.getElementById("end-period").value = endH < 12 ? "오전" : "오후";
   document.getElementById("end-hour").value = endTime;
 }
 
@@ -653,14 +635,11 @@ function confirmTime() {
 }
 
 function updateTimeDisplay() {
-  const startTime =
-    document.getElementById("start_time").value || "09:00";
+  const startTime = document.getElementById("start_time").value || "09:00";
   const endTime = document.getElementById("end_time").value || "18:00";
 
-  const startPeriod =
-    parseInt(startTime.split(":")[0]) < 12 ? "오전" : "오후";
-  const endPeriod =
-    parseInt(endTime.split(":")[0]) < 12 ? "오전" : "오후";
+  const startPeriod = parseInt(startTime.split(":")[0]) < 12 ? "오전" : "오후";
+  const endPeriod = parseInt(endTime.split(":")[0]) < 12 ? "오전" : "오후";
 
   const display = `${startPeriod} ${startTime} ~ ${endPeriod} ${endTime}`;
   document.getElementById("time-display").textContent = display;
@@ -706,7 +685,12 @@ function toggleDays() {
   });
 
   dayCheckboxes.forEach((checkbox) => {
-    checkbox.disabled = isNegotiable;
+    if (isNegotiable) {
+      checkbox.checked = true;
+      checkbox.disabled = true;
+    } else {
+      checkbox.disabled = false;
+    }
   });
 }
 dayNegotiable.addEventListener("change", toggleDays);

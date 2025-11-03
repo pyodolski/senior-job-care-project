@@ -228,7 +228,13 @@
             resume.work_friday %}{% set _ = days.append('금') %}{% endif %} {%
             if resume.work_saturday %}{% set _ = days.append('토') %}{% endif %}
             {% if resume.work_sunday %}{% set _ = days.append('일') %}{% endif
-            %} {% if days %} {% for day in days %}
+            %} {% if days|length == 7 %}
+            <span
+              class="inline-block bg-blue-100 text-blue-900 text-sm px-3 py-1 rounded-full font-medium"
+            >
+              협의 가능
+            </span>
+            {% elif days %} {% for day in days %}
             <span
               class="inline-block bg-green-100 text-green-900 text-sm px-3 py-1 rounded-full font-medium"
             >

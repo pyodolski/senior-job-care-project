@@ -118,11 +118,27 @@
           >
           <strong>희망 근무 요일</strong>
           <div>
-            {% if resume.work_monday %}월 {% endif %} {% if resume.work_tuesday
-            %}화 {% endif %} {% if resume.work_wednesday %}수 {% endif %} {% if
-            resume.work_thursday %}목 {% endif %} {% if resume.work_friday %}금
-            {% endif %} {% if resume.work_saturday %}토 {% endif %} {% if
-            resume.work_sunday %}일 {% endif %}
+            {% set day_count = 0 %} {% if resume.work_monday %}{% set day_count
+            = day_count + 1 %}{% endif %} {% if resume.work_tuesday %}{% set
+            day_count = day_count + 1 %}{% endif %} {% if resume.work_wednesday
+            %}{% set day_count = day_count + 1 %}{% endif %} {% if
+            resume.work_thursday %}{% set day_count = day_count + 1 %}{% endif
+            %} {% if resume.work_friday %}{% set day_count = day_count + 1 %}{%
+            endif %} {% if resume.work_saturday %}{% set day_count = day_count +
+            1 %}{% endif %} {% if resume.work_sunday %}{% set day_count =
+            day_count + 1 %}{% endif %} {% if day_count == 7 %}
+            <span class="tag">협의 가능</span>
+            {% elif day_count > 0 %} {% if resume.work_monday %}<span
+              class="tag"
+              >월</span
+            >{% endif %} {% if resume.work_tuesday %}<span class="tag">화</span
+            >{% endif %} {% if resume.work_wednesday %}<span class="tag"
+              >수</span
+            >{% endif %} {% if resume.work_thursday %}<span class="tag">목</span
+            >{% endif %} {% if resume.work_friday %}<span class="tag">금</span
+            >{% endif %} {% if resume.work_saturday %}<span class="tag">토</span
+            >{% endif %} {% if resume.work_sunday %}<span class="tag">일</span
+            >{% endif %} {% else %} 미설정 {% endif %}
           </div>
           <strong>희망 근무 시간</strong>
           <span>
