@@ -116,16 +116,11 @@ function updateCurrentLocation(position, accuracy = null) {
 
 // 네비게이션 호출(모바일: 카카오내비, PC: 카카오맵 길찾기)
 function navigateTo(lat, lng, name) {
+  const numLat = Number(lat);
+  const numLng = Number(lng);
   const safeName = encodeURIComponent(name ?? "");
-  const isMobile = /Mobi/i.test(navigator.userAgent);
-
-  if (isMobile) {
-    const url = `kakaonavi-sdk://navigate?destination=${safeName}&x=${lng}&y=${lat}&coord_type=wgs84`;
-    window.location.href = url;
-  } else {
-    const url = `https://map.kakao.com/link/to/${safeName},${lat},${lng}`;
-    window.open(url, "_blank", "noopener,noreferrer");
-  }
+  const url = `https://map.kakao.com/link/to/${safeName},${numLat},${numLng}`;
+  window.open(url, "_blank", "noopener,noreferrer");
 }
 window.navigateTo = navigateTo; // 인포윈도우 버튼에서 호출
 
