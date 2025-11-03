@@ -1,95 +1,185 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>이력서 상세 정보</title>
     <!-- my_resume.html과 동일한 스타일 사용 -->
     <style>
-        body { font-family: sans-serif; background-color: #f4f7f6; }
-        .container { max-width: 800px; margin: 40px auto; padding: 30px; background: white; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.05); }
-        .header { text-align: center; border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 30px; }
-        .header img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; }
-        .header h1 { margin: 10px 0 5px; }
-        .section { margin-bottom: 30px; }
-        .section h2 { font-size: 1.2em; color: #007bff; border-bottom: 2px solid #007bff; padding-bottom: 5px; margin-bottom: 15px; }
-        .grid { display: grid; grid-template-columns: 150px 1fr; gap: 10px; align-items: center; }
-        .grid strong { color: #555; }
-        .tag { display: inline-block; background: #e9ecef; color: #495057; padding: 5px 10px; border-radius: 15px; margin: 2px; }
+      body {
+        font-family: sans-serif;
+        background-color: #f4f7f6;
+      }
+      .container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 30px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+      }
+      .header {
+        text-align: center;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+      }
+      .header img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .header h1 {
+        margin: 10px 0 5px;
+      }
+      .section {
+        margin-bottom: 30px;
+      }
+      .section h2 {
+        font-size: 1.2em;
+        color: #007bff;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 5px;
+        margin-bottom: 15px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        gap: 10px;
+        align-items: center;
+      }
+      .grid strong {
+        color: #555;
+      }
+      .tag {
+        display: inline-block;
+        background: #e9ecef;
+        color: #495057;
+        padding: 5px 10px;
+        border-radius: 15px;
+        margin: 2px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        {% if resume %}
-            <div class="header">
-                <img src="{{ resume.user.profile_image_url or url_for('static', filename='default_profile.png') }}" alt="프로필 사진">
-                <h1>{{ resume.user.username }}님의 이력서</h1>
-            </div>
+      {% if resume %}
+      <div class="header">
+        <img
+          src="{{ resume.user.profile_image_url or url_for('static', filename='default_profile.png') }}"
+          alt="프로필 사진"
+        />
+        <h1>{{ resume.user.username }}님의 이력서</h1>
+      </div>
 
-            <!-- my_resume.html과 동일한 내용 반복 -->
-            <div class="section">
-                <h2>희망 근무 조건</h2>
-                <div class="grid">
-                    <strong>희망 직무분야</strong>
-                    <div>{% for cat in resume.desired_categories.split(',') %}<span class="tag">{{ cat }}</span>{% endfor %}</div>
-                    <strong>희망 근무 형태</strong>
-                    <span>{{ resume.desired_work_type.value if resume.desired_work_type }}</span>
-                    <strong>희망 근무 요일</strong>
-                    <div>
-                        {% if resume.work_monday %}월 {% endif %}
-                        {% if resume.work_tuesday %}화 {% endif %}
-                        {% if resume.work_wednesday %}수 {% endif %}
-                        {% if resume.work_thursday %}목 {% endif %}
-                        {% if resume.work_friday %}금 {% endif %}
-                        {% if resume.work_saturday %}토 {% endif %}
-                        {% if resume.work_sunday %}일 {% endif %}
-                    </div>
-                    <strong>희망 근무 시간</strong>
-                    <span>
-                        {% if resume.is_time_negotiable %}
-                            시간 협의 가능
-                        {% else %}
-                            {{ resume.desired_start_time.strftime('%H:%M') if resume.desired_start_time }} ~ {{ resume.desired_end_time.strftime('%H:%M') if resume.desired_end_time }}
-                        {% endif %}
-                    </span>
-                </div>
-            </div>
+      <!-- my_resume.html과 동일한 내용 반복 -->
+      <div class="section">
+        <h2>기본 정보</h2>
+        <div class="grid">
+          <strong>성별</strong>
+          <span>
+            {% if resume.user.gender == 'male' or resume.user.gender == '남자'
+            %}남성 {% elif resume.user.gender == 'female' or resume.user.gender
+            == '여자' %}여성 {% else %}미설정{% endif %}
+          </span>
+          <strong>생년월일</strong>
+          <span
+            >{% if resume.user.birth_date %}{{
+            resume.user.birth_date.strftime('%Y.%m.%d') }}{% else %}미설정{%
+            endif %}</span
+          >
+          <strong>전화번호</strong>
+          <span>{{ resume.user.phone or '미설정' }}</span>
+          <strong>이메일</strong>
+          <span>{{ resume.user.email or '미설정' }}</span>
+          <strong>주소</strong>
+          <span>
+            {% if resume.user.sido and resume.user.sigungu and resume.user.dong
+            %} {{ resume.user.sido }} {{ resume.user.sigungu }} {{
+            resume.user.dong }} {% else %}미설정{% endif %}
+          </span>
+        </div>
+      </div>
 
-            <div class="section">
-                <h2>경력 및 자기소개</h2>
-                <p>{{ resume.experience }}</p><br>
-                <h3>자기소개</h3>
-                <p>{{ resume.self_introduction }}</p><br>
-            </div>
+      <div class="section">
+        <h2>희망 근무 조건</h2>
+        <div class="grid">
+          <strong>희망 직무분야</strong>
+          <div>
+            {% for cat in resume.desired_categories.split(',') %}<span
+              class="tag"
+              >{{ cat }}</span
+            >{% endfor %}
+          </div>
+          <strong>희망 근무 형태</strong>
+          <span
+            >{{ resume.desired_work_type.value if resume.desired_work_type
+            }}</span
+          >
+          <strong>희망 근무 요일</strong>
+          <div>
+            {% if resume.work_monday %}월 {% endif %} {% if resume.work_tuesday
+            %}화 {% endif %} {% if resume.work_wednesday %}수 {% endif %} {% if
+            resume.work_thursday %}목 {% endif %} {% if resume.work_friday %}금
+            {% endif %} {% if resume.work_saturday %}토 {% endif %} {% if
+            resume.work_sunday %}일 {% endif %}
+          </div>
+          <strong>희망 근무 시간</strong>
+          <span>
+            {% if resume.is_time_negotiable %} 시간 협의 가능 {% else %} {{
+            resume.desired_start_time.strftime('%H:%M') if
+            resume.desired_start_time }} ~ {{
+            resume.desired_end_time.strftime('%H:%M') if resume.desired_end_time
+            }} {% endif %}
+          </span>
+        </div>
+      </div>
 
-            <div class="section">
-                <h2>자격증</h2>
-                {% for cert in resume.certificates %}
-                    <p>{{ cert.name }} - <a href="{{ cert.image_url }}" target="_blank">증명서 보기</a></p>
-                {% else %}
-                    <p>등록된 자격증이 없습니다.</p>
-                {% endfor %}
-            </div>
+      <div class="section">
+        <h2>경력 및 자기소개</h2>
+        <p>{{ resume.experience }}</p>
+        <br />
+        <h3>자기소개</h3>
+        <p>{{ resume.self_introduction }}</p>
+        <br />
+      </div>
 
-            <div class="section">
-                <h2>개인 특성</h2>
-                <div class="grid">
-                    <strong>성격 및 강점</strong>
-                    <div>{% for s in resume.strengths.split(',') %}<span class="tag">{{ s }}</span>{% endfor %}</div>
-                    <strong>이동 가능 시간</strong>
-                    <span>{{ resume.commute_time }}분 이내</span>
-                    <strong>지속 보행 가능 시간</strong>
-                    <span>{{ resume.walkable_minutes }}분</span>
-                    <strong>신체적 특징</strong>
-                    <span>{{ resume.physical_notes }}</span>
-                </div>
-            </div>
-
-            <!-- 수정하기 버튼이 없습니다. -->
-
+      <div class="section">
+        <h2>자격증</h2>
+        {% for cert in resume.certificates %}
+        <p>
+          {{ cert.name }} -
+          <a href="{{ cert.image_url }}" target="_blank">증명서 보기</a>
+        </p>
         {% else %}
-            <!-- 이 경우는 라우트에서 처리되므로 템플릿에서는 굳이 처리할 필요가 없습니다. -->
-            <h1>해당 이력서를 찾을 수 없습니다.</h1>
-        {% endif %}
+        <p>등록된 자격증이 없습니다.</p>
+        {% endfor %}
+      </div>
+
+      <div class="section">
+        <h2>개인 특성</h2>
+        <div class="grid">
+          <strong>성격 및 강점</strong>
+          <div>
+            {% for s in resume.strengths.split(',') %}<span class="tag"
+              >{{ s }}</span
+            >{% endfor %}
+          </div>
+          <strong>이동 가능 시간</strong>
+          <span>{{ resume.commute_time }}분 이내</span>
+          <strong>지속 보행 가능 시간</strong>
+          <span>{{ resume.walkable_minutes }}분</span>
+          <strong>신체적 특징</strong>
+          <span>{{ resume.physical_notes }}</span>
+        </div>
+      </div>
+
+      <!-- 수정하기 버튼이 없습니다. -->
+
+      {% else %}
+      <!-- 이 경우는 라우트에서 처리되므로 템플릿에서는 굳이 처리할 필요가 없습니다. -->
+      <h1>해당 이력서를 찾을 수 없습니다.</h1>
+      {% endif %}
     </div>
-</body>
+  </body>
 </html>

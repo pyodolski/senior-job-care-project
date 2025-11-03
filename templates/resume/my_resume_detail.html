@@ -113,8 +113,9 @@
           <div class="info-row">
             <div class="info-label">성별</div>
             <div class="info-value">
-              {% if resume.user.gender == 'male' %}남성 {% elif
-              resume.user.gender == 'female' %}여성 {% else %}미설정{% endif %}
+              {% if resume.user.gender == 'male' or resume.user.gender == '남자'
+              %}남성 {% elif resume.user.gender == 'female' or
+              resume.user.gender == '여자' %}여성 {% else %}미설정{% endif %}
             </div>
           </div>
           <div class="info-row">
