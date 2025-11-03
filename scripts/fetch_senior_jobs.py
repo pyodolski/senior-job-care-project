@@ -201,13 +201,32 @@ def fetch_and_store_jobs(page_number=1):
         new_jobs_count = 0
         updated_jobs_count = 0
         ai_analyzed_count = 0
+        skipped_jobs_count = 0  # 건너뛴 공고 수
         AI_ANALYSIS_LIMIT = 5  # AI 분석 제한 (토큰 절약)
+
+        today = datetime.now().date()
 
         print(f"총 {len(items)}개의 공고 상세 정보를 조회합니다.")
         print(f"⚠️  AI 분석은 상위 {AI_ANALYSIS_LIMIT}개만 수행합니다.")
+        print(f"(오늘 날짜: {today} / 마감일이 지난 공고는 건너뜁니다)")
 
         for idx, item in enumerate(items, 1):
             job_id = get_text(item, 'jobId')
+
+            end_date_str = get_text(item, 'toDd')
+            recruitment_end_date_obj = None
+
+            if end_date_str:
+                try:
+                    recruitment_end_date_obj = datetime.strptime(end_date_str, '%Y%m%d').date()
+                    # 마감일이 오늘보다 이전이면 건너뜁니다.
+                    if recruitment_end_date_obj < today:
+                        print(f"  ⏭️  공고 건너뜀 (ID: {job_id}): 마감일({recruitment_end_date_obj})이 지났습니다.")
+                        skipped_jobs_count += 1
+                        continue  # 이 공고 처리를 중단하고 다음 루프로 이동
+                except ValueError:
+                    # 날짜 형식이 잘못된 경우 (예: '20230000'), 경고만 출력하고 일단 처리
+                    print(f"  ⚠️  마감일 형식 오류 (ID: {job_id}): {end_date_str}. 일단 처리합니다.")
 
             # 1. 상세 정보 API 호출 (공고마다 개별 호출)
             detail_data = fetch_job_detail(job_id)
@@ -241,8 +260,7 @@ def fetch_and_store_jobs(page_number=1):
                 'region': get_text(item, 'workPlcNm'),
                 'recruitment_start_date': datetime.strptime(get_text(item, 'frDd'), '%Y%m%d').date() if get_text(item,
                                                                                                                  'frDd') else None,
-                'recruitment_end_date': datetime.strptime(get_text(item, 'toDd'), '%Y%m%d').date() if get_text(item,
-                                                                                                               'toDd') else None,
+                'recruitment_end_date': recruitment_end_date_obj,
 
                 # 4. 상세 정보 필드 병합
                 'description': detail_data.get(

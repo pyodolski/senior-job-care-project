@@ -21,6 +21,7 @@ from routes.map import map_bp
 from routes.news import news_bp
 from routes.recommendations import recommendations_bp
 from routes.admin.data_sync import data_sync_bp
+from routes.admin.data_cleanup import data_cleanup_bp
 from flask_socketio import SocketIO
 
 socketio = SocketIO(cors_allowed_origins="*", manage_session=False)
@@ -111,6 +112,7 @@ app.register_blueprint(news_bp)
 app.register_blueprint(map_bp)
 app.register_blueprint(recommendations_bp)
 app.register_blueprint(data_sync_bp)
+app.register_blueprint(data_cleanup_bp)
 
 # CLI 명령어 등록
 register_cli(app)

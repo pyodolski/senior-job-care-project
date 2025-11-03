@@ -411,6 +411,12 @@
             >
               🔄 공공데이터 최신화
             </button>
+            <a
+                    href="{{ url_for('data_cleanup.data_cleanup_page') }}"
+                    class="block w-full bg-red-600 bg-opacity-80 rounded-xl p-3 text-center font-bold hover:bg-opacity-100 transition-all"
+            >
+              🧹 데이터 정리 페이지
+            </a>
             <div id="syncResult" class="mt-2 text-sm"></div>
           </div>
         </section>

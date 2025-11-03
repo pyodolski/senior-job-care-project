@@ -1,6 +1,7 @@
-"""백그라운드 스케줄러 - 공공데이터 자동 수집"""
+"""백그라운드 스케줄러 - 공공데이터 자동 수집, 마감 기한 지난 공고 삭제"""
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
+from scripts.scheduler_service import delete_expired_job_posts
 from datetime import datetime
 import logging
 
@@ -22,6 +23,21 @@ def fetch_senior_jobs_task():
     except Exception as e:
         logger.error(f"❌ 공공데이터 수집 실패: {e}")
 
+
+def delete_expired_jobs_task():
+    """만료된 공고 삭제 작업"""
+    try:
+        logger.info("🗑️ 만료된 공고 삭제 시작...")
+        from app import app
+
+
+        with app.app_context():
+            delete_expired_job_posts()
+
+        logger.info("✅ 만료된 공고 삭제 완료!")
+    except Exception as e:
+        logger.error(f"❌ 만료된 공고 삭제 실패: {e}")
+
 def start_scheduler():
     """스케줄러 시작"""
     scheduler = BackgroundScheduler()
@@ -42,6 +58,14 @@ def start_scheduler():
     #     id='fetch_senior_jobs_startup',
     #     name='공공데이터 수집 (시작시)'
     # )
+
+    scheduler.add_job(
+        func=delete_expired_jobs_task,
+        trigger=CronTrigger(hour=4, minute=0),
+        id='delete_expired_jobs',
+        name='만료 공고 삭제',
+        replace_existing=True
+    )
     
     scheduler.start()
     logger.info("⏰ 스케줄러 시작됨 - 매일 오전 3시 실행")
