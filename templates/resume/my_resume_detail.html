@@ -144,7 +144,7 @@
           </div>
         </div>
 
-        <!-- 희망 급여 -->
+        <!-- 근무 형태 -->
         <div class="bg-white mb-2 px-4 py-4">
           <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
             <svg
@@ -160,7 +160,7 @@
                 d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            희망 급여
+            근무 형태
           </h3>
           <div class="bg-gray-50 rounded-lg p-3">
             <p class="text-sm text-gray-700">
@@ -327,7 +327,7 @@
           </h3>
           <div class="bg-gray-50 rounded-lg p-4">
             <p class="text-sm text-gray-700 whitespace-pre-wrap">
-              {{ resume.experience or '등록된 경력이 없습니다.' }}
+              {{- resume.experience or '등록된 경력이 없습니다.' -}}
             </p>
           </div>
         </div>
@@ -357,7 +357,7 @@
               class="bg-gray-50 rounded-lg p-3 flex items-center justify-between"
             >
               <span class="text-sm text-gray-800 font-medium"
-                >{{ cert.name }}</span
+                >{{- cert.name -}}</span
               >
               {% if cert.image_url %}
               <a
@@ -415,7 +415,7 @@
             <p
               class="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed"
             >
-              {{ resume.self_introduction or '등록된 자기소개가 없습니다.' }}
+              {{- resume.self_introduction or '등록된 자기소개가 없습니다.' -}}
             </p>
           </div>
         </div>
@@ -440,7 +440,7 @@
             <div class="pt-2 border-t">
               <span class="text-sm text-gray-600">신체적 특징</span>
               <p class="text-sm text-gray-800 mt-1 whitespace-pre-wrap">
-                {{ resume.physical_notes }}
+                {{- resume.physical_notes -}}
               </p>
             </div>
             {% endif %}

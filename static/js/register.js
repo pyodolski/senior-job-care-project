@@ -313,6 +313,47 @@ function confirmLocation() {
   }
 }
 
+// 주소 검색 기능
+function searchAddress() {
+  const keyword = document.getElementById("map-search-input").value.trim();
+
+  if (!keyword) {
+    alert("검색할 주소를 입력해주세요.");
+    return;
+  }
+
+  // 카카오 주소 검색 서비스
+  const ps = new kakao.maps.services.Places();
+
+  ps.keywordSearch(keyword, function (result, status) {
+    if (status === kakao.maps.services.Status.OK) {
+      // 첫 번째 검색 결과로 이동
+      const place = result[0];
+      const moveLatLon = new kakao.maps.LatLng(place.y, place.x);
+
+      // 지도 중심 이동
+      map.setCenter(moveLatLon);
+
+      // 마커 이동
+      if (!marker) {
+        marker = new kakao.maps.Marker({
+          position: moveLatLon,
+          map: map,
+        });
+      } else {
+        marker.setPosition(moveLatLon);
+      }
+
+      // 주소 정보 가져오기
+      getAddressFromCoords(place.y, place.x);
+    } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+      alert("검색 결과가 없습니다.");
+    } else {
+      alert("검색 중 오류가 발생했습니다.");
+    }
+  });
+}
+
 // 뒤로가기
 function goBack() {
   if (currentStep === 1) {
@@ -437,9 +478,7 @@ function useMyName(event) {
   }
 }
 
-
 async function nextStep() {
-
   switch (currentStep) {
     case 1:
       const username = document.getElementById("username").value;
@@ -447,9 +486,9 @@ async function nextStep() {
       const button = document.getElementById("next-button");
 
       if (!username || username.trim() === "") {
-        errorEl.textContent = '아이디를 입력해주세요.';
-        errorEl.classList.remove('hidden', 'text-green-500');
-        errorEl.classList.add('text-red-500');
+        errorEl.textContent = "아이디를 입력해주세요.";
+        errorEl.classList.remove("hidden", "text-green-500");
+        errorEl.classList.add("text-red-500");
         return;
       }
 
@@ -460,8 +499,8 @@ async function nextStep() {
         const checkUrl = document.body.dataset.checkUsernameUrl;
 
         const response = await fetch(checkUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username: username }),
         });
 
@@ -469,32 +508,30 @@ async function nextStep() {
 
         if (data.available) {
           errorEl.textContent = data.message;
-          errorEl.classList.remove('hidden', 'text-red-500');
-          errorEl.classList.add('text-green-500');
+          errorEl.classList.remove("hidden", "text-red-500");
+          errorEl.classList.add("text-green-500");
 
           formData.username = username;
 
           setTimeout(() => {
             currentStep++;
             showStep(currentStep);
-            errorEl.classList.add('hidden');
+            errorEl.classList.add("hidden");
             button.textContent = "다음";
           }, 1000);
-
         } else {
           // 아이디 중복 또는 오류
           errorEl.textContent = data.message;
-          errorEl.classList.remove('hidden', 'text-green-500');
-          errorEl.classList.add('text-red-500');
+          errorEl.classList.remove("hidden", "text-green-500");
+          errorEl.classList.add("text-red-500");
           button.disabled = false;
           button.textContent = "다음";
         }
-
       } catch (error) {
-        console.error('아이디 확인 중 오류:', error);
-        errorEl.textContent = '아이디 확인 중 오류가 발생했습니다.';
-        errorEl.classList.remove('hidden', 'text-green-500');
-        errorEl.classList.add('text-red-500');
+        console.error("아이디 확인 중 오류:", error);
+        errorEl.textContent = "아이디 확인 중 오류가 발생했습니다.";
+        errorEl.classList.remove("hidden", "text-green-500");
+        errorEl.classList.add("text-red-500");
         button.disabled = false;
         button.textContent = "다음";
       }
@@ -588,14 +625,13 @@ document.getElementById("sido").addEventListener("change", updateNextButton);
 document.getElementById("sigungu").addEventListener("change", updateNextButton);
 document.getElementById("dong").addEventListener("change", updateNextButton);
 
-document.getElementById("username").addEventListener("input", function() {
+document.getElementById("username").addEventListener("input", function () {
   const errorEl = document.getElementById("username-error");
-  if (errorEl && !errorEl.classList.contains('hidden')) {
-    errorEl.classList.add('hidden');
-    errorEl.classList.remove('text-green-500', 'text-red-500');
+  if (errorEl && !errorEl.classList.contains("hidden")) {
+    errorEl.classList.add("hidden");
+    errorEl.classList.remove("text-green-500", "text-red-500");
   }
 });
-
 
 // Enter 키로 다음 단계
 document.querySelectorAll("input").forEach((input) => {

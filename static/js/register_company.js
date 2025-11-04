@@ -60,13 +60,9 @@ function updateNextButton() {
 
         // 비밀번호 불일치 에러 메시지
         if (confirmPassword !== "" && password !== confirmPassword) {
-          document
-            .getElementById("password-error")
-            .classList.remove("hidden");
+          document.getElementById("password-error").classList.remove("hidden");
         } else {
-          document
-            .getElementById("password-error")
-            .classList.add("hidden");
+          document.getElementById("password-error").classList.add("hidden");
         }
       } else {
         document
@@ -76,12 +72,10 @@ function updateNextButton() {
       }
       break;
     case 3:
-      isValid =
-        document.getElementById("company-name").value.trim() !== "";
+      isValid = document.getElementById("company-name").value.trim() !== "";
       break;
     case 4:
-      isValid =
-        document.getElementById("manager-name").value.trim() !== "";
+      isValid = document.getElementById("manager-name").value.trim() !== "";
       break;
     case 5:
       const email = document.getElementById("email").value.trim();
@@ -107,19 +101,11 @@ function updateNextButton() {
   if (isValid) {
     button.disabled = false;
     button.classList.remove("bg-gray-300", "text-gray-500");
-    button.classList.add(
-      "bg-blue-900",
-      "text-white",
-      "hover:bg-blue-800"
-    );
+    button.classList.add("bg-blue-900", "text-white", "hover:bg-blue-800");
   } else {
     button.disabled = true;
     button.classList.add("bg-gray-300", "text-gray-500");
-    button.classList.remove(
-      "bg-blue-900",
-      "text-white",
-      "hover:bg-blue-800"
-    );
+    button.classList.remove("bg-blue-900", "text-white", "hover:bg-blue-800");
   }
 }
 
@@ -133,9 +119,9 @@ async function nextStep() {
       const button = document.getElementById("next-button");
 
       if (!username || username.trim() === "") {
-        errorEl.textContent = '아이디를 입력해주세요.';
-        errorEl.classList.remove('hidden', 'text-green-500');
-        errorEl.classList.add('text-red-500');
+        errorEl.textContent = "아이디를 입력해주세요.";
+        errorEl.classList.remove("hidden", "text-green-500");
+        errorEl.classList.add("text-red-500");
         return;
       }
 
@@ -144,8 +130,8 @@ async function nextStep() {
 
       try {
         const response = await fetch(CHECK_USERNAME_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username: username }),
         });
 
@@ -154,8 +140,8 @@ async function nextStep() {
         if (data.available) {
           // 아이디 사용 가능
           errorEl.textContent = data.message;
-          errorEl.classList.remove('hidden', 'text-red-500');
-          errorEl.classList.add('text-green-500');
+          errorEl.classList.remove("hidden", "text-red-500");
+          errorEl.classList.add("text-green-500");
 
           formData.username = username; // formData에 아이디 저장
 
@@ -163,25 +149,23 @@ async function nextStep() {
           setTimeout(() => {
             currentStep++;
             showStep(currentStep);
-            errorEl.classList.add('hidden'); // 다음 단계로 가면 메시지 숨김
+            errorEl.classList.add("hidden"); // 다음 단계로 가면 메시지 숨김
             button.textContent = "다음"; // 버튼 텍스트 복원
           }, 1000);
-
         } else {
           // 아이디 중복 또는 오류
           errorEl.textContent = data.message;
-          errorEl.classList.remove('hidden', 'text-green-500');
-          errorEl.classList.add('text-red-500');
+          errorEl.classList.remove("hidden", "text-green-500");
+          errorEl.classList.add("text-red-500");
           button.disabled = false; // 다시 시도할 수 있도록 버튼 활성화
           button.textContent = "다음";
           // 1단계에 머무름
         }
-
       } catch (error) {
-        console.error('아이디 확인 중 오류:', error);
-        errorEl.textContent = '아이디 확인 중 오류가 발생했습니다.';
-        errorEl.classList.remove('hidden', 'text-green-500');
-        errorEl.classList.add('text-red-500');
+        console.error("아이디 확인 중 오류:", error);
+        errorEl.textContent = "아이디 확인 중 오류가 발생했습니다.";
+        errorEl.classList.remove("hidden", "text-green-500");
+        errorEl.classList.add("text-red-500");
         button.disabled = false;
         button.textContent = "다음";
       }
@@ -193,23 +177,19 @@ async function nextStep() {
         document.getElementById("confirm-password").value;
       break;
     case 3:
-      formData.companyName =
-        document.getElementById("company-name").value;
+      formData.companyName = document.getElementById("company-name").value;
       break;
     case 4:
-      formData.managerName =
-        document.getElementById("manager-name").value;
+      formData.managerName = document.getElementById("manager-name").value;
       break;
     case 5:
       formData.email = document.getElementById("email").value;
       break;
     case 6:
-      formData.companySido =
-        document.getElementById("company-sido").value;
+      formData.companySido = document.getElementById("company-sido").value;
       formData.companySigungu =
         document.getElementById("company-sigungu").value;
-      formData.companyDong =
-        document.getElementById("company-dong").value;
+      formData.companyDong = document.getElementById("company-dong").value;
       formData.companyFullAddress = document.getElementById(
         "company-full-address"
       ).value;
@@ -220,8 +200,7 @@ async function nextStep() {
       document.getElementById("final-password").value = formData.password;
       document.getElementById("final-confirm-password").value =
         formData.confirmPassword;
-      document.getElementById("final-nickname").value =
-        formData.companyName;
+      document.getElementById("final-nickname").value = formData.companyName;
       document.getElementById("final-name").value = formData.managerName;
       document.getElementById("final-email").value = formData.email;
       document.getElementById("final-company-sido").value =
@@ -235,8 +214,7 @@ async function nextStep() {
 
       currentStep++;
       showStep(currentStep);
-      document.getElementById("next-button-container").style.display =
-        "none";
+      document.getElementById("next-button-container").style.display = "none";
 
       // 폼 제출
       setTimeout(() => {
@@ -336,28 +314,24 @@ function initCompanyMap() {
   }
 
   // 지도 클릭 이벤트
-  kakao.maps.event.addListener(
-    companyMap,
-    "click",
-    function (mouseEvent) {
-      const latlng = mouseEvent.latLng;
-      const lat = latlng.getLat();
-      const lng = latlng.getLng();
+  kakao.maps.event.addListener(companyMap, "click", function (mouseEvent) {
+    const latlng = mouseEvent.latLng;
+    const lat = latlng.getLat();
+    const lng = latlng.getLng();
 
-      // 마커 이동
-      if (!companyMarker) {
-        companyMarker = new kakao.maps.Marker({
-          position: latlng,
-          map: companyMap,
-        });
-      } else {
-        companyMarker.setPosition(latlng);
-      }
-
-      // 주소 가져오기
-      getCompanyAddressFromCoords(lat, lng);
+    // 마커 이동
+    if (!companyMarker) {
+      companyMarker = new kakao.maps.Marker({
+        position: latlng,
+        map: companyMap,
+      });
+    } else {
+      companyMarker.setPosition(latlng);
     }
-  );
+
+    // 주소 가져오기
+    getCompanyAddressFromCoords(lat, lng);
+  });
 }
 
 // 회사 주소 좌표로 주소 가져오기
@@ -441,13 +415,52 @@ function confirmCompanyLocation() {
   }
 }
 
+// 회사 주소 검색 기능
+function searchCompanyAddress() {
+  const keyword = document
+    .getElementById("company-map-search-input")
+    .value.trim();
+
+  if (!keyword) {
+    alert("검색할 주소를 입력해주세요.");
+    return;
+  }
+
+  // 카카오 주소 검색 서비스
+  const ps = new kakao.maps.services.Places();
+
+  ps.keywordSearch(keyword, function (result, status) {
+    if (status === kakao.maps.services.Status.OK) {
+      // 첫 번째 검색 결과로 이동
+      const place = result[0];
+      const moveLatLon = new kakao.maps.LatLng(place.y, place.x);
+
+      // 지도 중심 이동
+      companyMap.setCenter(moveLatLon);
+
+      // 마커 이동
+      if (!companyMarker) {
+        companyMarker = new kakao.maps.Marker({
+          position: moveLatLon,
+          map: companyMap,
+        });
+      } else {
+        companyMarker.setPosition(moveLatLon);
+      }
+
+      // 주소 정보 가져오기
+      getCompanyAddressFromCoords(place.y, place.x);
+    } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+      alert("검색 결과가 없습니다.");
+    } else {
+      alert("검색 중 오류가 발생했습니다.");
+    }
+  });
+}
+
 // 입력 이벤트 리스너
-document
-  .getElementById("username")
-  .addEventListener("input", updateNextButton);
-document
-  .getElementById("password")
-  .addEventListener("input", updateNextButton);
+document.getElementById("username").addEventListener("input", updateNextButton);
+document.getElementById("password").addEventListener("input", updateNextButton);
 document
   .getElementById("confirm-password")
   .addEventListener("input", updateNextButton);
@@ -457,9 +470,7 @@ document
 document
   .getElementById("manager-name")
   .addEventListener("input", updateNextButton);
-document
-  .getElementById("email")
-  .addEventListener("input", updateNextButton);
+document.getElementById("email").addEventListener("input", updateNextButton);
 document
   .getElementById("business_registration")
   .addEventListener("change", updateNextButton);
@@ -467,10 +478,7 @@ document
 // Enter 키로 다음 단계
 document.querySelectorAll("input").forEach((input) => {
   input.addEventListener("keypress", function (e) {
-    if (
-      e.key === "Enter" &&
-      !document.getElementById("next-button").disabled
-    ) {
+    if (e.key === "Enter" && !document.getElementById("next-button").disabled) {
       e.preventDefault();
       nextStep();
     }

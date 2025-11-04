@@ -11,16 +11,21 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/first_login_page.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/first_login_page.css') }}"
+    />
   </head>
   <body class="bg-gray-100">
     <div
-      class="w-full max-w-md mx-auto px-4 bg-white shadow-lg min-h-screen flex items-center justify-center"
+      class="w-full bg-white shadow-lg min-h-screen flex items-center justify-center"
     >
-      <div class="w-full p-6 sm:p-8">
+      <div class="w-full p-6 sm:p-8 px-4">
         <!-- Logo -->
         <div class="flex justify-center mb-6">
-          <div class="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center">
+          <div
+            class="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center"
+          >
             <img
               src="{{ url_for('static', filename='images/header/logo.png') }}"
               alt="이음 로고"
@@ -30,7 +35,9 @@
         </div>
 
         <!-- 이음 Title -->
-        <h1 class="logo-font text-3xl sm:text-4xl text-[#023591] text-center mb-8 sm:mb-12">
+        <h1
+          class="logo-font text-3xl sm:text-4xl text-[#023591] text-center mb-8 sm:mb-12"
+        >
           이음
         </h1>
 
@@ -76,7 +83,9 @@
           href="{{ url_for('auth.home') }}"
           class="w-full h-14 sm:h-[59px] bg-[#F3F4F6] rounded-[10px] hover:bg-gray-300 transition-colors flex items-center justify-center"
         >
-          <span class="font-medium text-lg sm:text-xl tracking-[-0.5px] text-black">
+          <span
+            class="font-medium text-lg sm:text-xl tracking-[-0.5px] text-black"
+          >
             로그인하기
           </span>
         </a>
