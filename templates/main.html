@@ -412,8 +412,8 @@
               🔄 공공데이터 최신화
             </button>
             <a
-                    href="{{ url_for('data_cleanup.data_cleanup_page') }}"
-                    class="block w-full bg-red-600 bg-opacity-80 rounded-xl p-3 text-center font-bold hover:bg-opacity-100 transition-all"
+              href="{{ url_for('data_cleanup.data_cleanup_page') }}"
+              class="block w-full bg-red-600 bg-opacity-80 rounded-xl p-3 text-center font-bold hover:bg-opacity-100 transition-all"
             >
               🧹 데이터 정리 페이지
             </a>
@@ -533,7 +533,7 @@
                 <button
                   class="text-white font-bold py-2 px-4 rounded-full text-sm"
                   style="background-color: #023591"
-                  onclick="event.stopPropagation(); applyJob({{ job.id }})"
+                  onclick="event.stopPropagation(); applyJob({{ job.id }}, '{{ job.source or '' }}')"
                 >
                   지원하기
                 </button>

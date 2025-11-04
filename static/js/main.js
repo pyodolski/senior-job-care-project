@@ -21,7 +21,14 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // 공고 지원하기 함수
-async function applyJob(jobId) {
+async function applyJob(jobId, source) {
+  // 공공데이터 공고(K-Senior)인 경우 상세 페이지로 이동하면서 모달 자동 열기
+  if (source === "K-Senior") {
+    window.location.href = `/company/${jobId}?showContact=true`;
+    return;
+  }
+
+  // 일반 공고인 경우 기존 로직 실행
   if (
     !confirm(
       "이 공고에 지원하시겠습니까?\n지원하면 자동으로 채팅방이 생성됩니다."
