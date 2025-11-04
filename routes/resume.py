@@ -67,18 +67,21 @@ def create_resume():
             except ValueError:
                 return None
 
+        # 요일 협의 가능 여부 확인
+        is_day_negotiable = 'is_day_negotiable' in request.form
+        
         # 폼 데이터 수집
         resume_data = {
             'is_public': 'is_public' in request.form,
             'desired_categories': ",".join(request.form.getlist('categories')),
             'desired_work_type': request.form.get('desired_work_type'),
-            'work_monday': 'work_monday' in request.form,
-            'work_tuesday': 'work_tuesday' in request.form,
-            'work_wednesday': 'work_wednesday' in request.form,
-            'work_thursday': 'work_thursday' in request.form,
-            'work_friday': 'work_friday' in request.form,
-            'work_saturday': 'work_saturday' in request.form,
-            'work_sunday': 'work_sunday' in request.form,
+            'work_monday': 'work_monday' in request.form or is_day_negotiable,
+            'work_tuesday': 'work_tuesday' in request.form or is_day_negotiable,
+            'work_wednesday': 'work_wednesday' in request.form or is_day_negotiable,
+            'work_thursday': 'work_thursday' in request.form or is_day_negotiable,
+            'work_friday': 'work_friday' in request.form or is_day_negotiable,
+            'work_saturday': 'work_saturday' in request.form or is_day_negotiable,
+            'work_sunday': 'work_sunday' in request.form or is_day_negotiable,
             'is_time_negotiable': 'is_time_negotiable' in request.form,
             'desired_start_time': parse_time(request.form.get('start_time')),
             'desired_end_time': parse_time(request.form.get('end_time')),
@@ -221,16 +224,20 @@ def resume_preview():
     print("================")
     
     # 요일 데이터 처리
-    work_days = []
-    if request.form.get('work_monday'): work_days.append('월')
-    if request.form.get('work_tuesday'): work_days.append('화')
-    if request.form.get('work_wednesday'): work_days.append('수')
-    if request.form.get('work_thursday'): work_days.append('목')
-    if request.form.get('work_friday'): work_days.append('금')
-    if request.form.get('work_saturday'): work_days.append('토')
-    if request.form.get('work_sunday'): work_days.append('일')
+    is_day_negotiable = request.form.get('is_day_negotiable') == 'on'
     
-    days_text = '요일 협의 가능' if request.form.get('is_day_negotiable') else (', '.join(work_days) if work_days else '선택 안 함')
+    if is_day_negotiable:
+        days_text = '요일 협의 가능'
+    else:
+        work_days = []
+        if request.form.get('work_monday'): work_days.append('월')
+        if request.form.get('work_tuesday'): work_days.append('화')
+        if request.form.get('work_wednesday'): work_days.append('수')
+        if request.form.get('work_thursday'): work_days.append('목')
+        if request.form.get('work_friday'): work_days.append('금')
+        if request.form.get('work_saturday'): work_days.append('토')
+        if request.form.get('work_sunday'): work_days.append('일')
+        days_text = ', '.join(work_days) if work_days else '미설정'
     time_text = '시간 협의 가능' if request.form.get('is_time_negotiable') else f"{request.form.get('start_time', '09:00')} ~ {request.form.get('end_time', '18:00')}"
     
     # 미리보기 데이터 생성
@@ -290,18 +297,21 @@ def submit_resume():
         except ValueError:
             return None
     
+    # 요일 협의 가능 여부 확인
+    is_day_negotiable = 'is_day_negotiable' in form_data
+    
     # 데이터 변환
     resume_data = {
         'is_public': 'is_public' in form_data,
         'desired_categories': ",".join(form_data.get('categories', [])),
         'desired_work_type': form_data.get('desired_work_type', [None])[0],
-        'work_monday': 'work_monday' in form_data,
-        'work_tuesday': 'work_tuesday' in form_data,
-        'work_wednesday': 'work_wednesday' in form_data,
-        'work_thursday': 'work_thursday' in form_data,
-        'work_friday': 'work_friday' in form_data,
-        'work_saturday': 'work_saturday' in form_data,
-        'work_sunday': 'work_sunday' in form_data,
+        'work_monday': 'work_monday' in form_data or is_day_negotiable,
+        'work_tuesday': 'work_tuesday' in form_data or is_day_negotiable,
+        'work_wednesday': 'work_wednesday' in form_data or is_day_negotiable,
+        'work_thursday': 'work_thursday' in form_data or is_day_negotiable,
+        'work_friday': 'work_friday' in form_data or is_day_negotiable,
+        'work_saturday': 'work_saturday' in form_data or is_day_negotiable,
+        'work_sunday': 'work_sunday' in form_data or is_day_negotiable,
         'is_time_negotiable': 'is_time_negotiable' in form_data,
         'desired_start_time': parse_time(form_data.get('start_time', [None])[0]),
         'desired_end_time': parse_time(form_data.get('end_time', [None])[0]),
