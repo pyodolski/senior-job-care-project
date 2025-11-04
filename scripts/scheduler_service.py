@@ -1,8 +1,7 @@
-from models import db, JobPost
+from models import db, JobPost, JobBookmark, JobApplication, ChatRoom, JobSuggestion
 from models import get_kst_now  # KST 시간 헬퍼
 import logging
 
-# 로깅 설정
 logger = logging.getLogger(__name__)
 
 
@@ -16,19 +15,41 @@ def delete_expired_job_posts():
             JobPost.recruitment_end_date < today
         )
 
-        # 삭제 전 로그를 위해 카운트
-        count = expired_jobs_query.count()
+        expired_job_ids = [job.id for job in expired_jobs_query.all()]
+        count = len(expired_job_ids)
 
         if count > 0:
-            logger.info(f"[Scheduler] {count}개의 만료된 공고를 찾았습니다. 삭제를 시작합니다.")
+            logger.info(f"[Scheduler] {count}개의 만료된 공고를 찾았습니다. 종속 데이터 삭제를 시작합니다.")
 
-            expired_jobs_query.delete(synchronize_session=False)
+            JobBookmark.query.filter(JobBookmark.job_id.in_(expired_job_ids)).delete(synchronize_session=False)
+
+            JobApplication.query.filter(JobApplication.job_id.in_(expired_job_ids)).delete(synchronize_session=False)
+
+            expired_chat_rooms = ChatRoom.query.filter(ChatRoom.job_id.in_(expired_job_ids)).all()
+            expired_room_ids = [room.id for room in expired_chat_rooms]
+
+            if expired_room_ids:
+                from models import ChatMessage
+                ChatMessage.query.filter(ChatMessage.room_id.in_(expired_room_ids)).delete(synchronize_session=False)
+
+            # ChatRoom 삭제
+            ChatRoom.query.filter(ChatRoom.job_id.in_(expired_job_ids)).delete(synchronize_session=False)
+
+            # 제안 삭제
+            JobSuggestion.query.filter(JobSuggestion.job_id.in_(expired_job_ids)).delete(synchronize_session=False)
+
+            logger.info("[Scheduler] 모든 종속 데이터 삭제 완료. JobPost 삭제를 시작합니다.")
+
+            # 공고 삭제
+
+            JobPost.query.filter(JobPost.id.in_(expired_job_ids)).delete(synchronize_session=False)
 
             db.session.commit()
-            logger.info(f"[Scheduler] {count}개의 만료된 공고 삭제 완료.")
+            logger.info(f"[Scheduler] {count}개의 만료된 공고 및 연관 데이터 삭제 완료.")
         else:
             logger.info("[Scheduler] 만료된 공고가 없습니다.")
 
     except Exception as e:
         logger.error(f"[Scheduler] 만료된 공고 삭제 중 오류 발생: {e}")
         db.session.rollback()
+

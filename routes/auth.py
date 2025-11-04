@@ -788,6 +788,45 @@ def edit_profile_image():
     return render_template('edit_profile_image.html', user=user, profile_url=profile_url)
 
 
+# 프로필 이미지 삭제
+
+@auth_bp.route('/delete_profile_image', methods=['POST'])
+@login_required
+def delete_profile_image():
+    user = current_user
+
+    #  프로필 이미지가 없는 경우
+    if not user.profile_image:
+        return redirect(url_for('auth.profile'))
+
+    s3_key = user.profile_image
+
+    try:
+        #  S3에서 삭제
+        print(f"=== S3에서 프로필 이미지 삭제 시도: {s3_key} ===")
+
+        # S3 파일 삭제
+        s3_client = boto3.client(
+            's3',
+            aws_access_key_id=current_app.config.get('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=current_app.config.get('AWS_SECRET_ACCESS_KEY'),
+            region_name=current_app.config.get('AWS_S3_REGION')
+        )
+        bucket_name = current_app.config.get('AWS_S3_BUCKET_NAME')
+        s3_client.delete_object(Bucket=bucket_name, Key=s3_key)
+
+        print(f"✅ S3 삭제 성공: {s3_key}")
+
+        # 3. DB에서 profile_image 필드를 NULL로 설정
+        user.profile_image = None
+        db.session.commit()
+
+    except Exception as e:
+        db.session.rollback()
+
+
+    return redirect(url_for('auth.profile'))
+
 # 사용자 정보 업데이트 (이력서 작성 전)
 @auth_bp.route("/update-user-info", methods=["POST"])
 @login_required
