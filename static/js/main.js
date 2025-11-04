@@ -192,8 +192,8 @@ function startVoiceSearch() {
     // 음성 피드백
     speak("검색 중입니다");
 
-    // 공고 검색 페이지로 이동 (파라미터: q)
-    window.location.href = `/jobs?q=${encodeURIComponent(transcript)}`;
+    // 기업이음 공고 검색 페이지로 이동 (파라미터: q)
+    window.location.href = `/company?q=${encodeURIComponent(transcript)}`;
   };
 
   // 음성 인식 종료
