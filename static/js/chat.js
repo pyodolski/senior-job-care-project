@@ -4,7 +4,7 @@
 const socket = io({ withCredentials: true }); // 세션 기반 인증 공유
 
 // 템플릿에서 주입된 전역 값 사용
-const ROOM_ID = window.roomId;
+const ROOM_ID = parseInt(window.roomId) || 0;
 const CURRENT_USER_ID = window.currentUserId;
 const CURRENT_USER_NAME = window.currentUserName || "?";
 const OTHER_USER_NAME = window.otherUserName || "?";
@@ -214,8 +214,10 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener("DOMContentLoaded", function () {
   // 연결되면 방 참가 + 초기 읽음 처리
   socket.on("connect", () => {
-    socket.emit("join", { room_id: ROOM_ID }); // 방 참가
-    socket.emit("read_messages", { room_id: ROOM_ID }); // 초기 읽음 처리
+    if (ROOM_ID > 0) {
+      socket.emit("join", { room_id: ROOM_ID }); // 방 참가
+      socket.emit("read_messages", { room_id: ROOM_ID }); // 초기 읽음 처리
+     }
   });
 
   socket.on("connect_error", (err) =>
