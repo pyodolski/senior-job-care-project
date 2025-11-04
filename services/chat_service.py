@@ -17,7 +17,7 @@
 from models import db, ChatRoom, ChatMessage, JobPost, User, JobApplication
 from sqlalchemy import select,or_, and_, desc, func, case
 from datetime import datetime
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased, joinedload
 from utils.files_handler import generate_presigned_get_url
 
 class ChatService:
@@ -257,7 +257,8 @@ class ChatService:
         ).first_or_404()
         
         # 메시지 조회 (최신 순)
-        pagination = ChatMessage.query.filter_by(room_id=room_id)\
+        pagination = ChatMessage.query.filter_by(room_id=room_id) \
+            .options(joinedload(ChatMessage.sender)) \
             .order_by(desc(ChatMessage.created_at))\
             .paginate(page=page, per_page=per_page, error_out=False)
         return pagination

@@ -86,7 +86,7 @@
           <div class="message-avatar">
             {% if message.sender.profile_image %}
             <img
-              src="{{ message.sender.profile_image }}"
+              src="{{ generate_url(message.sender.profile_image) }}"
               alt="{{ message.sender.nickname }}"
             />
             {% else %} {{ message.sender.nickname[0] if message.sender.nickname

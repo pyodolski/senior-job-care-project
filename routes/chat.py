@@ -18,9 +18,18 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from services.chat_service import ChatService
 from services.application_service import ApplicationService
+from utils.files_handler import generate_presigned_get_url
 
 # 채팅 관련 블루프린트 생성
 chat_bp = Blueprint("chat", __name__)
+
+
+@chat_bp.app_template_global()
+def generate_url(key):
+    """템플릿에서 파일 경로(key)를 Presigned URL로 변환하는 함수"""
+    if not key:
+        return None
+    return generate_presigned_get_url(key)
 
 @chat_bp.route("/chat")
 @login_required
@@ -87,7 +96,7 @@ def chat_room(room_id):
     
     # 상대방 정보
     other_user = room.employer if room.applicant_id == current_user.id else room.applicant
-    
+
     # 메시지를 읽음으로 표시
     ChatService.mark_messages_as_read(room_id, current_user.id)
     
