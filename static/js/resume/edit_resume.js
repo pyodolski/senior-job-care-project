@@ -18,22 +18,22 @@ function showStep(step) {
 
 function updateFooterButton() {
   const footerBtn = document.getElementById("footer-next-btn");
-  const isLastStep = currentStep === 7 || currentStep === "7";
+  const isLastStep = currentStep === 6;
 
   if (isLastStep) {
-    footerBtn.textContent = "제출하기";
-    footerBtn.classList.remove("bg-blue-600", "hover:bg-blue-700");
-    footerBtn.classList.add("bg-green-600", "hover:bg-green-700");
+    footerBtn.textContent = "미리보기";
   } else {
     footerBtn.textContent = "다음";
-    footerBtn.classList.remove("bg-green-600", "hover:bg-green-700");
-    footerBtn.classList.add("bg-blue-600", "hover:bg-blue-700");
   }
+
+  // 항상 파란색 유지
+  footerBtn.classList.remove("bg-green-600", "hover:bg-green-700");
+  footerBtn.classList.add("bg-blue-600", "hover:bg-blue-700");
 }
 
 function handleFooterNext() {
-  if (currentStep === 7 || currentStep === "7") {
-    // 마지막 단계(미리보기)에서는 form submit
+  if (currentStep === 6) {
+    // 마지막 단계에서는 form submit
     document.querySelector("form").submit();
   } else {
     // 다음 단계로 이동
@@ -45,7 +45,6 @@ function handleFooterNext() {
     else if (currentStep === 5) nextStepValue = "5-2";
     else if (currentStep === "5-2") nextStepValue = "5-3";
     else if (currentStep === "5-3") nextStepValue = 6;
-    else if (currentStep === 6) nextStepValue = 7;
     else nextStepValue = currentStep + 1;
 
     nextStep(nextStepValue);
