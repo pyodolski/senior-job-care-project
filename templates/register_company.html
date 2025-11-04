@@ -19,9 +19,9 @@
     />
   </head>
   <body class="bg-gray-100">
-    <div class="w-full max-w-md mx-auto px-4 bg-white shadow-lg min-h-screen">
+    <div class="w-full bg-white shadow-lg min-h-screen">
       <!-- 상단 헤더 -->
-      <div class="pt-6 pb-4">
+      <div class="pt-6 pb-4 px-4">
         <div class="flex items-center justify-between mb-4">
           <button type="button" onclick="goBack()" class="text-gray-600">
             <svg
@@ -287,8 +287,8 @@
       class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
     >
       <div
-        class="bg-white rounded-lg overflow-hidden"
-        style="width: 80%; max-width: 400px; height: 45vh"
+        class="bg-white rounded-lg overflow-hidden w-[90%] sm:w-[80%] md:w-[70%] lg:w-[60%] xl:w-[50%]"
+        style="max-width: 600px; height: 45vh"
       >
         <!-- 모달 헤더 -->
         <div class="p-4 border-b flex items-center justify-between">
@@ -314,10 +314,42 @@
           </button>
         </div>
 
+        <!-- 검색창 -->
+        <div class="p-4 border-b">
+          <div class="relative">
+            <input
+              type="text"
+              id="company-map-search-input"
+              placeholder="주소를 검색하세요"
+              class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onkeypress="if(event.key === 'Enter') searchCompanyAddress()"
+            />
+            <button
+              type="button"
+              onclick="searchCompanyAddress()"
+              class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
         <!-- 지도 영역 -->
         <div
           id="company-map"
-          style="width: 100%; height: calc(100% - 180px)"
+          style="width: 100%; height: calc(100% - 240px)"
         ></div>
 
         <!-- 주소 표시 및 확인 버튼 -->
