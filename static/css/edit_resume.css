@@ -38,10 +38,8 @@ body {
   z-index: 50;
 }
 .step-container {
-  border: 1px solid #ddd;
   padding: 20px;
   margin-top: 20px;
-  border-radius: 8px;
 }
 #step-5 {
   border: none;

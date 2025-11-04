@@ -570,9 +570,9 @@
                 {% for work_type in all_work_types %}
                 <label class="work-type-label">
                   <input type="radio" name="desired_work_type" value="{{
-                  work_type.name }}" class="hidden work-type-radio" {% if resume
-                  and resume.desired_work_type == work_type %}checked{% endif
-                  %}>
+                  work_type.value }}" class="hidden work-type-radio" {% if
+                  resume and resume.desired_work_type == work_type.value
+                  %}checked{% endif %}>
                   <span class="work-type-btn">{{ work_type.value }}</span>
                 </label>
                 {% endfor %}
