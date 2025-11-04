@@ -553,20 +553,12 @@ def edit_job(job_id):
 @login_required
 def delete_job(job_id):
     job = JobPost.query.get_or_404(job_id)
-    
-    # 작성자만 삭제 가능
-    if job.author_id != current_user.id:
-        flash("본인이 작성한 공고만 삭제할 수 있습니다.", "error")
-        return redirect(url_for("jobs.job_detail", job_id=job_id))
-    
+
     try:
-        db.session.delete(job)
-        db.session.commit()
-        flash("공고가 삭제되었습니다.", "success")
-        return redirect(url_for("jobs.job_list"))
+        JobService.delete_job_safely(job_id)
+        return redirect(url_for("jobs.my_posts"))
     except Exception as e:
         db.session.rollback()
-        flash("공고 삭제 중 오류가 발생했습니다.", "error")
         return redirect(url_for("jobs.job_detail", job_id=job_id))
 
 @jobs_bp.route("/jobs/<int:job_id>/bookmark", methods=["POST"])

@@ -4,6 +4,7 @@ from flask_login import current_user
 from flask_socketio import emit, join_room, leave_room
 from models import ChatRoom, ChatMessage, db
 from services.chat_service import ChatService
+from utils.files_handler import generate_presigned_get_url
 
 def init_chat_socketio(socketio):
     # 채팅방 룸명
@@ -76,12 +77,19 @@ def init_chat_socketio(socketio):
             return
         try:
             msg = ChatService.send_message(room_id, current_user.id, content, msg_type)
+
+            sender_profile_url = None
+            if current_user.profile_image:
+                sender_profile_url = generate_presigned_get_url(current_user.profile_image)
+
             payload = {
                 "id": msg.id,
                 "room_id": room_id,
                 "message": msg.message,
                 "message_type": msg.message_type,
                 "sender_id": msg.sender_id,
+                "sender_name": current_user.nickname,
+                "sender_profile_url": sender_profile_url,
                 "created_at": msg.created_at.strftime("%Y-%m-%d %H:%M:%S"),
                 "is_read": msg.is_read,
             }

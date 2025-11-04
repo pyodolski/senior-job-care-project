@@ -98,9 +98,28 @@ function createMessageElement(messageData, isOwn = false) {
   const avatarDiv = document.createElement("div");
   avatarDiv.className = "message-avatar";
   const senderName = messageData.sender_name || "?";
+
   if (!isSystem) {
-    avatarDiv.textContent = senderName.charAt(0);
+
+    // 💡 URL 결정 로직을 단순화: 항상 messageData.sender_profile_url만 사용합니다.
+    const profileUrl = messageData.sender_profile_url;
+
+    if (profileUrl) {
+        // 이미지가 있는 경우
+        const img = document.createElement("img");
+        img.src = profileUrl;
+        img.alt = senderName;
+        img.className = "w-full h-full rounded-full object-cover";
+        avatarDiv.appendChild(img);
+    } else {
+        // 이미지가 없을 경우 (닉네임 첫 글자 표시 로직)
+        const initial = senderName.charAt(0);
+        avatarDiv.innerHTML = `<div class="w-full h-full rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-semibold text-lg">${initial}</div>`;
+    }
+
+    messageDiv.appendChild(avatarDiv);
   }
+
 
   const contentDiv = document.createElement("div");
   contentDiv.className = "message-content";
@@ -225,6 +244,7 @@ document.addEventListener("DOMContentLoaded", function () {
         message: msg.message,
         sender_id: msg.sender_id,
         sender_name: isOwn ? CURRENT_USER_NAME : OTHER_USER_NAME,
+        sender_profile_url: msg.sender_profile_url || null,
         created_at: msg.created_at,
         message_type: msg.message_type,
       },

@@ -1,6 +1,7 @@
 from models import db, JobPost, JobBookmark, User
 from sqlalchemy import desc
 from flask_login import current_user
+from models import JobApplication, ChatRoom, ChatMessage, JobSuggestion
 
 class JobService:
     @staticmethod
@@ -63,14 +64,49 @@ class JobService:
             setattr(job, key, value)
         db.session.commit()
         return job
-    
+
+    @staticmethod
+    def delete_job_safely(job_id):
+        """
+        공고와 연관된 모든 데이터 삭제
+        """
+        job = JobPost.query.get_or_404(job_id)
+
+        # 1. 공고 ID를 가져옵니다.
+        job_id_to_delete = job.id
+
+        # 2. ChatRoom과 ChatMessage 삭제 (순서 중요: 메시지 -> 방)
+
+        # 2-1. 해당 공고의 모든 채팅방 ID를 찾습니다.
+        expired_chat_rooms = ChatRoom.query.filter(ChatRoom.job_id == job_id_to_delete).all()
+        expired_room_ids = [room.id for room in expired_chat_rooms]
+
+        if expired_room_ids:
+            # 2-2. ChatMessage 삭제 (가장 하위)
+            ChatMessage.query.filter(ChatMessage.room_id.in_(expired_room_ids)).delete(synchronize_session=False)
+
+        # 2-3. ChatRoom 삭제
+        ChatRoom.query.filter(ChatRoom.job_id == job_id_to_delete).delete(synchronize_session=False)
+
+        # 3. JobApplication (지원 내역) 삭제
+        JobApplication.query.filter(JobApplication.job_id == job_id_to_delete).delete(synchronize_session=False)
+
+        # 4. JobBookmark (찜 목록) 삭제
+        JobBookmark.query.filter(JobBookmark.job_id == job_id_to_delete).delete(synchronize_session=False)
+
+        # 5. JobSuggestion (공고 제안) 삭제
+        JobSuggestion.query.filter(JobSuggestion.job_id == job_id_to_delete).delete(synchronize_session=False)
+
+        # 6. JobPost 본체 삭제 (마지막)
+        db.session.delete(job)
+
+        db.session.commit()
+        return True
+
     @staticmethod
     def delete_job(job_id):
         """공고 삭제"""
-        job = JobPost.query.get_or_404(job_id)
-        db.session.delete(job)
-        db.session.commit()
-        return True
+        return JobService.delete_job_safely(job_id)
     
     @staticmethod
     def increment_view_count(job_id):
