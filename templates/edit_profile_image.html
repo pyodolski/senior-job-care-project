@@ -45,6 +45,22 @@
         {% endif %}
       </div>
 
+      {% if profile_url %}
+      <form
+        method="POST"
+        action="{{ url_for('auth.delete_profile_image') }}"
+        onsubmit="return confirm('현재 프로필 사진을 삭제하고 기본 이미지로 되돌리시겠습니까?');"
+        class="mb-6"
+      >
+        <button
+          type="submit"
+          class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition-colors"
+        >
+          현재 프로필 사진 삭제 (기본 이미지로)
+        </button>
+      </form>
+      {% endif %}
+
       <form
         method="POST"
         action="{{ url_for('auth.edit_profile_image') }}"
