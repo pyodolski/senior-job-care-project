@@ -11,6 +11,8 @@ let currentLocationMarker = null; // 현재 위치 마커
 let currentFilter = "all"; // 현재 필터 상태
 const infoWindow = new kakao.maps.InfoWindow({ removable: true }); // 단일 재사용
 
+let isMapManuallyMoved = false;
+
 // 유틸: 안전 숫자 변환
 const toNumber = (v) => {
   const n = Number(v);
@@ -459,6 +461,13 @@ function createMapAndLoad(center, userLocation = null, accuracy = null) {
   // 지도 이동/줌 이벤트 리스너 추가
   kakao.maps.event.addListener(map, "idle", () => {
     updateVisibleJobList();
+  });
+
+  kakao.maps.event.addListener(map, "dragstart", () => {
+    isMapManuallyMoved = true;
+  });
+  kakao.maps.event.addListener(map, "zoom_start", () => {
+    isMapManuallyMoved = true;
   });
 
   loadAllJobs();
