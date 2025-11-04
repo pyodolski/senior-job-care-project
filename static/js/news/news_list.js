@@ -19,57 +19,9 @@ function updateActiveCategory(category) {
   });
 }
 
-async function changeCategory(category) {
-  try {
-    currentQuery = category;
-    currentPage = 1;
-    updateActiveCategory(category);
-
-    // 로딩 표시
-    const newsContainer = document.querySelector(".space-y-6");
-    newsContainer.innerHTML =
-      '<div class="text-center py-8"><p class="text-gray-500">로딩 중...</p></div>';
-
-    // 뉴스 목록 로드
-    const response = await fetch(
-      `/news?q=${encodeURIComponent(category)}&page=1`,
-      {
-        method: "GET",
-        credentials: "same-origin",
-        headers: {
-          Accept: "text/html",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const html = await response.text();
-
-    // HTML 파싱하여 뉴스 목록만 추출
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-    const newArticles = doc.querySelectorAll("article");
-
-    if (newArticles.length === 0) {
-      newsContainer.innerHTML =
-        '<div class="text-center py-8"><p class="text-gray-500">검색 결과가 없습니다.</p></div>';
-      return;
-    }
-
-    // 기존 뉴스 목록 교체
-    newsContainer.innerHTML = "";
-    newArticles.forEach((article) => {
-      newsContainer.appendChild(article);
-    });
-  } catch (error) {
-    console.error("카테고리 변경 오류:", error);
-    const newsContainer = document.querySelector(".space-y-6");
-    newsContainer.innerHTML =
-      '<div class="text-center py-8"><p class="text-red-500">뉴스를 불러오는데 실패했습니다.</p></div>';
-  }
+function changeCategory(category) {
+  // 페이지 새로고침 방식으로 변경 (배포 서버 호환성)
+  window.location.href = `/news?q=${encodeURIComponent(category)}&page=1`;
 }
 
 async function loadMoreNews() {
