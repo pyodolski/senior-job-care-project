@@ -12,7 +12,7 @@ def news_list():
     # 검색어 파라미터 받기 (기본값: 시니어 일자리)
     query = request.args.get('q', '시니어 일자리')
     page = int(request.args.get('page', 1))
-    display = 10  # 한 페이지당 뉴스 개수 (더 많이 표시)
+    display = 5  # 한 페이지당 뉴스 개수
     start = (page - 1) * display + 1
 
     # 네이버 뉴스 서비스 인스턴스 생성
@@ -60,7 +60,7 @@ def news_detail(news_id):
 def news_by_category(category):
     """카테고리별 뉴스 목록"""
     page = int(request.args.get('page', 1))
-    display = 10
+    display = 5
     start = (page - 1) * display + 1
     
     news_service = NaverNewsService()
