@@ -9,11 +9,36 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/edit_profile_image.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/edit_profile_image.css') }}"
+    />
   </head>
   <body>
-    <div class="max-w-md mx-auto bg-white mt-8 shadow rounded-lg p-6">
-      <h2 class="text-2xl font-bold mb-6 text-gray-900">프로필 사진 수정</h2>
+    <div class="max-w-md mx-auto bg-white shadow-lg min-h-screen p-6">
+      <!-- 헤더 with 뒤로가기 버튼 -->
+      <div class="flex items-center justify-between mb-20">
+        <a
+          href="{{ url_for('auth.profile') }}"
+          class="text-gray-600 hover:text-gray-800"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </a>
+        <h2 class="text-xl font-bold text-gray-900">프로필 사진 수정</h2>
+        <div class="w-6"></div>
+      </div>
 
       <!-- 현재 프로필 이미지 -->
       <div class="flex justify-center mb-6">
@@ -44,22 +69,6 @@
         </div>
         {% endif %}
       </div>
-
-      {% if profile_url %}
-      <form
-        method="POST"
-        action="{{ url_for('auth.delete_profile_image') }}"
-        onsubmit="return confirm('현재 프로필 사진을 삭제하고 기본 이미지로 되돌리시겠습니까?');"
-        class="mb-6"
-      >
-        <button
-          type="submit"
-          class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition-colors"
-        >
-          현재 프로필 사진 삭제 (기본 이미지로)
-        </button>
-      </form>
-      {% endif %}
 
       <form
         method="POST"
@@ -96,21 +105,40 @@
           </div>
         </div>
 
-        <button
-          type="submit"
-          class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-3 rounded-lg transition-colors"
-        >
-          프로필 사진 변경
-        </button>
-        <a
-          href="{{ url_for('auth.profile') }}"
-          class="block mt-4 text-blue-900 text-center font-semibold hover:underline"
-        >
-          ← 프로필로 돌아가기
-        </a>
+        <!-- 버튼들을 같은 행에 배치 -->
+        <div class="flex gap-3">
+          <button
+            type="submit"
+            class="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-semibold py-3 rounded-lg transition-colors"
+          >
+            프로필 사진 변경
+          </button>
+          {% if profile_url %}
+          <button
+            type="button"
+            onclick="deleteProfileImage()"
+            class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition-colors"
+          >
+            프로필 사진 삭제
+          </button>
+          {% endif %}
+        </div>
       </form>
     </div>
 
     <script src="{{ url_for('static', filename='js/edit_profile_image.js') }}"></script>
+    <script>
+      function deleteProfileImage() {
+        if (
+          confirm("현재 프로필 사진을 삭제하고 기본 이미지로 되돌리시겠습니까?")
+        ) {
+          const form = document.createElement("form");
+          form.method = "POST";
+          form.action = "{{ url_for('auth.delete_profile_image') }}";
+          document.body.appendChild(form);
+          form.submit();
+        }
+      }
+    </script>
   </body>
 </html>
