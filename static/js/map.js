@@ -517,7 +517,7 @@ function startLocationTracking() {
       );
       updateCurrentLocation(position, accuracy);
 
-      if ((accuracy < 200 && map) || !currentLocationMarker) {
+      if (!isMapManuallyMoved && accuracy < 200 && map) {
         map.setCenter(position);
       }
     },
