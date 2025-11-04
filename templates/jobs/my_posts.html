@@ -81,9 +81,9 @@
               <div
                 class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"
               >
-                {% if job.author.profile_image %}
+                {% if profile_url %}
                 <img
-                  src="{{ job.author.profile_image }}"
+                  src="{{ profile_url }}"
                   alt="프로필"
                   class="w-full h-full object-cover"
                 />
