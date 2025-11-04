@@ -186,7 +186,6 @@ def create_job():
             
             # 필수 필드 검증
             if not all([title, company, description]):
-                flash("제목, 회사명, 설명은 필수 입력 항목입니다.", "error")
                 return render_template("jobs/create_job_scroll.html")
             
             # 정규직인 경우 work_period를 자동으로 설정
@@ -247,8 +246,7 @@ def create_job():
                 print(f"✅ AI 분석 완료: {result['category']}")
             except Exception as e:
                 print(f"⚠️ AI 분석 실패 (공고는 정상 등록됨): {e}")
-            
-            flash("공고가 성공적으로 등록되었습니다!", "success")
+
             return redirect(url_for("jobs.job_list"))
             
         except Exception as e:
@@ -256,7 +254,6 @@ def create_job():
             print(f"공고 등록 오류: {e}")
             import traceback
             traceback.print_exc()
-            flash(f"공고 등록 중 오류가 발생했습니다: {str(e)}", "error")
             return render_template("jobs/create_job_scroll.html")
     
     return render_template("jobs/create_job_scroll.html", kakao_key=kakao_api_key)
@@ -317,7 +314,6 @@ def create_company_job():
             
             # 필수 필드 검증
             if not all([title, company, description]):
-                flash("제목, 회사명, 설명은 필수 입력 항목입니다.", "error")
                 return render_template("jobs/create_company_job_scroll.html", kakao_key=kakao_api_key)
             
             # 정규직인 경우 work_period를 자동으로 설정
@@ -381,8 +377,7 @@ def create_company_job():
                 print(f"✅ AI 분석 완료: {result['category']}")
             except Exception as e:
                 print(f"⚠️ AI 분석 실패 (공고는 정상 등록됨): {e}")
-            
-            flash("기업 공고가 성공적으로 등록되었습니다!", "success")
+
             return redirect(url_for("company.company_list"))
             
         except Exception as e:
@@ -390,7 +385,6 @@ def create_company_job():
             print(f"공고 등록 오류: {e}")
             import traceback
             traceback.print_exc()
-            flash(f"공고 등록 중 오류가 발생했습니다: {str(e)}", "error")
             return render_template("jobs/create_company_job_scroll.html", kakao_key=kakao_api_key)
     
     return render_template("jobs/create_company_job_scroll.html", kakao_key=kakao_api_key)
@@ -489,7 +483,6 @@ def edit_job(job_id):
     
     # 작성자만 수정 가능
     if job.author_id != current_user.id:
-        flash("본인이 작성한 공고만 수정할 수 있습니다.", "error")
         return redirect(url_for("jobs.job_detail", job_id=job_id))
     
     if request.method == "POST":
@@ -536,12 +529,10 @@ def edit_job(job_id):
             job.work_sunday = bool(request.form.get("work_sunday"))
             
             db.session.commit()
-            flash("공고가 성공적으로 수정되었습니다!", "success")
             return redirect(url_for("jobs.job_detail", job_id=job_id))
             
         except Exception as e:
             db.session.rollback()
-            flash("공고 수정 중 오류가 발생했습니다.", "error")
     
     # Kakao Map API 키 가져오기
     kakao_api_key = current_app.config.get("KAKAO_MAP_API_KEY")
@@ -607,9 +598,8 @@ def toggle_bookmark(job_id):
                 'bookmark_count': job.bookmark_count,
                 'message': message
             })
-        
-        # 일반 요청인 경우 플래시 메시지와 함께 리다이렉트
-        flash(message, "success")
+
+
         return redirect(url_for("jobs.job_detail", job_id=job_id))
         
     except Exception as e:
@@ -619,8 +609,7 @@ def toggle_bookmark(job_id):
                 'success': False,
                 'message': '오류가 발생했습니다.'
             }), 500
-        
-        flash("오류가 발생했습니다.", "error")
+
         return redirect(url_for("jobs.job_detail", job_id=job_id))
 
 @jobs_bp.route("/jobs/<int:job_id>/bookmark/status", methods=["GET"])
@@ -812,8 +801,7 @@ def apply_job(job_id):
                 'success': False,
                 'message': error_message
             }), 500
-        
-        flash(error_message, "error")
+
         return redirect(url_for("jobs.job_detail", job_id=job_id))
 
 @jobs_bp.route("/jobs/<int:job_id>/applications")
@@ -854,7 +842,6 @@ def job_applications(job_id):
                              applications=applications)
         
     except Exception as e:
-        flash("지원자 목록을 조회할 수 없습니다.", "error")
         return redirect(url_for("jobs.job_detail", job_id=job_id))
 
 
