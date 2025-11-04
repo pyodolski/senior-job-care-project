@@ -947,17 +947,6 @@ def ai_generate_description():
 def my_posts():
     """
     내가 올린 글 목록 페이지
-    ======================
-
-    기능:
-    - 현재 로그인한 사용자가 작성한 공고 목록 조회
-    - 작성일 기준 최신순 정렬
-
-    URL: GET /my-posts
-    템플릿: jobs/my_posts.html
-
-    반환값:
-    - jobs: 사용자가 작성한 공고 목록 (JobPost 객체 리스트)
     """
     try:
         # 현재 사용자가 작성한 공고 조회 (최신순)
@@ -979,7 +968,6 @@ def my_posts():
 
     except Exception as e:
         current_app.logger.error(f"내가 올린 글 조회 중 오류: {e}")
-        flash("글 목록을 불러오는 중 오류가 발생했습니다.", "error")
         return redirect(url_for('auth.profile'))
 
 @jobs_bp.route("/my-applications")
