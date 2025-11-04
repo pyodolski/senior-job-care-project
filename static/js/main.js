@@ -1,5 +1,25 @@
 // 메인 페이지 JavaScript
 
+// 검색 폼 제출 처리
+document.addEventListener("DOMContentLoaded", function () {
+  const searchForm = document.getElementById("searchForm");
+  if (searchForm) {
+    searchForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const searchType = document.querySelector(
+        'input[name="searchType"]:checked'
+      ).value;
+      const searchQuery = document.getElementById("searchInput").value;
+
+      if (searchType === "company") {
+        window.location.href = `/company?q=${encodeURIComponent(searchQuery)}`;
+      } else {
+        window.location.href = `/jobs?q=${encodeURIComponent(searchQuery)}`;
+      }
+    });
+  }
+});
+
 // 공고 지원하기 함수
 async function applyJob(jobId) {
   if (
@@ -298,5 +318,24 @@ async function syncPublicData() {
       btn.disabled = false;
       btn.textContent = "🔄 공공데이터 최신화";
     }, 3000);
+  }
+}
+
+// ==================== 검색창 토글 ====================
+
+function toggleSearchBar() {
+  const searchBar = document.getElementById("searchBar");
+  const searchInput = document.getElementById("searchInput");
+
+  if (searchBar) {
+    if (searchBar.classList.contains("hidden")) {
+      searchBar.classList.remove("hidden");
+      // 검색창이 나타나면 입력창에 포커스
+      if (searchInput) {
+        setTimeout(() => searchInput.focus(), 100);
+      }
+    } else {
+      searchBar.classList.add("hidden");
+    }
   }
 }
