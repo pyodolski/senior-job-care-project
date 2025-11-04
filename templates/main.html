@@ -872,7 +872,7 @@
                   <span
                     class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
                   >
-                    {{ resume.desired_work_type }}
+                    {{ resume.desired_work_type | format_work_type }}
                   </span>
                   {% endif %} {% if resume.desired_categories %}
                   <span

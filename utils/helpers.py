@@ -116,3 +116,18 @@ def validate_phone(phone):
     # 숫자만 추출
     numbers = re.sub(r'[^\d]', '', phone)
     return len(numbers) in [10, 11]
+
+def format_work_type(work_type):
+    """근무 형태를 한글로 변환"""
+    if not work_type:
+        return '근무 형태 협의'
+    
+    work_type_mapping = {
+        'SHORT_TERM': '단기',
+        'FULL_TIME': '정직원',
+        'PART_TIME': '파트타임',
+        'FULL_TIME_HOURS': '풀타임',
+        'ETC': '기타'
+    }
+    
+    return work_type_mapping.get(work_type, work_type)

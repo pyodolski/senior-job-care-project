@@ -142,7 +142,7 @@
             <div class="flex flex-wrap gap-2 mb-3">
               {% if resume.desired_work_type %}
               <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                {{ resume.desired_work_type }}
+                {{ resume.desired_work_type | format_work_type }}
               </span>
               {% endif %} {% if resume.desired_salary %}
               <span

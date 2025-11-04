@@ -253,7 +253,7 @@
               <!-- 행[2]: 희망 근무 형태 -->
               <div class="mb-2">
                 <p class="text-blue-600 font-bold">
-                  {{ resume.desired_work_type or '근무 형태 협의' }}
+                  {{ resume.desired_work_type | format_work_type }}
                 </p>
               </div>
 

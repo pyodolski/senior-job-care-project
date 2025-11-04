@@ -112,10 +112,7 @@
             >{% endfor %}
           </div>
           <strong>희망 근무 형태</strong>
-          <span
-            >{{ resume.desired_work_type.value if resume.desired_work_type
-            }}</span
-          >
+          <span>{{ resume.desired_work_type | format_work_type }}</span>
           <strong>희망 근무 요일</strong>
           <div>
             {% set day_count = 0 %} {% if resume.work_monday %}{% set day_count

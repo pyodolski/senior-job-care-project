@@ -164,7 +164,7 @@
           </h3>
           <div class="bg-gray-50 rounded-lg p-3">
             <p class="text-sm text-gray-700">
-              {{ resume.desired_work_type or '미설정' }}
+              {{ resume.desired_work_type | format_work_type }}
             </p>
           </div>
         </div>

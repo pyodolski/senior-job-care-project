@@ -14,7 +14,7 @@ from routes.chat import chat_bp
 from routes.company import company_bp
 from routes.resume import resumes_bp
 from routes.job_assistant import job_assistant_bp
-from utils.helpers import format_date, format_datetime, format_salary, get_work_days, calculate_time_ago
+from utils.helpers import format_date, format_datetime, format_salary, get_work_days, calculate_time_ago, format_work_type
 from cli import register_cli  # ⬅ cli.py에서 만든 함수 import
 from routes.admin.admin import admin_bp
 from routes.map import map_bp
@@ -78,6 +78,7 @@ app.jinja_env.filters['format_datetime'] = format_datetime
 app.jinja_env.filters['format_salary'] = format_salary
 app.jinja_env.filters['get_work_days'] = get_work_days
 app.jinja_env.filters['time_ago'] = calculate_time_ago
+app.jinja_env.filters['format_work_type'] = format_work_type
 
 # 공통으로 사용할 프로필 이미지 ( 채팅 목록, 프로필 이미지, 채팅방 등등)
 @app.context_processor
