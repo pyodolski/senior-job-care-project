@@ -373,7 +373,7 @@
               <button
                 class="text-white font-bold py-2 px-4 rounded-full text-sm"
                 style="background-color: #023591"
-                onclick="event.stopPropagation(); applyJob({{ job.id }})"
+                onclick="event.stopPropagation(); applyJob({{ job.id }}, '{{ job.source or '' }}')"
               >
                 지원하기
               </button>

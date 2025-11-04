@@ -4,14 +4,22 @@ const jobId = mainContainer ? mainContainer.dataset.jobId : null;
 // K-Senior 외부 공고용 모달 함수
 if (window.isKSeniorJob) {
   function showContactModal() {
-    document.getElementById('contactModal').classList.remove('hidden');
+    document.getElementById("contactModal").classList.remove("hidden");
   }
   function closeContactModal() {
-    document.getElementById('contactModal').classList.add('hidden');
+    document.getElementById("contactModal").classList.add("hidden");
   }
   // window 객체에 함수 등록
   window.showContactModal = showContactModal;
   window.closeContactModal = closeContactModal;
+
+  // URL 파라미터 확인하여 자동으로 모달 열기
+  document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("showContact") === "true") {
+      showContactModal();
+    }
+  });
 }
 
 function toggleBookmark() {
@@ -34,9 +42,7 @@ function toggleBookmark() {
         }
 
         // 통계 업데이트 (찜 수)
-        const currentStats = document.querySelector(
-          "section .flex.gap-4"
-        );
+        const currentStats = document.querySelector("section .flex.gap-4");
         if (currentStats && currentStats.children[1]) {
           currentStats.children[1].textContent = `찜 ${data.bookmark_count}`;
         }

@@ -1,5 +1,12 @@
 // 공고 지원하기 함수
-async function applyJob(jobId) {
+async function applyJob(jobId, source) {
+  // 공공데이터 공고(K-Senior)인 경우 상세 페이지로 이동하면서 모달 자동 열기
+  if (source === "K-Senior") {
+    window.location.href = `/company/${jobId}?showContact=true`;
+    return;
+  }
+
+  // 일반 공고인 경우 기존 로직 실행
   if (
     !confirm(
       "이 공고에 지원하시겠습니까?\n지원하면 자동으로 채팅방이 생성됩니다."
@@ -105,39 +112,40 @@ function changeSortOrder(sortBy) {
 
 // 필터 모달 열기
 function openFilterModal() {
-  const filterModal = document.getElementById('filterModal');
+  const filterModal = document.getElementById("filterModal");
   if (filterModal) {
-    filterModal.classList.add('show');
+    filterModal.classList.add("show");
   }
 }
 
 // 필터 모달 닫기
 function closeFilterModal() {
-  const filterModal = document.getElementById('filterModal');
+  const filterModal = document.getElementById("filterModal");
   if (filterModal) {
-    filterModal.classList.remove('show');
+    filterModal.classList.remove("show");
   }
 }
 
 // 필터 초기화 함수
 function resetFilters() {
   const currentUrl = new URL(window.location.href);
-  currentUrl.searchParams.delete('region1');
-  currentUrl.searchParams.delete('region2');
-  currentUrl.searchParams.delete('region3');
-  currentUrl.searchParams.delete('page'); // 페이지 리셋
-  window.location.href = currentUrl.pathname + '?' + currentUrl.searchParams.toString();
+  currentUrl.searchParams.delete("region1");
+  currentUrl.searchParams.delete("region2");
+  currentUrl.searchParams.delete("region3");
+  currentUrl.searchParams.delete("page"); // 페이지 리셋
+  window.location.href =
+    currentUrl.pathname + "?" + currentUrl.searchParams.toString();
 }
 
 // DOMContentLoaded 이벤트 핸들러
 document.addEventListener("DOMContentLoaded", function () {
   // 필터 모달 초기화
-  const filterModal = document.getElementById('filterModal');
-  const filterForm = document.getElementById('filterForm');
+  const filterModal = document.getElementById("filterModal");
+  const filterForm = document.getElementById("filterForm");
 
   if (filterForm) {
     // 필터 적용 폼 제출 이벤트
-    filterForm.addEventListener('submit', function(event) {
+    filterForm.addEventListener("submit", function (event) {
       event.preventDefault();
 
       const formData = new FormData(filterForm);
@@ -145,7 +153,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const params = currentUrl.searchParams;
 
       // 지역 필터 파라미터 업데이트
-      ['region1', 'region2', 'region3'].forEach(key => {
+      ["region1", "region2", "region3"].forEach((key) => {
         const value = formData.get(key).trim();
         if (value) {
           params.set(key, value);
@@ -156,7 +164,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       params.set("page", 1); // 필터 적용 시 1페이지로 리셋
 
-      window.location.href = currentUrl.pathname + '?' + params.toString();
+      window.location.href = currentUrl.pathname + "?" + params.toString();
     });
   }
 
