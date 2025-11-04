@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 from urllib.parse import quote
 from bs4 import BeautifulSoup
+from concurrent.futures import ThreadPoolExecutor
 
 class NaverNewsService:
     def __init__(self):
@@ -105,9 +106,7 @@ class NaverNewsService:
             pub_date = item.get('pubDate', '')
             formatted_date = self._format_date(pub_date)
 
-            # Open Graph 이미지 추출
             link = item.get('link', '')
-            image_url = self._get_og_image(link)
 
             news_item = {
                 'id': hash(link),  # 링크를 기반으로 고유 ID 생성
@@ -118,9 +117,18 @@ class NaverNewsService:
                 'original_link': item.get('originallink', ''),
                 'category': '시니어 일자리',
                 'content': description,  # 상세 내용으로 description 사용
-                'image': image_url  # 이미지 URL 추가
+                'image': None  # 나중에 병렬로 채움
             }
             formatted_news.append(news_item)
+
+        # 이미지는 병렬로 처리하여 속도 향상
+        if formatted_news:
+            with ThreadPoolExecutor(max_workers=5) as executor:
+                links = [item['link'] for item in formatted_news]
+                image_urls = list(executor.map(self._get_og_image, links))
+                
+                for i, news in enumerate(formatted_news):
+                    news['image'] = image_urls[i]
 
         return {
             'total': raw_data.get('total', 0),
