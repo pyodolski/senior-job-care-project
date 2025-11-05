@@ -74,7 +74,7 @@ function applyAIText() {
 
 // 💡 8단계 구조에 맞게 maxStep과 selectedData 수정
 let currentStep = 1;
-let maxStep = 8;
+let maxStep = 9;
 let selectedData = {
   category: "", // 1단계: 직무 분야 (job_category)
   title: "",    // 2단계: 제목
@@ -87,6 +87,7 @@ let selectedData = {
   endTime: "", // 3단계: 종료 시간
   salaryType: "", // 5단계: 급여 타입
   salaryAmount: 0, // 5단계: 급여 금액
+  recruitmentCount: 0,
   description: "", // 6단계: 상세 설명
   location: "", // 7단계: 주소 (위치)
   detailAddress: "", // 7단계: 상세 주소
@@ -197,13 +198,17 @@ function updateNextButton() {
       // 급여 타입이 선택되었고, 금액이 0보다 커야 유효
       isValid = selectedData.salaryType !== "" && selectedData.salaryAmount > 0;
       break;
-    case 6: // 상세 설명
+    case 6: // 💡 모집 인원 (새로 추가)
+      // 모집 인원은 1명 이상이어야 유효
+      isValid = selectedData.recruitmentCount > 0;
+      break;
+    case 7: // 💡 상세 설명 (기존 6)
       isValid = selectedData.description.length > 0;
       break;
-    case 7: // 위치
+    case 8: // 💡 위치 (기존 7)
       isValid = selectedData.location.length > 0;
       break;
-    case 8: // 연락처 및 동의
+    case 9: // 💡 연락처 및 동의 (기존 8)
       const agreeTerms = document.getElementById("agreeTerms")?.checked;
       isValid = selectedData.phone.length > 0 && agreeTerms;
       nextBtn.textContent = "공고 등록하기";
@@ -321,7 +326,17 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // 6단계: 상세 설명 입력
+  const recruitmentCount = document.getElementById("recruitmentCount");
+  if (recruitmentCount) {
+    recruitmentCount.addEventListener("input", function(e) {
+        let value = e.target.value.replace(/[^0-9]/g, "");
+        e.target.value = value;
+        selectedData.recruitmentCount = parseInt(value) || 0;
+        updateNextButton();
+    });
+  }
+
+  // 7단계: 상세 설명 입력
   const jobDescription = document.getElementById("jobDescription");
   if (jobDescription) {
     jobDescription.addEventListener("input", function () {
@@ -331,7 +346,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  // 7단계: 상세 주소 입력
+  // 8단계: 상세 주소 입력
   const detailAddress = document.getElementById("detailAddress");
   if (detailAddress) {
     detailAddress.addEventListener("input", function () {
@@ -339,7 +354,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // 8단계: 연락처 입력
+  // 9단계: 연락처 입력
   const contactPhone = document.getElementById("contactPhone");
   if (contactPhone) {
     contactPhone.addEventListener("input", function (e) {
@@ -771,8 +786,13 @@ async function submitJob() {
         formData.append("recruitment_end_date", selectedData.recruitmentEndDate);
     }
 
-    // 💡 모집 인원 추가 (UI가 없으므로 기본값 1 전송)
-    formData.append("recruitment_count", 1);
+    // 💡 모집 인원 추가
+    if (selectedData.recruitmentCount > 0) {
+        formData.append("recruitment_count", selectedData.recruitmentCount);
+    } else {
+
+        formData.append("recruitment_count", 1);
+    }
 
     // 단기 근무일 경우 선택된 날짜 전송 (시작일/종료일)
     if (
