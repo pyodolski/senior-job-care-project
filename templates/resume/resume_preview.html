@@ -53,139 +53,502 @@
             </h2>
 
             <div class="space-y-4 mb-6">
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-base font-semibold text-gray-800">
-                    희망 직무분야
-                  </h3>
+              <!-- 희망 근무 직종 -->
+              <div class="bg-white mb-2 px-4 py-4">
+                <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+                  <svg
+                    class="w-5 h-5 mr-2 text-blue-900"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                  희망 근무 직종
+                </h3>
+
+                {% set category = preview_data.category %} {% if category ==
+                '안전·관리' %}
+                <div class="border-2 border-blue-500 bg-blue-50 rounded-xl p-4">
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                      <div class="flex items-center mb-2">
+                        <span class="text-2xl mr-2">🧯</span>
+                        <h4 class="text-lg font-bold text-gray-900">
+                          안전·관리
+                        </h4>
+                      </div>
+                      <p class="text-sm text-gray-600 mb-2">
+                        작업장 안전 관리와 분야를 담당합니다.
+                      </p>
+                      <div class="flex flex-wrap gap-1">
+                        <span class="text-xs text-blue-600">관리자</span>
+                        <span class="text-xs text-gray-400">·</span>
+                        <span class="text-xs text-blue-600">주차 관리</span>
+                        <span class="text-xs text-gray-400">·</span>
+                        <span class="text-xs text-blue-600"
+                          >시설 · 건물 관리</span
+                        >
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <p class="text-sm text-gray-700">{{ preview_data.category }}</p>
+
+                {% elif category == '서비스·매장' or category == '서비스·배장'
+                %}
+                <div class="border-2 border-blue-500 bg-blue-50 rounded-xl p-4">
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                      <div class="flex items-center mb-2">
+                        <span class="text-2xl mr-2">🛍️</span>
+                        <h4 class="text-lg font-bold text-gray-900">
+                          서비스·매장
+                        </h4>
+                      </div>
+                      <p class="text-sm text-gray-600 mb-2">
+                        판매업과 서비스업 분야에 들어가는 분야 적합합니다.
+                      </p>
+                      <div class="flex flex-wrap gap-1">
+                        <span class="text-xs text-blue-600">매장 계산원</span>
+                        <span class="text-xs text-gray-400">·</span>
+                        <span class="text-xs text-blue-600">안내 데스크</span>
+                        <span class="text-xs text-gray-400">·</span>
+                        <span class="text-xs text-blue-600"
+                          >음식점·카페 보조</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {% elif category == '생활·돌봄 지원' %}
+                <div class="border-2 border-blue-500 bg-blue-50 rounded-xl p-4">
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                      <div class="flex items-center mb-2">
+                        <span class="text-2xl mr-2">🌱</span>
+                        <h4 class="text-lg font-bold text-gray-900">
+                          생활·돌봄 지원
+                        </h4>
+                      </div>
+                      <p class="text-sm text-gray-600 mb-2">
+                        생활보건 또는 돌봄 업무를 가진 분야 외 업종입니다.
+                      </p>
+                      <div class="flex flex-wrap gap-1">
+                        <span class="text-xs text-blue-600">아이 돌봄</span>
+                        <span class="text-xs text-gray-400">·</span>
+                        <span class="text-xs text-blue-600">반려동물 산책</span>
+                        <span class="text-xs text-gray-400">·</span>
+                        <span class="text-xs text-blue-600">가사 지원</span>
+                        <span class="text-xs text-gray-400">·</span>
+                        <span class="text-xs text-blue-600">병원 동행</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {% elif category == '운전·배송' %}
+                <div class="border-2 border-blue-500 bg-blue-50 rounded-xl p-4">
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                      <div class="flex items-center mb-2">
+                        <span class="text-2xl mr-2">🚗</span>
+                        <h4 class="text-lg font-bold text-gray-900">
+                          운전·배송
+                        </h4>
+                      </div>
+                      <p class="text-sm text-gray-600 mb-2">
+                        운전에 익숙한 분들을 적합합니다.
+                      </p>
+                      <div class="flex flex-wrap gap-1">
+                        <span class="text-xs text-blue-600"
+                          >음식 배달 기사</span
+                        >
+                        <span class="text-xs text-gray-400">·</span>
+                        <span class="text-xs text-blue-600">생활 운전</span>
+                        <span class="text-xs text-gray-400">·</span>
+                        <span class="text-xs text-blue-600"
+                          >스쿠터 배달·심부름</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {% elif category == '사회·공공' %}
+                <div class="border-2 border-blue-500 bg-blue-50 rounded-xl p-4">
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                      <div class="flex items-center mb-2">
+                        <span class="text-2xl mr-2">🏛️</span>
+                        <h4 class="text-lg font-bold text-gray-900">
+                          사회·공공
+                        </h4>
+                      </div>
+                      <p class="text-sm text-gray-600 mb-2">
+                        행사나, 사회적 활동에 살업은 분류를 담당합니다.
+                      </p>
+                      <div class="flex flex-wrap gap-1">
+                        <span class="text-xs text-blue-600">도서관 보조</span>
+                        <span class="text-xs text-gray-400">·</span>
+                        <span class="text-xs text-blue-600"
+                          >환경미화·분리수거</span
+                        >
+                        <span class="text-xs text-gray-400">·</span>
+                        <span class="text-xs text-blue-600">복지센터 업무</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {% elif category == '기타' %}
+                <div class="border-2 border-blue-500 bg-blue-50 rounded-xl p-4">
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                      <div class="flex items-center mb-2">
+                        <span class="text-2xl mr-2">⭐</span>
+                        <h4 class="text-lg font-bold text-gray-900">
+                          기타 (직접 작성)
+                        </h4>
+                      </div>
+                      <p class="text-sm text-gray-600 mb-2">
+                        하고싶은 일(분야)를 적어주세요
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {% else %}
+                <div class="border-2 border-blue-500 bg-blue-50 rounded-xl p-4">
+                  <p class="text-lg font-bold text-gray-900">{{ category }}</p>
+                </div>
+                {% endif %}
               </div>
 
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-base font-semibold text-gray-800">
-                    희망 근무 형태
-                  </h3>
+              <!-- 희망 근무 요일/시간/형태 -->
+              <div class="bg-white mb-2 px-4 py-4">
+                <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+                  <svg
+                    class="w-5 h-5 mr-2 text-blue-900"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  희망 근무 요일/시간/형태
+                </h3>
+
+                <div class="border-2 border-blue-500 bg-blue-50 rounded-xl p-4">
+                  <div class="flex-1">
+                    <!-- 요일 (제목처럼 크고 굵게) -->
+                    <div class="mb-2">
+                      <h4 class="text-lg font-bold text-gray-900">
+                        {{ preview_data.days }}
+                      </h4>
+                    </div>
+
+                    <!-- 시간 (설명 스타일) -->
+                    <p class="text-sm text-gray-600 mb-2">
+                      {% set time_str = preview_data.time %} {% if '~' in
+                      time_str and '협의' not in time_str %} {% set times =
+                      time_str.split('~') %} {% set start = times[0].strip() %}
+                      {% set end = times[1].strip() %} {% set start_hour =
+                      start.split(':')[0]|int %} {% set end_hour =
+                      end.split(':')[0]|int %} {% if start_hour < 12 %}오전 {{
+                      start }}{% else %}오후 {{ '%02d'|format(start_hour - 12)
+                      }}:{{ start.split(':')[1] }}{% endif %} ~ {% if end_hour <
+                      12 %}오전 {{ end }}{% else %}오후 {{
+                      '%02d'|format(end_hour - 12) }}:{{ end.split(':')[1] }}{%
+                      endif %} {% else %} {{ time_str }} {% endif %}
+                    </p>
+
+                    <!-- 형태 (파란 작은 태그 스타일) -->
+                    <div class="flex flex-wrap gap-1">
+                      <span class="text-xs text-blue-600"
+                        >{{ preview_data.work_type }}</span
+                      >
+                    </div>
+                  </div>
                 </div>
-                <p class="text-sm text-gray-700">
-                  {{ preview_data.work_type }}
-                </p>
               </div>
 
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-base font-semibold text-gray-800">
-                    희망 근무 요일
-                  </h3>
-                </div>
-                <p class="text-sm text-gray-700">{{ preview_data.days }}</p>
-              </div>
-
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-base font-semibold text-gray-800">
-                    희망 근무 시간
-                  </h3>
-                </div>
-                <p class="text-sm text-gray-700">{{ preview_data.time }}</p>
-              </div>
-
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-base font-semibold text-gray-800">
-                    경력 및 경험
-                  </h3>
-                </div>
-                <div class="text-sm text-gray-700 space-y-1">
-                  {% for exp in preview_data.experience %}
-                  <p>• {{ exp }}</p>
-                  {% endfor %}
+              <!-- 경력 및 경험 -->
+              <div class="bg-white mb-2 px-4 py-4">
+                <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+                  <svg
+                    class="w-5 h-5 mr-2 text-blue-900"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                  경력 및 경험
+                </h3>
+                <div class="border-2 border-blue-500 bg-white rounded-xl p-4">
+                  <div class="text-base text-gray-700 space-y-1">
+                    {% for exp in preview_data.experience %}
+                    <p>{{ exp }}</p>
+                    {% endfor %}
+                  </div>
                 </div>
               </div>
 
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-base font-semibold text-gray-800">
-                    보유 기술 및 자격증
-                  </h3>
-                </div>
-                <div class="text-sm text-gray-700 space-y-1">
+              <!-- 보유 자격증 및 기술 -->
+              <div class="bg-white mb-2 px-4 py-4">
+                <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+                  <svg
+                    class="w-5 h-5 mr-2 text-blue-900"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                    />
+                  </svg>
+                  보유 자격증 및 기술
+                </h3>
+                <div
+                  class="border-2 border-blue-500 bg-white rounded-xl p-4 space-y-2"
+                >
                   {% for cert in preview_data.certificates %}
-                  <p>• {{ cert }}</p>
+                  <div class="flex items-center justify-between">
+                    <span class="text-base text-gray-800 font-medium"
+                      >{{ cert }}</span
+                    >
+                  </div>
                   {% endfor %}
                 </div>
               </div>
 
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-base font-semibold text-gray-800">
-                    성격 및 강점
-                  </h3>
-                </div>
-                <p class="text-sm text-gray-700">
-                  {{ preview_data.strengths }}
-                </p>
-              </div>
-
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-base font-semibold text-gray-800">
-                    신체적 활동 가능 범위
-                  </h3>
-                </div>
-                <p class="text-sm text-gray-700 mb-2">
-                  {{ preview_data.walkable }}
-                </p>
-                <div class="text-sm text-gray-700 space-y-1">
-                  {% for activity in preview_data.physical %}
-                  <p>• {{ activity }}</p>
+              <!-- 성격 및 강점 -->
+              <div class="bg-white mb-2 px-4 py-4">
+                <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+                  <svg
+                    class="w-5 h-5 mr-2 text-blue-900"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                    />
+                  </svg>
+                  성격 및 강점
+                </h3>
+                <div class="flex flex-wrap gap-2">
+                  {% set strengths_list = preview_data.strengths.split(',') if
+                  ',' in preview_data.strengths else [preview_data.strengths] %}
+                  {% for strength in strengths_list %}
+                  <span
+                    class="inline-block text-sm px-3 py-1 rounded-full font-medium text-white"
+                    style="background-color: #002fa7"
+                  >
+                    {{ strength.strip() }}
+                  </span>
                   {% endfor %}
                 </div>
               </div>
 
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-base font-semibold text-gray-800">
-                    이동 가능 범위
-                  </h3>
+              <!-- 신체적 활동 가능 범위 -->
+              <div class="bg-white mb-2 px-4 py-4">
+                <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+                  <svg
+                    class="w-5 h-5 mr-2 text-blue-900"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  신체적 활동 가능 범위
+                </h3>
+
+                <div
+                  class="border-2 border-blue-500 bg-blue-50 rounded-xl p-4 mb-3"
+                >
+                  <p class="text-base text-gray-700 flex items-center">
+                    <svg
+                      class="w-5 h-5 mr-2 text-blue-900 flex-shrink-0"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"
+                      />
+                    </svg>
+                    쉬지 않고 걸을 수 있는 시간 {{ preview_data.walkable }}
+                  </p>
                 </div>
-                <p class="text-sm text-gray-700">{{ preview_data.commute }}</p>
+
+                <!-- 신체적 특징 -->
+                {% if preview_data.physical and preview_data.physical[0] !=
+                '작성 안 함' %}
+                <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+                  <svg
+                    class="w-5 h-5 mr-2 text-blue-900"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                  신체적 특징
+                </h3>
+                <div class="border-2 border-blue-500 bg-white rounded-xl p-4">
+                  <div class="text-base text-gray-700 space-y-1">
+                    {% for activity in preview_data.physical %}
+                    <p>{{ activity }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+                {% endif %}
               </div>
 
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-base font-semibold text-gray-800">
-                    자기소개
-                  </h3>
+              <!-- 이동 가능 범위 -->
+              <div class="bg-white mb-2 px-4 py-4">
+                <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+                  <svg
+                    class="w-5 h-5 mr-2 text-blue-900"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  이동 가능 범위
+                </h3>
+
+                <div class="border-2 border-blue-500 bg-blue-50 rounded-xl p-4">
+                  <p class="text-base text-gray-700 flex items-center">
+                    <svg
+                      class="w-5 h-5 mr-2 text-blue-900 flex-shrink-0"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z"
+                      />
+                    </svg>
+                    대중 교통 이동 가능 시간 {{ preview_data.commute }}
+                  </p>
                 </div>
-                <p class="text-sm text-gray-700 whitespace-pre-wrap">
-                  {{ preview_data.introduction }}
-                </p>
               </div>
 
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-base font-semibold text-gray-800">
-                    연락 가능 시간
-                  </h3>
+              <!-- 자기소개서 -->
+              <div class="bg-white mb-2 px-4 py-4">
+                <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+                  <svg
+                    class="w-5 h-5 mr-2 text-blue-900"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                  자기소개서
+                </h3>
+                <div class="border-2 border-blue-500 bg-white rounded-xl p-4">
+                  <p
+                    class="text-base text-gray-700 whitespace-pre-wrap leading-relaxed"
+                  >
+                    {{ preview_data.introduction }}
+                  </p>
                 </div>
-                <p class="text-sm text-gray-700">
-                  {{ preview_data.call_time }}
-                </p>
               </div>
 
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-base font-semibold text-gray-800">
-                    개인정보 공개 범위
-                  </h3>
+              <!-- 통화 가능 시간 -->
+              {% if preview_data.call_time and preview_data.call_time !=
+              '언제든지' %}
+              <div class="bg-white mb-2 px-4 py-4">
+                <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+                  <svg
+                    class="w-5 h-5 mr-2 text-blue-900"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    />
+                  </svg>
+                  통화 가능 시간
+                </h3>
+                <div class="border-2 border-blue-500 bg-white rounded-xl p-4">
+                  <p class="text-base text-gray-700">
+                    {{ preview_data.call_time }}
+                  </p>
                 </div>
-                <p class="text-sm text-gray-700">{{ preview_data.privacy }}</p>
+              </div>
+              {% endif %}
+
+              <!-- 개인정보 공개 범위 -->
+              <div class="bg-white mb-2 px-4 py-4">
+                <h3 class="font-semibold text-gray-900 mb-3">
+                  개인정보 공개 범위
+                </h3>
+                <div class="border-2 border-blue-500 bg-white rounded-xl p-4">
+                  <p class="text-base text-gray-700">
+                    {{ preview_data.privacy }}
+                  </p>
+                </div>
               </div>
 
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+              <!-- 이력서 공개 여부 -->
+              <div class="bg-white mb-2 px-4 py-4">
+                <div class="bg-blue-50 rounded-lg p-4 border-2 border-blue-500">
                   <div class="flex items-center">
                     <svg
                       class="w-5 h-5 text-blue-600 mr-2"
