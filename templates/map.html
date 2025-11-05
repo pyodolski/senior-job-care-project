@@ -20,7 +20,11 @@
       <!-- 메인 컨텐츠: 지도 -->
       <main
         class="bg-white"
-        style="height: calc(100vh - 65px); position: relative"
+        style="
+          height: calc(100vh - 65px);
+          position: relative;
+          padding-bottom: 65px;
+        "
       >
         <!-- 검색바 및 필터 영역 -->
         <div
@@ -77,7 +81,11 @@
           </div>
         </div>
 
-        <div id="map" aria-label="일자리 지도"></div>
+        <div
+          id="map"
+          aria-label="일자리 지도"
+          style="height: 100%; width: 100%"
+        ></div>
 
         <!-- 하단 공고 목록 패널 -->
         <div id="jobListPanel" class="job-list-panel">
