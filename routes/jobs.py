@@ -481,64 +481,50 @@ def job_detail(job_id):
 @login_required
 def edit_job(job_id):
     job = JobPost.query.get_or_404(job_id)
-    
-    # 작성자만 수정 가능
+    kakao_api_key = current_app.config.get("KAKAO_MAP_API_KEY")
+
+    # 권한 확인
     if job.author_id != current_user.id:
         return redirect(url_for("jobs.job_detail", job_id=job_id))
-    
+
+    if job.author.user_type == 1:
+        return redirect(url_for("jobs.edit_company_job", job_id=job_id))
+
     if request.method == "POST":
         try:
-            # 폼 데이터 업데이트
-            job.title = request.form.get("title", "").strip()
-            job.company = request.form.get("company", "").strip()
-            job.description = request.form.get("description", "").strip()
-            job.recruitment_type = request.form.get("recruitment_type", "")
-            job.work_period = request.form.get("work_period", "")
-            job.salary = request.form.get("salary", "").strip()
-            job.region = request.form.get("region", "").strip()
-            job.contact_phone = request.form.get("contact_phone", "").strip()
-            job.recruitment_count = request.form.get("recruitment_count", type=int)
-
-            # --- 행정구역 정보 추가로 받기 ---
-            job.region_1depth_name = request.form.get("region_1depth_name")
-            job.region_2depth_name = request.form.get("region_2depth_name")
-            job.region_3depth_name = request.form.get("region_3depth_name")
-
-            latitude = request.form.get("latitude", type=float)
-            longitude = request.form.get("longitude", type=float)
-            if latitude is not None:
-                job.latitude = latitude
-            if longitude is not None:
-                job.longitude = longitude
-
-            # 근무 시간 업데이트
-            work_start_time_str = request.form.get("work_start_time", "")
-            work_end_time_str = request.form.get("work_end_time", "")
-            
-            if work_start_time_str:
-                job.work_start_time = datetime.strptime(work_start_time_str, "%H:%M").time()
-            if work_end_time_str:
-                job.work_end_time = datetime.strptime(work_end_time_str, "%H:%M").time()
-            
-            # 근무 요일 업데이트
-            job.work_monday = bool(request.form.get("work_monday"))
-            job.work_tuesday = bool(request.form.get("work_tuesday"))
-            job.work_wednesday = bool(request.form.get("work_wednesday"))
-            job.work_thursday = bool(request.form.get("work_thursday"))
-            job.work_friday = bool(request.form.get("work_friday"))
-            job.work_saturday = bool(request.form.get("work_saturday"))
-            job.work_sunday = bool(request.form.get("work_sunday"))
-            
-            db.session.commit()
+            JobService.update_job_by_type(job_id, request.form)
             return redirect(url_for("jobs.job_detail", job_id=job_id))
-            
+
         except Exception as e:
             db.session.rollback()
-    
-    # Kakao Map API 키 가져오기
+            return render_template("jobs/edit_job_people.html", job=job, kakao_key=kakao_api_key)
+
+    return render_template("jobs/edit_job_people.html", job=job, kakao_key=kakao_api_key)
+
+
+@jobs_bp.route("/jobs/company/<int:job_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_company_job(job_id):
+    job = JobPost.query.get_or_404(job_id)
     kakao_api_key = current_app.config.get("KAKAO_MAP_API_KEY")
-    
-    return render_template("jobs/edit_job.html", job=job, kakao_key=kakao_api_key)
+
+    if job.author_id != current_user.id:
+        return redirect(url_for("company.company_job_detail", job_id=job_id))
+
+    if job.author.user_type == 0:
+        return redirect(url_for("jobs.edit_job", job_id=job_id))
+
+    if request.method == "POST":
+        try:
+            JobService.update_job_by_type(job_id, request.form)
+            return redirect(url_for("company.company_job_detail", job_id=job_id))
+
+        except Exception as e:
+            db.session.rollback()
+            return render_template("jobs/edit_job_company.html", job=job, kakao_key=kakao_api_key)
+
+    return render_template("jobs/edit_job_company.html", job=job, kakao_key=kakao_api_key)
+
 
 # 공고 삭제
 @jobs_bp.route("/jobs/<int:job_id>/delete", methods=["POST"])
