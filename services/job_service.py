@@ -66,6 +66,96 @@ class JobService:
         return job
 
     @staticmethod
+    def update_job_by_type(job_id, form_data):
+        """
+        공고 타입에 따라 폼 데이터를 받아 공고를 수정합니다.
+
+        Args:
+            job_id (int): 수정할 JobPost의 ID.
+            form_data (ImmutableMultiDict): Flask request.form 객체.
+        """
+        job = JobPost.query.get_or_404(job_id)
+
+        # 폼 데이터에서 공통 필드 업데이트
+        job.title = form_data.get("title", "").strip()
+        job.company = form_data.get("company", "").strip()
+        job.description = form_data.get("description", "").strip()
+        job.recruitment_type = form_data.get("recruitment_type", "")
+        job.work_period = form_data.get("work_period", "")
+        job.salary = form_data.get("salary", "").strip()
+        job.region = form_data.get("region", "").strip()
+        job.contact_phone = form_data.get("contact_phone", "").strip()
+        job.recruitment_count = form_data.get("recruitment_count", type=int)
+
+        # 지역, 위도/경도 업데이트
+        job.region_1depth_name = form_data.get("region_1depth_name")
+        job.region_2depth_name = form_data.get("region_2depth_name")
+        job.region_3depth_name = form_data.get("region_3depth_name")
+
+        latitude = form_data.get("latitude", type=float)
+        longitude = form_data.get("longitude", type=float)
+        if latitude is not None:
+            job.latitude = latitude
+        if longitude is not None:
+            job.longitude = longitude
+
+        # 근무 시간 업데이트
+        work_start_time_str = form_data.get("work_start_time", "")
+        work_end_time_str = form_data.get("work_end_time", "")
+
+        from datetime import datetime
+        if work_start_time_str:
+            job.work_start_time = datetime.strptime(work_start_time_str, "%H:%M").time()
+        else:
+            job.work_start_time = None
+
+        if work_end_time_str:
+            job.work_end_time = datetime.strptime(work_end_time_str, "%H:%M").time()
+        else:
+            job.work_end_time = None
+
+        # 근무 요일 업데이트
+        job.work_monday = form_data.get("work_monday") == "true"
+        job.work_tuesday = form_data.get("work_tuesday") == "true"
+        job.work_wednesday = form_data.get("work_wednesday") == "true"
+        job.work_thursday = form_data.get("work_thursday") == "true"
+        job.work_friday = form_data.get("work_friday") == "true"
+        job.work_saturday = form_data.get("work_saturday") == "true"
+        job.work_sunday = form_data.get("work_sunday") == "true"
+
+        # --- 공고 타입별 필드 업데이트 ---
+
+        if job.job_category is None:
+            # 사람이음 공고 (
+            job.people_category = form_data.get("people_category", "").strip()
+            #  모집 기간 업데이트
+            job.recruitment_start_date = form_data.get("recruitment_start_date")
+            job.recruitment_end_date = form_data.get("recruitment_end_date")
+        else:
+            # 기업이음 공고
+            job.job_category = form_data.get("job_category", "").strip()
+
+            recruitment_end_date_str = form_data.get("recruitment_end_date")
+            if recruitment_end_date_str:
+                job.recruitment_end_date = datetime.strptime(recruitment_end_date_str, "%Y-%m-%d").date()
+            else:
+                job.recruitment_end_date = None
+
+
+            job.people_category = None
+
+        db.session.commit()
+        return job
+
+    @staticmethod
+    def is_company_job(job_id):
+
+        job = JobPost.query.get(job_id)
+        if job and job.job_category:
+            return True
+        return False
+
+    @staticmethod
     def delete_job_safely(job_id):
         """
         공고와 연관된 모든 데이터 삭제
