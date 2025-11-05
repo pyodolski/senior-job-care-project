@@ -72,23 +72,32 @@ function applyAIText() {
   }
 }
 
+// 💡 8단계 구조에 맞게 maxStep과 selectedData 수정
 let currentStep = 1;
-let maxStep = 6;
+let maxStep = 8;
 let selectedData = {
-  category: "",
-  title: "",
-  workPeriod: "",
-  selectedDates: [],
-  days: [],
-  startTime: "",
-  endTime: "",
-  salaryType: "",
-  salaryAmount: "",
-  location: "",
-  detailAddress: "",
-  phone: "",
-  description: "",
+  category: "", // 1단계: 직무 분야 (job_category)
+  title: "",    // 2단계: 제목
+  categories: [], // (사용되지 않음 - HTML에서 카테고리 버튼 제거됨)
+  workPeriod: "", // 3단계: 근무 기간
+  recruitmentEndDate: "", // 4단계: 모집 마감 기한
+  selectedDates: [], // 3단계: 단기 근무일
+  days: [], // 3단계: 근무 요일
+  startTime: "", // 3단계: 시작 시간
+  endTime: "", // 3단계: 종료 시간
+  salaryType: "", // 5단계: 급여 타입
+  salaryAmount: 0, // 5단계: 급여 금액
+  description: "", // 6단계: 상세 설명
+  location: "", // 7단계: 주소 (위치)
+  detailAddress: "", // 7단계: 상세 주소
+  phone: "", // 8단계: 연락처
+  latitude: null, // 지오코딩 결과
+  longitude: null // 지오코딩 결과
 };
+
+const MIN_HOURLY_WAGE = 10030; // 2025년 최저시급 (최소 금액 계산용)
+
+let geocodeResult = null;
 
 let currentCalendarDate = new Date();
 const today = new Date();
@@ -109,8 +118,11 @@ function goToNextStep() {
         "input:not([type='checkbox']):not([type='radio']), textarea, select"
       );
       inputs.forEach((input) => {
-        input.readOnly = true;
-        input.disabled = true;
+        // 급여 금액 필드는 예외적으로 비활성화하지 않음 (스크롤 시 계속 표시)
+        if (input.id !== 'salaryAmount') {
+          input.readOnly = true;
+          input.disabled = true;
+        }
       });
 
       const buttons = currentSection.querySelectorAll("button:not(#nextBtn)");
@@ -146,6 +158,7 @@ function goBack() {
       updateNextButton();
     }
   } else {
+    // 💡 기업이음 목록으로 리다이렉션 (window.COMPANY_LIST_URL 사용)
     window.location.href = window.COMPANY_LIST_URL;
   }
 }
@@ -155,76 +168,73 @@ function updateNextButton() {
   let isValid = false;
 
   switch (currentStep) {
-    case 1:
-      const hasSelection =
-        document.querySelectorAll("#step1 .radio-option.selected").length > 0;
-      const customOption = document.querySelector(
-        '#step1 .radio-option[data-value="기타"].selected'
-      );
-      if (customOption) {
-        const customValue = document
-          .getElementById("customCategory")
-          ?.value.trim();
-        isValid = hasSelection && customValue !== "";
-      } else {
-        isValid = hasSelection;
-      }
+    case 1: // 직무 분야
+      // '기타' 필드 처리 포함하여 선택 여부만 확인
+      isValid = selectedData.category !== "";
       break;
-    case 2:
+    case 2: // 제목
+      // 기업이음은 2단계에 카테고리 버튼이 없으므로 제목만 확인
       isValid = selectedData.title.length > 0;
       break;
-    case 3:
+    case 3: // 근무 조건 (기간, 요일, 시간)
       if (selectedData.workPeriod === "단기") {
         isValid = selectedData.selectedDates.length > 0;
+      } else if (selectedData.workPeriod !== "") {
+        const flexibleDays = document.getElementById("flexibleDays")?.checked;
+        const flexibleTime = document.getElementById("flexibleTime")?.checked;
+        const hasDays = flexibleDays || selectedData.days.length > 0;
+        const hasTime = flexibleTime || (selectedData.startTime && selectedData.endTime);
+        isValid = hasDays && hasTime;
       } else {
-        isValid = selectedData.workPeriod !== "";
+        isValid = false;
       }
       break;
-    case 4:
+    case 4: // 💡 모집 마감 기한 (선택 사항)
+      // 선택 사항이므로 항상 유효
+      isValid = true;
+      break;
+    case 5: // 💡 급여 정보
+      // 급여 타입이 선택되었고, 금액이 0보다 커야 유효
+      isValid = selectedData.salaryType !== "" && selectedData.salaryAmount > 0;
+      break;
+    case 6: // 상세 설명
       isValid = selectedData.description.length > 0;
       break;
-    case 5:
+    case 7: // 위치
       isValid = selectedData.location.length > 0;
       break;
-    case 6:
+    case 8: // 연락처 및 동의
       const agreeTerms = document.getElementById("agreeTerms")?.checked;
       isValid = selectedData.phone.length > 0 && agreeTerms;
-      nextBtn.textContent = "AI가 작성한 공고 보기";
+      nextBtn.textContent = "공고 등록하기";
       break;
   }
 
   nextBtn.disabled = !isValid;
 }
 
-// 1단계: 직무분야 선택
 document.addEventListener("DOMContentLoaded", function () {
+  // 1단계: 직무분야 선택
   document.querySelectorAll("#step1 .radio-option").forEach((option) => {
     option.addEventListener("click", function () {
+      // 선택 해제 로직은 기업이음이 다중 선택 가능하도록 설정되어 있으므로 수정
       this.classList.toggle("selected");
-      const radioDot = this.querySelector(".radio-dot");
-      radioDot.classList.toggle("hidden");
+      this.querySelector(".radio-dot").classList.toggle("hidden");
 
+      // 기타 입력 필드 표시/숨김
       if (this.dataset.value === "기타") {
-        const customInput = document.getElementById("customCategory");
-        if (this.classList.contains("selected")) {
-          customInput.classList.remove("hidden");
-        } else {
-          customInput.classList.add("hidden");
-          customInput.value = "";
-        }
+        document.getElementById("customCategory")?.classList.toggle("hidden", !this.classList.contains("selected"));
+        if (!this.classList.contains("selected")) document.getElementById("customCategory").value = "";
       }
 
+      // 선택된 카테고리를 selectedData.category에 저장 (다중 선택된 경우 콤마로 연결)
       const selectedCategories = [];
       document
         .querySelectorAll("#step1 .radio-option.selected")
         .forEach((opt) => {
           if (opt.dataset.value === "기타") {
-            const customValue = document
-              .getElementById("customCategory")
-              .value.trim();
-            if (customValue) {
-              selectedCategories.push(customValue);
-            }
+            const customValue = document.getElementById("customCategory")?.value.trim();
+            if (customValue) selectedCategories.push(customValue);
           } else {
             selectedCategories.push(opt.dataset.value);
           }
@@ -235,32 +245,24 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  document
-    .getElementById("customCategory")
-    ?.addEventListener("input", function () {
-      const selectedCategories = [];
-      document
-        .querySelectorAll("#step1 .radio-option.selected")
-        .forEach((opt) => {
-          if (opt.dataset.value === "기타") {
-            const customValue = this.value.trim();
-            if (customValue) {
-              selectedCategories.push(customValue);
-            }
-          } else {
-            selectedCategories.push(opt.dataset.value);
-          }
-        });
-
-      selectedData.category = selectedCategories.join(", ");
-      updateNextButton();
-    });
-
-  // 2단계: 제목 입력
-  document.getElementById("jobTitle")?.addEventListener("input", function () {
-    selectedData.title = this.value;
+  // 기타 입력 필드 로직
+  document.getElementById("customCategory")?.addEventListener("input", function () {
+    const 기타옵션 = document.querySelector('#step1 .radio-option[data-value="기타"].selected');
+    if (기타옵션) {
+        selectedData.category = this.value.trim();
+    }
     updateNextButton();
   });
+
+
+  // 2단계: 제목 입력
+  const jobTitle = document.getElementById("jobTitle");
+  if (jobTitle) {
+    jobTitle.addEventListener("input", function () {
+      selectedData.title = this.value;
+      updateNextButton();
+    });
+  }
 
   // 3단계: 근무 기간 선택
   document.querySelectorAll(".period-btn").forEach((btn) => {
@@ -270,10 +272,8 @@ document.addEventListener("DOMContentLoaded", function () {
         .forEach((b) => b.classList.remove("option-selected"));
       this.classList.add("option-selected");
       selectedData.workPeriod = this.dataset.period;
-
       const calendar = document.getElementById("shortTermCalendar");
       const schedule = document.getElementById("longTermSchedule");
-
       if (this.dataset.period === "단기") {
         calendar.classList.remove("hidden");
         schedule.classList.add("hidden");
@@ -282,35 +282,67 @@ document.addEventListener("DOMContentLoaded", function () {
         calendar.classList.add("hidden");
         schedule.classList.remove("hidden");
       }
-
       updateNextButton();
     });
   });
 
-  // 요일 선택
-  document.querySelectorAll(".day-btn").forEach((btn) => {
-    btn.addEventListener("click", function () {
-      this.classList.toggle("option-selected");
+  // 💡 4단계: 모집 마감일 입력
+  document.getElementById("recruitmentEndDate")?.addEventListener("change", function () {
+    selectedData.recruitmentEndDate = this.value;
+    updateNextButton();
+  });
 
-      const selectedDays = [];
-      document.querySelectorAll(".day-btn.option-selected").forEach((b) => {
-        selectedDays.push(b.dataset.day);
-      });
-      selectedData.days = selectedDays;
+
+  // 5단계: 급여 타입 버튼
+  document.querySelectorAll(".salary-type-btn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      document
+        .querySelectorAll(".salary-type-btn")
+        .forEach((b) => b.classList.remove("option-selected"));
+      this.classList.add("option-selected");
+      selectedData.salaryType = this.dataset.type;
+      calculateMinimumSalary();
+      updateNextButton();
     });
   });
 
-  // 상세 주소 입력
-  document
-    .getElementById("detailAddress")
-    .addEventListener("input", function () {
+  // 5단계: 급여 금액 입력
+  const salaryAmount = document.getElementById("salaryAmount");
+  if (salaryAmount) {
+    salaryAmount.addEventListener("input", function (e) {
+      let value = e.target.value.replace(/[^0-9]/g, "");
+      if (value) {
+        value = parseInt(value).toLocaleString();
+      }
+      e.target.value = value;
+      selectedData.salaryAmount = parseInt(value.replace(/,/g, "")) || 0;
+      calculateMinimumSalary();
+      updateNextButton();
+    });
+  }
+
+  // 6단계: 상세 설명 입력
+  const jobDescription = document.getElementById("jobDescription");
+  if (jobDescription) {
+    jobDescription.addEventListener("input", function () {
+      selectedData.description = this.value;
+      updateNextButton();
+    });
+  }
+
+
+  // 7단계: 상세 주소 입력
+  const detailAddress = document.getElementById("detailAddress");
+  if (detailAddress) {
+    detailAddress.addEventListener("input", function () {
       selectedData.detailAddress = this.value;
     });
+  }
 
-  // 연락처 입력
-  document
-    .getElementById("contactPhone")
-    .addEventListener("input", function (e) {
+  // 8단계: 연락처 입력
+  const contactPhone = document.getElementById("contactPhone");
+  if (contactPhone) {
+    contactPhone.addEventListener("input", function (e) {
       let value = e.target.value.replace(/[^0-9]/g, "");
       if (value.length > 3 && value.length <= 7) {
         value = value.slice(0, 3) + "-" + value.slice(3);
@@ -326,21 +358,84 @@ document.addEventListener("DOMContentLoaded", function () {
       selectedData.phone = value;
       updateNextButton();
     });
+  }
 
-  // 동의 체크박스
-  document
-    .getElementById("agreeTerms")
-    ?.addEventListener("change", function () {
+  // 8단계: 동의 체크박스
+  const agreeTerms = document.getElementById("agreeTerms");
+  if (agreeTerms) {
+    agreeTerms.addEventListener("change", function () {
+      updateNextButton();
+    });
+  }
+
+  // 3단계: 요일/시간 선택 및 협의 로직
+  document.querySelectorAll(".day-btn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      if (!this.classList.contains("disabled")) {
+        this.classList.toggle("option-selected");
+        const selectedDays = [];
+        document
+          .querySelectorAll(".day-btn.option-selected")
+          .forEach((b) => selectedDays.push(b.dataset.day));
+        selectedData.days = selectedDays;
+        updateNextButton();
+      }
+    });
+  });
+
+  const flexibleDays = document.getElementById("flexibleDays");
+  if (flexibleDays) {
+    flexibleDays.addEventListener("change", function () {
+      const dayBtns = document.querySelectorAll(".day-btn");
+      if (this.checked) {
+        dayBtns.forEach((btn) => {
+          btn.classList.add("disabled");
+          btn.classList.remove("option-selected");
+        });
+        selectedData.days = ["협의"];
+      } else {
+        dayBtns.forEach((btn) => {
+          btn.classList.remove("disabled");
+        });
+        selectedData.days = [];
+      }
+      updateNextButton();
+    });
+  }
+
+  const flexibleTime = document.getElementById("flexibleTime");
+  const startTimeSelect = document.getElementById("startTimeSelect");
+  const endTimeSelect = document.getElementById("endTimeSelect");
+  if (flexibleTime && startTimeSelect && endTimeSelect) {
+    flexibleTime.addEventListener("change", function () {
+      if (this.checked) {
+        startTimeSelect.disabled = true;
+        endTimeSelect.disabled = true;
+        startTimeSelect.classList.add("opacity-50", "cursor-not-allowed");
+        endTimeSelect.classList.add("opacity-50", "cursor-not-allowed");
+        selectedData.startTime = "협의";
+        selectedData.endTime = "협의";
+      } else {
+        startTimeSelect.disabled = false;
+        endTimeSelect.disabled = false;
+        startTimeSelect.classList.remove("opacity-50", "cursor-not-allowed");
+        endTimeSelect.classList.remove("opacity-50", "cursor-not-allowed");
+        selectedData.startTime = startTimeSelect.value;
+        selectedData.endTime = endTimeSelect.value;
+      }
       updateNextButton();
     });
 
-  // 설명 입력
-  document
-    .getElementById("jobDescription")
-    .addEventListener("input", function () {
-      selectedData.description = this.value;
+    startTimeSelect.addEventListener("change", function () {
+      selectedData.startTime = this.value;
       updateNextButton();
     });
+
+    endTimeSelect.addEventListener("change", function () {
+      selectedData.endTime = this.value;
+      updateNextButton();
+    });
+  }
 
   updateNextButton();
 });
@@ -460,37 +555,32 @@ function changeMonth(delta) {
 }
 window.changeMonth = changeMonth;
 
-// 최저임금 계산 함수
-function calculateMinimumWage() {
-  const minHourlyWage = 10030;
-  const salaryType = selectedData.salaryType;
-  const startTime = document.getElementById("startTimeSelect")?.value;
-  const endTime = document.getElementById("endTimeSelect")?.value;
-
-  let minWageText = "";
-
-  if (salaryType === "시급") {
-    if (startTime && endTime) {
-      const start = parseInt(startTime.split(":")[0]);
-      const end = parseInt(endTime.split(":")[0]);
-      const hours = end > start ? end - start : 24 - start + end;
-      const dailyWage = minHourlyWage * hours;
-      minWageText = `이 조건으로 근무할 경우 최소 일급은 <strong>${dailyWage.toLocaleString()}원</strong>이에요`;
-    } else {
-      minWageText = `이 조건으로 근무할 경우 최소 일급은 <strong>70,210원</strong>이에요 (7시간 기준)`;
-    }
-  } else if (salaryType === "일급") {
-    minWageText = `최저시급 기준 7시간 근무 시 최소 일급은 <strong>70,210원</strong>이에요`;
-  } else if (salaryType === "월급") {
-    const daysCount = selectedData.days.length || 5;
-    const monthlyWage = minHourlyWage * 7 * daysCount * 4;
-    minWageText = `주 ${daysCount}일 근무 시 최소 월급은 <strong>${monthlyWage.toLocaleString()}원</strong>이에요`;
-  } else if (salaryType === "건당") {
-    minWageText = `건당 급여는 작업 내용에 따라 협의하여 결정해주세요`;
+// 💡 최저임금 계산 함수
+function calculateMinimumSalary() {
+  const calculationText = document.getElementById("salaryCalculation");
+  if (!calculationText || !selectedData.salaryType) {
+    return;
   }
 
-  document.getElementById("minimumWageInfo").innerHTML = minWageText;
+  let minimumSalary = 0;
+  let salaryTypeText = selectedData.salaryType;
+
+  // 근무 조건에 따른 최소 급여 계산
+  if (selectedData.salaryType === "시급") {
+    minimumSalary = MIN_HOURLY_WAGE;
+    calculationText.textContent = `최소 시급은 ${minimumSalary.toLocaleString()}원이에요`;
+  } else if (selectedData.salaryType === "일급") {
+    minimumSalary = MIN_HOURLY_WAGE * 8;
+    calculationText.textContent = `최저시급 기준 8시간 근무 시 최소 일급은 ${minimumSalary.toLocaleString()}원이에요`;
+  } else if (selectedData.salaryType === "월급") {
+    minimumSalary = Math.floor(MIN_HOURLY_WAGE * 209);
+    calculationText.textContent = `주 40시간 근무 시 최소 월급은 ${minimumSalary.toLocaleString()}원이에요`;
+  } else if (selectedData.salaryType === "건당") {
+    calculationText.textContent = "건당 급여는 업무 내용에 따라 협의해주세요";
+    return;
+  }
 }
+window.calculateMinimumSalary = calculateMinimumSalary;
 
 // 지도 관련 변수
 let addressMap = null;
@@ -499,14 +589,9 @@ let selectedAddress = null;
 
 function openAddressSearch() {
   document.getElementById("addressModal").classList.remove("hidden");
-
   if (!addressMap) {
-    setTimeout(function () {
+    setTimeout(() => {
       initAddressMap();
-    }, 100);
-  } else {
-    setTimeout(function () {
-      addressMap.relayout();
     }, 100);
   }
 }
@@ -514,40 +599,18 @@ window.openAddressSearch = openAddressSearch;
 
 function initAddressMap() {
   const container = document.getElementById("addressMap");
-
-  if (typeof kakao === "undefined" || !kakao.maps) {
-    console.error("카카오 맵 스크립트가 아직 로드되지 않았습니다.");
-    return;
-  }
-
-  if (!container) {
-    console.error("지도 컨테이너를 찾을 수 없습니다.");
-    return;
-  }
-
   const options = {
     center: new kakao.maps.LatLng(35.8242, 128.7569),
     level: 5,
   };
-
   addressMap = new kakao.maps.Map(container, options);
-
-  setTimeout(function () {
-    addressMap.relayout();
-  }, 100);
-
   kakao.maps.event.addListener(addressMap, "click", function (mouseEvent) {
     const latlng = mouseEvent.latLng;
-
-    if (addressMarker) {
-      addressMarker.setMap(null);
-    }
-
+    if (addressMarker) addressMarker.setMap(null);
     addressMarker = new kakao.maps.Marker({
       position: latlng,
       map: addressMap,
     });
-
     const geocoder = new kakao.maps.services.Geocoder();
     geocoder.coord2Address(
       latlng.getLng(),
@@ -556,7 +619,6 @@ function initAddressMap() {
         if (status === kakao.maps.services.Status.OK) {
           const address = result[0].address;
           const roadAddress = result[0].road_address;
-
           selectedAddress = {
             address: roadAddress
               ? roadAddress.address_name
@@ -564,7 +626,6 @@ function initAddressMap() {
             lat: latlng.getLat(),
             lng: latlng.getLng(),
           };
-
           document.getElementById("selectedAddressText").textContent =
             selectedAddress.address;
           document.getElementById("confirmAddressBtn").disabled = false;
@@ -580,31 +641,22 @@ function searchAddress() {
     alert("주소를 입력해주세요");
     return;
   }
-
   const geocoder = new kakao.maps.services.Geocoder();
-
   geocoder.addressSearch(query, function (result, status) {
     if (status === kakao.maps.services.Status.OK) {
       const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-
       addressMap.setCenter(coords);
       addressMap.setLevel(3);
-
-      if (addressMarker) {
-        addressMarker.setMap(null);
-      }
-
+      if (addressMarker) addressMarker.setMap(null);
       addressMarker = new kakao.maps.Marker({
         position: coords,
         map: addressMap,
       });
-
       selectedAddress = {
         address: result[0].address_name || result[0].road_address?.address_name,
         lat: parseFloat(result[0].y),
         lng: parseFloat(result[0].x),
       };
-
       document.getElementById("selectedAddressText").textContent =
         selectedAddress.address;
       document.getElementById("confirmAddressBtn").disabled = false;
@@ -625,64 +677,136 @@ function closeAddressModal() {
 }
 window.closeAddressModal = closeAddressModal;
 
-function confirmAddress() {
+async function confirmAddress() {
   if (selectedAddress) {
     document.getElementById("workLocation").value = selectedAddress.address;
     selectedData.location = selectedAddress.address;
     selectedData.latitude = selectedAddress.lat;
     selectedData.longitude = selectedAddress.lng;
-    updateNextButton();
-    closeAddressModal();
+
+    // 지오코딩을 통해 행정 구역 정보 가져오기
+    const geocoder = new kakao.maps.services.Geocoder();
+    try {
+      const regionResult = await new Promise((resolve, reject) => {
+        geocoder.coord2RegionCode(
+          selectedAddress.lng,
+          selectedAddress.lat,
+          (result, status) => {
+            if (status === kakao.maps.services.Status.OK) {
+              resolve(result);
+            } else {
+              reject(new Error("주소 변환 실패"));
+            }
+          }
+        );
+      });
+
+      const legalRegion =
+        regionResult.find((r) => r.region_type === "B") || regionResult[0];
+
+      // 전역 geocodeResult 변수에 행정 구역 정보 저장
+      geocodeResult = {
+        lat: selectedAddress.lat,
+        lng: selectedAddress.lng,
+        region1: legalRegion.region_1depth_name,
+        region2: legalRegion.region_2depth_name,
+        region3: legalRegion.region_3depth_name,
+      };
+
+      // Hidden field에 값 설정 (HTML에 해당 필드가 있다고 가정)
+      document.getElementById("latitude").value = selectedAddress.lat;
+      document.getElementById("longitude").value = selectedAddress.lng;
+      document.getElementById("region_1depth_name").value = legalRegion.region_1depth_name;
+      document.getElementById("region_2depth_name").value = legalRegion.region_2depth_name;
+      document.getElementById("region_3depth_name").value = legalRegion.region_3depth_name;
+
+    } catch (error) {
+      console.error("주소 변환 중 오류 발생:", error);
+      geocodeResult = null;
+      alert("주소 정보를 가져오는 데 실패했습니다. 다른 위치를 선택해주세요.");
+    } finally {
+      updateNextButton();
+      closeAddressModal();
+    }
   }
 }
 window.confirmAddress = confirmAddress;
 
-// 제출 함수
+let isSubmitting = false; // 중복 제출 방지 플래그
+
 async function submitJob() {
+  if (isSubmitting) {
+    console.log("이미 제출 중입니다.");
+    return;
+  }
+
+  isSubmitting = true;
+
+  const nextBtn = document.getElementById("nextBtn");
+  if (nextBtn) {
+    nextBtn.disabled = true;
+    nextBtn.classList.add("bg-gray-400", "cursor-not-allowed");
+    nextBtn.classList.remove("bg-blue-600", "hover:bg-blue-700");
+    nextBtn.textContent = "제출 중...";
+  }
+
   console.log("제출 데이터:", selectedData);
-
   try {
-    let geocodeResult = null;
-    if (selectedData.latitude && selectedData.longitude) {
-      geocodeResult = {
-        lat: selectedData.latitude,
-        lng: selectedData.longitude,
-      };
-    } else {
-      geocodeResult = await geocodeAddress(selectedData.location);
-    }
-
     const formData = new FormData();
-
     formData.append("title", selectedData.title);
     formData.append("company", window.CURRENT_USER_NICKNAME);
-    formData.append("people_category", selectedData.category);
+
+    // 💡 기업이음: job_category와 recruitment_type에 1단계 선택 값 사용
+    formData.append("job_category", selectedData.category);
+    formData.append("recruitment_type", selectedData.category);
+
     formData.append(
       "description",
       selectedData.description || "상세 설명 없음"
     );
     formData.append("work_period", selectedData.workPeriod);
 
-    if (
-      selectedData.workPeriod === "단기" &&
-      selectedData.startDate &&
-      selectedData.endDate
-    ) {
-      formData.append("recruitment_start_date", selectedData.startDate);
-      formData.append("recruitment_end_date", selectedData.endDate);
+    // 💡 모집 마감 기한 추가 (4단계)
+    if (selectedData.recruitmentEndDate) {
+        formData.append("recruitment_end_date", selectedData.recruitmentEndDate);
     }
 
-    formData.append(
-      "salary",
-      `${selectedData.salaryType} ${selectedData.salaryAmount}원`
-    );
-    formData.append("region", selectedData.location);
+    // 💡 모집 인원 추가 (UI가 없으므로 기본값 1 전송)
+    formData.append("recruitment_count", 1);
 
+    // 단기 근무일 경우 선택된 날짜 전송 (시작일/종료일)
+    if (
+      selectedData.workPeriod === "단기" &&
+      selectedData.selectedDates.length > 0
+    ) {
+      const sortedDates = selectedData.selectedDates.sort();
+      formData.append("recruitment_start_date", sortedDates[0]);
+      formData.append(
+        "recruitment_end_date",
+        sortedDates[sortedDates.length - 1]
+      );
+    }
+
+    // 💡 급여 정보 전송 (5단계)
+    if (selectedData.salaryType && selectedData.salaryAmount > 0) {
+      formData.append(
+        "salary",
+        `${
+          selectedData.salaryType
+        } ${selectedData.salaryAmount.toLocaleString()}원`
+      );
+    } else {
+      formData.append("salary", "급여 협의");
+    }
+
+    formData.append("region", selectedData.location);
+    formData.append("contact_phone", selectedData.phone);
     if (selectedData.detailAddress) {
       formData.append("detail_address", selectedData.detailAddress);
     }
 
-    if (geocodeResult) {
+    // 지오코딩 결과 전송
+    if (geocodeResult && geocodeResult.lat && geocodeResult.lng) {
       formData.append("latitude", geocodeResult.lat);
       formData.append("longitude", geocodeResult.lng);
       formData.append("region_1depth_name", geocodeResult.region1 || "");
@@ -690,86 +814,81 @@ async function submitJob() {
       formData.append("region_3depth_name", geocodeResult.region3 || "");
     }
 
-    formData.append("contact_phone", selectedData.phone);
-
+    // 근무 요일 (협의 포함)
     formData.append(
       "work_monday",
-      selectedData.days.includes("월") ? "true" : "false"
+      selectedData.days.includes("월") || selectedData.days.includes("협의") ? "true" : "false"
     );
     formData.append(
       "work_tuesday",
-      selectedData.days.includes("화") ? "true" : "false"
+      selectedData.days.includes("화") || selectedData.days.includes("협의") ? "true" : "false"
     );
     formData.append(
       "work_wednesday",
-      selectedData.days.includes("수") ? "true" : "false"
+      selectedData.days.includes("수") || selectedData.days.includes("협의") ? "true" : "false"
     );
     formData.append(
       "work_thursday",
-      selectedData.days.includes("목") ? "true" : "false"
+      selectedData.days.includes("목") || selectedData.days.includes("협의") ? "true" : "false"
     );
     formData.append(
       "work_friday",
-      selectedData.days.includes("금") ? "true" : "false"
+      selectedData.days.includes("금") || selectedData.days.includes("협의") ? "true" : "false"
     );
     formData.append(
       "work_saturday",
-      selectedData.days.includes("토") ? "true" : "false"
+      selectedData.days.includes("토") || selectedData.days.includes("협의") ? "true" : "false"
     );
     formData.append(
       "work_sunday",
-      selectedData.days.includes("일") ? "true" : "false"
+      selectedData.days.includes("일") || selectedData.days.includes("협의") ? "true" : "false"
     );
 
+    // 근무 시간 (협의 제외)
     const startTimeSelect = document.getElementById("startTimeSelect");
     const endTimeSelect = document.getElementById("endTimeSelect");
 
-    if (startTimeSelect && startTimeSelect.value) {
+    if (startTimeSelect && startTimeSelect.value && selectedData.startTime !== "협의") {
       formData.append("work_start_time", startTimeSelect.value);
     }
-    if (endTimeSelect && endTimeSelect.value) {
+    if (endTimeSelect && endTimeSelect.value && selectedData.endTime !== "협의") {
       formData.append("work_end_time", endTimeSelect.value);
     }
 
+    // 💡 기업이음 공고 작성 URL 사용
     const response = await fetch(window.CREATE_COMPANY_JOB_URL, {
       method: "POST",
       body: formData,
     });
 
     if (response.ok) {
-      alert("공고가 성공적으로 작성되었습니다! 지도에서 확인할 수 있습니다.");
-      window.location.href = window.COMPANY_LIST_URL;
+      alert("공고가 성공적으로 작성되었습니다!");
+      window.location.href = window.COMPANY_LIST_URL; // 💡 기업이음 목록으로 리다이렉션
     } else {
       const text = await response.text();
       console.error("서버 응답:", text);
       alert("공고 작성 중 오류가 발생했습니다.");
+
+      // 오류 발생 시 버튼 다시 활성화
+      isSubmitting = false;
+      if (nextBtn) {
+        nextBtn.disabled = false;
+        nextBtn.classList.remove("bg-gray-400", "cursor-not-allowed");
+        nextBtn.classList.add("bg-blue-600", "hover:bg-blue-700");
+        nextBtn.textContent = currentStep === maxStep ? "공고 등록하기" : "다음";
+      }
     }
   } catch (error) {
     console.error("Error:", error);
     alert("공고 작성 중 오류가 발생했습니다: " + error.message);
-  }
-}
 
-async function geocodeAddress(address) {
-  try {
-    const response = await fetch(
-      `/api/address_search?query=${encodeURIComponent(address)}`
-    );
-    const data = await response.json();
-
-    if (data.documents && data.documents.length > 0) {
-      const result = data.documents[0];
-      return {
-        lat: parseFloat(result.y),
-        lng: parseFloat(result.x),
-        region1: result.address?.region_1depth_name || "",
-        region2: result.address?.region_2depth_name || "",
-        region3: result.address?.region_3depth_name || "",
-      };
+    // 오류 발생 시 버튼 다시 활성화
+    isSubmitting = false;
+    if (nextBtn) {
+      nextBtn.disabled = false;
+      nextBtn.classList.remove("bg-gray-400", "cursor-not-allowed");
+      nextBtn.classList.add("bg-blue-600", "hover:bg-blue-700");
+      nextBtn.textContent = currentStep === maxStep ? "공고 등록하기" : "다음";
     }
-    return null;
-  } catch (error) {
-    console.error("주소 변환 오류:", error);
-    return null;
   }
 }

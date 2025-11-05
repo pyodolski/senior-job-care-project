@@ -277,7 +277,7 @@ def create_company_job():
             region = request.form.get("region", "").strip()
             contact_phone = request.form.get("contact_phone", "").strip()
             recruitment_count = request.form.get("recruitment_count", type=int)
-            
+            recruitment_end_date = request.form.get("recruitment_end_date")
             # 기업이음 카테고리 (안전·관리, 서비스·매장, 생활·돌봄 지원, 운전·배송, 사회·공공, 기타)
             job_category = request.form.get("job_category", "").strip()
             print(f"📝 기업이음 공고 작성 - job_category: '{job_category}'")
@@ -333,6 +333,7 @@ def create_company_job():
                 longitude=longitude,
                 contact_phone=contact_phone,
                 recruitment_count=recruitment_count,
+                recruitment_end_date = recruitment_end_date,
                 job_category=job_category,  # 기업이음 카테고리
                 work_start_time=work_start_time,
                 work_end_time=work_end_time,
