@@ -69,10 +69,6 @@ class JobService:
     def update_job_by_type(job_id, form_data):
         """
         공고 타입에 따라 폼 데이터를 받아 공고를 수정합니다.
-
-        Args:
-            job_id (int): 수정할 JobPost의 ID.
-            form_data (ImmutableMultiDict): Flask request.form 객체.
         """
         job = JobPost.query.get_or_404(job_id)
 
