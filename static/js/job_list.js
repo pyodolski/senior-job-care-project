@@ -142,7 +142,5 @@ filterForm.addEventListener("submit", function (event) {
     }
   });
 
-  // [수정] 페이지 파라미터 관련 코드 제거
-
   window.location.href = currentUrl.pathname + "?" + params.toString();
 });

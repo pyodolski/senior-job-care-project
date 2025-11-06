@@ -65,6 +65,47 @@
 
       <!-- 메인 컨텐츠: 이력서 목록 -->
       <main class="px-4 py-4 sm:px-6 bg-gray-50 pb-24">
+        <section class="mb-4 overflow-x-auto whitespace-nowrap hide-scroll">
+            <div id="filter-container" class="inline-flex space-x-2">
+
+                <div class="relative inline-block text-left">
+                    <button type="button" onclick="toggleFilterDropdown(this)" data-filter="category"
+                            class="inline-flex justify-center items-center w-full rounded-full border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        직무 분야 <svg class="ml-2 -mr-1 h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    </button>
+                    <div class="filter-dropdown absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20 hidden" data-filter-target="category">
+                        </div>
+                </div>
+
+                <div class="relative inline-block text-left">
+                    <button type="button" onclick="toggleFilterDropdown(this)" data-filter="day"
+                            class="inline-flex justify-center items-center w-full rounded-full border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        근무 요일 <svg class="ml-2 -mr-1 h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    </button>
+                    <div class="filter-dropdown absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20 hidden" data-filter-target="day">
+                        </div>
+                </div>
+
+                <div class="relative inline-block text-left">
+                    <button type="button" onclick="toggleFilterDropdown(this)" data-filter="physical"
+                            class="inline-flex justify-center items-center w-full rounded-full border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        신체 활동 <svg class="ml-2 -mr-1 h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    </button>
+                    <div class="filter-dropdown absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20 hidden" data-filter-target="physical">
+                        </div>
+                </div>
+
+                <div class="relative inline-block text-left">
+                    <button type="button" onclick="toggleFilterDropdown(this)" data-filter="walkable"
+                            class="inline-flex justify-center items-center w-full rounded-full border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        이동 거리 <svg class="ml-2 -mr-1 h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    </button>
+                    <div class="filter-dropdown absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20 hidden" data-filter-target="walkable">
+                        </div>
+                </div>
+            </div>
+        </section>
+
         <div id="resume-container" class="space-y-4">
           {% if resumes %}
           <!-- 초기 이력서 목록 렌더링 -->
