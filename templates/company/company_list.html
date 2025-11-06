@@ -304,12 +304,16 @@
                 </div>
                 <p class="text-sm text-gray-600">{{ job.company }}</p>
               </div>
+              {% if job.recruitment_end_date %}
               <p class="text-xs text-gray-500">
-                ~{{ job.created_at.strftime('%m/%d') }} ({% set day_map =
+                ~{{ job.recruitment_end_date.strftime('%m/%d') }} ({% set day_map =
                 {'Mon': '월', 'Tue': '화', 'Wed': '수', 'Thu': '목', 'Fri':
                 '금', 'Sat': '토', 'Sun': '일'} %}{{
-                day_map[job.created_at.strftime('%a')] }})
+                day_map[job.recruitment_end_date.strftime('%a')] }})
               </p>
+              {% else %}
+              <p class="text-xs text-gray-500">마감일 없음</p>
+              {% endif %}
             </div>
 
             <!-- 행[1]: 공고명, 하트 버튼 -->
