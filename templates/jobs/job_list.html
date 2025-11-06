@@ -324,24 +324,35 @@
             <!-- 행[1]: 공고명, 하트 버튼 -->
             <div class="flex items-center justify-between mb-1">
               <h3 class="font-bold text-lg">{{ job.title }}</h3>
-              <button
-                class="{% if status.bookmarked %}text-red-500{% else %}text-gray-400{% endif %} hover:text-red-500"
-                onclick="event.stopPropagation(); toggleBookmark({{ job.id }}, this);"
-              >
-                <svg
-                  class="w-6 h-6"
-                  fill="{% if status.bookmarked %}currentColor{% else %}none{% endif %}"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
-                  />
-                </svg>
-              </button>
+              <div class="flex flex-col items-end flex-shrink-0">
+                  {% if job.recruitment_end_date %}
+                      {% set day_name = job.recruitment_end_date.strftime('%a') %}
+                      {% set day_mapping = {'Mon': '월', 'Tue': '화', 'Wed': '수', 'Thu': '목', 'Fri': '금', 'Sat': '토', 'Sun': '일'} %}
+                      {% set formatted_day = day_mapping[day_name] if day_name in day_mapping else '' %}
+                      <p class="text-xs text-gray-500 mb-1 leading-none">
+                          ~{{ job.recruitment_end_date.strftime('%m/%d') }} ({{ formatted_day }})
+                      </p>
+                  {% endif %}
+
+                  <button
+                    class="{% if status.bookmarked %}text-red-500{% else %}text-gray-400{% endif %} hover:text-red-500"
+                    onclick="event.stopPropagation(); toggleBookmark({{ job.id }}, this);"
+                  >
+                    <svg
+                      class="w-6 h-6"
+                      fill="{% if status.bookmarked %}currentColor{% else %}none{% endif %}"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
+                      />
+                    </svg>
+                  </button>
+              </div>
             </div>
 
             <!-- 행[2]: 급여 -->
@@ -362,14 +373,7 @@
                 {% if job.work_period %}
                 <span class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full">
                   {{ job.work_period }}
-                  {% if job.recruitment_start_date and job.recruitment_end_date %}
-                  ({{ job.recruitment_start_date.strftime('%m/%d') }}~{{ job.recruitment_end_date.strftime('%m/%d') }})
-                  {% elif job.recruitment_start_date %}
-                  ({{ job.recruitment_start_date.strftime('%m/%d') }}~)
-                  {% elif job.recruitment_end_date %}
-                  (~{{ job.recruitment_end_date.strftime('%m/%d') }})
-                  {% endif %}
-                </span>
+                  </span>
                 {% endif %}
               </div>
               {% if current_user.id == job.author_id %}

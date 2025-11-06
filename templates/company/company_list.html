@@ -342,7 +342,7 @@
             <!-- 행[2]: 급여 -->
             <div class="mb-2">
               <p class="text-blue-600 font-bold">
-                월급 {{ job.salary or '3,000,000원' }}
+                {% if job.salary %}{{ job.salary }}{% else %}급여 협의{% endif %}
               </p>
             </div>
 
@@ -353,10 +353,12 @@
                   class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
                   >{{ job.recruitment_type or '정직원' }}</span
                 >
+                {% if job.work_period %}
                 <span
                   class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
-                  >{{ job.work_period or '상주직' }}</span
+                  >{{ job.work_period }}</span
                 >
+                {% endif %}
               </div>
               {% if current_user.user_type == 1 and current_user.id ==
               job.author_id %}

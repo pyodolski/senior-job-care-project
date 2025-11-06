@@ -177,22 +177,30 @@
             <div class="flex-1">
               <div class="text-white text-base font-semibold">
                 {{ job.work_period }}
-                {% if job.recruitment_start_date and job.recruitment_end_date %}
-                <span class="text-sm font-normal ml-2">
-                  ({{ job.recruitment_start_date.strftime('%Y.%m.%d') }} ~ {{ job.recruitment_end_date.strftime('%Y.%m.%d') }})
-                </span>
-                {% elif job.recruitment_start_date %}
-                <span class="text-sm font-normal ml-2">
-                  ({{ job.recruitment_start_date.strftime('%Y.%m.%d') }}부터)
-                </span>
-                {% elif job.recruitment_end_date %}
-                <span class="text-sm font-normal ml-2">
-                  (~{{ job.recruitment_end_date.strftime('%Y.%m.%d') }})
-                </span>
-                {% endif %}
-              </div>
+                </div>
             </div>
           </div>
+
+          {% if job.recruitment_start_date or job.recruitment_end_date %}
+          <div class="px-3">
+            <p class="text-sm text-gray-600 font-medium">
+                모집 기간:
+                {% if job.recruitment_start_date and job.recruitment_end_date %}
+                    <span class="text-gray-900 font-semibold">
+                      {{ job.recruitment_start_date.strftime('%Y.%m.%d') }} ~ {{ job.recruitment_end_date.strftime('%Y.%m.%d') }}
+                    </span>
+                {% elif job.recruitment_start_date %}
+                    <span class="text-gray-900 font-semibold">
+                      {{ job.recruitment_start_date.strftime('%Y.%m.%d') }}부터
+                    </span>
+                {% elif job.recruitment_end_date %}
+                    <span class="text-gray-900 font-semibold">
+                      ~ {{ job.recruitment_end_date.strftime('%Y.%m.%d') }}까지
+                    </span>
+                {% endif %}
+            </p>
+          </div>
+          {% endif %}
           {% endif %}
         </div>
 
