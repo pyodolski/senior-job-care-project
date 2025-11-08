@@ -88,6 +88,9 @@ class JobService:
         job.region_2depth_name = form_data.get("region_2depth_name")
         job.region_3depth_name = form_data.get("region_3depth_name")
 
+        job.detail_address = form_data.get("detail_address", "").strip()
+
+
         latitude = form_data.get("latitude", type=float)
         longitude = form_data.get("longitude", type=float)
         if latitude is not None:

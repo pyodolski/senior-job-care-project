@@ -159,6 +159,8 @@ def create_job():
             region_2depth_name = request.form.get("region_2depth_name")
             region_3depth_name = request.form.get("region_3depth_name")
 
+            detail_address = request.form.get("detail_address", "").strip()
+
             # 위도, 경도 폼 데이터
             latitude = request.form.get("latitude", type=float)
             longitude = request.form.get("longitude", type=float)
@@ -218,6 +220,7 @@ def create_job():
                 region_1depth_name=region_1depth_name,
                 region_2depth_name=region_2depth_name,
                 region_3depth_name=region_3depth_name,
+                detail_address=detail_address,
                 author_id=current_user.id
             )
             
