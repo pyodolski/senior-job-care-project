@@ -116,7 +116,8 @@ def create_resume():
         resume=None,
         all_categories=list(Category),
         all_work_types=list(WorkType),
-        all_strengths=list(Strength)
+        all_strengths=list(Strength),
+        submit_url=url_for('resumes.resume_preview')
     )
 
 
@@ -199,7 +200,8 @@ def edit_resume(resume_id):
         resume=resume,
         all_categories=list(Category),
         all_work_types=list(WorkType),
-        all_strengths=list(Strength)
+        all_strengths=list(Strength),
+        submit_url=url_for('resumes.edit_resume', resume_id=resume_id)
     )
 
 
