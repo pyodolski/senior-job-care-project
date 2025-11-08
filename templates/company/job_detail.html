@@ -253,7 +253,7 @@
         {% if current_user.id == job.author_id %}
         <div class="flex gap-4 mt-6 pt-6 border-t">
           <a
-            href="{{ url_for('jobs.edit_company_job', job_id=job.id) }}"
+            href="{{ url_for('company.edit_company_job', job_id=job.id) }}"
             class="flex-1 text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg transition-colors"
             >수정하기</a
           >

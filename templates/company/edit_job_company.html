@@ -3,37 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>사람이음 공고 수정</title>
+    <title>기업이음 공고 수정</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_key }}&libraries=services"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/company/create_company_job_scroll.css') }}"
-    />
-  </head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/company/create_company_job_scroll.css') }}" />
+    </head>
   <body class="bg-gray-50">
     <script>
       // JavaScript 파일이 참조할 초기 공고 데이터
       window.INITIAL_JOB_DATA = {
         id: {{ job.id }},
-        category: "{{ job.people_category | default('') }}",
+        category: "{{ job.job_category | default('') }}",
         title: "{{ job.title | default('') }}",
         workPeriod: "{{ job.work_period | default('') }}",
-        recruitmentStartDate: "{{ job.recruitment_start_date.strftime('%Y-%m-%d') if job.recruitment_start_date else '' }}",
         recruitmentEndDate: "{{ job.recruitment_end_date.strftime('%Y-%m-%d') if job.recruitment_end_date else '' }}",
         salary: "{{ job.salary | default('') }}",
+        recruitmentCount: {{ job.recruitment_count | default(0) }},
         description: `{{ job.description | default('') | e }}`,
         location: "{{ job.region | default('') }}",
         detailAddress: "{{ job.detail_address | default('') }}",
         phone: "{{ job.contact_phone | default('') }}",
         latitude: {{ job.latitude | default('null') }},
         longitude: {{ job.longitude | default('null') }},
-        // 모집 형태 (categories는 recruitment_type 필드에 저장됨)
-        recruitmentType: "{{ job.recruitment_type | default('') }}",
         // 근무 요일 및 시간
         workDays: [
             {% if job.work_monday %} '월', {% endif %}
@@ -52,164 +47,167 @@
     <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto pb-24">
       <header class="bg-white border-b px-4 py-4 fixed top-0 left-0 right-0 max-w-md mx-auto z-40">
         <div class="flex items-center justify-between">
-          <button onclick="window.location.href = '{{ url_for('jobs.job_detail', job_id=job.id) }}'" class="text-gray-600">
+          <button onclick="window.location.href = '{{ url_for('company.company_job_detail', job_id=job.id) }}'" class="text-gray-600">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 class="text-lg font-bold text-gray-800">사람이음 공고 수정</h1>
+          <h1 class="text-lg font-bold text-gray-800">기업이음 공고 수정</h1>
           <div class="w-6"></div>
         </div>
       </header>
 
-      <form method="POST" action="{{ url_for('jobs.edit_job', job_id=job.id) }}" id="editJobForm">
-
-        <section id="step1" class="pt-20 p-4">
-            <div class="mb-4">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">
-                1. 어떤 분을 찾고 계세요?
+      <form method="POST" action="{{ url_for('company.edit_company_job', job_id=job.id) }}" id="editJobForm">
+        <!-- 메인 컨텐츠 영역 -->
+        <main class="pt-20">
+          <section id="step1" class="scroll-section visible p-4">
+          <div class="mb-4">
+            <h2 class="text-xl font-bold text-gray-900 mb-2">
+              1. 직무분야를 선택해 주세요
             </h2>
+            <p class="text-sm text-gray-500 mb-6">(중복선택 가능)</p>
 
             <div class="space-y-4">
-                <div
+              <div
                 class="radio-option border-2 border-gray-200 rounded-2xl p-4"
-                data-value="업무"
-                >
+                data-value="안전·관리"
+              >
+                 <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                      <span class="text-2xl mr-3">🛡️</span>
+                      <div>
+                        <h3 class="font-bold text-gray-900">안전·관리</h3>
+                        <p class="text-sm text-gray-500">
+                          경비원, 주차 관리, 시설 관리, 사무 보조
+                        </p>
+                      </div>
+                    </div>
+                    <div
+                      class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
+                    >
+                      <div class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"></div>
+                    </div>
+                  </div>
+              </div>
+              <div
+                class="radio-option border-2 border-gray-200 rounded-2xl p-4"
+                data-value="서비스·매장"
+              >
+                 <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                      <span class="text-2xl mr-3">🏪</span>
+                      <div>
+                        <h3 class="font-bold text-gray-900">서비스·매장</h3>
+                        <p class="text-sm text-gray-500">
+                          매장 계산원, 판매 대스크, 홀서빙, 카페 보조
+                        </p>
+                      </div>
+                    </div>
+                    <div
+                      class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
+                    >
+                      <div class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"></div>
+                    </div>
+                  </div>
+              </div>
+              <div
+                class="radio-option border-2 border-gray-200 rounded-2xl p-4"
+                data-value="생활·돌봄 지원"
+              >
+                 <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                      <span class="text-2xl mr-3">🍀</span>
+                      <div>
+                        <h3 class="font-bold text-gray-900">생활·돌봄 지원</h3>
+                        <p class="text-sm text-gray-500">
+                          아이 돌봄, 반려동물 산책, 가사 지원, 방문 돌봄
+                        </p>
+                      </div>
+                    </div>
+                    <div
+                      class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
+                    >
+                      <div class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"></div>
+                    </div>
+                  </div>
+              </div>
+              <div
+                class="radio-option border-2 border-gray-200 rounded-2xl p-4"
+                data-value="운전·배송"
+              >
+                 <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                      <span class="text-2xl mr-3">🚗</span>
+                      <div>
+                        <h3 class="font-bold text-gray-900">운전·배송</h3>
+                        <p class="text-sm text-gray-500">
+                          택배 보조 기사, 셔틀 운전, 송고 배달, 심부름
+                        </p>
+                      </div>
+                    </div>
+                    <div
+                      class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
+                    >
+                      <div class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"></div>
+                    </div>
+                  </div>
+              </div>
+              <div
+                class="radio-option border-2 border-gray-200 rounded-2xl p-4"
+                data-value="사회·공공"
+              >
+                 <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                      <span class="text-2xl mr-3">🏛️</span>
+                      <div>
+                        <h3 class="font-bold text-gray-900">사회·공공</h3>
+                        <p class="text-sm text-gray-500">
+                          도서관 보조, 환경미화·분리수거, 복지센터 안내
+                        </p>
+                      </div>
+                    </div>
+                    <div
+                      class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
+                    >
+                      <div class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"></div>
+                    </div>
+                  </div>
+              </div>
+              <div
+                class="radio-option border-2 border-gray-200 rounded-2xl p-4"
+                data-value="기타"
+              >
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                    <span class="text-2xl mr-3">🏪</span>
-                    <div>
-                        <h3 class="font-bold text-gray-900">
-                        함께 일하실 분 (업무)
-                        </h3>
-                        <p class="text-sm text-gray-500">
-                        예) 서빙, 주방보조, 배장 관리, 판매 등
-                        </p>
-                    </div>
+                      <span class="text-2xl mr-3">✏️</span>
+                      <div>
+                        <h3 class="font-bold text-gray-900">기타 (직접 작성)</h3>
+                      </div>
                     </div>
                     <div
-                    class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
+                      class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
                     >
-                    <div
-                        class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
-                    ></div>
+                      <div class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"></div>
                     </div>
-                </div>
-                </div>
+                  </div>
+              </div>
 
-                <div
-                class="radio-option border-2 border-gray-200 rounded-2xl p-4"
-                data-value="이웃"
-                >
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                    <span class="text-2xl mr-3">💖</span>
-                    <div>
-                        <h3 class="font-bold text-gray-900">도와주실 분 (이웃)</h3>
-                        <p class="text-sm text-gray-500">
-                        예) 집 청기기, 아이 돌봄, 반려동물 등
-                        </p>
-                    </div>
-                    </div>
-                    <div
-                    class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
-                    >
-                    <div
-                        class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
-                    ></div>
-                    </div>
-                </div>
-                </div>
-
-                <div
-                class="radio-option border-2 border-gray-200 rounded-2xl p-4"
-                data-value="과외"
-                >
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                    <span class="text-2xl mr-3">📚</span>
-                    <div>
-                        <h3 class="font-bold text-gray-900">
-                        가르쳐 주실 분 (과외)
-                        </h3>
-                        <p class="text-sm text-gray-500">
-                        예) 외국어 회화, 골프 레슨 등
-                        </p>
-                    </div>
-                    </div>
-                    <div
-                    class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
-                    >
-                    <div
-                        class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
-                    ></div>
-                    </div>
-                </div>
-                </div>
-
-                <div
-                class="radio-option border-2 border-gray-200 rounded-2xl p-4"
-                data-value="제능"
-                >
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                    <span class="text-2xl mr-3">✋</span>
-                    <div>
-                        <h3 class="font-bold text-gray-900">
-                        만들어 주실 분 (제능)
-                        </h3>
-                        <p class="text-sm text-gray-500">
-                        예) 김치/장아찌, 수공예, 목공
-                        </p>
-                    </div>
-                    </div>
-                    <div
-                    class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
-                    >
-                    <div
-                        class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
-                    ></div>
-                    </div>
-                </div>
-                </div>
-
-                <div
-                class="radio-option border-2 border-gray-200 rounded-2xl p-4"
-                data-value="문화"
-                >
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                    <span class="text-2xl mr-3">🎪</span>
-                    <div>
-                        <h3 class="font-bold text-gray-900">
-                        같이 즐기실 분 (문화)
-                        </h3>
-                        <p class="text-sm text-gray-500">
-                        예) 여행 동행, 등산/산책 친구, 동호회
-                        </p>
-                    </div>
-                    </div>
-                    <div
-                    class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
-                    >
-                    <div
-                        class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
-                    ></div>
-                    </div>
-                </div>
-                </div>
+              <input
+                type="text"
+                id="customCategory"
+                placeholder="직무분야를 직접 입력해주세요"
+                class="hidden w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
+              />
             </div>
-            </div>
+          </div>
         </section>
 
-
-        <section id="step2" class="p-4 border-t">
+        <section id="step2" class="scroll-section visible p-4 border-t">
           <div class="mb-4">
             <h2 class="text-xl font-bold text-gray-900 mb-6">
               2. 어떤 제목으로 올려볼까요?
             </h2>
-
-            <div class="mb-4">
+            <div class="mb-8">
               <input
                 type="text"
                 id="jobTitle"
@@ -219,106 +217,11 @@
                 maxlength="50"
                 value="{{ job.title | default('') }}"
               />
-              <input type="hidden" name="company" value="{{ job.company | default(current_user.nickname) }}" />
-              <input type="hidden" name="people_category" id="peopleCategoryHidden" value="{{ job.people_category | default('') }}" />
-            </div>
-
-            <div class="flex items-start gap-2 mb-8">
-              <div
-                id="categoryContainer"
-                class="flex flex-wrap gap-2 category-container flex-1"
-              >
-                <button
-                  type="button"
-                  class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                  data-category="주방보조/설거지"
-                >
-                  주방 보조 / 설거지
-                </button>
-                <button
-                  type="button"
-                  class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                  data-category="편의점"
-                >
-                  편의점
-                </button>
-                <button
-                  type="button"
-                  class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                  data-category="서빙"
-                >
-                  서빙
-                </button>
-                <button
-                  type="button"
-                  class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                  data-category="카페/베이커리"
-                >
-                  카페 / 베이커리
-                </button>
-                <button
-                  type="button"
-                  class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                  data-category="아이돌봄"
-                >
-                  아이돌봄
-                </button>
-                <button
-                  type="button"
-                  class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                  data-category="학원/과외"
-                >
-                  학원/과외
-                </button>
-                <button
-                  type="button"
-                  class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                  data-category="집청소"
-                >
-                  집 청소
-                </button>
-                <button
-                  type="button"
-                  class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                  data-category="전단지/홍보"
-                >
-                  전단지 / 홍보
-                </button>
-                <button
-                  type="button"
-                  class="category-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                  data-category="기타"
-                >
-                  기타
-                </button>
-              </div>
-              <button
-                id="categoryToggleBtn"
-                type="button"
-                onclick="toggleCategories()"
-                class="flex items-center justify-center flex-shrink-0 w-10 h-10 rounded-full border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                <svg
-                  id="categoryToggleIcon"
-                  class="w-5 h-5 transition-transform"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-              <input type="hidden" name="recruitment_type" id="recruitmentTypeHidden" value="{{ job.recruitment_type | default('') }}" />
             </div>
           </div>
         </section>
 
-        <section id="step3" class="p-4 border-t">
+        <section id="step3" class="scroll-section visible p-4 border-t">
           <div class="mb-4">
             <h2 class="text-xl font-bold text-gray-900 mb-6">
               3. 원하는 근무 조건이 무엇인가요?
@@ -353,7 +256,6 @@
               >
                 1년이상
               </button>
-              <input type="hidden" name="work_period" id="workPeriodHidden" value="{{ job.work_period | default('') }}" />
             </div>
 
             <div id="shortTermCalendar" class="hidden mb-8">
@@ -361,7 +263,7 @@
                 일하는 날짜를 선택해 주세요
               </h3>
               <div class="text-center mb-4">
-                <p class="text-base font-medium text-gray-900">
+                <p class="base font-medium text-gray-900">
                   <span id="selectedDatesDisplay">날짜를 선택해주세요</span>
                 </p>
               </div>
@@ -409,7 +311,6 @@
                     </svg>
                   </button>
                 </div>
-
                 <div class="grid grid-cols-7 gap-1 mb-2">
                   <div class="text-center text-sm text-red-500 py-1 font-medium">
                     일
@@ -433,10 +334,8 @@
                     토
                   </div>
                 </div>
-
                 <div id="calendarGrid" class="grid grid-cols-7 gap-1 mb-3"></div>
               </div>
-
               <p class="text-sm text-gray-600 mt-3 text-center">
                 총
                 <span id="selectedDatesCount" class="font-bold text-blue-600"
@@ -505,21 +404,12 @@
                   <input
                     type="checkbox"
                     id="flexibleDays"
-                    name="work_flexible_days"
                     class="w-5 h-5 mr-2 rounded border-gray-300"
-                    {% if job.work_start_time and job.work_start_time.strftime('%H:%M') == '협의' %} checked {% endif %}
                   />
                   <label for="flexibleDays" class="text-sm text-gray-600"
                     >요일 협의 후 결정</label
                   >
                 </div>
-                <input type="hidden" name="work_monday" id="work_monday_hidden" value="{{ 'true' if job.work_monday else 'false' }}" />
-                <input type="hidden" name="work_tuesday" id="work_tuesday_hidden" value="{{ 'true' if job.work_tuesday else 'false' }}" />
-                <input type="hidden" name="work_wednesday" id="work_wednesday_hidden" value="{{ 'true' if job.work_wednesday else 'false' }}" />
-                <input type="hidden" name="work_thursday" id="work_thursday_hidden" value="{{ 'true' if job.work_thursday else 'false' }}" />
-                <input type="hidden" name="work_friday" id="work_friday_hidden" value="{{ 'true' if job.work_friday else 'false' }}" />
-                <input type="hidden" name="work_saturday" id="work_saturday_hidden" value="{{ 'true' if job.work_saturday else 'false' }}" />
-                <input type="hidden" name="work_sunday" id="work_sunday_hidden" value="{{ 'true' if job.work_sunday else 'false' }}" />
               </div>
 
               <div class="mb-8">
@@ -529,10 +419,10 @@
                 <div class="flex gap-3 mb-4">
                   <select
                     id="startTimeSelect"
-                    name="work_start_time"
                     class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-gray-700"
+                    name="work_start_time"
                   >
-                    <option value="">시간 선택</option>
+                    <option value="">오전 09:00</option>
                     <option value="06:00">오전 06:00</option>
                     <option value="07:00">오전 07:00</option>
                     <option value="08:00">오전 08:00</option>
@@ -549,10 +439,10 @@
                   </select>
                   <select
                     id="endTimeSelect"
-                    name="work_end_time"
                     class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-gray-700"
+                    name="work_end_time"
                   >
-                    <option value="">시간 선택</option>
+                    <option value="">오후 06:00</option>
                     <option value="12:00">오후 12:00</option>
                     <option value="13:00">오후 01:00</option>
                     <option value="14:00">오후 02:00</option>
@@ -570,48 +460,44 @@
                   <input
                     type="checkbox"
                     id="flexibleTime"
-                    name="work_flexible_time"
                     class="w-5 h-5 mr-2 rounded border-gray-300"
-                    {% if job.work_start_time and job.work_start_time.strftime('%H:%M') == '협의' %} checked {% endif %}
                   />
                   <label for="flexibleTime" class="text-sm text-gray-600"
                     >시간 협의 가능</label
                   >
                 </div>
               </div>
-
-              <div class="mb-8">
-                <h3 class="text-lg font-medium text-gray-800 mb-4">
-                  근무 기간을 선택해 주세요 (선택 사항)
-                </h3>
-                <div class="flex gap-3 mb-2">
-                  <input
-                    type="date"
-                    id="longTermStartDate"
-                    name="recruitment_start_date"
-                    class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-gray-700"
-                    placeholder="시작일"
-                    value="{{ job.recruitment_start_date.strftime('%Y-%m-%d') if job.recruitment_start_date else '' }}"
-                  />
-                  <input
-                    type="date"
-                    id="longTermEndDate"
-                    name="recruitment_end_date"
-                    class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-gray-700"
-                    placeholder="종료일"
-                    value="{{ job.recruitment_end_date.strftime('%Y-%m-%d') if job.recruitment_end_date else '' }}"
-                  />
-                </div>
-                <p class="text-sm text-gray-500 mt-2">시작일과 종료일을 선택해주세요 (선택사항)</p>
-              </div>
             </div>
           </div>
         </section>
 
-        <section id="step4" class="p-4 border-t">
+        <section id="step4" class="scroll-section visible p-4 border-t">
           <div class="mb-4">
             <h2 class="text-xl font-bold text-gray-900 mb-6">
-              4. 급여를 적어주세요
+              4. 모집 마감일을 선택해 주세요
+            </h2>
+
+            <div class="mb-8">
+              <input
+                type="date"
+                id="recruitmentEndDate"
+                name="recruitment_end_date"
+                class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-gray-700"
+                placeholder="마감일"
+                value="{{ job.recruitment_end_date.strftime('%Y-%m-%d') if job.recruitment_end_date else '' }}"
+              />
+              <p class="text-sm text-gray-500 mt-2 px-1">
+                  선택하지 않으면 등록일로부터 30일 뒤 자동으로 마감됩니다. (선택사항)
+              </p>
+            </div>
+          </div>
+        </section>
+
+
+        <section id="step5" class="scroll-section visible p-4 border-t">
+          <div class="mb-4">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">
+              5. 급여를 적어주세요
             </h2>
 
             <div class="mb-6">
@@ -653,14 +539,12 @@
                   placeholder="금액을 입력해주세요"
                   class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none pr-12"
                   inputmode="numeric"
-                  value=""
                 />
                 <span
                   class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium"
                   >원</span
                 >
               </div>
-              <input type="hidden" name="salary" id="salaryHidden" value="{{ job.salary | default('') }}" />
 
               <div class="bg-blue-50 rounded-2xl p-5 border border-blue-200">
                 <p class="text-base text-gray-800 mb-3 text-center">
@@ -680,11 +564,37 @@
           </div>
         </section>
 
-        <section id="step5" class="p-4 border-t">
+        <section id="step6" class="scroll-section visible p-4 border-t">
+          <div class="mb-4">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">
+              6. 모집 인원을 알려주세요
+            </h2>
+
+            <div class="relative mb-8">
+              <input
+                type="number"
+                id="recruitmentCount"
+                name="recruitment_count"
+                placeholder="모집 인원 (숫자만 입력)"
+                class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none pr-12"
+                inputmode="numeric"
+                min="1"
+                value="{{ job.recruitment_count | default(1) }}"
+              />
+              <span
+                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium"
+                >명</span
+              >
+            </div>
+          </div>
+        </section>
+
+
+        <section id="step7" class="scroll-section visible p-4 border-t">
           <div class="mb-4">
             <div class="flex items-center justify-between mb-6">
               <h2 class="text-xl font-bold text-gray-900">
-                5. 일에 대하여 참고할 사항을 적어주세요
+                7. 일에 대하여 참고할 사항을 적어주세요
               </h2>
               <button
                 type="button"
@@ -694,18 +604,6 @@
                 <span>✨</span>
                 <span>AI 도움</span>
               </button>
-            </div>
-
-            <div class="bg-blue-50 rounded-2xl p-5 mb-4 border border-blue-200">
-              <p class="text-base text-gray-800 mb-3 text-center font-bold">
-                이런 내용을 적어보세요
-              </p>
-              <hr class="border-blue-300 mb-3" />
-              <ul class="space-y-2 text-base text-gray-800 text-center">
-                <li>• 어떤 도움이 필요한가요?</li>
-                <li>• 일을 위해 필요한 준비물이 있을까요?</li>
-                <li>• 미리 협의해야 할 사항이 있나요?</li>
-              </ul>
             </div>
             <textarea
               id="jobDescription"
@@ -717,10 +615,10 @@
           </div>
         </section>
 
-        <section id="step6" class="p-4 border-t">
+        <section id="step8" class="scroll-section visible p-4 border-t">
           <div class="mb-4">
             <h2 class="text-xl font-bold text-gray-900 mb-6">
-              6. 일할 장소를 알려주세요
+              8. 일할 장소를 알려주세요
             </h2>
 
             <div class="space-y-4">
@@ -773,32 +671,18 @@
 
               <input type="hidden" id="latitude" name="latitude" value="{{ job.latitude | default('') }}" />
               <input type="hidden" id="longitude" name="longitude" value="{{ job.longitude | default('') }}" />
-              <input
-                type="hidden"
-                id="region_1depth_name"
-                name="region_1depth_name"
-                value="{{ job.region_1depth_name | default('') }}"
-              />
-              <input
-                type="hidden"
-                id="region_2depth_name"
-                name="region_2depth_name"
-                value="{{ job.region_2depth_name | default('') }}"
-              />
-              <input
-                type="hidden"
-                id="region_3depth_name"
-                name="region_3depth_name"
-                value="{{ job.region_3depth_name | default('') }}"
-              />
+              <input type="hidden" id="region_1depth_name" name="region_1depth_name" value="{{ job.region_1depth_name | default('') }}" />
+              <input type="hidden" id="region_2depth_name" name="region_2depth_name" value="{{ job.region_2depth_name | default('') }}" />
+              <input type="hidden" id="region_3depth_name" name="region_3depth_name" value="{{ job.region_3depth_name | default('') }}" />
+
             </div>
           </div>
         </section>
 
-        <section id="step7" class="p-4 border-t">
+        <section id="step9" class="scroll-section visible p-4 border-t">
           <div class="mb-4">
             <h2 class="text-xl font-bold text-gray-900 mb-6">
-              7. 연락처를 알려주세요
+              9. 연락처를 알려주세요
             </h2>
 
             <div class="mb-6">
@@ -821,12 +705,12 @@
                 <input
                   type="checkbox"
                   id="agreeTerms"
+                  name="agreeTerms"
                   class="w-5 h-5 mt-0.5 mr-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  checked
                 />
                 <label for="agreeTerms" class="text-sm text-gray-800 flex-1">
-                  <span class="font-bold block mb-1"
-                    >사람 이음 준수사항 동의 (필수)</span
-                  >
+                  <span class="font-bold block mb-1">기업 이음 준수사항 동의 (필수)</span>
                   <span class="text-gray-600 block">
                     • 최저임금 및 근로기준법을 준수합니다<br />
                     • 고용 차별을 하지 않습니다<br />
@@ -837,6 +721,13 @@
             </div>
           </div>
         </section>
+        </main>
+
+        <input type="hidden" name="job_category" value="{{ job.job_category | default('') }}" />
+        <input type="hidden" name="recruitment_type" value="{{ job.recruitment_type | default('') }}" />
+        <input type="hidden" name="company" value="{{ job.company | default(current_user.nickname) }}" />
+        <input type="hidden" name="work_period" value="{{ job.work_period | default('') }}" />
+
 
         <div class="next-btn-fixed bg-white border-t p-4">
           <button
@@ -849,6 +740,7 @@
             수정 완료
           </button>
         </div>
+
       </form>
 
       <div
@@ -859,11 +751,12 @@
           class="bg-white rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col"
         >
           <div class="p-4 border-b flex items-center justify-between">
-            <h3 class="text-lg font-bold flex items-center gap-2">
+            <h3 class="lg font-bold flex items-center gap-2">
               <span>✨</span>
               <span>AI 작성 도우미</span>
             </h3>
             <button
+              type="button"
               onclick="closeAIModal()"
               class="text-gray-400 hover:text-gray-600"
             >
@@ -1046,7 +939,7 @@
               <button
                 type="button"
                 id="confirmAddressBtn"
-                onclick="confirmAddress()"
+                onclick="confirmLocation()"
                 class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
                 disabled
               >
@@ -1060,10 +953,12 @@
 
     <script>
       window.AI_GENERATE_URL = "{{ url_for('jobs.ai_generate_description') }}";
-      window.MAIN_URL = "{{ url_for('auth.main') }}";
+      window.COMPANY_LIST_URL = "{{ url_for('company.company_list') }}";
       window.CURRENT_USER_NICKNAME = "{{ current_user.nickname }}";
-      window.DETAIL_URL = "{{ url_for('jobs.job_detail', job_id=job.id) }}";
+      window.MAIN_URL = "{{ url_for('auth.main') }}";
+      window.DETAIL_URL = "{{ url_for('company.company_job_detail', job_id=job.id) }}";
     </script>
-    <script src="{{ url_for('static', filename='js/edit_job_people.js') }}"></script>
-  </body>
+
+    <script src="{{ url_for('static', filename='js/company/edit_job_company.js') }}"></script>
+    </body>
 </html>
