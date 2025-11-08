@@ -24,7 +24,7 @@ def login():
     session['oauth_state'] = state
 
     # 카카오 인증 URL 생성
-    redirect_uri = "http://localhost:5002/kakao_login_callback"
+    redirect_uri = "https://senior-job-care-project-production.up.railway.app/kakao_login_callback"
     auth_url = f"{KAKAO_AUTH_URL}?" \
                f"client_id={Config.KAKAO_CLIENT_ID}&" \
                f"redirect_uri={redirect_uri}&" \
