@@ -259,138 +259,6 @@ def create_job():
     return render_template("jobs/create_job_scroll.html", kakao_key=kakao_api_key)
 
 
-# 기업이음 공고 작성 (스크롤 방식)
-@jobs_bp.route("/jobs/create_company", methods=["GET", "POST"])
-@login_required
-def create_company_job():
-    kakao_api_key = current_app.config.get('KAKAO_MAP_API_KEY')
-    print(f"🗺️ 기업이음 글쓰기 - KAKAO_MAP_API_KEY: {kakao_api_key}")
-    if request.method == "POST":
-        try:
-            # 폼 데이터 받기
-            title = request.form.get("title", "").strip()
-            company = request.form.get("company", "").strip()
-            description = request.form.get("description", "").strip()
-            recruitment_type = request.form.get("recruitment_type", "")
-            work_period = request.form.get("work_period", "")
-            salary = request.form.get("salary", "").strip()
-            region = request.form.get("region", "").strip()
-            contact_phone = request.form.get("contact_phone", "").strip()
-            recruitment_count = request.form.get("recruitment_count", type=int)
-            recruitment_end_date = request.form.get("recruitment_end_date")
-            # 기업이음 카테고리 (안전·관리, 서비스·매장, 생활·돌봄 지원, 운전·배송, 사회·공공, 기타)
-            job_category = request.form.get("job_category", "").strip()
-            print(f"📝 기업이음 공고 작성 - job_category: '{job_category}'")
-
-            # 행정구역 정보
-            region_1depth_name = request.form.get("region_1depth_name")
-            region_2depth_name = request.form.get("region_2depth_name")
-            region_3depth_name = request.form.get("region_3depth_name")
-
-            # 위도, 경도
-            latitude = request.form.get("latitude", type=float)
-            longitude = request.form.get("longitude", type=float)
-            
-            # 근무 시간
-            work_start_time_str = request.form.get("work_start_time", "")
-            work_end_time_str = request.form.get("work_end_time", "")
-            
-            work_start_time = None
-            work_end_time = None
-            
-            if work_start_time_str:
-                work_start_time = datetime.strptime(work_start_time_str, "%H:%M").time()
-            if work_end_time_str:
-                work_end_time = datetime.strptime(work_end_time_str, "%H:%M").time()
-            
-            # 근무 요일
-            work_monday = request.form.get("work_monday") == "true"
-            work_tuesday = request.form.get("work_tuesday") == "true"
-            work_wednesday = request.form.get("work_wednesday") == "true"
-            work_thursday = request.form.get("work_thursday") == "true"
-            work_friday = request.form.get("work_friday") == "true"
-            work_saturday = request.form.get("work_saturday") == "true"
-            work_sunday = request.form.get("work_sunday") == "true"
-            
-            # 필수 필드 검증
-            if not all([title, company, description]):
-                return render_template("jobs/create_company_job_scroll.html", kakao_key=kakao_api_key)
-            
-            # 정규직인 경우 work_period를 자동으로 설정
-            if recruitment_type == "정규직":
-                work_period = "장기"
-            
-            # 새 공고 생성
-            new_job = JobPost(
-                title=title,
-                company=company,
-                description=description,
-                recruitment_type=recruitment_type,
-                work_period=work_period,
-                salary=salary,
-                region=region,
-                latitude=latitude,
-                longitude=longitude,
-                contact_phone=contact_phone,
-                recruitment_count=recruitment_count,
-                recruitment_end_date = recruitment_end_date,
-                job_category=job_category,  # 기업이음 카테고리
-                work_start_time=work_start_time,
-                work_end_time=work_end_time,
-                work_monday=work_monday,
-                work_tuesday=work_tuesday,
-                work_wednesday=work_wednesday,
-                work_thursday=work_thursday,
-                work_friday=work_friday,
-                work_saturday=work_saturday,
-                work_sunday=work_sunday,
-                region_1depth_name=region_1depth_name,
-                region_2depth_name=region_2depth_name,
-                region_3depth_name=region_3depth_name,
-                author_id=current_user.id
-            )
-            
-            db.session.add(new_job)
-            db.session.commit()
-            
-            print(f"✅ 기업이음 공고 저장 완료 - ID: {new_job.id}, job_category: '{new_job.job_category}'")
-            
-            # AI 자동 분석 (실시간)
-            try:
-                from services.ai_analyzer_service import AIAnalyzerService
-                import json
-                from datetime import datetime
-                
-                result = AIAnalyzerService.analyze_job_post(
-                    title=new_job.title,
-                    description=new_job.description,
-                    company=new_job.company
-                )
-                
-                new_job.ai_category = result['category']
-                new_job.ai_keywords = json.dumps(result['keywords'], ensure_ascii=False)
-                new_job.ai_skills = json.dumps(result['skills'], ensure_ascii=False)
-                new_job.ai_summary = result['summary']
-                new_job.ai_difficulty = result['difficulty']
-                new_job.ai_analyzed_at = datetime.now()
-                
-                db.session.commit()
-                print(f"✅ AI 분석 완료: {result['category']}")
-            except Exception as e:
-                print(f"⚠️ AI 분석 실패 (공고는 정상 등록됨): {e}")
-
-            return redirect(url_for("company.company_list"))
-            
-        except Exception as e:
-            db.session.rollback()
-            print(f"공고 등록 오류: {e}")
-            import traceback
-            traceback.print_exc()
-            return render_template("jobs/create_company_job_scroll.html", kakao_key=kakao_api_key)
-    
-    return render_template("jobs/create_company_job_scroll.html", kakao_key=kakao_api_key)
-
-
 # 공고 상세보기
 @jobs_bp.route("/jobs/<int:job_id>")
 @login_required
@@ -488,7 +356,7 @@ def edit_job(job_id):
         return redirect(url_for("jobs.job_detail", job_id=job_id))
 
     if job.author.user_type == 1:
-        return redirect(url_for("jobs.edit_company_job", job_id=job_id))
+        return redirect(url_for("company.edit_company_job", job_id=job_id))
 
     if request.method == "POST":
         try:
@@ -500,30 +368,6 @@ def edit_job(job_id):
             return render_template("jobs/edit_job_people.html", job=job, kakao_key=kakao_api_key)
 
     return render_template("jobs/edit_job_people.html", job=job, kakao_key=kakao_api_key)
-
-
-@jobs_bp.route("/jobs/company/<int:job_id>/edit", methods=["GET", "POST"])
-@login_required
-def edit_company_job(job_id):
-    job = JobPost.query.get_or_404(job_id)
-    kakao_api_key = current_app.config.get("KAKAO_MAP_API_KEY")
-
-    if job.author_id != current_user.id:
-        return redirect(url_for("company.company_job_detail", job_id=job_id))
-
-    if job.author.user_type == 0:
-        return redirect(url_for("jobs.edit_job", job_id=job_id))
-
-    if request.method == "POST":
-        try:
-            JobService.update_job_by_type(job_id, request.form)
-            return redirect(url_for("company.company_job_detail", job_id=job_id))
-
-        except Exception as e:
-            db.session.rollback()
-            return render_template("jobs/edit_job_company.html", job=job, kakao_key=kakao_api_key)
-
-    return render_template("jobs/edit_job_company.html", job=job, kakao_key=kakao_api_key)
 
 
 # 공고 삭제
