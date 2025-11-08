@@ -293,7 +293,7 @@
           resume.favorites|selectattr('user_id', 'equalto',
           current_user.id)|list|length > 0 %}
           <div
-            class="resume-card bg-white rounded-2xl p-4 shadow-sm border mb-3"
+            class="resume-card bg-white rounded-2xl p-4 shadow-sm border mb-3 cursor-pointer hover:shadow-md transition-shadow"
             data-categories="{{ resume.desired_categories or '' }}"
             data-monday="{{ 'true' if resume.work_monday else 'false' }}"
             data-tuesday="{{ 'true' if resume.work_tuesday else 'false' }}"
@@ -304,6 +304,7 @@
             data-sunday="{{ 'true' if resume.work_sunday else 'false' }}"
             data-walkable="{{ resume.walkable_minutes or 0 }}"
             data-commute="{{ resume.commute_time or 0 }}"
+            onclick="location.href='{{ url_for('company.resume_detail', resume_id=resume.id) }}'"
           >
             <!-- 행[0]: 프로필사진, 이름, 생성시간 -->
             <div class="flex items-center justify-between mb-2">

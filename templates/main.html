@@ -808,7 +808,7 @@
             resume_data.is_favorited %}
             <div
               class="bg-white rounded-2xl p-4 shadow-sm border mb-3 cursor-pointer"
-              onclick="location.href='{{ url_for('resumes.view_resume', resume_id=resume.id) }}'"
+              onclick="location.href='{{ url_for('company.resume_detail', resume_id=resume.id) }}'"
             >
               <!-- 행[0]: 프로필사진, 작성자명, 업데이트 날짜 -->
               <div class="flex items-center justify-between mb-1">

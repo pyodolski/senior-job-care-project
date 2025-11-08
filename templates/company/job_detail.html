@@ -5,231 +5,300 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ job.title }} - 기업이음</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_key }}&libraries=services"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/company/job_detail.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/company/job_detail.css') }}"
+    />
   </head>
-  <body class="bg-gray-100">
+  <body class="bg-gray-50">
     <div
       class="w-full bg-white shadow-lg min-h-screen"
       data-job-id="{{ job.id }}"
     >
-      <!-- 상단 바 -->
+      <!-- 상단 헤더 -->
       <header
-        class="sticky top-0 z-10 px-4 py-3 sm:px-6 flex justify-between items-center bg-white shadow-sm"
+        class="sticky top-0 z-10 px-4 py-3 flex justify-between items-center bg-white border-b"
       >
         <button class="p-2" onclick="history.back()">
           <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
+            class="w-6 h-6"
             fill="none"
-            viewBox="0 0 24 24"
             stroke="currentColor"
-            stroke-width="2"
+            viewBox="0 0 24 24"
           >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
+              stroke-width="2"
               d="M15 19l-7-7 7-7"
             />
           </svg>
         </button>
-        <h1 class="text-xl font-bold text-gray-800">기업 공고 상세</h1>
-        <div class="w-8">
-          <!-- 오른쪽 공간 맞춤용 빈 div -->
-          <button class="p-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+        <h1 class="text-lg font-bold text-gray-800">공고 상세</h1>
+        {% if current_user.id == job.author_id %}
+        <a
+          href="{{ url_for('company.edit_company_job', job_id=job.id) }}"
+          class="p-2 text-gray-600 hover:text-blue-600"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
               stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-              />
-            </svg>
-          </button>
-        </div>
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+            />
+          </svg>
+        </a>
+        {% else %}
+        <div class="w-8"></div>
+        {% endif %}
       </header>
 
       <!-- 메인 컨텐츠 -->
-      <main class="px-4 py-4 sm:px-6 bg-white pb-24">
-        <!-- 헤더 정보 -->
-        <section class="border-b pb-4 mb-4 relative">
-          <!-- 기업 배지 -->
-          <div class="absolute top-0 right-0">
+      <main class="bg-white pb-32">
+        <!-- 1. 공고 제목 -->
+        <div class="px-6 py-6 border-b">
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="text-2xl font-bold text-gray-900">{{ job.title }}</h2>
             <span
-              class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full"
+              class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full"
             >
               기업
             </span>
           </div>
+        </div>
 
-          <div class="flex items-center gap-4 mb-4">
-            <div
-              class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 text-xl font-bold flex-shrink-0"
-            >
-              {{ job.company[0] if job.company else '기' }}
-            </div>
-            <div>
-              <h2 class="text-lg font-semibold text-gray-800">
-                {{ job.company }}
-              </h2>
-              <p class="text-sm text-gray-500">기업 회원</p>
-            </div>
-          </div>
-          <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ job.title }}</h3>
-          <div class="flex gap-4 text-sm text-gray-500">
-            <span>조회 {{ job.view_count }}</span>
-            <span>찜 {{ job.bookmark_count }}</span>
-            <span>지원 {{ job.application_count }}</span>
-          </div>
-        </section>
-
-        <!-- 기본 정보 -->
-        <section class="mb-6">
-          <h4
-            class="text-lg font-bold text-gray-800 mb-3 pb-2 border-b-2 border-blue-800"
-          >
-            기본 정보
-          </h4>
-          <div class="grid grid-cols-2 gap-4">
-            <div class="bg-gray-100 p-3 rounded-lg">
-              <p class="text-xs text-gray-500 mb-1">모집 형태</p>
-              <div class="font-semibold">
-                {{ job.recruitment_type or '미정' }} {% if job.recruitment_type
-                == '일용직' and job.work_period %}
-                <span
-                  class="ml-2 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs"
-                >
-                  {{ job.work_period }}
+        <!-- 2. 프로필 사진과 이름 (기업 정보) -->
+        <div class="px-6 py-4 border-b">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center border-2 border-blue-200"
+              >
+                <span class="text-blue-600 font-bold text-lg">
+                  {{ job.company[0] if job.company else '기' }}
                 </span>
-                {% endif %}
+              </div>
+              <div>
+                <p class="font-semibold text-gray-900">
+                  {{ job.company or '기업명 미등록' }}
+                </p>
               </div>
             </div>
-            <div class="bg-blue-50 p-3 rounded-lg">
-              <p class="text-xs text-blue-700 mb-1">급여</p>
-              <p class="font-bold text-blue-800">{{ job.salary or '협의' }}</p>
-            </div>
-            <div class="bg-gray-100 p-3 rounded-lg">
-              <p class="text-xs text-gray-500 mb-1">모집 인원</p>
-              <p class="font-semibold">
-                {{ job.recruitment_count or '미정' }}명
-              </p>
-            </div>
-            <div class="bg-gray-100 p-3 rounded-lg">
-              <p class="text-xs text-gray-500 mb-1">근무 지역</p>
-              <p class="font-semibold">{{ job.region or '협의' }}</p>
-            </div>
-            {% if job.application_method %}
-            <div class="bg-gray-100 p-3 rounded-lg">
-              <p class="text-xs text-gray-500 mb-1">접수 방법</p>
-              <p class="font-semibold">{{ job.application_method }}</p>
-            </div>
-            {% endif %}
-            {% if job.full_address %}
-            <div class="bg-gray-100 p-3 rounded-lg col-span-2">
-              <p class="text-xs text-gray-500 mb-1">근무지 전체 주소</p>
-              <p class="font-semibold">{{ job.full_address }}</p>
-            </div>
-            {% endif %}
+            <span class="text-xs text-gray-400">{{ time_ago }}</span>
           </div>
-        </section>
+        </div>
 
-        <!-- 근무 조건 -->
-        <section class="mb-6">
-          <h4
-            class="text-lg font-bold text-gray-800 mb-3 pb-2 border-b-2 border-blue-800"
-          >
-            근무 조건
-          </h4>
-          <div class="space-y-4">
-            {% if job.work_start_time or job.work_end_time %}
-            <div class="bg-gray-100 p-3 rounded-lg">
-              <p class="text-xs text-gray-500 mb-1">근무 시간</p>
-              <p class="font-semibold">
-                {% if job.work_start_time %}{{
-                job.work_start_time.strftime('%H:%M') }}{% else %}시작시간
-                미정{% endif %} ~ {% if job.work_end_time %}{{
-                job.work_end_time.strftime('%H:%M') }}{% else %}종료시간 미정{%
-                endif %}
-              </p>
-            </div>
-            {% endif %}
-            <div class="bg-gray-100 p-3 rounded-lg">
-              <p class="text-xs text-gray-500 mb-1">근무 요일</p>
-              <div class="flex flex-wrap gap-2 mt-2">
-                <span
-                  class="text-xs font-medium px-2 py-1 rounded-full {% if job.work_monday %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-500{% endif %}"
-                  >월</span
-                >
-                <span
-                  class="text-xs font-medium px-2 py-1 rounded-full {% if job.work_tuesday %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-500{% endif %}"
-                  >화</span
-                >
-                <span
-                  class="text-xs font-medium px-2 py-1 rounded-full {% if job.work_wednesday %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-500{% endif %}"
-                  >수</span
-                >
-                <span
-                  class="text-xs font-medium px-2 py-1 rounded-full {% if job.work_thursday %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-500{% endif %}"
-                  >목</span
-                >
-                <span
-                  class="text-xs font-medium px-2 py-1 rounded-full {% if job.work_friday %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-500{% endif %}"
-                  >금</span
-                >
-                <span
-                  class="text-xs font-medium px-2 py-1 rounded-full {% if job.work_saturday %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-500{% endif %}"
-                  >토</span
-                >
-                <span
-                  class="text-xs font-medium px-2 py-1 rounded-full {% if job.work_sunday %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-500{% endif %}"
-                  >일</span
-                >
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- 상세 설명 -->
-        <section class="mb-6">
-          <h4
-            class="text-lg font-bold text-gray-800 mb-3 pb-2 border-b-2 border-blue-800"
-          >
-            상세 설명
-          </h4>
+        <!-- 3. 시급, 근무시간, 근무요일, 근무기간 카드 -->
+        {% set ns = namespace(count=0) %}
+        <div class="px-6 py-4 space-y-2">
+          <!-- 시급 카드 -->
+          {% if job.salary %} {% set ns.count = ns.count + 1 %}
           <div
-            class="bg-gray-100 p-4 rounded-lg text-gray-700 whitespace-pre-wrap"
+            class="rounded-2xl px-4 py-2.5 flex items-center gap-3"
+            style="background-color: {% if ns.count % 2 == 1 %}#023591{% else %}#2D71EB{% endif %};"
           >
-            {{ job.description }}
+            <div class="text-2xl">💰</div>
+            <div class="flex-1">
+              <div class="text-white text-base font-semibold">
+                급여 / {{ job.salary }}
+              </div>
+            </div>
           </div>
-        </section>
+          {% endif %}
 
-        <!-- 연락처 -->
-        {% if job.contact_phone %}
-        <section class="mb-6">
-          <h4
-            class="text-lg font-bold text-gray-800 mb-3 pb-2 border-b-2 border-blue-800"
+          <!-- 근무시간 카드 -->
+          {% if job.work_start_time or job.work_end_time %} {% set ns.count =
+          ns.count + 1 %}
+          <div
+            class="rounded-2xl px-4 py-2.5 flex items-center gap-3"
+            style="background-color: {% if ns.count % 2 == 1 %}#023591{% else %}#2D71EB{% endif %};"
           >
-            연락처
-          </h4>
-          <div class="bg-gray-100 p-3 rounded-lg">
-            <p class="text-xs text-gray-500 mb-1">전화번호</p>
-            <p class="font-semibold">{{ job.contact_phone }}</p>
+            <div class="text-2xl">🕐</div>
+            <div class="flex-1">
+              <div class="text-white text-base font-semibold">
+                {% if job.work_start_time %}{{
+                job.work_start_time.strftime('%H:%M') }}{% else %}미정{% endif
+                %} ~ {% if job.work_end_time %}{{
+                job.work_end_time.strftime('%H:%M') }}{% else %}미정{% endif %}
+                <span class="text-sm font-normal ml-2">(협의 가능)</span>
+              </div>
+            </div>
           </div>
-        </section>
+          {% endif %}
+
+          <!-- 근무요일 카드 -->
+          {% set ns.count = ns.count + 1 %}
+          <div
+            class="rounded-2xl px-4 py-2.5 flex items-center gap-3"
+            style="background-color: {% if ns.count % 2 == 1 %}#023591{% else %}#2D71EB{% endif %};"
+          >
+            <div class="text-2xl">📅</div>
+            <div class="flex-1">
+              <div class="text-white text-base font-semibold">
+                {% set selected_days = [] %} {% if job.work_monday %}{% set _ =
+                selected_days.append('월') %}{% endif %} {% if job.work_tuesday
+                %}{% set _ = selected_days.append('화') %}{% endif %} {% if
+                job.work_wednesday %}{% set _ = selected_days.append('수') %}{%
+                endif %} {% if job.work_thursday %}{% set _ =
+                selected_days.append('목') %}{% endif %} {% if job.work_friday
+                %}{% set _ = selected_days.append('금') %}{% endif %} {% if
+                job.work_saturday %}{% set _ = selected_days.append('토') %}{%
+                endif %} {% if job.work_sunday %}{% set _ =
+                selected_days.append('일') %}{% endif %} {% if selected_days %}
+                {{ selected_days|join(', ') }} {% else %} 협의 가능 {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- 근무기간 카드 -->
+          {% if job.work_period %} {% set ns.count = ns.count + 1 %}
+          <div
+            class="rounded-2xl px-4 py-2.5 flex items-center gap-3"
+            style="background-color: {% if ns.count % 2 == 1 %}#023591{% else %}#2D71EB{% endif %};"
+          >
+            <div class="text-2xl">⏰</div>
+            <div class="flex-1">
+              <div class="text-white text-base font-semibold">
+                {{ job.work_period }}
+              </div>
+            </div>
+          </div>
+
+          {% if job.recruitment_start_date or job.recruitment_end_date %}
+          <div class="px-3">
+            <p class="text-sm text-gray-600 font-medium text-right">
+              모집 기간: {% if job.recruitment_start_date and
+              job.recruitment_end_date %}
+              <span class="text-gray-900 font-semibold">
+                {{ job.recruitment_start_date.strftime('%Y.%m.%d') }} ~ {{
+                job.recruitment_end_date.strftime('%Y.%m.%d') }}
+              </span>
+              {% elif job.recruitment_start_date %}
+              <span class="text-gray-900 font-semibold">
+                {{ job.recruitment_start_date.strftime('%Y.%m.%d') }}부터
+              </span>
+              {% elif job.recruitment_end_date %}
+              <span class="text-gray-900 font-semibold">
+                ~ {{ job.recruitment_end_date.strftime('%Y.%m.%d') }}까지
+              </span>
+              {% endif %}
+            </p>
+          </div>
+          {% endif %} {% endif %}
+        </div>
+
+        <!-- 5. 추가 정보 (모집형태, 모집인원 등) -->
+        {% if job.recruitment_type or job.recruitment_count or
+        job.application_method %}
+        <div class="px-6 py-4 border-t">
+          {% if job.recruitment_type %}
+          <div
+            class="flex items-center justify-between py-3 border-b border-gray-100"
+          >
+            <span class="text-sm font-medium text-gray-600">모집형태</span>
+            <span class="text-sm text-gray-900"
+              >{{ job.recruitment_type }}</span
+            >
+          </div>
+          {% endif %} {% if job.recruitment_count %}
+          <div
+            class="flex items-center justify-between py-3 border-b border-gray-100"
+          >
+            <span class="text-sm font-medium text-gray-600">모집인원</span>
+            <span class="text-sm text-gray-900"
+              >{{ job.recruitment_count }}명</span
+            >
+          </div>
+          {% endif %} {% if job.application_method %}
+          <div class="flex items-center justify-between py-3">
+            <span class="text-sm font-medium text-gray-600">접수방법</span>
+            <span class="text-sm text-gray-900"
+              >{{ job.application_method }}</span
+            >
+          </div>
+          {% endif %}
+        </div>
         {% endif %}
 
-        <!-- 작성자 전용 지원자 관리 -->
+        <!-- 6. 상세 설명 -->
+        <div class="px-6 py-4 border-b">
+          <h3 class="text-sm font-semibold text-gray-700 mb-3">상세 설명</h3>
+          <div class="text-gray-700 whitespace-pre-wrap leading-relaxed">
+            {{- job.description -}}
+          </div>
+          <!-- 조회, 찜, 지원 -->
+          <div class="flex justify-end gap-4 text-sm text-gray-500 mt-4">
+            <span>조회 {{ job.view_count }}</span>
+            <span>•</span>
+            <span>찜 {{ job.bookmark_count }}</span>
+            <span>•</span>
+            <span>지원 {{ job.application_count }}</span>
+          </div>
+        </div>
+
+        <!-- 7. 지도, 주소, 상세주소 -->
+        {% if job.latitude and job.longitude %}
+        <div class="px-6 py-4 border-b">
+          <div
+            id="map"
+            class="w-full h-64 rounded-lg border border-gray-200 mb-3"
+          ></div>
+          <div class="bg-gray-50 rounded-lg p-4">
+            <p class="text-sm text-gray-600 mb-1">주소</p>
+            <p class="font-medium text-gray-900">
+              {{ job.region or job.full_address or '주소 정보 없음' }}
+            </p>
+            {% if job.detail_address %}
+            <p class="text-sm text-gray-600 mt-2">{{ job.detail_address }}</p>
+            {% endif %}
+          </div>
+        </div>
+        {% elif job.full_address %}
+        <div class="px-6 py-4 border-b">
+          <div class="bg-gray-50 rounded-lg p-4">
+            <p class="text-sm text-gray-600 mb-1">주소</p>
+            <p class="font-medium text-gray-900">{{ job.full_address }}</p>
+            {% if job.detail_address %}
+            <p class="text-sm text-gray-600 mt-2">{{ job.detail_address }}</p>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- 8. 연락처 -->
+        {% if job.contact_phone %}
+        <div class="px-6 py-4 border-b">
+          <h3 class="text-sm font-semibold text-gray-700 mb-3">📞 연락처</h3>
+          <div class="bg-gray-50 rounded-lg p-4">
+            <a
+              href="tel:{{ job.contact_phone }}"
+              class="text-blue-600 font-medium text-lg"
+            >
+              {{ job.contact_phone }}
+            </a>
+            {% if job.contact_name %}
+            <p class="text-sm text-gray-600 mt-1">
+              담당자: {{ job.contact_name }}
+            </p>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- 9. 작성자 전용 지원자 관리 -->
         {% if current_user.id == job.author_id %}
-        <section class="mb-6">
+        <div class="px-6 py-4 border-b">
           <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h4 class="text-lg font-bold text-blue-900 mb-2">📋 지원자 관리</h4>
             <p class="text-sm text-blue-700 mb-3">
@@ -242,222 +311,206 @@
               지원자 목록 보기
             </a>
           </div>
-        </section>
-        {% endif %}
-
-        <p class="text-xs text-gray-400 text-right mt-6">
-          {{ job.created_at.strftime('%Y년 %m월 %d일 %H:%M') }} 등록
-        </p>
-
-        <!-- 작성자 전용 액션 -->
-        {% if current_user.id == job.author_id %}
-        <div class="flex gap-4 mt-6 pt-6 border-t">
-          <a
-            href="{{ url_for('company.edit_company_job', job_id=job.id) }}"
-            class="flex-1 text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg transition-colors"
-            >수정하기</a
-          >
-          <form
-            method="POST"
-            action="{{ url_for('jobs.delete_job', job_id=job.id) }}"
-            class="flex-1"
-            onsubmit="return confirm('정말 삭제하시겠습니까?')"
-          >
-            <button
-              type="submit"
-              class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
-            >
-              삭제하기
-            </button>
-          </form>
         </div>
         {% endif %}
 
-        <!-- 지원자용 액션 버튼 -->
-        {% if current_user.user_type == 0 %}
-        <div class="mt-8 flex gap-3">
-          <button
-                  onclick="toggleBookmark()"
-                  class="btn-bookmark p-3 bg-gray-200 rounded-lg"
-          >
-            <svg
-                    class="w-6 h-6 transition-colors {% if is_bookmarked %}text-red-500{% else %}text-gray-500{% endif %}"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-            >
-              <path
-                      fill-rule="evenodd"
-                      d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                      clip-rule="evenodd"
-              />
-            </svg>
-          </button>
+        <!-- 등록 정보 -->
+        <div class="px-6 py-3 border-b">
+          <p class="text-xs text-gray-400 text-right">
+            {{ job.created_at.strftime('%Y년 %m월 %d일 %H:%M') }} 등록
+          </p>
+        </div>
 
-          {% if job.source == 'K-Senior' %}
-            <button
-              onclick="showContactModal()"
-              class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors"
+        <!-- 작성자 전용 액션 -->
+        {% if current_user.id == job.author_id %}
+        <div class="px-6 py-4 border-b">
+          <div class="flex gap-3">
+            <a
+              href="{{ url_for('company.edit_company_job', job_id=job.id) }}"
+              class="flex-1 text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg transition-colors"
+              >수정하기</a
             >
-              지원 및 연락처 안내
-            </button>
-            {% else %}
-            {% if application_status.applied %}
-            <button
-                    class="btn-apply flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
-                    onclick="goToChatFromDetail()"
+            <form
+              method="POST"
+              action="{{ url_for('jobs.delete_job', job_id=job.id) }}"
+              class="flex-1"
+              onsubmit="return confirm('정말 삭제하시겠습니까?')"
             >
-              채팅하기
-            </button>
-            {% else %}
-            <button
-                    class="btn-apply flex-1 bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-4 rounded-lg transition-colors"
-                    onclick="applyJob()"
-            >
-              지원하기
-            </button>
-            {% endif %}
-          {% endif %}
+              <button
+                type="submit"
+                class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
+              >
+                삭제하기
+              </button>
+            </form>
+          </div>
         </div>
         {% endif %}
       </main>
 
-      <!-- 하단 네비게이션 -->
-      <footer
-        class="fixed bottom-0 left-0 right-0 w-full bg-gray-50 border-t flex justify-around"
+      <!-- 하단 고정 버튼 -->
+      <div
+        class="fixed bottom-0 left-0 right-0 w-full bg-white border-t p-4 z-20"
       >
-        <a
-          href="{{ url_for('map.show_map') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/map.png') }}"
-              alt="지도"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">지도</span>
-        </a>
-        <a
-          href="{{ url_for('jobs.bookmark_list') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/favorite.png') }}"
-              alt="찜"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">찜</span>
-        </a>
-        <a
-          href="{{ url_for('auth.main') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/home.png') }}"
-              alt="홈"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">홈</span>
-        </a>
-        <a
-          href="{{ url_for('chat.chat_list') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/chatting.png') }}"
-              alt="채팅"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">채팅</span>
-        </a>
-        <a
-          href="{{ url_for('auth.profile') }}"
-          class="flex-1 flex flex-col items-center justify-center p-2 text-gray-500"
-        >
-          <div class="w-6 h-6 mb-1 flex items-center justify-center">
-            <img
-              src="{{ url_for('static', filename='images/footer/profile.png') }}"
-              alt="내정보"
-              class="max-w-full max-h-full object-contain"
-            />
-          </div>
-          <span class="text-xs">내정보</span>
-        </a>
-      </footer>
+        <div class="flex gap-2">
+          <!-- 즐겨찾기 버튼 -->
+          <button
+            onclick="toggleBookmark()"
+            class="btn-bookmark w-14 h-14 flex items-center justify-center border-2 rounded-xl transition-colors {% if is_bookmarked %}border-red-500 bg-red-50{% else %}border-gray-300 bg-white{% endif %}"
+          >
+            <svg
+              class="w-7 h-7 transition-colors {% if is_bookmarked %}text-red-500{% else %}text-gray-400{% endif %}"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+
+          <!-- 작성자가 아닐 때: 지원하기/채팅하기 버튼만 표시 -->
+          {% if current_user.id != job.author_id %} {% if job.source ==
+          'K-Senior' %}
+          <button
+            onclick="showContactModal()"
+            class="flex-1 text-white font-bold py-4 rounded-xl transition-colors hover:opacity-90"
+            style="background-color: #16a34a"
+          >
+            지원 및 연락처 안내
+          </button>
+          {% else %} {% if application_status.applied %}
+          <button
+            class="flex-1 text-white font-bold py-4 rounded-xl transition-colors hover:opacity-90"
+            style="background-color: #002fa7"
+            onclick="goToChatFromDetail()"
+          >
+            채팅하기
+          </button>
+          {% else %}
+          <button
+            class="flex-1 text-white font-bold py-4 rounded-xl transition-colors hover:opacity-90"
+            style="background-color: #002fa7"
+            onclick="applyJob()"
+          >
+            지원하기
+          </button>
+          {% endif %} {% endif %} {% else %}
+          <!-- 작성자일 때: 모집글 올리기 버튼 표시 -->
+          <button
+            onclick="window.location.href='{{ url_for('company.create_company_job') }}'"
+            class="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-bold py-4 rounded-xl transition-colors"
+          >
+            모집글 올리기
+          </button>
+          {% endif %}
+        </div>
+      </div>
     </div>
 
     {% if job.source == 'K-Senior' %}
-    <div id="contactModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-sm p-6">
-            <h3 class="text-lg font-bold mb-4 text-blue-800">지원 안내 및 연락처</h3>
-            <p class="text-sm text-gray-700 mb-4">
-                이 공고는 외부 기관에서 제공되었으므로, 아래 연락 방법을 통해 직접 문의 및 지원하셔야 합니다.
+    <div
+      id="contactModal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+    >
+      <div class="bg-white rounded-2xl w-full max-w-sm p-6">
+        <h3 class="text-lg font-bold mb-4 text-blue-800">
+          지원 안내 및 연락처
+        </h3>
+        <p class="text-sm text-gray-700 mb-4">
+          이 공고는 외부 기관에서 제공되었으므로, 아래 연락 방법을 통해 직접
+          문의 및 지원하셔야 합니다.
+        </p>
+        <div class="space-y-3 border-t border-b py-4">
+          <div>
+            <p class="text-xs font-medium text-gray-500 mb-1">접수 방법</p>
+            <p class="text-base font-semibold text-gray-800">
+              {{ job.application_method or '정보 없음' }}
             </p>
-            <div class="space-y-3 border-t border-b py-4">
-                <div>
-                    <p class="text-xs font-medium text-gray-500 mb-1">접수 방법</p>
-                    <p class="text-base font-semibold text-gray-800">{{ job.application_method or '정보 없음' }}</p>
-                </div>
-                {% if job.contact_name or job.contact_phone %}
-                <div>
-                    <p class="text-xs font-medium text-gray-500 mb-1">담당자 및 연락처</p>
-                    <p class="text-base font-semibold text-gray-800">{{ job.contact_name or '담당자 미기재' }} | {{ job.contact_phone or '연락처 미기재' }}</p>
-                </div>
-                {% endif %}
-                {% if job.full_address %}
-                <div>
-                    <p class="text-xs font-medium text-gray-500 mb-1">근무지 전체 주소</p>
-                    <p class="text-base font-semibold text-gray-800">{{ job.full_address }}</p>
-                </div>
-                {% endif %}
-                {% if job.homepage_url %}
-                <div>
-                    <p class="text-xs font-medium text-gray-500 mb-1">기관 채용 홈페이지</p>
-                    <p class="text-base font-semibold text-gray-800 truncate">
-                        <a href="{{ job.homepage_url }}" target="_blank" class="text-blue-600 hover:underline">
-                            {{ job.homepage_url }}
-                        </a>
-                    </p>
-                </div>
-                {% endif %}
-            </div>
-            <div class="mt-6 flex flex-col gap-2">
-              {% if job.homepage_url %}
-              <a href="{{ job.homepage_url }}" target="_blank"
-                 class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg text-center">
-                기관 홈페이지에서 지원하기
+          </div>
+          {% if job.contact_name or job.contact_phone %}
+          <div>
+            <p class="text-xs font-medium text-gray-500 mb-1">
+              담당자 및 연락처
+            </p>
+            <p class="text-base font-semibold text-gray-800">
+              {{ job.contact_name or '담당자 미기재' }} | {{ job.contact_phone
+              or '연락처 미기재' }}
+            </p>
+          </div>
+          {% endif %} {% if job.full_address %}
+          <div>
+            <p class="text-xs font-medium text-gray-500 mb-1">
+              근무지 전체 주소
+            </p>
+            <p class="text-base font-semibold text-gray-800">
+              {{ job.full_address }}
+            </p>
+          </div>
+          {% endif %} {% if job.homepage_url %}
+          <div>
+            <p class="text-xs font-medium text-gray-500 mb-1">
+              기관 채용 홈페이지
+            </p>
+            <p class="text-base font-semibold text-gray-800 truncate">
+              <a
+                href="{{ job.homepage_url }}"
+                target="_blank"
+                class="text-blue-600 hover:underline"
+              >
+                {{ job.homepage_url }}
               </a>
-              {% else %}
-              <div class="grid grid-cols-2 gap-2 w-full">
-                <a href="https://www.jobkorea.co.kr/Search/?stext={{ (job.title + ' ' + job.company)|urlencode }}"
-                   target="_blank"
-                   class="text-center text-sm font-bold py-3 px-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                  잡코리아 검색
-                </a>
-                <a href="https://www.saramin.co.kr/zf_user/search?searchword={{ (job.title + ' ' + job.company)|urlencode }}"
-                   target="_blank"
-                   class="text-center text-sm font-bold py-3 px-1 bg-sky-500 text-white rounded-lg hover:bg-sky-600">
-                  사람인 검색
-                </a>
-              </div>
-              {% endif %}
-              <button onclick="closeContactModal()" class="w-full bg-gray-100 text-gray-700 font-bold py-3 rounded-lg">
-                닫기
-              </button>
-            </div>
+            </p>
+          </div>
+          {% endif %}
         </div>
+        <div class="mt-6 flex flex-col gap-2">
+          {% if job.homepage_url %}
+          <a
+            href="{{ job.homepage_url }}"
+            target="_blank"
+            class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg text-center"
+          >
+            기관 홈페이지에서 지원하기
+          </a>
+          {% else %}
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <a
+              href="https://www.jobkorea.co.kr/Search/?stext={{ (job.title + ' ' + job.company)|urlencode }}"
+              target="_blank"
+              class="text-center text-sm font-bold py-3 px-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            >
+              잡코리아 검색
+            </a>
+            <a
+              href="https://www.saramin.co.kr/zf_user/search?searchword={{ (job.title + ' ' + job.company)|urlencode }}"
+              target="_blank"
+              class="text-center text-sm font-bold py-3 px-1 bg-sky-500 text-white rounded-lg hover:bg-sky-600"
+            >
+              사람인 검색
+            </a>
+          </div>
+          {% endif %}
+          <button
+            onclick="closeContactModal()"
+            class="w-full bg-gray-100 text-gray-700 font-bold py-3 rounded-lg"
+          >
+            닫기
+          </button>
+        </div>
+      </div>
     </div>
     {% endif %}
 
     <script>
       // Flask 템플릿 변수를 JavaScript로 전달
+      window.jobId = {{ job.id }};
+      {% if job.latitude and job.longitude %}
+      window.jobLatitude = {{ job.latitude }};
+      window.jobLongitude = {{ job.longitude }};
+      {% endif %}
       {% if job.source == 'K-Senior' %}
       window.isKSeniorJob = true;
       {% endif %}
