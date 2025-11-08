@@ -125,7 +125,7 @@ def kakao_login_callback():
         'grant_type': 'authorization_code',
         'client_id': Config.KAKAO_CLIENT_ID,
         'client_secret': Config.KAKAO_CLIENT_SECRET,
-        'redirect_uri': 'http://localhost:5002/kakao_login_callback',
+        'redirect_uri': 'https://senior-job-care-project-production.up.railway.app/kakao_login_callback',
         'code': code
     }
 
