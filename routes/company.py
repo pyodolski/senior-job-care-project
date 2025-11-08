@@ -16,11 +16,13 @@
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
 from flask_login import login_required, current_user
-from models import db, JobPost, User
+from models import db, JobPost, User, Resume
 from services.job_service import JobService
 from services.application_service import ApplicationService
 from services.suggestion_service import SuggestionService
-from utils.helpers import format_datetime, get_work_days
+from services.resume_service import ResumeService
+from utils.helpers import format_datetime, get_work_days, calculate_time_ago
+from utils.files_handler import generate_presigned_get_url
 from datetime import datetime, time
 
 # 기업 이음 관련 블루프린트 생성
@@ -289,40 +291,48 @@ def company_job_detail(job_id):
     """
     기업 공고 상세보기
     ==================
-    
+
     기능:
     - 기업 공고 상세 정보 표시
     - 일반 사용자는 지원 가능
     - 기업 회원은 지원자 관리 가능
-    
+
     URL: GET /company/<job_id>
     템플릿: company/job_detail.html
     """
-    
+
     job = JobService.get_job_by_id(job_id)
-    
+
     # 조회수 증가
     JobService.increment_view_count(job_id)
-    
+
     # 현재 사용자가 이 공고를 찜했는지 확인
     is_bookmarked = JobService.is_bookmarked(current_user.id, job_id)
-    
+
     # 현재 사용자의 지원 상태 확인 (일반 사용자만)
     if current_user.user_type == 0:
         application_status = ApplicationService.check_application_status(current_user.id, job_id)
     else:
         application_status = {'applied': False, 'status': None}
-    
+
     # 지원자 목록 (공고 작성자만)
     applications = []
     if current_user.id == job.author_id:
         applications = ApplicationService.get_job_applications(job_id, current_user.id)
-    
+
+    # Kakao Map API 키
+    kakao_api_key = current_app.config.get('KAKAO_MAP_API_KEY')
+
+    # 공고 작성 시간 차이 계산
+    time_ago = calculate_time_ago(job.created_at)
+
     return render_template("company/job_detail.html",
                          job=job,
                          is_bookmarked=is_bookmarked,
                          application_status=application_status,
-                         applications=applications)
+                         applications=applications,
+                         kakao_key=kakao_api_key,
+                         time_ago=time_ago)
 
 @company_bp.route("/company/<int:job_id>/edit", methods=["GET", "POST"])
 @login_required
@@ -473,8 +483,50 @@ def resume_list():
     # 공개된 이력서 조회 (user 관계 포함)
     from models import Resume, User
     public_resumes = Resume.query.join(User).filter(Resume.is_public == True).order_by(Resume.updated_at.desc()).all()
-    
+
     return render_template("company/resume_list.html", resumes=public_resumes)
+
+
+# 이력서 상세보기 페이지 (기업용)
+@company_bp.route("/resume/<int:resume_id>")
+@login_required
+def resume_detail(resume_id):
+    """
+    기업이 공개된 이력서 상세보기
+    ===============================
+
+    기능:
+    - 공개된 이력서 상세 정보 조회
+    - 이력서 소유자의 인적 정보, 경력, 희망 조건 등 확인
+
+    URL: GET /resume/<int:resume_id>
+    템플릿: company/resume_detail.html
+
+    권한: 로그인한 사용자만 접근 가능
+    공개된 이력서만 조회 가능
+    """
+
+    # 이력서 조회 (관계 포함)
+    resume = Resume.query.filter_by(id=resume_id).first()
+
+    if not resume:
+        flash('존재하지 않는 이력서입니다.', 'error')
+        return redirect(url_for('company.resume_list'))
+
+    # 공개된 이력서가 아니면 접근 불가
+    if not resume.is_public:
+        flash('비공개 이력서입니다.', 'error')
+        return redirect(url_for('company.resume_list'))
+
+    # 프로필 이미지 URL 생성
+    profile_url = None
+    if resume.user.profile_image:
+        profile_url = generate_presigned_get_url(resume.user.profile_image, expires=900)
+
+    return render_template('company/resume_detail.html',
+                         resume=resume,
+                         now=datetime.now(),
+                         profile_url=profile_url)
 
 
 @company_bp.route("/company/jobs/json")
