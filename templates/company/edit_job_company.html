@@ -10,8 +10,11 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/company/create_company_job_scroll.css') }}" />
-    </head>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/company/create_company_job_scroll.css') }}"
+    />
+  </head>
   <body class="bg-gray-50">
     <script>
       // JavaScript 파일이 참조할 초기 공고 데이터
@@ -45,11 +48,26 @@
     </script>
 
     <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto pb-24">
-      <header class="bg-white border-b px-4 py-4 fixed top-0 left-0 right-0 max-w-md mx-auto z-40">
+      <header
+        class="bg-white border-b px-4 py-4 fixed top-0 left-0 right-0 max-w-md mx-auto z-40"
+      >
         <div class="flex items-center justify-between">
-          <button onclick="window.location.href = '{{ url_for('company.company_job_detail', job_id=job.id) }}'" class="text-gray-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          <button
+            onclick="window.location.href = '{{ url_for('company.company_job_detail', job_id=job.id) }}'"
+            class="text-gray-600"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
           <h1 class="text-lg font-bold text-gray-800">기업이음 공고 수정</h1>
@@ -57,22 +75,26 @@
         </div>
       </header>
 
-      <form method="POST" action="{{ url_for('company.edit_company_job', job_id=job.id) }}" id="editJobForm">
+      <form
+        method="POST"
+        action="{{ url_for('company.edit_company_job', job_id=job.id) }}"
+        id="editJobForm"
+      >
         <!-- 메인 컨텐츠 영역 -->
         <main class="pt-20">
           <section id="step1" class="scroll-section visible p-4">
-          <div class="mb-4">
-            <h2 class="text-xl font-bold text-gray-900 mb-2">
-              1. 직무분야를 선택해 주세요
-            </h2>
-            <p class="text-sm text-gray-500 mb-6">(중복선택 가능)</p>
+            <div class="mb-4">
+              <h2 class="text-xl font-bold text-gray-900 mb-2">
+                1. 직무분야를 선택해 주세요
+              </h2>
+              <p class="text-sm text-gray-500 mb-6">(중복선택 가능)</p>
 
-            <div class="space-y-4">
-              <div
-                class="radio-option border-2 border-gray-200 rounded-2xl p-4"
-                data-value="안전·관리"
-              >
-                 <div class="flex items-center justify-between">
+              <div class="space-y-4">
+                <div
+                  class="radio-option border-2 border-gray-200 rounded-2xl p-4"
+                  data-value="안전·관리"
+                >
+                  <div class="flex items-center justify-between">
                     <div class="flex items-center">
                       <span class="text-2xl mr-3">🛡️</span>
                       <div>
@@ -85,15 +107,17 @@
                     <div
                       class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
                     >
-                      <div class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"></div>
+                      <div
+                        class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
+                      ></div>
                     </div>
                   </div>
-              </div>
-              <div
-                class="radio-option border-2 border-gray-200 rounded-2xl p-4"
-                data-value="서비스·매장"
-              >
-                 <div class="flex items-center justify-between">
+                </div>
+                <div
+                  class="radio-option border-2 border-gray-200 rounded-2xl p-4"
+                  data-value="서비스·매장"
+                >
+                  <div class="flex items-center justify-between">
                     <div class="flex items-center">
                       <span class="text-2xl mr-3">🏪</span>
                       <div>
@@ -106,15 +130,17 @@
                     <div
                       class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
                     >
-                      <div class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"></div>
+                      <div
+                        class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
+                      ></div>
                     </div>
                   </div>
-              </div>
-              <div
-                class="radio-option border-2 border-gray-200 rounded-2xl p-4"
-                data-value="생활·돌봄 지원"
-              >
-                 <div class="flex items-center justify-between">
+                </div>
+                <div
+                  class="radio-option border-2 border-gray-200 rounded-2xl p-4"
+                  data-value="생활·돌봄 지원"
+                >
+                  <div class="flex items-center justify-between">
                     <div class="flex items-center">
                       <span class="text-2xl mr-3">🍀</span>
                       <div>
@@ -127,15 +153,17 @@
                     <div
                       class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
                     >
-                      <div class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"></div>
+                      <div
+                        class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
+                      ></div>
                     </div>
                   </div>
-              </div>
-              <div
-                class="radio-option border-2 border-gray-200 rounded-2xl p-4"
-                data-value="운전·배송"
-              >
-                 <div class="flex items-center justify-between">
+                </div>
+                <div
+                  class="radio-option border-2 border-gray-200 rounded-2xl p-4"
+                  data-value="운전·배송"
+                >
+                  <div class="flex items-center justify-between">
                     <div class="flex items-center">
                       <span class="text-2xl mr-3">🚗</span>
                       <div>
@@ -148,15 +176,17 @@
                     <div
                       class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
                     >
-                      <div class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"></div>
+                      <div
+                        class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
+                      ></div>
                     </div>
                   </div>
-              </div>
-              <div
-                class="radio-option border-2 border-gray-200 rounded-2xl p-4"
-                data-value="사회·공공"
-              >
-                 <div class="flex items-center justify-between">
+                </div>
+                <div
+                  class="radio-option border-2 border-gray-200 rounded-2xl p-4"
+                  data-value="사회·공공"
+                >
+                  <div class="flex items-center justify-between">
                     <div class="flex items-center">
                       <span class="text-2xl mr-3">🏛️</span>
                       <div>
@@ -169,565 +199,630 @@
                     <div
                       class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
                     >
-                      <div class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"></div>
+                      <div
+                        class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
+                      ></div>
                     </div>
                   </div>
-              </div>
-              <div
-                class="radio-option border-2 border-gray-200 rounded-2xl p-4"
-                data-value="기타"
-              >
-                <div class="flex items-center justify-between">
+                </div>
+                <div
+                  class="radio-option border-2 border-gray-200 rounded-2xl p-4"
+                  data-value="기타"
+                >
+                  <div class="flex items-center justify-between">
                     <div class="flex items-center">
                       <span class="text-2xl mr-3">✏️</span>
                       <div>
-                        <h3 class="font-bold text-gray-900">기타 (직접 작성)</h3>
+                        <h3 class="font-bold text-gray-900">
+                          기타 (직접 작성)
+                        </h3>
                       </div>
                     </div>
                     <div
                       class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
                     >
-                      <div class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"></div>
+                      <div
+                        class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
+                      ></div>
                     </div>
                   </div>
+                </div>
+
+                <input
+                  type="text"
+                  id="customCategory"
+                  placeholder="직무분야를 직접 입력해주세요"
+                  class="hidden w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+            </div>
+          </section>
+
+          <section id="step2" class="scroll-section visible p-4 border-t">
+            <div class="mb-4">
+              <h2 class="text-xl font-bold text-gray-900 mb-6">
+                2. 어떤 제목으로 올려볼까요?
+              </h2>
+              <div class="mb-8">
+                <input
+                  type="text"
+                  id="jobTitle"
+                  name="title"
+                  placeholder="제목을 입력해 주세요"
+                  class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none"
+                  maxlength="50"
+                  value="{{ job.title | default('') }}"
+                />
+              </div>
+            </div>
+          </section>
+
+          <section id="step3" class="scroll-section visible p-4 border-t">
+            <div class="mb-4">
+              <h2 class="text-xl font-bold text-gray-900 mb-6">
+                3. 원하는 근무 조건이 무엇인가요?
+              </h2>
+
+              <div class="flex gap-2 mb-8 flex-wrap">
+                <button
+                  type="button"
+                  class="period-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                  data-period="단기"
+                >
+                  단기
+                </button>
+                <button
+                  type="button"
+                  class="period-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                  data-period="1개월이상"
+                >
+                  1개월 이상
+                </button>
+                <button
+                  type="button"
+                  class="period-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                  data-period="3개월이상"
+                >
+                  3개월 이상
+                </button>
+                <button
+                  type="button"
+                  class="period-btn px-4 py-2 rounded-full border-2 border-gray-300 text-sm font-medium"
+                  data-period="1년이상"
+                >
+                  1년이상
+                </button>
               </div>
 
-              <input
-                type="text"
-                id="customCategory"
-                placeholder="직무분야를 직접 입력해주세요"
-                class="hidden w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
-              />
-            </div>
-          </div>
-        </section>
-
-        <section id="step2" class="scroll-section visible p-4 border-t">
-          <div class="mb-4">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">
-              2. 어떤 제목으로 올려볼까요?
-            </h2>
-            <div class="mb-8">
-              <input
-                type="text"
-                id="jobTitle"
-                name="title"
-                placeholder="제목을 입력해 주세요"
-                class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none"
-                maxlength="50"
-                value="{{ job.title | default('') }}"
-              />
-            </div>
-          </div>
-        </section>
-
-        <section id="step3" class="scroll-section visible p-4 border-t">
-          <div class="mb-4">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">
-              3. 원하는 근무 조건이 무엇인가요?
-            </h2>
-
-            <div class="flex gap-2 mb-8 flex-wrap">
-              <button
-                type="button"
-                class="period-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                data-period="단기"
-              >
-                단기
-              </button>
-              <button
-                type="button"
-                class="period-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                data-period="1개월이상"
-              >
-                1개월 이상
-              </button>
-              <button
-                type="button"
-                class="period-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                data-period="3개월이상"
-              >
-                3개월 이상
-              </button>
-              <button
-                type="button"
-                class="period-btn px-4 py-2 rounded-full border-2 border-gray-300 text-sm font-medium"
-                data-period="1년이상"
-              >
-                1년이상
-              </button>
-            </div>
-
-            <div id="shortTermCalendar" class="hidden mb-8">
-              <h3 class="text-lg font-medium text-gray-800 mb-4">
-                일하는 날짜를 선택해 주세요
-              </h3>
-              <div class="text-center mb-4">
-                <p class="base font-medium text-gray-900">
-                  <span id="selectedDatesDisplay">날짜를 선택해주세요</span>
+              <div id="shortTermCalendar" class="hidden mb-8">
+                <h3 class="text-lg font-medium text-gray-800 mb-4">
+                  일하는 날짜를 선택해 주세요
+                </h3>
+                <div class="text-center mb-4">
+                  <p class="base font-medium text-gray-900">
+                    <span id="selectedDatesDisplay">날짜를 선택해주세요</span>
+                  </p>
+                </div>
+                <div class="bg-white rounded-xl p-3 border border-gray-200">
+                  <div class="flex justify-between items-center mb-4">
+                    <button
+                      type="button"
+                      onclick="changeMonth(-1)"
+                      class="p-2 hover:bg-gray-100 rounded"
+                    >
+                      <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15 19l-7-7 7-7"
+                        />
+                      </svg>
+                    </button>
+                    <span id="currentMonth" class="font-bold text-lg"
+                      >2025년 10월</span
+                    >
+                    <button
+                      type="button"
+                      onclick="changeMonth(1)"
+                      class="p-2 hover:bg-gray-100 rounded"
+                    >
+                      <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="grid grid-cols-7 gap-1 mb-2">
+                    <div
+                      class="text-center text-sm text-red-500 py-1 font-medium"
+                    >
+                      일
+                    </div>
+                    <div
+                      class="text-center text-sm text-gray-700 py-1 font-medium"
+                    >
+                      월
+                    </div>
+                    <div
+                      class="text-center text-sm text-gray-700 py-1 font-medium"
+                    >
+                      화
+                    </div>
+                    <div
+                      class="text-center text-sm text-gray-700 py-1 font-medium"
+                    >
+                      수
+                    </div>
+                    <div
+                      class="text-center text-sm text-gray-700 py-1 font-medium"
+                    >
+                      목
+                    </div>
+                    <div
+                      class="text-center text-sm text-gray-700 py-1 font-medium"
+                    >
+                      금
+                    </div>
+                    <div
+                      class="text-center text-sm text-blue-500 py-1 font-medium"
+                    >
+                      토
+                    </div>
+                  </div>
+                  <div
+                    id="calendarGrid"
+                    class="grid grid-cols-7 gap-1 mb-3"
+                  ></div>
+                </div>
+                <p class="text-sm text-gray-600 mt-3 text-center">
+                  총
+                  <span id="selectedDatesCount" class="font-bold text-blue-600"
+                    >0</span
+                  >일 동안 일해요
                 </p>
               </div>
-              <div class="bg-white rounded-xl p-3 border border-gray-200">
-                <div class="flex justify-between items-center mb-4">
-                  <button
-                    type="button"
-                    onclick="changeMonth(-1)"
-                    class="p-2 hover:bg-gray-100 rounded"
-                  >
-                    <svg
-                      class="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 19l-7-7 7-7"
-                      />
-                    </svg>
-                  </button>
-                  <span id="currentMonth" class="font-bold text-lg"
-                    >2025년 10월</span
-                  >
-                  <button
-                    type="button"
-                    onclick="changeMonth(1)"
-                    class="p-2 hover:bg-gray-100 rounded"
-                  >
-                    <svg
-                      class="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </button>
-                </div>
-                <div class="grid grid-cols-7 gap-1 mb-2">
-                  <div class="text-center text-sm text-red-500 py-1 font-medium">
-                    일
-                  </div>
-                  <div class="text-center text-sm text-gray-700 py-1 font-medium">
-                    월
-                  </div>
-                  <div class="text-center text-sm text-gray-700 py-1 font-medium">
-                    화
-                  </div>
-                  <div class="text-center text-sm text-gray-700 py-1 font-medium">
-                    수
-                  </div>
-                  <div class="text-center text-sm text-gray-700 py-1 font-medium">
-                    목
-                  </div>
-                  <div class="text-center text-sm text-gray-700 py-1 font-medium">
-                    금
-                  </div>
-                  <div class="text-center text-sm text-blue-500 py-1 font-medium">
-                    토
-                  </div>
-                </div>
-                <div id="calendarGrid" class="grid grid-cols-7 gap-1 mb-3"></div>
-              </div>
-              <p class="text-sm text-gray-600 mt-3 text-center">
-                총
-                <span id="selectedDatesCount" class="font-bold text-blue-600"
-                  >0</span
-                >일 동안 일해요
-              </p>
-            </div>
 
-            <div id="longTermSchedule" class="hidden">
+              <div id="longTermSchedule" class="hidden">
+                <div class="mb-8">
+                  <h3 class="text-lg font-medium text-gray-800 mb-4">
+                    일하는 요일을 선택해 주세요
+                  </h3>
+                  <div class="flex gap-2 mb-4">
+                    <button
+                      type="button"
+                      class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                      data-day="월"
+                    >
+                      월
+                    </button>
+                    <button
+                      type="button"
+                      class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                      data-day="화"
+                    >
+                      화
+                    </button>
+                    <button
+                      type="button"
+                      class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                      data-day="수"
+                    >
+                      수
+                    </button>
+                    <button
+                      type="button"
+                      class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                      data-day="목"
+                    >
+                      목
+                    </button>
+                    <button
+                      type="button"
+                      class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                      data-day="금"
+                    >
+                      금
+                    </button>
+                    <button
+                      type="button"
+                      class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                      data-day="토"
+                    >
+                      토
+                    </button>
+                    <button
+                      type="button"
+                      class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                      data-day="일"
+                    >
+                      일
+                    </button>
+                  </div>
+                  <div class="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="flexibleDays"
+                      class="w-5 h-5 mr-2 rounded border-gray-300"
+                    />
+                    <label for="flexibleDays" class="text-sm text-gray-600"
+                      >요일 협의 후 결정</label
+                    >
+                  </div>
+                </div>
+
+                <div class="mb-8">
+                  <h3 class="text-lg font-medium text-gray-800 mb-4">
+                    일하는 시간을 선택해 주세요
+                  </h3>
+                  <div class="flex gap-3 mb-4">
+                    <select
+                      id="startTimeSelect"
+                      class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-gray-700"
+                      name="work_start_time"
+                    >
+                      <option value="">시작 시간 선택</option>
+                      <option value="06:00">오전 06:00</option>
+                      <option value="07:00">오전 07:00</option>
+                      <option value="08:00">오전 08:00</option>
+                      <option value="09:00">오전 09:00</option>
+                      <option value="10:00">오전 10:00</option>
+                      <option value="11:00">오전 11:00</option>
+                      <option value="12:00">오후 12:00</option>
+                      <option value="13:00">오후 01:00</option>
+                      <option value="14:00">오후 02:00</option>
+                      <option value="15:00">오후 03:00</option>
+                      <option value="16:00">오후 04:00</option>
+                      <option value="17:00">오후 05:00</option>
+                      <option value="18:00">오후 06:00</option>
+                    </select>
+                    <select
+                      id="endTimeSelect"
+                      class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-gray-700"
+                      name="work_end_time"
+                    >
+                      <option value="">종료 시간 선택</option>
+                      <option value="12:00">오후 12:00</option>
+                      <option value="13:00">오후 01:00</option>
+                      <option value="14:00">오후 02:00</option>
+                      <option value="15:00">오후 03:00</option>
+                      <option value="16:00">오후 04:00</option>
+                      <option value="17:00">오후 05:00</option>
+                      <option value="18:00">오후 06:00</option>
+                      <option value="19:00">오후 07:00</option>
+                      <option value="20:00">오후 08:00</option>
+                      <option value="21:00">오후 09:00</option>
+                      <option value="22:00">오후 10:00</option>
+                    </select>
+                  </div>
+                  <div class="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="flexibleTime"
+                      class="w-5 h-5 mr-2 rounded border-gray-300"
+                    />
+                    <label for="flexibleTime" class="text-sm text-gray-600"
+                      >시간 협의 가능</label
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="step4" class="scroll-section visible p-4 border-t">
+            <div class="mb-4">
+              <h2 class="text-xl font-bold text-gray-900 mb-6">
+                4. 모집 마감일을 선택해 주세요
+              </h2>
+
               <div class="mb-8">
-                <h3 class="text-lg font-medium text-gray-800 mb-4">
-                  일하는 요일을 선택해 주세요
-                </h3>
+                <input
+                  type="date"
+                  id="recruitmentEndDate"
+                  name="recruitment_end_date"
+                  class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-gray-700"
+                  placeholder="마감일"
+                  value="{{ job.recruitment_end_date.strftime('%Y-%m-%d') if job.recruitment_end_date else '' }}"
+                />
+                <p class="text-sm text-gray-500 mt-2 px-1">
+                  선택하지 않으면 등록일로부터 30일 뒤 자동으로 마감됩니다.
+                  (선택사항)
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section id="step5" class="scroll-section visible p-4 border-t">
+            <div class="mb-4">
+              <h2 class="text-xl font-bold text-gray-900 mb-6">
+                5. 급여를 적어주세요
+              </h2>
+
+              <div class="mb-6">
                 <div class="flex gap-2 mb-4">
                   <button
                     type="button"
-                    class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                    data-day="월"
+                    class="salary-type-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                    data-type="시급"
                   >
-                    월
+                    시급
                   </button>
                   <button
                     type="button"
-                    class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                    data-day="화"
+                    class="salary-type-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                    data-type="일급"
                   >
-                    화
+                    일급
                   </button>
                   <button
                     type="button"
-                    class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                    data-day="수"
+                    class="salary-type-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                    data-type="월급"
                   >
-                    수
+                    월급
                   </button>
                   <button
                     type="button"
-                    class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                    data-day="목"
+                    class="salary-type-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
+                    data-type="건당"
                   >
-                    목
-                  </button>
-                  <button
-                    type="button"
-                    class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                    data-day="금"
-                  >
-                    금
-                  </button>
-                  <button
-                    type="button"
-                    class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                    data-day="토"
-                  >
-                    토
-                  </button>
-                  <button
-                    type="button"
-                    class="day-btn w-12 h-12 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                    data-day="일"
-                  >
-                    일
+                    건당
                   </button>
                 </div>
-                <div class="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="flexibleDays"
-                    class="w-5 h-5 mr-2 rounded border-gray-300"
-                  />
-                  <label for="flexibleDays" class="text-sm text-gray-600"
-                    >요일 협의 후 결정</label
-                  >
-                </div>
-              </div>
 
-              <div class="mb-8">
-                <h3 class="text-lg font-medium text-gray-800 mb-4">
-                  일하는 시간을 선택해 주세요
-                </h3>
-                <div class="flex gap-3 mb-4">
-                  <select
-                    id="startTimeSelect"
-                    class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-gray-700"
-                    name="work_start_time"
-                  >
-                    <option value="">오전 09:00</option>
-                    <option value="06:00">오전 06:00</option>
-                    <option value="07:00">오전 07:00</option>
-                    <option value="08:00">오전 08:00</option>
-                    <option value="09:00">오전 09:00</option>
-                    <option value="10:00">오전 10:00</option>
-                    <option value="11:00">오전 11:00</option>
-                    <option value="12:00">오후 12:00</option>
-                    <option value="13:00">오후 01:00</option>
-                    <option value="14:00">오후 02:00</option>
-                    <option value="15:00">오후 03:00</option>
-                    <option value="16:00">오후 04:00</option>
-                    <option value="17:00">오후 05:00</option>
-                    <option value="18:00">오후 06:00</option>
-                  </select>
-                  <select
-                    id="endTimeSelect"
-                    class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-gray-700"
-                    name="work_end_time"
-                  >
-                    <option value="">오후 06:00</option>
-                    <option value="12:00">오후 12:00</option>
-                    <option value="13:00">오후 01:00</option>
-                    <option value="14:00">오후 02:00</option>
-                    <option value="15:00">오후 03:00</option>
-                    <option value="16:00">오후 04:00</option>
-                    <option value="17:00">오후 05:00</option>
-                    <option value="18:00">오후 06:00</option>
-                    <option value="19:00">오후 07:00</option>
-                    <option value="20:00">오후 08:00</option>
-                    <option value="21:00">오후 09:00</option>
-                    <option value="22:00">오후 10:00</option>
-                  </select>
-                </div>
-                <div class="flex items-center">
+                <div class="relative mb-4">
                   <input
-                    type="checkbox"
-                    id="flexibleTime"
-                    class="w-5 h-5 mr-2 rounded border-gray-300"
+                    type="text"
+                    id="salaryAmount"
+                    placeholder="금액을 입력해주세요"
+                    class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none pr-12"
+                    inputmode="numeric"
                   />
-                  <label for="flexibleTime" class="text-sm text-gray-600"
-                    >시간 협의 가능</label
+                  <span
+                    class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium"
+                    >원</span
                   >
+                </div>
+
+                <div class="bg-blue-50 rounded-2xl p-5 border border-blue-200">
+                  <p class="text-base text-gray-800 mb-3 text-center">
+                    <span class="font-bold text-lg"
+                      >2025년 최저시급은 10,030원이에요</span
+                    >
+                  </p>
+                  <hr class="border-blue-300 my-3" />
+                  <p
+                    id="salaryCalculation"
+                    class="text-base text-gray-800 text-center font-medium"
+                  >
+                    조건을 선택하면 최소 급여를 계산해드려요
+                  </p>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <section id="step4" class="scroll-section visible p-4 border-t">
-          <div class="mb-4">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">
-              4. 모집 마감일을 선택해 주세요
-            </h2>
+          <section id="step6" class="scroll-section visible p-4 border-t">
+            <div class="mb-4">
+              <h2 class="text-xl font-bold text-gray-900 mb-6">
+                6. 모집 인원을 알려주세요
+              </h2>
 
-            <div class="mb-8">
-              <input
-                type="date"
-                id="recruitmentEndDate"
-                name="recruitment_end_date"
-                class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none text-gray-700"
-                placeholder="마감일"
-                value="{{ job.recruitment_end_date.strftime('%Y-%m-%d') if job.recruitment_end_date else '' }}"
-              />
-              <p class="text-sm text-gray-500 mt-2 px-1">
-                  선택하지 않으면 등록일로부터 30일 뒤 자동으로 마감됩니다. (선택사항)
-              </p>
-            </div>
-          </div>
-        </section>
-
-
-        <section id="step5" class="scroll-section visible p-4 border-t">
-          <div class="mb-4">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">
-              5. 급여를 적어주세요
-            </h2>
-
-            <div class="mb-6">
-              <div class="flex gap-2 mb-4">
-                <button
-                  type="button"
-                  class="salary-type-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                  data-type="시급"
-                >
-                  시급
-                </button>
-                <button
-                  type="button"
-                  class="salary-type-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                  data-type="일급"
-                >
-                  일급
-                </button>
-                <button
-                  type="button"
-                  class="salary-type-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                  data-type="월급"
-                >
-                  월급
-                </button>
-                <button
-                  type="button"
-                  class="salary-type-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-700 text-sm font-medium"
-                  data-type="건당"
-                >
-                  건당
-                </button>
-              </div>
-
-              <div class="relative mb-4">
+              <div class="relative mb-8">
                 <input
-                  type="text"
-                  id="salaryAmount"
-                  placeholder="금액을 입력해주세요"
+                  type="number"
+                  id="recruitmentCount"
+                  name="recruitment_count"
+                  placeholder="모집 인원 (숫자만 입력)"
                   class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none pr-12"
                   inputmode="numeric"
+                  min="1"
+                  value="{{ job.recruitment_count | default(1) }}"
                 />
                 <span
                   class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium"
-                  >원</span
+                  >명</span
                 >
               </div>
-
-              <div class="bg-blue-50 rounded-2xl p-5 border border-blue-200">
-                <p class="text-base text-gray-800 mb-3 text-center">
-                  <span class="font-bold text-lg"
-                    >2025년 최저시급은 10,030원이에요</span
-                  >
-                </p>
-                <hr class="border-blue-300 my-3" />
-                <p
-                  id="salaryCalculation"
-                  class="text-base text-gray-800 text-center font-medium"
-                >
-                  조건을 선택하면 최소 급여를 계산해드려요
-                </p>
-              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <section id="step6" class="scroll-section visible p-4 border-t">
-          <div class="mb-4">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">
-              6. 모집 인원을 알려주세요
-            </h2>
-
-            <div class="relative mb-8">
-              <input
-                type="number"
-                id="recruitmentCount"
-                name="recruitment_count"
-                placeholder="모집 인원 (숫자만 입력)"
-                class="w-full px-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none pr-12"
-                inputmode="numeric"
-                min="1"
-                value="{{ job.recruitment_count | default(1) }}"
-              />
-              <span
-                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium"
-                >명</span
-              >
-            </div>
-          </div>
-        </section>
-
-
-        <section id="step7" class="scroll-section visible p-4 border-t">
-          <div class="mb-4">
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-xl font-bold text-gray-900">
-                7. 일에 대하여 참고할 사항을 적어주세요
-              </h2>
-              <button
-                type="button"
-                onclick="openAIAssistant()"
-                class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
-              >
-                <span>✨</span>
-                <span>AI 도움</span>
-              </button>
-            </div>
-            <textarea
-              id="jobDescription"
-              name="description"
-              rows="8"
-              placeholder="나중에 AI로 정리하여 보여드리니 구체적이고 자유롭게 작성해 주세요."
-              class="w-full px-4 py-4 text-base border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none resize-none"
-            >{{ job.description | default('') }}</textarea>
-          </div>
-        </section>
-
-        <section id="step8" class="scroll-section visible p-4 border-t">
-          <div class="mb-4">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">
-              8. 일할 장소를 알려주세요
-            </h2>
-
-            <div class="space-y-4">
-              <div class="relative">
-                <input
-                  type="text"
-                  id="workLocation"
-                  name="region"
-                  placeholder="지도에서 위치를 선택해주세요"
-                  class="w-full px-4 py-4 text-lg border-2 border-gray-300 rounded-2xl focus:border-blue-600 focus:outline-none pr-12"
-                  readonly
-                  onclick="openAddressSearch()"
-                  value="{{ job.region | default('') }}"
-                />
+          <section id="step7" class="scroll-section visible p-4 border-t">
+            <div class="mb-4">
+              <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-gray-900">
+                  7. 일에 대하여 참고할 사항을 적어주세요
+                </h2>
                 <button
                   type="button"
-                  onclick="openAddressSearch()"
-                  class="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-600"
+                  onclick="openAIAssistant()"
+                  class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
                 >
-                  <svg
-                    class="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
+                  <span>✨</span>
+                  <span>AI 도움</span>
                 </button>
               </div>
-
-              <input
-                type="text"
-                id="detailAddress"
-                name="detail_address"
-                placeholder="상세 주소를 입력해주세요 (예: 101동 502호, 2층)"
-                class="w-full px-4 py-4 text-base border-2 border-gray-300 rounded-2xl focus:border-blue-500 focus:outline-none"
-                value="{{ job.detail_address | default('') }}"
-              />
-
-              <input type="hidden" id="latitude" name="latitude" value="{{ job.latitude | default('') }}" />
-              <input type="hidden" id="longitude" name="longitude" value="{{ job.longitude | default('') }}" />
-              <input type="hidden" id="region_1depth_name" name="region_1depth_name" value="{{ job.region_1depth_name | default('') }}" />
-              <input type="hidden" id="region_2depth_name" name="region_2depth_name" value="{{ job.region_2depth_name | default('') }}" />
-              <input type="hidden" id="region_3depth_name" name="region_3depth_name" value="{{ job.region_3depth_name | default('') }}" />
-
+              <textarea
+                id="jobDescription"
+                name="description"
+                rows="8"
+                placeholder="나중에 AI로 정리하여 보여드리니 구체적이고 자유롭게 작성해 주세요."
+                class="w-full px-4 py-4 text-base border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none resize-none"
+              >
+{{ job.description | default('') }}</textarea
+              >
             </div>
-          </div>
-        </section>
+          </section>
 
-        <section id="step9" class="scroll-section visible p-4 border-t">
-          <div class="mb-4">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">
-              9. 연락처를 알려주세요
-            </h2>
+          <section id="step8" class="scroll-section visible p-4 border-t">
+            <div class="mb-4">
+              <h2 class="text-xl font-bold text-gray-900 mb-6">
+                8. 일할 장소를 알려주세요
+              </h2>
 
-            <div class="mb-6">
-              <input
-                type="tel"
-                id="contactPhone"
-                name="contact_phone"
-                placeholder="010-0000-0000"
-                class="w-full px-4 py-4 text-lg border-2 border-gray-300 rounded-2xl focus:border-blue-500 focus:outline-none"
-                maxlength="13"
-                value="{{ job.contact_phone | default('') }}"
-              />
-              <p class="text-sm text-gray-500 mt-2 px-1">
-                지원자와 연락할 수 있는 전화번호를 입력해주세요
-              </p>
-            </div>
+              <div class="space-y-4">
+                <div class="relative">
+                  <input
+                    type="text"
+                    id="workLocation"
+                    name="region"
+                    placeholder="지도에서 위치를 선택해주세요"
+                    class="w-full px-4 py-4 text-lg border-2 border-gray-300 rounded-2xl focus:border-blue-600 focus:outline-none pr-12"
+                    readonly
+                    onclick="openAddressSearch()"
+                    value="{{ job.region | default('') }}"
+                  />
+                  <button
+                    type="button"
+                    onclick="openAddressSearch()"
+                    class="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-600"
+                  >
+                    <svg
+                      class="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                  </button>
+                </div>
 
-            <div class="bg-blue-50 rounded-2xl p-4 border border-blue-200">
-              <div class="flex items-start">
                 <input
-                  type="checkbox"
-                  id="agreeTerms"
-                  name="agreeTerms"
-                  class="w-5 h-5 mt-0.5 mr-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  checked
+                  type="text"
+                  id="detailAddress"
+                  name="detail_address"
+                  placeholder="상세 주소를 입력해주세요 (예: 101동 502호, 2층)"
+                  class="w-full px-4 py-4 text-base border-2 border-gray-300 rounded-2xl focus:border-blue-500 focus:outline-none"
+                  value="{{ job.detail_address | default('') }}"
                 />
-                <label for="agreeTerms" class="text-sm text-gray-800 flex-1">
-                  <span class="font-bold block mb-1">기업 이음 준수사항 동의 (필수)</span>
-                  <span class="text-gray-600 block">
-                    • 최저임금 및 근로기준법을 준수합니다<br />
-                    • 고용 차별을 하지 않습니다<br />
-                    • 허위 정보를 작성하지 않습니다
-                  </span>
-                </label>
+
+                <input
+                  type="hidden"
+                  id="latitude"
+                  name="latitude"
+                  value="{{ job.latitude | default('') }}"
+                />
+                <input
+                  type="hidden"
+                  id="longitude"
+                  name="longitude"
+                  value="{{ job.longitude | default('') }}"
+                />
+                <input
+                  type="hidden"
+                  id="region_1depth_name"
+                  name="region_1depth_name"
+                  value="{{ job.region_1depth_name | default('') }}"
+                />
+                <input
+                  type="hidden"
+                  id="region_2depth_name"
+                  name="region_2depth_name"
+                  value="{{ job.region_2depth_name | default('') }}"
+                />
+                <input
+                  type="hidden"
+                  id="region_3depth_name"
+                  name="region_3depth_name"
+                  value="{{ job.region_3depth_name | default('') }}"
+                />
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+
+          <section id="step9" class="scroll-section visible p-4 border-t">
+            <div class="mb-4">
+              <h2 class="text-xl font-bold text-gray-900 mb-6">
+                9. 연락처를 알려주세요
+              </h2>
+
+              <div class="mb-6">
+                <input
+                  type="tel"
+                  id="contactPhone"
+                  name="contact_phone"
+                  placeholder="010-0000-0000"
+                  class="w-full px-4 py-4 text-lg border-2 border-gray-300 rounded-2xl focus:border-blue-500 focus:outline-none"
+                  maxlength="13"
+                  value="{{ job.contact_phone | default('') }}"
+                />
+                <p class="text-sm text-gray-500 mt-2 px-1">
+                  지원자와 연락할 수 있는 전화번호를 입력해주세요
+                </p>
+              </div>
+
+              <div class="bg-blue-50 rounded-2xl p-4 border border-blue-200">
+                <div class="flex items-start">
+                  <input
+                    type="checkbox"
+                    id="agreeTerms"
+                    name="agreeTerms"
+                    class="w-5 h-5 mt-0.5 mr-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    checked
+                  />
+                  <label for="agreeTerms" class="text-sm text-gray-800 flex-1">
+                    <span class="font-bold block mb-1"
+                      >기업 이음 준수사항 동의 (필수)</span
+                    >
+                    <span class="text-gray-600 block">
+                      • 최저임금 및 근로기준법을 준수합니다<br />
+                      • 고용 차별을 하지 않습니다<br />
+                      • 허위 정보를 작성하지 않습니다
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
         </main>
 
-        <input type="hidden" name="job_category" value="{{ job.job_category | default('') }}" />
-        <input type="hidden" name="recruitment_type" value="{{ job.recruitment_type | default('') }}" />
-        <input type="hidden" name="company" value="{{ job.company | default(current_user.nickname) }}" />
-        <input type="hidden" name="work_period" value="{{ job.work_period | default('') }}" />
-
+        <input
+          type="hidden"
+          name="job_category"
+          value="{{ job.job_category | default('') }}"
+        />
+        <input
+          type="hidden"
+          name="recruitment_type"
+          value="{{ job.recruitment_type | default('') }}"
+        />
+        <input
+          type="hidden"
+          name="company"
+          value="{{ job.company | default(current_user.nickname) }}"
+        />
+        <input
+          type="hidden"
+          name="work_period"
+          value="{{ job.work_period | default('') }}"
+        />
 
         <div class="next-btn-fixed bg-white border-t p-4">
           <button
@@ -740,7 +835,6 @@
             수정 완료
           </button>
         </div>
-
       </form>
 
       <div
@@ -956,9 +1050,10 @@
       window.COMPANY_LIST_URL = "{{ url_for('company.company_list') }}";
       window.CURRENT_USER_NICKNAME = "{{ current_user.nickname }}";
       window.MAIN_URL = "{{ url_for('auth.main') }}";
-      window.DETAIL_URL = "{{ url_for('company.company_job_detail', job_id=job.id) }}";
+      window.DETAIL_URL =
+        "{{ url_for('company.company_job_detail', job_id=job.id) }}";
     </script>
 
     <script src="{{ url_for('static', filename='js/company/edit_job_company.js') }}"></script>
-    </body>
+  </body>
 </html>

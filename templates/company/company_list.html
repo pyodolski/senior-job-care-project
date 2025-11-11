@@ -1,14 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {% include 'includes/head.html' %}
     <title>기업이음 - 구인공고</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/company_list.css') }}"
@@ -17,76 +11,7 @@
   <body class="bg-gray-100">
     <div class="w-full bg-white shadow-lg min-h-screen">
       <div class="sticky top-0 z-10 bg-white shadow-sm">
-        <header class="px-4 py-3 sm:px-6 flex justify-between items-center">
-          <div class="flex items-center">
-            <div class="w-8 h-8 mr-2 flex items-center justify-center">
-              <img
-                src="{{ url_for('static', filename='images/header/logo.png') }}"
-                alt="로고"
-                class="max-w-full max-h-full object-contain"
-              />
-            </div>
-            <span class="text-2xl font-bold text-blue-900">이음</span>
-          </div>
-          <div class="flex items-center space-x-4">
-            <!-- 음성 검색 버튼 -->
-            <button
-              onclick="startVoiceSearchCompany()"
-              id="voiceBtn"
-              class="w-6 h-6 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
-              title="음성으로 검색하기"
-            >
-              <img
-                src="{{ url_for('static', filename='images/header/mic.png') }}"
-                alt="마이크"
-                class="max-w-full max-h-full object-contain"
-              />
-            </button>
-            <!-- 텍스트 검색 버튼 -->
-            <button
-              onclick="toggleSearchBar()"
-              id="searchBtn"
-              class="w-6 h-6 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
-              title="검색하기"
-            >
-              <img
-                src="{{ url_for('static', filename='images/header/search.png') }}"
-                alt="검색"
-                class="max-w-full max-h-full object-contain"
-              />
-            </button>
-          </div>
-        </header>
-
-        <!-- 검색창 (숨김/표시) -->
-        <div
-          id="searchBar"
-          class="hidden bg-white border-b px-4 py-3 shadow-sm"
-        >
-          <form action="/company" method="GET" class="flex gap-2">
-            <input
-              type="text"
-              name="q"
-              id="searchInput"
-              placeholder="검색어를 입력하세요 (예: 청소, 경비)"
-              value="{{ request.args.get('q', '') }}"
-              class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              type="submit"
-              class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors"
-            >
-              검색
-            </button>
-            <button
-              type="button"
-              onclick="toggleSearchBar()"
-              class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
-            >
-              취소
-            </button>
-          </form>
-        </div>
+        {% include 'includes/header.html' %}
 
         <nav class="flex border-b">
           <a
@@ -306,9 +231,9 @@
               </div>
               {% if job.recruitment_end_date %}
               <p class="text-xs text-gray-500">
-                ~{{ job.recruitment_end_date.strftime('%m/%d') }} ({% set day_map =
-                {'Mon': '월', 'Tue': '화', 'Wed': '수', 'Thu': '목', 'Fri':
-                '금', 'Sat': '토', 'Sun': '일'} %}{{
+                ~{{ job.recruitment_end_date.strftime('%m/%d') }} ({% set
+                day_map = {'Mon': '월', 'Tue': '화', 'Wed': '수', 'Thu': '목',
+                'Fri': '금', 'Sat': '토', 'Sun': '일'} %}{{
                 day_map[job.recruitment_end_date.strftime('%a')] }})
               </p>
               {% else %}
@@ -342,7 +267,8 @@
             <!-- 행[2]: 급여 -->
             <div class="mb-2">
               <p class="text-blue-600 font-bold">
-                {% if job.salary %}{{ job.salary }}{% else %}급여 협의{% endif %}
+                {% if job.salary %}{{ job.salary }}{% else %}급여 협의{% endif
+                %}
               </p>
             </div>
 
