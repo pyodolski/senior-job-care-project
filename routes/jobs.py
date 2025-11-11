@@ -185,6 +185,20 @@ def create_job():
             work_friday = request.form.get("work_friday") == "true"
             work_saturday = request.form.get("work_saturday") == "true"
             work_sunday = request.form.get("work_sunday") == "true"
+
+            recruitment_start_date_str = request.form.get("recruitment_start_date")
+            recruitment_end_date_str = request.form.get("recruitment_end_date")
+
+            recruitment_start_date = None
+            recruitment_end_date = None
+
+            if recruitment_start_date_str:
+                # JavaScript에서 전송된 "YYYY-MM-DD" 형식을 date 객체로 변환
+                # (날짜 형식 오류 시 ValueError를 발생시키므로, 전송되는 데이터 형식이 정확해야 함)
+                recruitment_start_date = datetime.strptime(recruitment_start_date_str, "%Y-%m-%d").date()
+
+            if recruitment_end_date_str:
+                recruitment_end_date = datetime.strptime(recruitment_end_date_str, "%Y-%m-%d").date()
             
             # 필수 필드 검증
             if not all([title, company, description]):
@@ -208,6 +222,8 @@ def create_job():
                 contact_phone=contact_phone,
                 recruitment_count=recruitment_count,
                 people_category=people_category,  # 사람이음 카테고리 추가
+                recruitment_start_date=recruitment_start_date,
+                recruitment_end_date=recruitment_end_date,
                 work_start_time=work_start_time,
                 work_end_time=work_end_time,
                 work_monday=work_monday,
