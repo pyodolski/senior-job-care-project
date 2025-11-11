@@ -139,50 +139,6 @@ async function toggleResumeFavorite(resumeId, button) {
   }
 }
 
-// 얼굴 토글 스위치 상태 관리
-let isToggleActive = false;
-
-// 토글 스위치 기능
-function updateToggleTheme() {
-  const toggle = document.getElementById("face-toggle");
-  const body = document.body;
-  const container = document.getElementById("toggleContainer");
-  const toggleText = document.getElementById("toggleText");
-
-  if (toggle.checked) {
-    body.classList.add("toggle-active");
-    container.classList.add("active");
-    isToggleActive = true;
-
-    // 1초 후에 토글 페이지로 이동 (애니메이션 완료 후)
-    setTimeout(() => {
-      window.location.href = "/toggle-page";
-    }, 1000);
-  } else {
-    body.classList.remove("toggle-active");
-    container.classList.remove("active");
-    isToggleActive = false;
-  }
-}
-
-// 페이지 로드 시 초기화
-document.addEventListener("DOMContentLoaded", function () {
-  const toggle = document.getElementById("face-toggle");
-  const urlParams = new URLSearchParams(window.location.search);
-
-  // reset_toggle 파라미터가 있으면 토글을 비활성화 상태로 설정
-  if (urlParams.get("reset_toggle") === "true") {
-    toggle.checked = false;
-    updateToggleTheme();
-  }
-
-  // 토글 변경 이벤트 리스너 추가
-  toggle.addEventListener("change", updateToggleTheme);
-
-  // 초기 상태 설정
-  updateToggleTheme();
-});
-
 // ==================== 음성 검색 기능 ====================
 
 // 음성 인식 지원 확인

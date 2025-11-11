@@ -28,60 +28,7 @@
                 class="max-w-full max-h-full object-contain"
               />
             </div>
-            <div class="toggle-container" id="toggleContainer">
-              <span class="toggle-text" id="toggleText">이음</span>
-              <div class="relative w-[50px] h-[26px]">
-                <input type="checkbox" id="face-toggle" class="hidden" />
-                <label
-                  for="face-toggle"
-                  class="block w-full h-full cursor-pointer relative border border-gray-300 p-[1.5px] transition-colors duration-500 ease-in-out rounded-[13px]"
-                  style="background-color: var(--toggle-bg)"
-                >
-                  <div
-                    class="toggle-handle relative w-[22px] h-[22px] bg-transparent rounded-full transition-transform duration-[600ms] ease-in-out"
-                  >
-                    <div
-                      class="roller relative w-full h-full transition-transform duration-[600ms] ease-in-out"
-                    >
-                      <!-- 앞면 (낮 모드) -->
-                      <div
-                        class="face-front absolute w-full h-full flex justify-center items-center bg-white rounded-full shadow-sm opacity-100 transition-opacity duration-100 linear"
-                      >
-                        <div
-                          class="face-feature eye left absolute border-b-[1px] rounded-full transition-colors duration-500 ease-in-out"
-                          style="border-color: var(--face-color)"
-                        ></div>
-                        <div
-                          class="face-feature eye right absolute border-b-[1px] rounded-full transition-colors duration-500 ease-in-out"
-                          style="border-color: var(--face-color)"
-                        ></div>
-                        <div
-                          class="face-feature mouth absolute border-b-[1px] rounded-full transition-colors duration-500 ease-in-out"
-                          style="border-color: var(--face-color)"
-                        ></div>
-                      </div>
-                      <!-- 뒷면 (밤 모드) -->
-                      <div
-                        class="face-back absolute w-full h-full flex justify-center items-center bg-white rounded-full shadow-sm opacity-0 transition-opacity duration-100 linear"
-                      >
-                        <div
-                          class="face-feature eye left absolute rounded-full transition-colors duration-500 ease-in-out"
-                          style="background-color: var(--face-color)"
-                        ></div>
-                        <div
-                          class="face-feature eye right absolute rounded-full transition-colors duration-500 ease-in-out"
-                          style="background-color: var(--face-color)"
-                        ></div>
-                        <div
-                          class="face-feature mouth absolute rounded-full transition-colors duration-500 ease-in-out"
-                          style="border-color: var(--face-color)"
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                </label>
-              </div>
-            </div>
+            <span class="text-xl font-bold text-blue-900">이음</span>
           </div>
           <div class="flex items-center space-x-3 sm:space-x-4">
             <!-- 음성 검색 버튼 -->
@@ -649,7 +596,7 @@
               style="box-shadow: 0 4px 6px -4px rgba(0, 0, 0, 0.25)"
             >
               <a
-                href="{{ url_for('jobs.my_posts') }}"
+                href="{{ url_for('company.company_favorites') }}"
                 class="text-gray-600 text-base font-medium inline-block py-1"
               >
                 내 공고 관리하기 →

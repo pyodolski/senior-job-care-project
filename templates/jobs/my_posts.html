@@ -19,7 +19,7 @@
       <!-- 상단 고정 영역 -->
       <div class="sticky top-0 z-10 bg-white shadow-sm">
         <!-- 상단 바 -->
-        <header class="px-4 sm:px-6 py-4 flex items-center"></header>
+        <header class="px-4 sm:px-6 py-4 flex items-center">
           <a href="{{ url_for('auth.profile') }}" class="mr-3">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -41,7 +41,7 @@
       </div>
 
       <!-- 메인 컨텐츠 -->
-      <main class="flex-grow px-4 sm:px-6 py-4 pb-24"></main>
+      <main class="flex-grow px-4 sm:px-6 py-4 pb-24">
         <!-- 검색 바 -->
         <div class="mb-4">
           <div class="relative">
@@ -183,6 +183,10 @@
       </main>
 
       <!-- 하단 네비게이션 -->
+      {% if current_user.is_authenticated and current_user.user_type == 1 %}
+      <!-- 기업 회원 전용 footer -->
+      {% include 'components/company_footer.html' %} {% else %}
+      <!-- 일반 회원 footer -->
       <footer
         class="fixed bottom-0 left-0 right-0 w-full bg-white border-t flex justify-around"
       >
@@ -252,6 +256,7 @@
           <span class="text-xs">내정보</span>
         </a>
       </footer>
+      {% endif %}
     </div>
 
     <script src="{{ url_for('static', filename='js/jobs/my_posts.js') }}"></script>

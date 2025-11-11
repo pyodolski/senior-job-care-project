@@ -44,22 +44,93 @@
             <span class="text-2xl font-bold text-blue-900">이음</span>
           </div>
           <div class="flex items-center space-x-4">
-            <div class="w-6 h-6 flex items-center justify-center">
+            <!-- 음성 검색 버튼 -->
+            <button
+              onclick="startVoiceSearch()"
+              id="voiceBtn"
+              class="w-6 h-6 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
+              title="음성으로 검색하기"
+            >
               <img
                 src="{{ url_for('static', filename='images/header/mic.png') }}"
                 alt="마이크"
                 class="max-w-full max-h-full object-contain"
               />
-            </div>
-            <div class="w-6 h-6 flex items-center justify-center">
+            </button>
+            <!-- 텍스트 검색 버튼 -->
+            <button
+              onclick="toggleSearchBar()"
+              id="searchBtn"
+              class="w-6 h-6 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
+              title="검색하기"
+            >
               <img
                 src="{{ url_for('static', filename='images/header/search.png') }}"
                 alt="검색"
                 class="max-w-full max-h-full object-contain"
               />
-            </div>
+            </button>
           </div>
         </header>
+
+        <!-- 검색창 (숨김/표시) -->
+        <div
+          id="searchBar"
+          class="hidden bg-white border-b px-4 py-3 shadow-sm"
+        >
+          <form id="searchForm" method="GET" class="space-y-3">
+            <!-- 검색 타입 선택 -->
+            <div class="flex gap-3 justify-center">
+              <label class="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="searchType"
+                  value="company"
+                  checked
+                  class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                />
+                <span class="ml-2 text-base font-medium text-gray-700"
+                  >기업이음</span
+                >
+              </label>
+              <label class="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="searchType"
+                  value="jobs"
+                  class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                />
+                <span class="ml-2 text-base font-medium text-gray-700"
+                  >사람이음</span
+                >
+              </label>
+            </div>
+
+            <!-- 검색 입력 -->
+            <div class="flex gap-2">
+              <input
+                type="text"
+                name="q"
+                id="searchInput"
+                placeholder="검색어를 입력하세요 (예: 청소, 경비)"
+                class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                type="submit"
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors"
+              >
+                검색
+              </button>
+              <button
+                type="button"
+                onclick="toggleSearchBar()"
+                class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                취소
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
 
       <!-- 내정보 타이틀 -->
@@ -313,5 +384,116 @@
       <!-- 하단 네비게이션 -->
       {% include 'components/company_footer.html' %}
     </div>
+
+    <script>
+      // ==================== 음성 검색 기능 ====================
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      function startVoiceSearch() {
+        if (!SpeechRecognition) {
+          alert(
+            "죄송합니다. 이 브라우저는 음성 인식을 지원하지 않습니다.\\nChrome 또는 Edge 브라우저를 사용해주세요."
+          );
+          return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = "ko-KR";
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+        const voiceBtn = document.getElementById("voiceBtn");
+
+        recognition.start();
+        voiceBtn.style.opacity = "0.5";
+        voiceBtn.style.animation = "pulse 1s infinite";
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          console.log("인식된 음성:", transcript);
+          speak("검색 중입니다");
+          window.location.href = `/company?q=${encodeURIComponent(transcript)}`;
+        };
+
+        recognition.onend = () => {
+          voiceBtn.style.opacity = "1";
+          voiceBtn.style.animation = "";
+        };
+
+        recognition.onerror = (event) => {
+          console.error("음성 인식 오류:", event.error);
+          voiceBtn.style.opacity = "1";
+          voiceBtn.style.animation = "";
+          let errorMsg = "음성 인식에 실패했습니다.";
+          switch (event.error) {
+            case "no-speech":
+              errorMsg = "음성이 감지되지 않았습니다. 다시 시도해주세요.";
+              break;
+            case "audio-capture":
+              errorMsg = "마이크를 찾을 수 없습니다.";
+              break;
+            case "not-allowed":
+              errorMsg =
+                "마이크 권한이 필요합니다. 브라우저 설정에서 마이크 권한을 허용해주세요.";
+              break;
+          }
+          alert(errorMsg);
+        };
+
+        speak("말씀해주세요");
+      }
+
+      function speak(text) {
+        if ("speechSynthesis" in window) {
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = "ko-KR";
+          utterance.rate = 0.9;
+          utterance.pitch = 1;
+          window.speechSynthesis.speak(utterance);
+        }
+      }
+
+      const style = document.createElement("style");
+      style.textContent = `@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }`;
+      document.head.appendChild(style);
+
+      // ==================== 검색창 토글 ====================
+      function toggleSearchBar() {
+        const searchBar = document.getElementById("searchBar");
+        const searchInput = document.getElementById("searchInput");
+        if (searchBar) {
+          if (searchBar.classList.contains("hidden")) {
+            searchBar.classList.remove("hidden");
+            if (searchInput) setTimeout(() => searchInput.focus(), 100);
+          } else {
+            searchBar.classList.add("hidden");
+          }
+        }
+      }
+
+      // ==================== 검색 폼 제출 처리 ====================
+      document.addEventListener("DOMContentLoaded", function () {
+        const searchForm = document.getElementById("searchForm");
+        if (searchForm) {
+          searchForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const searchType = document.querySelector(
+              'input[name="searchType"]:checked'
+            ).value;
+            const searchQuery = document.getElementById("searchInput").value;
+
+            if (searchType === "company") {
+              window.location.href = `/company?q=${encodeURIComponent(
+                searchQuery
+              )}`;
+            } else {
+              window.location.href = `/jobs?q=${encodeURIComponent(
+                searchQuery
+              )}`;
+            }
+          });
+        }
+      });
+    </script>
   </body>
 </html>
