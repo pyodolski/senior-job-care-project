@@ -1,14 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {% include 'includes/head.html' %}
     <title>이음 - 시니어 일자리</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/main.css') }}"
@@ -18,159 +12,7 @@
     <div class="w-full bg-white shadow-lg min-h-screen">
       <!-- 상단 고정 영역 -->
       <div class="sticky top-0 z-10 bg-white shadow-sm">
-        <!-- 상단 바 -->
-        <header class="px-4 py-3 sm:px-6 flex justify-between items-center">
-          <div class="flex items-center">
-            <div class="w-8 h-8 mr-2 flex items-center justify-center">
-              <img
-                src="{{ url_for('static', filename='images/header/logo.png') }}"
-                alt="로고"
-                class="max-w-full max-h-full object-contain"
-              />
-            </div>
-            <div class="toggle-container" id="toggleContainer">
-              <span class="toggle-text" id="toggleText">이음</span>
-              <div class="relative w-[50px] h-[26px]">
-                <input type="checkbox" id="face-toggle" class="hidden" />
-                <label
-                  for="face-toggle"
-                  class="block w-full h-full cursor-pointer relative border border-gray-300 p-[1.5px] transition-colors duration-500 ease-in-out rounded-[13px]"
-                  style="background-color: var(--toggle-bg)"
-                >
-                  <div
-                    class="toggle-handle relative w-[22px] h-[22px] bg-transparent rounded-full transition-transform duration-[600ms] ease-in-out"
-                  >
-                    <div
-                      class="roller relative w-full h-full transition-transform duration-[600ms] ease-in-out"
-                    >
-                      <!-- 앞면 (낮 모드) -->
-                      <div
-                        class="face-front absolute w-full h-full flex justify-center items-center bg-white rounded-full shadow-sm opacity-100 transition-opacity duration-100 linear"
-                      >
-                        <div
-                          class="face-feature eye left absolute border-b-[1px] rounded-full transition-colors duration-500 ease-in-out"
-                          style="border-color: var(--face-color)"
-                        ></div>
-                        <div
-                          class="face-feature eye right absolute border-b-[1px] rounded-full transition-colors duration-500 ease-in-out"
-                          style="border-color: var(--face-color)"
-                        ></div>
-                        <div
-                          class="face-feature mouth absolute border-b-[1px] rounded-full transition-colors duration-500 ease-in-out"
-                          style="border-color: var(--face-color)"
-                        ></div>
-                      </div>
-                      <!-- 뒷면 (밤 모드) -->
-                      <div
-                        class="face-back absolute w-full h-full flex justify-center items-center bg-white rounded-full shadow-sm opacity-0 transition-opacity duration-100 linear"
-                      >
-                        <div
-                          class="face-feature eye left absolute rounded-full transition-colors duration-500 ease-in-out"
-                          style="background-color: var(--face-color)"
-                        ></div>
-                        <div
-                          class="face-feature eye right absolute rounded-full transition-colors duration-500 ease-in-out"
-                          style="background-color: var(--face-color)"
-                        ></div>
-                        <div
-                          class="face-feature mouth absolute rounded-full transition-colors duration-500 ease-in-out"
-                          style="border-color: var(--face-color)"
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                </label>
-              </div>
-            </div>
-          </div>
-          <div class="flex items-center space-x-3 sm:space-x-4">
-            <!-- 음성 검색 버튼 -->
-            <button
-              onclick="startVoiceSearch()"
-              id="voiceBtn"
-              class="w-6 h-6 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
-              title="음성으로 검색하기"
-            >
-              <img
-                src="{{ url_for('static', filename='images/header/mic.png') }}"
-                alt="마이크"
-                class="max-w-full max-h-full object-contain"
-              />
-            </button>
-            <!-- 텍스트 검색 버튼 -->
-            <button
-              onclick="toggleSearchBar()"
-              id="searchBtn"
-              class="w-6 h-6 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
-              title="검색하기"
-            >
-              <img
-                src="{{ url_for('static', filename='images/header/search.png') }}"
-                alt="검색"
-                class="max-w-full max-h-full object-contain"
-              />
-            </button>
-          </div>
-        </header>
-
-        <!-- 검색창 (숨김/표시) -->
-        <div
-          id="searchBar"
-          class="hidden bg-white border-b px-4 py-3 shadow-sm"
-        >
-          <form id="searchForm" method="GET" class="space-y-3">
-            <!-- 검색 타입 선택 -->
-            <div class="flex gap-3 justify-center">
-              <label class="flex items-center cursor-pointer">
-                <input
-                  type="radio"
-                  name="searchType"
-                  value="company"
-                  checked
-                  class="w-4 h-4 text-blue-600 focus:ring-blue-500"
-                />
-                <span class="ml-2 text-base font-medium text-gray-700"
-                  >기업이음</span
-                >
-              </label>
-              <label class="flex items-center cursor-pointer">
-                <input
-                  type="radio"
-                  name="searchType"
-                  value="jobs"
-                  class="w-4 h-4 text-blue-600 focus:ring-blue-500"
-                />
-                <span class="ml-2 text-base font-medium text-gray-700"
-                  >사람이음</span
-                >
-              </label>
-            </div>
-
-            <!-- 검색 입력 -->
-            <div class="flex gap-2">
-              <input
-                type="text"
-                name="q"
-                id="searchInput"
-                placeholder="검색어를 입력하세요 (예: 청소, 경비)"
-                class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button
-                type="submit"
-                class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors"
-              >
-                검색
-              </button>
-              <button
-                type="button"
-                onclick="toggleSearchBar()"
-                class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
-              >
-                취소
-              </button>
-            </div>
-          </form>
-        </div>
+        {% include 'includes/header.html' %}
 
         <!-- 네비게이션 탭 -->
         <!-- 기업 회원이 아닐 때만 탭 표시 -->
@@ -649,7 +491,7 @@
               style="box-shadow: 0 4px 6px -4px rgba(0, 0, 0, 0.25)"
             >
               <a
-                href="{{ url_for('jobs.my_posts') }}"
+                href="{{ url_for('company.company_favorites') }}"
                 class="text-gray-600 text-base font-medium inline-block py-1"
               >
                 내 공고 관리하기 →

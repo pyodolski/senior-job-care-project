@@ -1,14 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {% include 'includes/head.html' %}
     <title>기업 내정보 - 이음</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
     <style>
       body {
         font-family: "Noto Sans KR", sans-serif;
@@ -28,38 +22,10 @@
     </style>
   </head>
   <body class="bg-gray-50">
-    <div class="max-w-md mx-auto bg-white min-h-screen flex flex-col pb-20">
+    <div class="w-full bg-white shadow-lg min-h-screen flex flex-col">
       <!-- 상단 고정 영역 -->
       <div class="sticky top-0 z-10 bg-white shadow-sm">
-        <!-- 상단 바 -->
-        <header class="px-4 py-3 sm:px-6 flex justify-between items-center">
-          <div class="flex items-center">
-            <div class="w-8 h-8 mr-2 flex items-center justify-center">
-              <img
-                src="{{ url_for('static', filename='images/header/logo.png') }}"
-                alt="로고"
-                class="max-w-full max-h-full object-contain"
-              />
-            </div>
-            <span class="text-2xl font-bold text-blue-900">이음</span>
-          </div>
-          <div class="flex items-center space-x-4">
-            <div class="w-6 h-6 flex items-center justify-center">
-              <img
-                src="{{ url_for('static', filename='images/header/mic.png') }}"
-                alt="마이크"
-                class="max-w-full max-h-full object-contain"
-              />
-            </div>
-            <div class="w-6 h-6 flex items-center justify-center">
-              <img
-                src="{{ url_for('static', filename='images/header/search.png') }}"
-                alt="검색"
-                class="max-w-full max-h-full object-contain"
-              />
-            </div>
-          </div>
-        </header>
+        {% include 'includes/header.html' %}
       </div>
 
       <!-- 내정보 타이틀 -->
@@ -68,7 +34,7 @@
       </div>
 
       <!-- 콘텐츠 영역 -->
-      <main class="flex-grow bg-gray-50 overflow-auto">
+      <main class="flex-grow bg-gray-50 overflow-auto pb-20">
         <!-- 프로필 카드 -->
         <div class="bg-white px-6 pt-8 pb-6">
           <!-- 프로필 이미지 -->
@@ -154,13 +120,13 @@
             </div>
             <div class="text-center">
               <p class="text-sm text-gray-500 mb-1">받은 이력서</p>
-              <p class="text-2xl font-bold text-green-600">
+              <p class="text-2xl font-bold text-blue-600">
                 {{ received_applications_count }}
               </p>
             </div>
             <div class="text-center">
               <p class="text-sm text-gray-500 mb-1">내 구인글</p>
-              <p class="text-2xl font-bold text-purple-600">{{ job_count }}</p>
+              <p class="text-2xl font-bold text-blue-600">{{ job_count }}</p>
             </div>
           </div>
         </div>
@@ -287,26 +253,142 @@
           </a>
         </div>
 
-        <!-- 로그아웃 -->
-        <div class="mt-4 px-6 py-4">
-          <a
-            href="{{ url_for('auth.logout') }}"
-            class="block text-center text-red-600 font-medium"
+        <!-- 간격 -->
+        <div class="h-2 bg-gray-50"></div>
+
+        <!-- 하단 버튼 영역 -->
+        <div class="bg-white px-6 py-4 flex gap-3">
+          <!-- 로그아웃 -->
+          <button
+            onclick="window.location.href='{{ url_for('auth.logout') }}';"
+            class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 rounded-lg transition-colors"
           >
             로그아웃
-          </a>
-        </div>
+          </button>
 
-        <!-- 회원탈퇴 -->
-        <div class="px-6 pb-6">
-          <a href="#" class="block text-center text-gray-400 text-sm">
+          <!-- 회원탈퇴 -->
+          <button
+            onclick="alert('회원탈퇴 기능은 준비 중입니다.');"
+            class="flex-1 bg-white hover:bg-gray-50 text-gray-500 font-medium py-3 rounded-lg border border-gray-300 transition-colors"
+          >
             회원탈퇴
-          </a>
+          </button>
         </div>
       </main>
 
       <!-- 하단 네비게이션 -->
       {% include 'components/company_footer.html' %}
     </div>
+
+    <script>
+      // ==================== 음성 검색 기능 ====================
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      function startVoiceSearch() {
+        if (!SpeechRecognition) {
+          alert(
+            "죄송합니다. 이 브라우저는 음성 인식을 지원하지 않습니다.\\nChrome 또는 Edge 브라우저를 사용해주세요."
+          );
+          return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = "ko-KR";
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+        const voiceBtn = document.getElementById("voiceBtn");
+
+        recognition.start();
+        voiceBtn.style.opacity = "0.5";
+        voiceBtn.style.animation = "pulse 1s infinite";
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          console.log("인식된 음성:", transcript);
+          speak("검색 중입니다");
+          window.location.href = `/company?q=${encodeURIComponent(transcript)}`;
+        };
+
+        recognition.onend = () => {
+          voiceBtn.style.opacity = "1";
+          voiceBtn.style.animation = "";
+        };
+
+        recognition.onerror = (event) => {
+          console.error("음성 인식 오류:", event.error);
+          voiceBtn.style.opacity = "1";
+          voiceBtn.style.animation = "";
+          let errorMsg = "음성 인식에 실패했습니다.";
+          switch (event.error) {
+            case "no-speech":
+              errorMsg = "음성이 감지되지 않았습니다. 다시 시도해주세요.";
+              break;
+            case "audio-capture":
+              errorMsg = "마이크를 찾을 수 없습니다.";
+              break;
+            case "not-allowed":
+              errorMsg =
+                "마이크 권한이 필요합니다. 브라우저 설정에서 마이크 권한을 허용해주세요.";
+              break;
+          }
+          alert(errorMsg);
+        };
+
+        speak("말씀해주세요");
+      }
+
+      function speak(text) {
+        if ("speechSynthesis" in window) {
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = "ko-KR";
+          utterance.rate = 0.9;
+          utterance.pitch = 1;
+          window.speechSynthesis.speak(utterance);
+        }
+      }
+
+      const style = document.createElement("style");
+      style.textContent = `@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }`;
+      document.head.appendChild(style);
+
+      // ==================== 검색창 토글 ====================
+      function toggleSearchBar() {
+        const searchBar = document.getElementById("searchBar");
+        const searchInput = document.getElementById("searchInput");
+        if (searchBar) {
+          if (searchBar.classList.contains("hidden")) {
+            searchBar.classList.remove("hidden");
+            if (searchInput) setTimeout(() => searchInput.focus(), 100);
+          } else {
+            searchBar.classList.add("hidden");
+          }
+        }
+      }
+
+      // ==================== 검색 폼 제출 처리 ====================
+      document.addEventListener("DOMContentLoaded", function () {
+        const searchForm = document.getElementById("searchForm");
+        if (searchForm) {
+          searchForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const searchType = document.querySelector(
+              'input[name="searchType"]:checked'
+            ).value;
+            const searchQuery = document.getElementById("searchInput").value;
+
+            if (searchType === "company") {
+              window.location.href = `/company?q=${encodeURIComponent(
+                searchQuery
+              )}`;
+            } else {
+              window.location.href = `/jobs?q=${encodeURIComponent(
+                searchQuery
+              )}`;
+            }
+          });
+        }
+      });
+    </script>
   </body>
 </html>

@@ -15,11 +15,11 @@
     />
   </head>
   <body class="bg-gray-50">
-    <div class="max-w-md mx-auto bg-gray-50 min-h-screen flex flex-col">
+    <div class="w-full bg-gray-50 min-h-screen flex flex-col">
       <!-- 상단 고정 영역 -->
-      <div class="sticky top-0 z-10 bg-white">
+      <div class="sticky top-0 z-10 bg-white shadow-sm">
         <!-- 상단 바 -->
-        <header class="px-4 py-4 flex items-center">
+        <header class="px-4 sm:px-6 py-4 flex items-center">
           <a href="{{ url_for('auth.profile') }}" class="mr-3">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -41,7 +41,7 @@
       </div>
 
       <!-- 메인 컨텐츠 -->
-      <main class="flex-grow px-4 py-4 pb-24">
+      <main class="flex-grow px-4 sm:px-6 py-4 pb-24">
         <!-- 검색 바 -->
         <div class="mb-4">
           <div class="relative">
@@ -75,7 +75,7 @@
         <!-- 내가 올린 글 리스트 -->
         {% if jobs %} {% for job in jobs %}
         <div
-          class="bg-white rounded-xl p-5 mb-3 shadow-sm border border-gray-100"
+          class="bg-white rounded-xl p-4 sm:p-5 mb-3 shadow-sm border border-gray-100"
           data-job-id="{{ job.id }}"
         >
           <!-- [0]행: 프로필사진, 닉네임, 채용중 -->
@@ -183,8 +183,12 @@
       </main>
 
       <!-- 하단 네비게이션 -->
+      {% if current_user.is_authenticated and current_user.user_type == 1 %}
+      <!-- 기업 회원 전용 footer -->
+      {% include 'components/company_footer.html' %} {% else %}
+      <!-- 일반 회원 footer -->
       <footer
-        class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t flex justify-around"
+        class="fixed bottom-0 left-0 right-0 w-full bg-white border-t flex justify-around"
       >
         <a
           href="{{ url_for('map.show_map') }}"
@@ -252,6 +256,7 @@
           <span class="text-xs">내정보</span>
         </a>
       </footer>
+      {% endif %}
     </div>
 
     <script src="{{ url_for('static', filename='js/jobs/my_posts.js') }}"></script>

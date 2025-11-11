@@ -77,7 +77,7 @@ let currentStep = 1;
 let maxStep = 9;
 let selectedData = {
   category: "", // 1단계: 직무 분야 (job_category)
-  title: "",    // 2단계: 제목
+  title: "", // 2단계: 제목
   categories: [], // (사용되지 않음 - HTML에서 카테고리 버튼 제거됨)
   workPeriod: "", // 3단계: 근무 기간
   recruitmentEndDate: "", // 4단계: 모집 마감 기한
@@ -93,7 +93,7 @@ let selectedData = {
   detailAddress: "", // 7단계: 상세 주소
   phone: "", // 8단계: 연락처
   latitude: null, // 지오코딩 결과
-  longitude: null // 지오코딩 결과
+  longitude: null, // 지오코딩 결과
 };
 
 const MIN_HOURLY_WAGE = 10030; // 2025년 최저시급 (최소 금액 계산용)
@@ -120,7 +120,7 @@ function goToNextStep() {
       );
       inputs.forEach((input) => {
         // 급여 금액 필드는 예외적으로 비활성화하지 않음 (스크롤 시 계속 표시)
-        if (input.id !== 'salaryAmount') {
+        if (input.id !== "salaryAmount") {
           input.readOnly = true;
           input.disabled = true;
         }
@@ -159,8 +159,8 @@ function goBack() {
       updateNextButton();
     }
   } else {
-    // 💡 기업이음 목록으로 리다이렉션 (window.COMPANY_LIST_URL 사용)
-    window.location.href = window.COMPANY_LIST_URL;
+    // 💡 브라우저 히스토리 뒤로가기 (사용자가 온 경로로 자연스럽게 복귀)
+    history.back();
   }
 }
 
@@ -184,7 +184,8 @@ function updateNextButton() {
         const flexibleDays = document.getElementById("flexibleDays")?.checked;
         const flexibleTime = document.getElementById("flexibleTime")?.checked;
         const hasDays = flexibleDays || selectedData.days.length > 0;
-        const hasTime = flexibleTime || (selectedData.startTime && selectedData.endTime);
+        const hasTime =
+          flexibleTime || (selectedData.startTime && selectedData.endTime);
         isValid = hasDays && hasTime;
       } else {
         isValid = false;
@@ -228,8 +229,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // 기타 입력 필드 표시/숨김
       if (this.dataset.value === "기타") {
-        document.getElementById("customCategory")?.classList.toggle("hidden", !this.classList.contains("selected"));
-        if (!this.classList.contains("selected")) document.getElementById("customCategory").value = "";
+        document
+          .getElementById("customCategory")
+          ?.classList.toggle("hidden", !this.classList.contains("selected"));
+        if (!this.classList.contains("selected"))
+          document.getElementById("customCategory").value = "";
       }
 
       // 선택된 카테고리를 selectedData.category에 저장 (다중 선택된 경우 콤마로 연결)
@@ -238,7 +242,9 @@ document.addEventListener("DOMContentLoaded", function () {
         .querySelectorAll("#step1 .radio-option.selected")
         .forEach((opt) => {
           if (opt.dataset.value === "기타") {
-            const customValue = document.getElementById("customCategory")?.value.trim();
+            const customValue = document
+              .getElementById("customCategory")
+              ?.value.trim();
             if (customValue) selectedCategories.push(customValue);
           } else {
             selectedCategories.push(opt.dataset.value);
@@ -251,14 +257,17 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // 기타 입력 필드 로직
-  document.getElementById("customCategory")?.addEventListener("input", function () {
-    const 기타옵션 = document.querySelector('#step1 .radio-option[data-value="기타"].selected');
-    if (기타옵션) {
+  document
+    .getElementById("customCategory")
+    ?.addEventListener("input", function () {
+      const 기타옵션 = document.querySelector(
+        '#step1 .radio-option[data-value="기타"].selected'
+      );
+      if (기타옵션) {
         selectedData.category = this.value.trim();
-    }
-    updateNextButton();
-  });
-
+      }
+      updateNextButton();
+    });
 
   // 2단계: 제목 입력
   const jobTitle = document.getElementById("jobTitle");
@@ -292,11 +301,12 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // 💡 4단계: 모집 마감일 입력
-  document.getElementById("recruitmentEndDate")?.addEventListener("change", function () {
-    selectedData.recruitmentEndDate = this.value;
-    updateNextButton();
-  });
-
+  document
+    .getElementById("recruitmentEndDate")
+    ?.addEventListener("change", function () {
+      selectedData.recruitmentEndDate = this.value;
+      updateNextButton();
+    });
 
   // 5단계: 급여 타입 버튼
   document.querySelectorAll(".salary-type-btn").forEach((btn) => {
@@ -328,11 +338,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const recruitmentCount = document.getElementById("recruitmentCount");
   if (recruitmentCount) {
-    recruitmentCount.addEventListener("input", function(e) {
-        let value = e.target.value.replace(/[^0-9]/g, "");
-        e.target.value = value;
-        selectedData.recruitmentCount = parseInt(value) || 0;
-        updateNextButton();
+    recruitmentCount.addEventListener("input", function (e) {
+      let value = e.target.value.replace(/[^0-9]/g, "");
+      e.target.value = value;
+      selectedData.recruitmentCount = parseInt(value) || 0;
+      updateNextButton();
     });
   }
 
@@ -344,7 +354,6 @@ document.addEventListener("DOMContentLoaded", function () {
       updateNextButton();
     });
   }
-
 
   // 8단계: 상세 주소 입력
   const detailAddress = document.getElementById("detailAddress");
@@ -731,10 +740,12 @@ async function confirmAddress() {
       // Hidden field에 값 설정 (HTML에 해당 필드가 있다고 가정)
       document.getElementById("latitude").value = selectedAddress.lat;
       document.getElementById("longitude").value = selectedAddress.lng;
-      document.getElementById("region_1depth_name").value = legalRegion.region_1depth_name;
-      document.getElementById("region_2depth_name").value = legalRegion.region_2depth_name;
-      document.getElementById("region_3depth_name").value = legalRegion.region_3depth_name;
-
+      document.getElementById("region_1depth_name").value =
+        legalRegion.region_1depth_name;
+      document.getElementById("region_2depth_name").value =
+        legalRegion.region_2depth_name;
+      document.getElementById("region_3depth_name").value =
+        legalRegion.region_3depth_name;
     } catch (error) {
       console.error("주소 변환 중 오류 발생:", error);
       geocodeResult = null;
@@ -783,15 +794,14 @@ async function submitJob() {
 
     // 💡 모집 마감 기한 추가 (4단계)
     if (selectedData.recruitmentEndDate) {
-        formData.append("recruitment_end_date", selectedData.recruitmentEndDate);
+      formData.append("recruitment_end_date", selectedData.recruitmentEndDate);
     }
 
     // 💡 모집 인원 추가
     if (selectedData.recruitmentCount > 0) {
-        formData.append("recruitment_count", selectedData.recruitmentCount);
+      formData.append("recruitment_count", selectedData.recruitmentCount);
     } else {
-
-        formData.append("recruitment_count", 1);
+      formData.append("recruitment_count", 1);
     }
 
     // 단기 근무일 경우 선택된 날짜 전송 (시작일/종료일)
@@ -837,41 +847,63 @@ async function submitJob() {
     // 근무 요일 (협의 포함)
     formData.append(
       "work_monday",
-      selectedData.days.includes("월") || selectedData.days.includes("협의") ? "true" : "false"
+      selectedData.days.includes("월") || selectedData.days.includes("협의")
+        ? "true"
+        : "false"
     );
     formData.append(
       "work_tuesday",
-      selectedData.days.includes("화") || selectedData.days.includes("협의") ? "true" : "false"
+      selectedData.days.includes("화") || selectedData.days.includes("협의")
+        ? "true"
+        : "false"
     );
     formData.append(
       "work_wednesday",
-      selectedData.days.includes("수") || selectedData.days.includes("협의") ? "true" : "false"
+      selectedData.days.includes("수") || selectedData.days.includes("협의")
+        ? "true"
+        : "false"
     );
     formData.append(
       "work_thursday",
-      selectedData.days.includes("목") || selectedData.days.includes("협의") ? "true" : "false"
+      selectedData.days.includes("목") || selectedData.days.includes("협의")
+        ? "true"
+        : "false"
     );
     formData.append(
       "work_friday",
-      selectedData.days.includes("금") || selectedData.days.includes("협의") ? "true" : "false"
+      selectedData.days.includes("금") || selectedData.days.includes("협의")
+        ? "true"
+        : "false"
     );
     formData.append(
       "work_saturday",
-      selectedData.days.includes("토") || selectedData.days.includes("협의") ? "true" : "false"
+      selectedData.days.includes("토") || selectedData.days.includes("협의")
+        ? "true"
+        : "false"
     );
     formData.append(
       "work_sunday",
-      selectedData.days.includes("일") || selectedData.days.includes("협의") ? "true" : "false"
+      selectedData.days.includes("일") || selectedData.days.includes("협의")
+        ? "true"
+        : "false"
     );
 
     // 근무 시간 (협의 제외)
     const startTimeSelect = document.getElementById("startTimeSelect");
     const endTimeSelect = document.getElementById("endTimeSelect");
 
-    if (startTimeSelect && startTimeSelect.value && selectedData.startTime !== "협의") {
+    if (
+      startTimeSelect &&
+      startTimeSelect.value &&
+      selectedData.startTime !== "협의"
+    ) {
       formData.append("work_start_time", startTimeSelect.value);
     }
-    if (endTimeSelect && endTimeSelect.value && selectedData.endTime !== "협의") {
+    if (
+      endTimeSelect &&
+      endTimeSelect.value &&
+      selectedData.endTime !== "협의"
+    ) {
       formData.append("work_end_time", endTimeSelect.value);
     }
 
@@ -895,7 +927,8 @@ async function submitJob() {
         nextBtn.disabled = false;
         nextBtn.classList.remove("bg-gray-400", "cursor-not-allowed");
         nextBtn.classList.add("bg-blue-600", "hover:bg-blue-700");
-        nextBtn.textContent = currentStep === maxStep ? "공고 등록하기" : "다음";
+        nextBtn.textContent =
+          currentStep === maxStep ? "공고 등록하기" : "다음";
       }
     }
   } catch (error) {

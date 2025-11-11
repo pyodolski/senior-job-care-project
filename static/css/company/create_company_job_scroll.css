@@ -66,12 +66,68 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  max-width: 28rem;
-  margin: 0 auto;
+  width: 100%;
   z-index: 50;
 }
 
 /* 부드러운 스크롤 */
 html {
   scroll-behavior: smooth;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 640px) {
+  .scroll-section {
+    padding: 0 0.75rem;
+  }
+
+  .scroll-section.visible {
+    padding: 0.75rem 0.75rem;
+  }
+
+  .category-btn,
+  .period-btn,
+  .salary-type-btn {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="date"],
+  input[type="time"],
+  select,
+  textarea {
+    padding: 0.75rem !important;
+    font-size: 0.875rem !important;
+  }
+}
+
+@media (min-width: 641px) {
+  .scroll-section {
+    padding: 0 1.5rem;
+  }
+
+  .scroll-section.visible {
+    padding: 1rem 1.5rem;
+  }
+
+  .category-btn,
+  .period-btn,
+  .salary-type-btn {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="date"],
+  input[type="time"],
+  select,
+  textarea {
+    padding: 1rem !important;
+    font-size: 1rem !important;
+  }
 }

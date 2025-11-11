@@ -66,11 +66,6 @@ def internal_error(error):
 def splash():
     return render_template('splash.html')
 
-# 토글 페이지 라우트
-@app.route('/toggle-page')
-def toggle_page():
-    return render_template('toggle_page.html')
-
 
 # 템플릿 필터 등록
 app.jinja_env.filters['format_date'] = format_date

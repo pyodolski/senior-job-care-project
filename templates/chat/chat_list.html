@@ -1,15 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {% include 'includes/head.html' %}
     <title>채팅 - 사람이음</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4/dist/socket.io.min.js"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/chat.css') }}"
@@ -29,35 +23,7 @@
     <div class="w-full bg-white shadow-lg min-h-screen">
       <!-- 상단 고정 영역 -->
       <div class="sticky top-0 z-10 bg-white shadow-sm">
-        <!-- 상단 바 -->
-        <header class="px-4 py-3 sm:px-6 flex justify-between items-center">
-          <div class="flex items-center">
-            <div class="w-8 h-8 mr-2 flex items-center justify-center">
-              <img
-                src="{{ url_for('static', filename='images/header/logo.png') }}"
-                alt="로고"
-                class="max-w-full max-h-full object-contain"
-              />
-            </div>
-            <span class="text-2xl font-bold text-blue-900">이음</span>
-          </div>
-          <div class="flex items-center space-x-4">
-            <div class="w-6 h-6 flex items-center justify-center">
-              <img
-                src="{{ url_for('static', filename='images/header/mic.png') }}"
-                alt="마이크"
-                class="max-w-full max-h-full object-contain"
-              />
-            </div>
-            <div class="w-6 h-6 flex items-center justify-center">
-              <img
-                src="{{ url_for('static', filename='images/header/search.png') }}"
-                alt="검색"
-                class="max-w-full max-h-full object-contain"
-              />
-            </div>
-          </div>
-        </header>
+        {% include 'includes/header.html' %}
       </div>
 
       <!-- 메인 컨텐츠 -->
@@ -186,11 +152,9 @@
       </main>
 
       <!-- 하단 네비게이션 -->
-      {% if current_user.user_type == 1 %}
-      {% include 'components/company_footer.html' %}
-      {% else %}
-      {% include 'components/footer.html' %}
-      {% endif %}
+      {% if current_user.user_type == 1 %} {% include
+      'components/company_footer.html' %} {% else %} {% include
+      'components/footer.html' %} {% endif %}
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}"></script>
@@ -232,6 +196,115 @@
           noResultsMessage.style.display = "none";
         }
       }
+
+      // ==================== 음성 검색 기능 ====================
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      function startVoiceSearch() {
+        if (!SpeechRecognition) {
+          alert(
+            "죄송합니다. 이 브라우저는 음성 인식을 지원하지 않습니다.\\nChrome 또는 Edge 브라우저를 사용해주세요."
+          );
+          return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = "ko-KR";
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+        const voiceBtn = document.getElementById("voiceBtn");
+
+        recognition.start();
+        voiceBtn.style.opacity = "0.5";
+        voiceBtn.style.animation = "pulse 1s infinite";
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          console.log("인식된 음성:", transcript);
+          speak("검색 중입니다");
+          window.location.href = `/company?q=${encodeURIComponent(transcript)}`;
+        };
+
+        recognition.onend = () => {
+          voiceBtn.style.opacity = "1";
+          voiceBtn.style.animation = "";
+        };
+
+        recognition.onerror = (event) => {
+          console.error("음성 인식 오류:", event.error);
+          voiceBtn.style.opacity = "1";
+          voiceBtn.style.animation = "";
+          let errorMsg = "음성 인식에 실패했습니다.";
+          switch (event.error) {
+            case "no-speech":
+              errorMsg = "음성이 감지되지 않았습니다. 다시 시도해주세요.";
+              break;
+            case "audio-capture":
+              errorMsg = "마이크를 찾을 수 없습니다.";
+              break;
+            case "not-allowed":
+              errorMsg =
+                "마이크 권한이 필요합니다. 브라우저 설정에서 마이크 권한을 허용해주세요.";
+              break;
+          }
+          alert(errorMsg);
+        };
+
+        speak("말씀해주세요");
+      }
+
+      function speak(text) {
+        if ("speechSynthesis" in window) {
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = "ko-KR";
+          utterance.rate = 0.9;
+          utterance.pitch = 1;
+          window.speechSynthesis.speak(utterance);
+        }
+      }
+
+      const style = document.createElement("style");
+      style.textContent = `@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }`;
+      document.head.appendChild(style);
+
+      // ==================== 검색창 토글 ====================
+      function toggleSearchBar() {
+        const searchBar = document.getElementById("searchBar");
+        const searchInput = document.getElementById("searchInput");
+        if (searchBar) {
+          if (searchBar.classList.contains("hidden")) {
+            searchBar.classList.remove("hidden");
+            if (searchInput) setTimeout(() => searchInput.focus(), 100);
+          } else {
+            searchBar.classList.add("hidden");
+          }
+        }
+      }
+
+      // ==================== 검색 폼 제출 처리 ====================
+      document.addEventListener("DOMContentLoaded", function () {
+        const searchForm = document.getElementById("searchForm");
+        if (searchForm) {
+          searchForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const searchType = document.querySelector(
+              'input[name="searchType"]:checked'
+            ).value;
+            const searchQuery = document.getElementById("searchInput").value;
+
+            if (searchType === "company") {
+              window.location.href = `/company?q=${encodeURIComponent(
+                searchQuery
+              )}`;
+            } else {
+              window.location.href = `/jobs?q=${encodeURIComponent(
+                searchQuery
+              )}`;
+            }
+          });
+        }
+      });
     </script>
   </body>
 </html>

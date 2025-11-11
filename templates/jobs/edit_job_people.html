@@ -49,12 +49,27 @@
       };
     </script>
 
-    <div class="w-full bg-white shadow-lg min-h-screen max-w-md mx-auto pb-24">
-      <header class="bg-white border-b px-4 py-4 fixed top-0 left-0 right-0 max-w-md mx-auto z-40">
+    <div class="w-full bg-white shadow-lg min-h-screen pb-24">
+      <header
+        class="bg-white border-b px-4 sm:px-6 py-4 fixed top-0 left-0 right-0 w-full z-40"
+      >
         <div class="flex items-center justify-between">
-          <button onclick="window.location.href = '{{ url_for('jobs.job_detail', job_id=job.id) }}'" class="text-gray-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          <button
+            onclick="window.location.replace('{{ url_for('jobs.job_detail', job_id=job.id) }}')"
+            class="text-gray-600"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
           <h1 class="text-lg font-bold text-gray-800">사람이음 공고 수정</h1>
@@ -62,146 +77,150 @@
         </div>
       </header>
 
-      <form method="POST" action="{{ url_for('jobs.edit_job', job_id=job.id) }}" id="editJobForm">
-
+      <form
+        method="POST"
+        action="{{ url_for('jobs.edit_job', job_id=job.id) }}"
+        id="editJobForm"
+      >
         <section id="step1" class="pt-20 p-4">
-            <div class="mb-4">
+          <div class="mb-4">
             <h2 class="text-xl font-bold text-gray-900 mb-6">
-                1. 어떤 분을 찾고 계세요?
+              1. 어떤 분을 찾고 계세요?
             </h2>
 
             <div class="space-y-4">
-                <div
+              <div
                 class="radio-option border-2 border-gray-200 rounded-2xl p-4"
                 data-value="업무"
-                >
+              >
                 <div class="flex items-center justify-between">
-                    <div class="flex items-center">
+                  <div class="flex items-center">
                     <span class="text-2xl mr-3">🏪</span>
                     <div>
-                        <h3 class="font-bold text-gray-900">
+                      <h3 class="font-bold text-gray-900">
                         함께 일하실 분 (업무)
-                        </h3>
-                        <p class="text-sm text-gray-500">
+                      </h3>
+                      <p class="text-sm text-gray-500">
                         예) 서빙, 주방보조, 배장 관리, 판매 등
-                        </p>
+                      </p>
                     </div>
-                    </div>
-                    <div
+                  </div>
+                  <div
                     class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
-                    >
+                  >
                     <div
-                        class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
+                      class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
                     ></div>
-                    </div>
+                  </div>
                 </div>
-                </div>
+              </div>
 
-                <div
+              <div
                 class="radio-option border-2 border-gray-200 rounded-2xl p-4"
                 data-value="이웃"
-                >
+              >
                 <div class="flex items-center justify-between">
-                    <div class="flex items-center">
+                  <div class="flex items-center">
                     <span class="text-2xl mr-3">💖</span>
                     <div>
-                        <h3 class="font-bold text-gray-900">도와주실 분 (이웃)</h3>
-                        <p class="text-sm text-gray-500">
+                      <h3 class="font-bold text-gray-900">
+                        도와주실 분 (이웃)
+                      </h3>
+                      <p class="text-sm text-gray-500">
                         예) 집 청기기, 아이 돌봄, 반려동물 등
-                        </p>
+                      </p>
                     </div>
-                    </div>
-                    <div
+                  </div>
+                  <div
                     class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
-                    >
+                  >
                     <div
-                        class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
+                      class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
                     ></div>
-                    </div>
+                  </div>
                 </div>
-                </div>
+              </div>
 
-                <div
+              <div
                 class="radio-option border-2 border-gray-200 rounded-2xl p-4"
                 data-value="과외"
-                >
+              >
                 <div class="flex items-center justify-between">
-                    <div class="flex items-center">
+                  <div class="flex items-center">
                     <span class="text-2xl mr-3">📚</span>
                     <div>
-                        <h3 class="font-bold text-gray-900">
+                      <h3 class="font-bold text-gray-900">
                         가르쳐 주실 분 (과외)
-                        </h3>
-                        <p class="text-sm text-gray-500">
+                      </h3>
+                      <p class="text-sm text-gray-500">
                         예) 외국어 회화, 골프 레슨 등
-                        </p>
+                      </p>
                     </div>
-                    </div>
-                    <div
+                  </div>
+                  <div
                     class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
-                    >
+                  >
                     <div
-                        class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
+                      class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
                     ></div>
-                    </div>
+                  </div>
                 </div>
-                </div>
+              </div>
 
-                <div
+              <div
                 class="radio-option border-2 border-gray-200 rounded-2xl p-4"
                 data-value="제능"
-                >
+              >
                 <div class="flex items-center justify-between">
-                    <div class="flex items-center">
+                  <div class="flex items-center">
                     <span class="text-2xl mr-3">✋</span>
                     <div>
-                        <h3 class="font-bold text-gray-900">
+                      <h3 class="font-bold text-gray-900">
                         만들어 주실 분 (제능)
-                        </h3>
-                        <p class="text-sm text-gray-500">
+                      </h3>
+                      <p class="text-sm text-gray-500">
                         예) 김치/장아찌, 수공예, 목공
-                        </p>
+                      </p>
                     </div>
-                    </div>
-                    <div
+                  </div>
+                  <div
                     class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
-                    >
+                  >
                     <div
-                        class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
+                      class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
                     ></div>
-                    </div>
+                  </div>
                 </div>
-                </div>
+              </div>
 
-                <div
+              <div
                 class="radio-option border-2 border-gray-200 rounded-2xl p-4"
                 data-value="문화"
-                >
+              >
                 <div class="flex items-center justify-between">
-                    <div class="flex items-center">
+                  <div class="flex items-center">
                     <span class="text-2xl mr-3">🎪</span>
                     <div>
-                        <h3 class="font-bold text-gray-900">
+                      <h3 class="font-bold text-gray-900">
                         같이 즐기실 분 (문화)
-                        </h3>
-                        <p class="text-sm text-gray-500">
+                      </h3>
+                      <p class="text-sm text-gray-500">
                         예) 여행 동행, 등산/산책 친구, 동호회
-                        </p>
+                      </p>
                     </div>
-                    </div>
-                    <div
+                  </div>
+                  <div
                     class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center"
-                    >
+                  >
                     <div
-                        class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
+                      class="w-3 h-3 bg-blue-600 rounded-full hidden radio-dot"
                     ></div>
-                    </div>
+                  </div>
                 </div>
-                </div>
+              </div>
             </div>
-            </div>
+          </div>
         </section>
-
 
         <section id="step2" class="p-4 border-t">
           <div class="mb-4">
@@ -219,8 +238,17 @@
                 maxlength="50"
                 value="{{ job.title | default('') }}"
               />
-              <input type="hidden" name="company" value="{{ job.company | default(current_user.nickname) }}" />
-              <input type="hidden" name="people_category" id="peopleCategoryHidden" value="{{ job.people_category | default('') }}" />
+              <input
+                type="hidden"
+                name="company"
+                value="{{ job.company | default(current_user.nickname) }}"
+              />
+              <input
+                type="hidden"
+                name="people_category"
+                id="peopleCategoryHidden"
+                value="{{ job.people_category | default('') }}"
+              />
             </div>
 
             <div class="flex items-start gap-2 mb-8">
@@ -313,7 +341,12 @@
                   />
                 </svg>
               </button>
-              <input type="hidden" name="recruitment_type" id="recruitmentTypeHidden" value="{{ job.recruitment_type | default('') }}" />
+              <input
+                type="hidden"
+                name="recruitment_type"
+                id="recruitmentTypeHidden"
+                value="{{ job.recruitment_type | default('') }}"
+              />
             </div>
           </div>
         </section>
@@ -353,7 +386,12 @@
               >
                 1년이상
               </button>
-              <input type="hidden" name="work_period" id="workPeriodHidden" value="{{ job.work_period | default('') }}" />
+              <input
+                type="hidden"
+                name="work_period"
+                id="workPeriodHidden"
+                value="{{ job.work_period | default('') }}"
+              />
             </div>
 
             <div id="shortTermCalendar" class="hidden mb-8">
@@ -411,30 +449,47 @@
                 </div>
 
                 <div class="grid grid-cols-7 gap-1 mb-2">
-                  <div class="text-center text-sm text-red-500 py-1 font-medium">
+                  <div
+                    class="text-center text-sm text-red-500 py-1 font-medium"
+                  >
                     일
                   </div>
-                  <div class="text-center text-sm text-gray-700 py-1 font-medium">
+                  <div
+                    class="text-center text-sm text-gray-700 py-1 font-medium"
+                  >
                     월
                   </div>
-                  <div class="text-center text-sm text-gray-700 py-1 font-medium">
+                  <div
+                    class="text-center text-sm text-gray-700 py-1 font-medium"
+                  >
                     화
                   </div>
-                  <div class="text-center text-sm text-gray-700 py-1 font-medium">
+                  <div
+                    class="text-center text-sm text-gray-700 py-1 font-medium"
+                  >
                     수
                   </div>
-                  <div class="text-center text-sm text-gray-700 py-1 font-medium">
+                  <div
+                    class="text-center text-sm text-gray-700 py-1 font-medium"
+                  >
                     목
                   </div>
-                  <div class="text-center text-sm text-gray-700 py-1 font-medium">
+                  <div
+                    class="text-center text-sm text-gray-700 py-1 font-medium"
+                  >
                     금
                   </div>
-                  <div class="text-center text-sm text-blue-500 py-1 font-medium">
+                  <div
+                    class="text-center text-sm text-blue-500 py-1 font-medium"
+                  >
                     토
                   </div>
                 </div>
 
-                <div id="calendarGrid" class="grid grid-cols-7 gap-1 mb-3"></div>
+                <div
+                  id="calendarGrid"
+                  class="grid grid-cols-7 gap-1 mb-3"
+                ></div>
               </div>
 
               <p class="text-sm text-gray-600 mt-3 text-center">
@@ -502,24 +557,57 @@
                   </button>
                 </div>
                 <div class="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="flexibleDays"
-                    name="work_flexible_days"
-                    class="w-5 h-5 mr-2 rounded border-gray-300"
-                    {% if job.work_start_time and job.work_start_time.strftime('%H:%M') == '협의' %} checked {% endif %}
-                  />
+                  <input type="checkbox" id="flexibleDays"
+                  name="work_flexible_days" class="w-5 h-5 mr-2 rounded
+                  border-gray-300" {% if job.work_start_time and
+                  job.work_start_time.strftime('%H:%M') == '협의' %} checked {%
+                  endif %} />
                   <label for="flexibleDays" class="text-sm text-gray-600"
                     >요일 협의 후 결정</label
                   >
                 </div>
-                <input type="hidden" name="work_monday" id="work_monday_hidden" value="{{ 'true' if job.work_monday else 'false' }}" />
-                <input type="hidden" name="work_tuesday" id="work_tuesday_hidden" value="{{ 'true' if job.work_tuesday else 'false' }}" />
-                <input type="hidden" name="work_wednesday" id="work_wednesday_hidden" value="{{ 'true' if job.work_wednesday else 'false' }}" />
-                <input type="hidden" name="work_thursday" id="work_thursday_hidden" value="{{ 'true' if job.work_thursday else 'false' }}" />
-                <input type="hidden" name="work_friday" id="work_friday_hidden" value="{{ 'true' if job.work_friday else 'false' }}" />
-                <input type="hidden" name="work_saturday" id="work_saturday_hidden" value="{{ 'true' if job.work_saturday else 'false' }}" />
-                <input type="hidden" name="work_sunday" id="work_sunday_hidden" value="{{ 'true' if job.work_sunday else 'false' }}" />
+                <input
+                  type="hidden"
+                  name="work_monday"
+                  id="work_monday_hidden"
+                  value="{{ 'true' if job.work_monday else 'false' }}"
+                />
+                <input
+                  type="hidden"
+                  name="work_tuesday"
+                  id="work_tuesday_hidden"
+                  value="{{ 'true' if job.work_tuesday else 'false' }}"
+                />
+                <input
+                  type="hidden"
+                  name="work_wednesday"
+                  id="work_wednesday_hidden"
+                  value="{{ 'true' if job.work_wednesday else 'false' }}"
+                />
+                <input
+                  type="hidden"
+                  name="work_thursday"
+                  id="work_thursday_hidden"
+                  value="{{ 'true' if job.work_thursday else 'false' }}"
+                />
+                <input
+                  type="hidden"
+                  name="work_friday"
+                  id="work_friday_hidden"
+                  value="{{ 'true' if job.work_friday else 'false' }}"
+                />
+                <input
+                  type="hidden"
+                  name="work_saturday"
+                  id="work_saturday_hidden"
+                  value="{{ 'true' if job.work_saturday else 'false' }}"
+                />
+                <input
+                  type="hidden"
+                  name="work_sunday"
+                  id="work_sunday_hidden"
+                  value="{{ 'true' if job.work_sunday else 'false' }}"
+                />
               </div>
 
               <div class="mb-8">
@@ -567,13 +655,11 @@
                   </select>
                 </div>
                 <div class="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="flexibleTime"
-                    name="work_flexible_time"
-                    class="w-5 h-5 mr-2 rounded border-gray-300"
-                    {% if job.work_start_time and job.work_start_time.strftime('%H:%M') == '협의' %} checked {% endif %}
-                  />
+                  <input type="checkbox" id="flexibleTime"
+                  name="work_flexible_time" class="w-5 h-5 mr-2 rounded
+                  border-gray-300" {% if job.work_start_time and
+                  job.work_start_time.strftime('%H:%M') == '협의' %} checked {%
+                  endif %} />
                   <label for="flexibleTime" class="text-sm text-gray-600"
                     >시간 협의 가능</label
                   >
@@ -602,7 +688,9 @@
                     value="{{ job.recruitment_end_date.strftime('%Y-%m-%d') if job.recruitment_end_date else '' }}"
                   />
                 </div>
-                <p class="text-sm text-gray-500 mt-2">시작일과 종료일을 선택해주세요 (선택사항)</p>
+                <p class="text-sm text-gray-500 mt-2">
+                  시작일과 종료일을 선택해주세요 (선택사항)
+                </p>
               </div>
             </div>
           </div>
@@ -660,7 +748,12 @@
                   >원</span
                 >
               </div>
-              <input type="hidden" name="salary" id="salaryHidden" value="{{ job.salary | default('') }}" />
+              <input
+                type="hidden"
+                name="salary"
+                id="salaryHidden"
+                value="{{ job.salary | default('') }}"
+              />
 
               <div class="bg-blue-50 rounded-2xl p-5 border border-blue-200">
                 <p class="text-base text-gray-800 mb-3 text-center">
@@ -713,7 +806,9 @@
               rows="8"
               placeholder="나중에 AI로 정리하여 보여드리니 구체적이고 자유롭게 작성해 주세요."
               class="w-full px-4 py-4 text-base border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none resize-none"
-            >{{ job.description | default('') }}</textarea>
+            >
+{{ job.description | default('') }}</textarea
+            >
           </div>
         </section>
 
@@ -771,8 +866,18 @@
                 value="{{ job.detail_address | default('') }}"
               />
 
-              <input type="hidden" id="latitude" name="latitude" value="{{ job.latitude | default('') }}" />
-              <input type="hidden" id="longitude" name="longitude" value="{{ job.longitude | default('') }}" />
+              <input
+                type="hidden"
+                id="latitude"
+                name="latitude"
+                value="{{ job.latitude | default('') }}"
+              />
+              <input
+                type="hidden"
+                id="longitude"
+                name="longitude"
+                value="{{ job.longitude | default('') }}"
+              />
               <input
                 type="hidden"
                 id="region_1depth_name"

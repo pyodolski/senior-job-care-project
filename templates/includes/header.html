@@ -1,0 +1,97 @@
+<!-- 상단 바 -->
+<header class="px-4 py-3 sm:px-6 flex justify-between items-center">
+  <div class="flex items-center">
+    <div class="w-8 h-8 mr-2 flex items-center justify-center">
+      <img
+        src="{{ url_for('static', filename='images/header/logo.png') }}"
+        alt="로고"
+        class="max-w-full max-h-full object-contain"
+      />
+    </div>
+    <span
+      class="text-xl font-medium text-blue-900"
+      style="font-family: 'LotteriaChab'"
+      >이음</span
+    >
+  </div>
+  <div class="flex items-center space-x-3 sm:space-x-4">
+    <!-- 음성 검색 버튼 -->
+    <button
+      onclick="startVoiceSearch()"
+      id="voiceBtn"
+      class="w-6 h-6 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
+      title="음성으로 검색하기"
+    >
+      <img
+        src="{{ url_for('static', filename='images/header/mic.png') }}"
+        alt="마이크"
+        class="max-w-full max-h-full object-contain"
+      />
+    </button>
+    <!-- 텍스트 검색 버튼 -->
+    <button
+      onclick="toggleSearchBar()"
+      id="searchBtn"
+      class="w-6 h-6 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
+      title="검색하기"
+    >
+      <img
+        src="{{ url_for('static', filename='images/header/search.png') }}"
+        alt="검색"
+        class="max-w-full max-h-full object-contain"
+      />
+    </button>
+  </div>
+</header>
+
+<!-- 검색창 (숨김/표시) -->
+<div id="searchBar" class="hidden bg-white border-b px-4 py-3 shadow-sm">
+  <form id="searchForm" method="GET" class="space-y-3">
+    <!-- 검색 타입 선택 -->
+    <div class="flex gap-3 justify-center">
+      <label class="flex items-center cursor-pointer">
+        <input
+          type="radio"
+          name="searchType"
+          value="company"
+          checked
+          class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+        />
+        <span class="ml-2 text-base font-medium text-gray-700">기업이음</span>
+      </label>
+      <label class="flex items-center cursor-pointer">
+        <input
+          type="radio"
+          name="searchType"
+          value="jobs"
+          class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+        />
+        <span class="ml-2 text-base font-medium text-gray-700">사람이음</span>
+      </label>
+    </div>
+
+    <!-- 검색 입력 -->
+    <div class="flex gap-2">
+      <input
+        type="text"
+        name="q"
+        id="searchInput"
+        placeholder="검색어를 입력하세요 (예: 청소, 경비)"
+        class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <button
+        type="submit"
+        class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors"
+      >
+        검색
+      </button>
+      <button
+        type="button"
+        onclick="toggleSearchBar()"
+        class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+      >
+        취소
+      </button>
+    </div>
+  </form>
+</div>
