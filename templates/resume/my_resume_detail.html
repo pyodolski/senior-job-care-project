@@ -15,10 +15,10 @@
     />
   </head>
   <body class="bg-gray-50">
-    <div class="max-w-md mx-auto bg-white min-h-screen flex flex-col">
+    <div class="w-full bg-white shadow-lg min-h-screen flex flex-col">
       <!-- 상단 헤더 -->
       <div class="sticky top-0 z-10 bg-white border-b">
-        <header class="px-4 py-4 flex items-center">
+        <header class="px-4 py-4 sm:px-6 flex items-center">
           <a href="{{ url_for('resumes.my_view_resume') }}" class="mr-3">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -44,7 +44,7 @@
         {% if resume %}
 
         <!-- 기본 인적 정보 -->
-        <div class="px-4 py-6 bg-white border-b">
+        <div class="px-4 sm:px-6 py-6 bg-white border-b">
           <h3 class="text-lg font-bold text-gray-900 mb-4">기본 인적 정보</h3>
 
           <div class="flex gap-4">
@@ -137,7 +137,7 @@
         </div>
 
         <!-- 희망 근무 직종 -->
-        <div class="bg-white mb-2 px-4 py-4">
+        <div class="bg-white mb-2 px-4 sm:px-6 py-4">
           <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
@@ -299,7 +299,7 @@
         </div>
 
         <!-- 희망 근무 요일/시간/형태 -->
-        <div class="bg-white mb-2 px-4 py-4">
+        <div class="bg-white mb-2 px-4 sm:px-6 py-4">
           <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
@@ -364,7 +364,7 @@
         </div>
 
         <!-- 경력 사항 -->
-        <div class="bg-white mb-2 px-4 py-4">
+        <div class="bg-white mb-2 px-4 sm:px-6 py-4">
           <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
@@ -389,7 +389,7 @@
         </div>
 
         <!-- 자격 사항 -->
-        <div class="bg-white mb-2 px-4 py-4">
+        <div class="bg-white mb-2 px-4 sm:px-6 py-4">
           <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
@@ -448,7 +448,7 @@
         </div>
 
         <!-- 성격 및 강점 -->
-        <div class="bg-white mb-2 px-4 py-4">
+        <div class="bg-white mb-2 px-4 sm:px-6 py-4">
           <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
@@ -481,7 +481,7 @@
         </div>
 
         <!-- 신체적 활동 가능 범위 -->
-        <div class="bg-white mb-2 px-4 py-4">
+        <div class="bg-white mb-2 px-4 sm:px-6 py-4">
           <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
@@ -525,7 +525,7 @@
         </div>
 
         <!-- 이동 가능 범위 -->
-        <div class="bg-white mb-2 px-4 py-4">
+        <div class="bg-white mb-2 px-4 sm:px-6 py-4">
           <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
@@ -566,7 +566,7 @@
         </div>
 
         <!-- 자기소개서 -->
-        <div class="bg-white mb-2 px-4 py-4">
+        <div class="bg-white mb-2 px-4 sm:px-6 py-4">
           <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
@@ -594,7 +594,7 @@
 
         <!-- 통화 가능 시간 -->
         {% if resume.call_available_time %}
-        <div class="bg-white mb-2 px-4 py-4">
+        <div class="bg-white mb-2 px-4 sm:px-6 py-4">
           <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
@@ -620,7 +620,7 @@
         {% endif %}
 
         <!-- 공개/비공개 토글 -->
-        <div class="bg-white mx-4 mb-4 rounded-lg border px-4 py-4">
+        <div class="bg-white mx-4 sm:mx-6 mb-4 rounded-lg border px-4 py-4">
           <div class="flex items-center justify-between">
             <div>
               <h3 class="font-semibold text-gray-900 mb-1">이력서 공개 설정</h3>
@@ -650,7 +650,7 @@
         </div>
 
         <!-- 버튼 영역 -->
-        <div class="px-4 pb-4 flex gap-2">
+        <div class="px-4 sm:px-6 pb-4 flex gap-2">
           <a
             href="{{ url_for('resumes.edit_resume', resume_id=resume.id) }}"
             class="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-semibold py-3 rounded-xl transition-colors text-center"
