@@ -55,7 +55,7 @@
       >
         <div class="flex items-center justify-between">
           <button
-            onclick="window.location.href = '{{ url_for('jobs.job_detail', job_id=job.id) }}'"
+            onclick="window.location.replace('{{ url_for('jobs.job_detail', job_id=job.id) }}')"
             class="text-gray-600"
           >
             <svg

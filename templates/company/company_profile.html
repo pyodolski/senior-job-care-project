@@ -28,7 +28,7 @@
     </style>
   </head>
   <body class="bg-gray-50">
-    <div class="max-w-md mx-auto bg-white min-h-screen flex flex-col pb-20">
+    <div class="w-full bg-white shadow-lg min-h-screen flex flex-col">
       <!-- 상단 고정 영역 -->
       <div class="sticky top-0 z-10 bg-white shadow-sm">
         <!-- 상단 바 -->
@@ -68,7 +68,7 @@
       </div>
 
       <!-- 콘텐츠 영역 -->
-      <main class="flex-grow bg-gray-50 overflow-auto">
+      <main class="flex-grow bg-gray-50 overflow-auto pb-20">
         <!-- 프로필 카드 -->
         <div class="bg-white px-6 pt-8 pb-6">
           <!-- 프로필 이미지 -->
@@ -154,13 +154,13 @@
             </div>
             <div class="text-center">
               <p class="text-sm text-gray-500 mb-1">받은 이력서</p>
-              <p class="text-2xl font-bold text-green-600">
+              <p class="text-2xl font-bold text-blue-600">
                 {{ received_applications_count }}
               </p>
             </div>
             <div class="text-center">
               <p class="text-sm text-gray-500 mb-1">내 구인글</p>
-              <p class="text-2xl font-bold text-purple-600">{{ job_count }}</p>
+              <p class="text-2xl font-bold text-blue-600">{{ job_count }}</p>
             </div>
           </div>
         </div>
@@ -287,21 +287,26 @@
           </a>
         </div>
 
-        <!-- 로그아웃 -->
-        <div class="mt-4 px-6 py-4">
-          <a
-            href="{{ url_for('auth.logout') }}"
-            class="block text-center text-red-600 font-medium"
+        <!-- 간격 -->
+        <div class="h-2 bg-gray-50"></div>
+
+        <!-- 하단 버튼 영역 -->
+        <div class="bg-white px-6 py-4 flex gap-3">
+          <!-- 로그아웃 -->
+          <button
+            onclick="window.location.href='{{ url_for('auth.logout') }}';"
+            class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 rounded-lg transition-colors"
           >
             로그아웃
-          </a>
-        </div>
+          </button>
 
-        <!-- 회원탈퇴 -->
-        <div class="px-6 pb-6">
-          <a href="#" class="block text-center text-gray-400 text-sm">
+          <!-- 회원탈퇴 -->
+          <button
+            onclick="alert('회원탈퇴 기능은 준비 중입니다.');"
+            class="flex-1 bg-white hover:bg-gray-50 text-gray-500 font-medium py-3 rounded-lg border border-gray-300 transition-colors"
+          >
             회원탈퇴
-          </a>
+          </button>
         </div>
       </main>
 

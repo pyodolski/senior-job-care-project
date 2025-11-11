@@ -15,62 +15,113 @@
       }
     </style>
   </head>
-  <body class="bg-gray-100">
-    <div class="max-w-md mx-auto bg-white min-h-screen">
-      <header class="bg-white p-4 border-b">
-        <div class="relative flex items-center justify-center">
-          <a href="{{ url_for('company.resume_list') }}" class="absolute left-0">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6 text-gray-800"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+  <body class="bg-gray-50">
+    <div class="w-full bg-white shadow-lg min-h-screen">
+      <!-- 상단 헤더 -->
+      <header class="sticky top-0 z-10 bg-white shadow-sm">
+        <div class="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-3 sm:py-4">
+          <div class="relative flex items-center justify-center">
+            <a
+              href="{{ url_for('company.resume_list') }}"
+              class="absolute left-0 p-1 hover:bg-gray-100 rounded-full transition-colors"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </a>
-          <h1 class="text-lg font-bold text-gray-800">공고 제안하기</h1>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 sm:h-6 sm:w-6 text-gray-800"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </a>
+            <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
+              공고 제안하기
+            </h1>
+          </div>
         </div>
       </header>
 
-      <main class="p-6">
-        <p class="text-gray-700 text-center mb-6">
-          <span class="font-bold text-blue-600">{{ resume.user.name }}</span>
-          님에게 제안할 공고를 선택해주세요.
-        </p>
+      <!-- 메인 컨텐츠 -->
+      <main
+        class="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-6 sm:py-8 md:py-10 max-w-4xl mx-auto"
+      >
+        <!-- 안내 메시지 -->
+        <div
+          class="bg-blue-50 border-l-4 border-blue-600 p-4 sm:p-5 md:p-6 rounded-lg mb-6 sm:mb-8"
+        >
+          <p class="text-gray-700 text-sm sm:text-base md:text-lg text-center">
+            <span
+              class="font-bold text-blue-600 text-base sm:text-lg md:text-xl"
+              >{{ resume.user.name }}</span
+            >
+            님에게 제안할 공고를 선택해주세요.
+          </p>
+        </div>
 
-        <div class="space-y-3">
-          {% if jobs_for_suggestion %}
-          {% for item in jobs_for_suggestion %}
+        <!-- 공고 목록 -->
+        <div class="space-y-3 sm:space-y-4">
+          {% if jobs_for_suggestion %} {% for item in jobs_for_suggestion %}
           <div
-            class="flex items-center p-4 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors **cursor-pointer**"
-            onclick="location.href='{{ url_for('company.company_job_detail', job_id=item.job.id) }}'"**
+            class="flex flex-col sm:flex-row items-start sm:items-center p-4 sm:p-5 md:p-6 border-2 border-gray-200 rounded-xl bg-white hover:bg-gray-50 hover:border-blue-300 transition-all cursor-pointer shadow-sm hover:shadow-md"
+            onclick="location.href='{{ url_for('company.company_job_detail', job_id=item.job.id) }}'"
           >
-            <div class="flex-1">
-              <p class="font-semibold text-gray-800">{{ item.job.title }}</p>
-              <p class="text-sm text-gray-500 mt-0.5">{{ item.job.company }}</p>
+            <!-- 공고 정보 -->
+            <div class="flex-1 mb-3 sm:mb-0">
+              <p
+                class="font-semibold text-gray-800 text-base sm:text-lg md:text-xl mb-1"
+              >
+                {{ item.job.title }}
+              </p>
+              <p class="text-sm sm:text-base text-gray-500">
+                {{ item.job.company }}
+              </p>
+
+              <!-- 추가 정보 (모바일에서만 표시) -->
+              <div class="flex flex-wrap gap-2 mt-2 sm:hidden">
+                {% if item.job.recruitment_type %}
+                <span
+                  class="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"
+                >
+                  {{ item.job.recruitment_type }}
+                </span>
+                {% endif %} {% if item.job.salary %}
+                <span
+                  class="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"
+                >
+                  {{ item.job.salary }}
+                </span>
+                {% endif %}
+              </div>
             </div>
 
-            <div class="ml-4" onclick="event.stopPropagation();">
+            <!-- 버튼 영역 -->
+            <div
+              class="w-full sm:w-auto sm:ml-4"
+              onclick="event.stopPropagation();"
+            >
               {% if item.status == 'sent' %}
               <button
-                      class="bg-gray-200 text-gray-500 font-bold py-2 px-4 rounded-lg text-sm cursor-not-allowed"
-                      disabled
+                class="w-full sm:w-auto bg-gray-200 text-gray-500 font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg text-sm sm:text-base cursor-not-allowed"
+                disabled
               >
                 응답 대기 중
               </button>
               {% else %}
-              <form action="{{ url_for('company.suggest_job', resume_id=resume.id) }}" method="POST" class="m-0">
-                <input type="hidden" name="job_ids" value="{{ item.job.id }}">
+              <form
+                action="{{ url_for('company.suggest_job', resume_id=resume.id) }}"
+                method="POST"
+                class="m-0"
+              >
+                <input type="hidden" name="job_ids" value="{{ item.job.id }}" />
                 <button
-                        type="submit"
-                        class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                  type="submit"
+                  class="w-full sm:w-auto bg-blue-600 text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg text-sm sm:text-base hover:bg-blue-700 active:scale-95 transition-all shadow-md hover:shadow-lg"
                 >
                   제안하기
                 </button>
@@ -78,24 +129,40 @@
               {% endif %}
             </div>
           </div>
-          {% endfor %}
-          {% else %}
-          <div class="text-center text-gray-500 py-16">
-            <p>제안할 수 있는 공고가 없습니다.</p>
-            <a
-                    href="{{ url_for('company.create_company_job') }}"
-                    class="mt-4 inline-block text-blue-600 font-semibold"
+          {% endfor %} {% else %}
+          <!-- 빈 상태 -->
+          <div class="text-center text-gray-500 py-16 sm:py-20 md:py-24">
+            <svg
+              class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-4 sm:mb-6 text-gray-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              공고 등록하러 가기 &rarr;
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            <p class="text-base sm:text-lg md:text-xl mb-4 sm:mb-6">
+              제안할 수 있는 공고가 없습니다.
+            </p>
+            <a
+              href="{{ url_for('company.create_company_job') }}"
+              class="inline-block bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+            >
+              공고 등록하러 가기 →
             </a>
           </div>
           {% endif %}
         </div>
 
-        <div class="mt-8">
+        <!-- 취소 버튼 -->
+        <div class="mt-8 sm:mt-10 md:mt-12">
           <a
-                  href="{{ url_for('company.resume_list') }}"
-                  class="block w-full text-center text-gray-600 font-medium py-3 rounded-lg hover:bg-gray-200 transition-colors"
+            href="{{ url_for('company.resume_list') }}"
+            class="block w-full text-center text-gray-600 font-semibold py-3 sm:py-4 rounded-xl hover:bg-gray-100 transition-colors border-2 border-gray-200 text-sm sm:text-base md:text-lg"
           >
             취소
           </a>
