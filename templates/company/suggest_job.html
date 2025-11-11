@@ -48,13 +48,16 @@
         <div class="space-y-3">
           {% if jobs_for_suggestion %}
           {% for item in jobs_for_suggestion %}
-          <div class="flex items-center p-4 border border-gray-200 rounded-lg">
+          <div
+            class="flex items-center p-4 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors **cursor-pointer**"
+            onclick="location.href='{{ url_for('company.company_job_detail', job_id=item.job.id) }}'"**
+          >
             <div class="flex-1">
               <p class="font-semibold text-gray-800">{{ item.job.title }}</p>
               <p class="text-sm text-gray-500 mt-0.5">{{ item.job.company }}</p>
             </div>
 
-            <div class="ml-4">
+            <div class="ml-4" onclick="event.stopPropagation();">
               {% if item.status == 'sent' %}
               <button
                       class="bg-gray-200 text-gray-500 font-bold py-2 px-4 rounded-lg text-sm cursor-not-allowed"
