@@ -105,9 +105,9 @@ class Config:
         }
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # Google OAuth
-    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID")
-    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET")
+    # Google OAuth (줄바꿈 제거)
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID", "").strip()
+    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET", "").strip()
 
     # Naver OAuth
     NAVER_CLIENT_ID = os.getenv("NAVER_CLIENT_ID")
