@@ -16,6 +16,9 @@ if os.environ.get("FLASK_ENV") == "development" or os.path.exists('.env.local'):
 class Config:
     # 기본 설정
     SECRET_KEY = os.getenv("SECRET_KEY", "your-default-secret-key")
+    
+    # Railway 환경 감지
+    IS_RAILWAY = os.getenv("RAILWAY_ENVIRONMENT") is not None
 
     AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
     AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
@@ -63,9 +66,17 @@ class Config:
         except Exception as e:
             print(f"Database host: parsing failed - {e}")
     
-    # Railway 환경 감지
-    IS_RAILWAY = os.getenv("RAILWAY_ENVIRONMENT") is not None
     print(f"🚂 Railway 환경: {IS_RAILWAY}")
+    
+    # Flask-Dance 세션 설정 (Railway HTTPS 지원)
+    if IS_RAILWAY:
+        SESSION_COOKIE_SECURE = True  # HTTPS에서만 쿠키 전송
+        SESSION_COOKIE_HTTPONLY = True
+        SESSION_COOKIE_SAMESITE = 'Lax'
+        PREFERRED_URL_SCHEME = 'https'
+    else:
+        SESSION_COOKIE_SECURE = False  # 로컬 HTTP 허용
+        SESSION_COOKIE_SAMESITE = 'Lax'
     
     # Railway 환경에 최적화된 데이터베이스 연결 설정
     if IS_RAILWAY:

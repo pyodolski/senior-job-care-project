@@ -28,6 +28,14 @@ socketio = SocketIO(cors_allowed_origins="*", manage_session=False)
 app = Flask(__name__)
 app.config.from_object(Config)
 
+# Flask-Dance를 위한 추가 설정
+app.config['SESSION_COOKIE_NAME'] = 'senior_session'
+if Config.IS_RAILWAY:
+    # Railway HTTPS 환경
+    app.config['SESSION_COOKIE_SECURE'] = True
+    app.config['PREFERRED_URL_SCHEME'] = 'https'
+    print("🔒 HTTPS 세션 쿠키 활성화")
+
 Session(app)
 db.init_app(app)
 
