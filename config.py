@@ -74,6 +74,8 @@ class Config:
         SESSION_COOKIE_HTTPONLY = True
         SESSION_COOKIE_SAMESITE = 'Lax'
         PREFERRED_URL_SCHEME = 'https'
+        # Flask-Dance가 HTTPS를 사용하도록 강제
+        os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '0'
     else:
         SESSION_COOKIE_SECURE = False  # 로컬 HTTP 허용
         SESSION_COOKIE_SAMESITE = 'Lax'

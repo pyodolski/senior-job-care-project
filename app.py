@@ -23,10 +23,16 @@ from routes.recommendations import recommendations_bp
 from routes.admin.data_sync import data_sync_bp
 from routes.admin.data_cleanup import data_cleanup_bp
 from flask_socketio import SocketIO
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 socketio = SocketIO(cors_allowed_origins="*", manage_session=False)
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# Railway 프록시 설정 - HTTPS 리다이렉트 처리
+if Config.IS_RAILWAY:
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+    print("🔧 ProxyFix 적용: HTTPS 리다이렉트 지원")
 
 # Flask-Dance를 위한 추가 설정
 app.config['SESSION_COOKIE_NAME'] = 'senior_session'
