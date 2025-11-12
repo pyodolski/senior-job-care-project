@@ -6,9 +6,6 @@ from flask_login import login_user
 from models import db, User
 from config import Config
 
-# OAuth insecure transport 허용 (개발 환경용)
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-
 # Google OAuth 블루프린트
 google_bp = make_google_blueprint(
     client_id=Config.GOOGLE_CLIENT_ID,

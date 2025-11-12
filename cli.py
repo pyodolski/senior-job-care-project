@@ -56,3 +56,64 @@ def register_cli(app):
         fetch_and_store_jobs(page_number=page)
 
         print(">> 작업이 완료되었습니다.")
+
+    @app.cli.command("db-query")
+    @click.argument('query')
+    @with_appcontext
+    def db_query_command(query):
+        """데이터베이스 쿼리를 실행합니다."""
+        from sqlalchemy import text
+        try:
+            result = db.session.execute(text(query))
+            
+            # SELECT 쿼리인 경우 결과 출력
+            if query.strip().upper().startswith('SELECT'):
+                rows = result.fetchall()
+                if rows:
+                    # 컬럼 이름 출력
+                    columns = result.keys()
+                    click.echo("\n" + " | ".join(columns))
+                    click.echo("-" * (len(" | ".join(columns))))
+                    
+                    # 데이터 출력
+                    for row in rows:
+                        click.echo(" | ".join(str(val) for val in row))
+                    click.echo(f"\n총 {len(rows)}개의 결과")
+                else:
+                    click.echo("결과가 없습니다.")
+            else:
+                db.session.commit()
+                click.echo("쿼리가 실행되었습니다.")
+        except Exception as e:
+            db.session.rollback()
+            click.echo(f"에러 발생: {str(e)}", err=True)
+
+    @app.cli.command("db-tables")
+    @with_appcontext
+    def db_tables_command():
+        """데이터베이스의 모든 테이블 목록을 표시합니다."""
+        from sqlalchemy import text
+        try:
+            result = db.session.execute(text("SHOW TABLES"))
+            tables = [row[0] for row in result.fetchall()]
+            
+            click.echo("\n📊 데이터베이스 테이블 목록:")
+            click.echo("-" * 40)
+            for table in tables:
+                click.echo(f"  • {table}")
+            click.echo(f"\n총 {len(tables)}개의 테이블")
+        except Exception as e:
+            click.echo(f"에러 발생: {str(e)}", err=True)
+
+    @app.cli.command("db-count")
+    @click.argument('table')
+    @with_appcontext
+    def db_count_command(table):
+        """특정 테이블의 레코드 수를 확인합니다."""
+        from sqlalchemy import text
+        try:
+            result = db.session.execute(text(f"SELECT COUNT(*) FROM {table}"))
+            count = result.scalar()
+            click.echo(f"\n📊 {table} 테이블: {count}개의 레코드")
+        except Exception as e:
+            click.echo(f"에러 발생: {str(e)}", err=True)

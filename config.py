@@ -8,9 +8,10 @@ if os.path.exists('.env.local'):
 else:
     load_dotenv()
 
-# 개발 환경일 경우 HTTP 허용
-if os.environ.get("FLASK_ENV") == "development":
+# 개발 환경일 경우에만 HTTP 허용 (Railway는 HTTPS 사용)
+if os.environ.get("FLASK_ENV") == "development" or os.path.exists('.env.local'):
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+    print("🔓 개발 환경: HTTP OAuth 허용")
 
 class Config:
     # 기본 설정
