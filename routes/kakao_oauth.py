@@ -83,39 +83,42 @@ def kakao_login_callback():
     kakao_id = str(user_info['id'])
     kakao_account = user_info.get('kakao_account', {})
     profile = kakao_account.get('profile', {})
-    
+
     email = kakao_account.get('email')
     nickname = profile.get('nickname', '카카오 사용자')
     profile_image = profile.get('profile_image_url')
-    
+
     # 기존 사용자 확인 또는 새 사용자 생성
-    user = User.query.filter_by(kakao_id=kakao_id).first()
-    
+    user = User.query.filter_by(social_type='kakao', social_id=kakao_id).first()
+
     if not user:
         # 이메일로도 확인 (이미 다른 방법으로 가입한 경우)
         if email:
             user = User.query.filter_by(email=email).first()
             if user:
-                # 기존 계정에 카카오 ID 연결
-                user.kakao_id = kakao_id
+                # 기존 계정에 카카오 소셜 로그인 연결
+                user.social_type = 'kakao'
+                user.social_id = kakao_id
             else:
                 # 새 사용자 생성
                 user = User(
                     email=email,
-                    username=nickname,
-                    kakao_id=kakao_id,
+                    nickname=nickname,
+                    social_type='kakao',
+                    social_id=kakao_id,
                     profile_image=profile_image
                 )
                 db.session.add(user)
         else:
             # 이메일 없이 카카오 ID만으로 생성
             user = User(
-                username=nickname,
-                kakao_id=kakao_id,
+                nickname=nickname,
+                social_type='kakao',
+                social_id=kakao_id,
                 profile_image=profile_image
             )
             db.session.add(user)
-        
+
         db.session.commit()
     
     # 로그인 처리
