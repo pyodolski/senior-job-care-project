@@ -20,7 +20,7 @@ def login():
     session['oauth_state'] = state
 
     # 환경에 따라 동적으로 Redirect URI 생성
-    redirect_uri = url_for('kakao_login_callback', _external=True, _scheme='https' if Config.IS_RAILWAY else 'http')
+    redirect_uri = url_for('kakao.kakao_login_callback', _external=True, _scheme='https' if Config.IS_RAILWAY else 'http')
     
     # 카카오 인증 URL 생성
     auth_url = f"{KAKAO_AUTH_URL}?" \
