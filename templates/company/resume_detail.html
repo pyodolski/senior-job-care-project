@@ -19,7 +19,7 @@
       <!-- 상단 고정 영역 -->
       <div class="sticky top-0 z-10 bg-white shadow-sm">
         <!-- 상단 헤더 -->
-        <header class="px-4 py-3 sm:px-6 flex items-center"></header>
+        <header class="px-4 py-3 sm:px-6 flex items-center">
           <button onclick="history.back()" class="mr-3">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -41,13 +41,13 @@
       </div>
 
       <!-- 메인 컨텐츠 -->
-      <main class="px-4 py-4 sm:px-6 bg-gray-50 pb-24"></main>
+      <main class="px-4 py-4 sm:px-6 bg-gray-50 pb-24">
         {% if resume %}
 
         <!-- 기본 인적 정보 -->
         <section class="mb-4">
-        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border"></div>
-          <h3 class="text-lg font-bold text-gray-900 mb-4">기본 인적 정보</h3>
+          <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">기본 인적 정보</h3>
 
           <div class="flex gap-4">
             <!-- 프로필 사진 -->
@@ -141,8 +141,8 @@
 
         <!-- 희망 근무 직종 -->
         <section class="mb-4">
-        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border"></div>
-          <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+          <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border">
+            <h3 class="font-semibold text-gray-900 mb-3 flex items-center"></h3>
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
               fill="none"
@@ -305,8 +305,8 @@
 
         <!-- 희망 근무 요일/시간/형태 -->
         <section class="mb-4">
-        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border"></div>
-          <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+          <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border">
+            <h3 class="font-semibold text-gray-900 mb-3 flex items-center"></h3>
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
               fill="none"
@@ -372,8 +372,8 @@
 
         <!-- 경력 사항 -->
         <section class="mb-4">
-        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border"></div>
-          <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+          <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border">
+            <h3 class="font-semibold text-gray-900 mb-3 flex items-center"></h3>
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
               fill="none"
@@ -399,8 +399,8 @@
 
         <!-- 자격 사항 -->
         <section class="mb-4">
-        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border"></div>
-          <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+          <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border">
+            <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
               fill="none"
@@ -460,8 +460,8 @@
 
         <!-- 성격 및 강점 -->
         <section class="mb-4">
-        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border"></div>
-          <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+          <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border">
+            <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
               fill="none"
@@ -495,8 +495,8 @@
 
         <!-- 신체적 활동 가능 범위 -->
         <section class="mb-4">
-        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border"></div>
-          <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+          <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border">
+            <h3 class="font-semibold text-gray-900 mb-3 flex items-center"></h3>
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
               fill="none"
@@ -541,8 +541,8 @@
 
         <!-- 이동 가능 범위 -->
         <section class="mb-4">
-        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border"></div>
-          <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+          <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border">
+            <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
               fill="none"
@@ -584,8 +584,8 @@
 
         <!-- 자기소개서 -->
         <section class="mb-4">
-        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border"></div>
-          <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+          <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border">
+            <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
               fill="none"
@@ -614,8 +614,8 @@
         <!-- 통화 가능 시간 -->
         {% if resume.call_available_time %}
         <section class="mb-4">
-        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border"></div>
-          <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+          <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border">
+            <h3 class="font-semibold text-gray-900 mb-3 flex items-center"></h3>
             <svg
               class="w-5 h-5 mr-2 text-blue-900"
               fill="none"
