@@ -76,7 +76,7 @@ if __name__ == '__main__':
     force = '--force' in sys.argv
     
     # limit 파라미터 확인
-    limit = 5
+    limit = 100
     for arg in sys.argv:
         if arg.startswith('--limit='):
             try:
