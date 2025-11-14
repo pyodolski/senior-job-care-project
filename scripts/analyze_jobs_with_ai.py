@@ -6,7 +6,7 @@ from services.ai_analyzer_service import AIAnalyzerService
 from datetime import datetime
 
 
-def analyze_all_jobs(force=False, limit=5):
+def analyze_all_jobs(force=False, limit=100):
     """
     공고를 AI로 분석
     
