@@ -202,7 +202,7 @@ def fetch_and_store_jobs(page_number=1):
         updated_jobs_count = 0
         ai_analyzed_count = 0
         skipped_jobs_count = 0  # 건너뛴 공고 수
-        AI_ANALYSIS_LIMIT = 5  # AI 분석 제한 (토큰 절약)
+        AI_ANALYSIS_LIMIT = 100  # AI 분석 제한 (토큰 절약)
 
         today = datetime.now().date()
 
