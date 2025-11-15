@@ -17,23 +17,7 @@ class AIAnalyzerService:
     
     @staticmethod
     def analyze_job_post(title, description, company=None):
-        """
-        공고를 AI로 분석하여 카테고리, 키워드, 스킬, 난이도 추출
-        
-        Args:
-            title: 공고 제목
-            description: 공고 설명
-            company: 회사명 (선택)
-            
-        Returns:
-            dict: {
-                'category': str,
-                'keywords': list,
-                'skills': list,
-                'summary': str,
-                'difficulty': str  # '초급', '중급', '고급'
-            }
-        """
+        """공고를 AI로 분석하여 카테고리, 키워드, 스킬, 난이도 추출"""
         # OpenAI 클라이언트가 없으면 기본값 반환
         if not client:
             return {
@@ -106,21 +90,7 @@ class AIAnalyzerService:
     
     @staticmethod
     def analyze_resume(experience, strengths, desired_categories=None):
-        """
-        이력서를 AI로 분석하여 키워드, 스킬, 경력 레벨 추출
-        
-        Args:
-            experience: 경력 사항
-            strengths: 강점
-            desired_categories: 희망 직종
-            
-        Returns:
-            dict: {
-                'keywords': list,
-                'skills': list,
-                'career_level': str  # '신입', '경력', '전문가'
-            }
-        """
+        """이력서를 AI로 분석하여 키워드, 스킬, 경력 레벨 추출"""
         # OpenAI 클라이언트가 없으면 기본값 반환
         if not client:
             return {
@@ -183,18 +153,7 @@ class AIAnalyzerService:
     
     @staticmethod
     def calculate_similarity(job_keywords, job_skills, resume_keywords, resume_skills):
-        """
-        공고와 이력서의 유사도 계산 (0-100점)
-        
-        Args:
-            job_keywords: 공고 키워드 리스트
-            job_skills: 공고 스킬 리스트
-            resume_keywords: 이력서 키워드 리스트
-            resume_skills: 이력서 스킬 리스트
-            
-        Returns:
-            float: 유사도 점수 (0-100)
-        """
+        """공고와 이력서의 유사도 계산 (0-100점)"""
         if not job_keywords and not job_skills:
             return 50.0  # 기본 점수
         

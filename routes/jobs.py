@@ -1,19 +1,4 @@
-"""
-공고 관련 라우트 모듈
-===================
-
-이 모듈은 구인공고와 관련된 모든 웹 라우트를 처리합니다.
-
-주요 기능:
-- 공고 목록 조회 및 검색/필터링
-- 공고 상세 정보 조회
-- 공고 작성, 수정, 삭제 (CRUD)
-- 찜하기/찜 해제 기능
-- 사용자별 찜 목록 관리
-
-작성자: [팀명]
-최종 수정일: 2025-01-09
-"""
+"""공고 관련 라우트 """
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify,  current_app
 from flask_login import login_required, current_user
@@ -31,50 +16,26 @@ jobs_bp = Blueprint("jobs", __name__)
 @jobs_bp.route("/jobs")
 @login_required
 def job_list():
-    """
-    공고 목록 페이지
-    ===============
-
-    기능:
-    - 전체 공고 목록 조회
-    - 검색어로 공고 검색 (제목, 회사명, 설명 검색)
-    - 지역, 모집형태, 근무기간으로 필터링
-    - 페이지네이션 지원 (기본 10개씩)
-
-    URL: GET /jobs
-    템플릿: jobs/job_list.html
-
-    쿼리 파라미터:
-    - q: 검색어 (선택)
-    - region: 지역 필터 (선택)
-    - recruitment_type: 모집형태 필터 (선택)
-    - work_period: 근무기간 필터 (선택)
-    - page: 페이지 번호 (선택, 기본값: 1)
-
-    반환값:
-    - jobs: 공고 목록
-    - current_region: 현재 선택된 지역
-    - pagination: 페이지네이션 정보
-    """
+    """공고 목록 페이지 """
 
     # 페이지네이션 설정
     page = request.args.get('page', 1, type=int)
     per_page = 10
 
-    # URL 쿼리 파라미터에서 검색 및 필터 조건 추출
-    query = request.args.get('q', '')  # 검색어
-    recruitment_type = request.args.get('recruitment_type', '')  # 모집형태 필터
-    work_period = request.args.get('work_period', '')  # 근무기간 필터
-    sort_by = request.args.get('sort', 'latest')  # 정렬 기준
+    # 필터 조건 추출
+    query = request.args.get('q', '')
+    recruitment_type = request.args.get('recruitment_type', '')
+    work_period = request.args.get('work_period', '')
+    sort_by = request.args.get('sort', 'latest')
 
-    # 필터 조건을 딕셔너리로 구성 (정확 일치용)
+    # 필터 조건을 딕셔너리로 구성
     filters = {}
     if recruitment_type:
         filters['recruitment_type'] = recruitment_type
     if work_period:
         filters['work_period'] = work_period
 
-    # LIKE 검색 조건 (부분 일치용)
+    # LIKE 검색 조건
     conditions = []
     region1 = request.args.get('region1')
     region2 = request.args.get('region2')
@@ -87,10 +48,10 @@ def job_list():
     if region3:
         conditions.append(JobPost.region_3depth_name.like(f"{region3}%"))
 
-    # 사람이음 공고만 필터링 (job_category가 없고 외부 데이터가 아닌 공고)
+    # 사람이음 공고만 필터
     people_condition = db.and_(
         JobPost.job_category.is_(None),
-        JobPost.source.is_(None)  # 외부 데이터(K-Senior 등) 제외
+        JobPost.source.is_(None)  # 공공데이터 제외
     )
     if conditions:
         conditions.append(people_condition)
@@ -98,9 +59,9 @@ def job_list():
         conditions = [people_condition]
 
     # 검색어나 필터가 있으면 검색 실행, 없으면 전체 목록 조회
-    if query or filters or len(conditions) > 1:  # people_condition 외에 다른 조건이 있으면
+    if query or filters or len(conditions) > 1:
         jobs = JobService.search_jobs(query, filters, conditions, sort_by)
-        jobs_pagination = None  # search_jobs는 페이지네이션을 반환하지 않음
+        jobs_pagination = None
     else:
         jobs_pagination = JobService.get_all_jobs(page=page, per_page=per_page, sort_by=sort_by, conditions=conditions)
         jobs = jobs_pagination.items
@@ -109,9 +70,7 @@ def job_list():
     jobs_with_status = []
     for job in jobs:
         application_status = ApplicationService.check_application_status(current_user.id, job.id)
-        # 북마크 상태 추가
         application_status['bookmarked'] = JobService.is_bookmarked(current_user.id, job.id)
-        # 시간 경과 계산 추가
         job.time_ago = calculate_time_ago(job.created_at)
         job_data = {
             'job': job,
@@ -193,18 +152,14 @@ def create_job():
             recruitment_end_date = None
 
             if recruitment_start_date_str:
-                # JavaScript에서 전송된 "YYYY-MM-DD" 형식을 date 객체로 변환
-                # (날짜 형식 오류 시 ValueError를 발생시키므로, 전송되는 데이터 형식이 정확해야 함)
                 recruitment_start_date = datetime.strptime(recruitment_start_date_str, "%Y-%m-%d").date()
 
             if recruitment_end_date_str:
                 recruitment_end_date = datetime.strptime(recruitment_end_date_str, "%Y-%m-%d").date()
-            
-            # 필수 필드 검증
+
             if not all([title, company, description]):
                 return render_template("jobs/create_job_scroll.html")
-            
-            # 정규직인 경우 work_period를 자동으로 설정
+
             if recruitment_type == "정규직":
                 work_period = "장기"
             
@@ -221,7 +176,7 @@ def create_job():
                 longitude=longitude,
                 contact_phone=contact_phone,
                 recruitment_count=recruitment_count,
-                people_category=people_category,  # 사람이음 카테고리 추가
+                people_category=people_category,
                 recruitment_start_date=recruitment_start_date,
                 recruitment_end_date=recruitment_end_date,
                 work_start_time=work_start_time,
@@ -253,7 +208,7 @@ def create_job():
                     description=new_job.description,
                     company=new_job.company
                 )
-                
+
                 new_job.ai_category = result['category']
                 new_job.ai_keywords = json.dumps(result['keywords'], ensure_ascii=False)
                 new_job.ai_skills = json.dumps(result['skills'], ensure_ascii=False)
@@ -286,11 +241,9 @@ def job_detail(job_id):
     
     # 조회수 증가
     JobService.increment_view_count(job_id)
-    
-    # 현재 사용자가 이 공고를 찜했는지 확인
+
     is_bookmarked = JobService.is_bookmarked(current_user.id, job_id)
-    
-    # 현재 사용자의 지원 상태 확인
+
     application_status = ApplicationService.check_application_status(current_user.id, job_id)
     
     # 같은 지역의 다른 공고 추천 (최대 6개)
@@ -299,7 +252,7 @@ def job_detail(job_id):
         print(f"[DEBUG] 현재 공고 ID: {job_id}, 지역: {job.region}")
         print(f"[DEBUG] region_2depth_name: {job.region_2depth_name}, region_1depth_name: {job.region_1depth_name}")
         
-        # 1차 시도: region_2depth_name으로 정확 매칭
+        # region_2depth_name
         if job.region_2depth_name:
             related_jobs = JobPost.query.filter(
                 JobPost.region_2depth_name == job.region_2depth_name,
@@ -307,7 +260,7 @@ def job_detail(job_id):
             ).order_by(JobPost.created_at.desc()).limit(6).all()
             print(f"[DEBUG] region_2depth_name으로 조회: {len(related_jobs)}개 공고 발견")
         
-        # 2차 시도: 결과가 없으면 region_1depth_name으로 시도
+        # 결과가 없으면 region_1depth_name
         if not related_jobs and job.region_1depth_name:
             related_jobs = JobPost.query.filter(
                 JobPost.region_1depth_name == job.region_1depth_name,
@@ -315,7 +268,7 @@ def job_detail(job_id):
             ).order_by(JobPost.created_at.desc()).limit(6).all()
             print(f"[DEBUG] region_1depth_name으로 조회: {len(related_jobs)}개 공고 발견")
         
-        # 3차 시도: 여전히 결과가 없으면 region 필드로 LIKE 검색
+        # 여전히 결과가 없으면 region 필드로 검색
         if not related_jobs and job.region:
             region_parts = job.region.split()
             if region_parts:
@@ -405,37 +358,12 @@ def delete_job(job_id):
 @jobs_bp.route("/jobs/<int:job_id>/bookmark", methods=["POST"])
 @login_required
 def toggle_bookmark(job_id):
-    """
-    찜하기/찜 해제 토글
-    ==================
-    
-    기능:
-    - 공고를 찜 목록에 추가하거나 제거
-    - AJAX 요청과 일반 폼 요청 모두 지원
-    - 찜 상태에 따라 적절한 메시지 반환
-    
-    URL: POST /jobs/<job_id>/bookmark
-    
-    매개변수:
-    - job_id: 찜할 공고의 ID
-    
-    반환값 (AJAX):
-    - success: 성공 여부 (boolean)
-    - is_bookmarked: 찜 상태 (boolean)
-    - bookmark_count: 총 찜 개수 (int)
-    - message: 결과 메시지 (string)
-    
-    반환값 (일반 요청):
-    - 성공 시: 공고 상세 페이지로 리다이렉트
-    - 실패 시: 에러 메시지와 함께 공고 상세 페이지로 리다이렉트
-    """
+    """찜하기/찜 해제 토글"""
     try:
-        # JobService를 통해 찜 상태 토글 (True: 찜 추가, False: 찜 해제)
         is_bookmarked = JobService.toggle_bookmark(current_user.id, job_id)
-        
-        # 업데이트된 공고 정보 조회
+
         job = JobService.get_job_by_id(job_id)
-        
+
         # 찜 상태에 따른 메시지 설정
         message = "찜 목록에 추가했습니다." if is_bookmarked else "찜을 취소했습니다."
         
@@ -465,23 +393,7 @@ def toggle_bookmark(job_id):
 @jobs_bp.route("/jobs/<int:job_id>/bookmark/status", methods=["GET"])
 @login_required
 def get_bookmark_status(job_id):
-    """
-    즐겨찾기 상태 확인
-    ==================
-
-    기능:
-    - 현재 사용자의 해당 공고 즐겨찾기 상태 확인
-    - 페이지 로드 시 즐겨찾기 상태 동기화에 사용
-
-    URL: GET /jobs/<job_id>/bookmark/status
-
-    매개변수:
-    - job_id: 확인할 공고의 ID
-
-    반환값:
-    - success: 성공 여부 (boolean)
-    - is_bookmarked: 찜 상태 (boolean)
-    """
+    """즐겨찾기 상태 확인"""
     try:
         # JobService를 통해 즐겨찾기 상태 확인
         is_bookmarked = JobService.is_bookmarked(current_user.id, job_id)
@@ -500,40 +412,20 @@ def get_bookmark_status(job_id):
 @jobs_bp.route("/bookmarks")
 @login_required
 def bookmark_list():
-    """
-    사용자 찜 목록 페이지
-    ===================
-
-    기능:
-    - 현재 로그인한 사용자의 찜한 공고 목록 조회
-    - 카테고리별 필터링 (사람 이음 / 기업 이음)
-    - 찜한 순서대로 정렬 (최신순)
-    - 찜 해제 기능 포함
-
-    URL: GET /bookmarks
-    템플릿: jobs/bookmark_list.html
-
-    반환값:
-    - jobs: 사용자가 찜한 공고 목록
-
-    주의사항:
-    - 로그인이 필요한 페이지
-    - 찜 목록이 비어있을 경우 빈 상태 메시지 표시
-    """
+    """사용자 찜 목록 페이지"""
 
     # 정렬 기준 및 카테고리 추출
     sort_by = request.args.get('sort', 'latest')
-    category = request.args.get('category', 'people')  # people(사람 이음) 또는 company(기업 이음)
+    category = request.args.get('category', 'people')
 
-    # JobService를 통해 현재 사용자의 찜 목록 조회
     jobs = JobService.get_user_bookmarks(current_user.id)
 
     # 카테고리별 필터링
     if category == 'company':
-        # 기업 이음: user_type이 1인 작성자의 공고
+        # user_type이 1 기업
         jobs = [job for job in jobs if job.author.user_type == 1]
     else:  # people
-        # 사람 이음: user_type이 0인 작성자의 공고
+        # user_type이 0 일반 사용자
         jobs = [job for job in jobs if job.author.user_type == 0]
 
     # 정렬 적용
@@ -548,7 +440,6 @@ def bookmark_list():
     jobs_with_status = []
     for job in jobs:
         application_status = ApplicationService.check_application_status(current_user.id, job.id)
-        # 북마크 상태 추가 (북마크 리스트에서는 항상 true)
         application_status['bookmarked'] = True
         job_data = {
             'job': job,
@@ -564,37 +455,12 @@ def bookmark_list():
 @jobs_bp.route("/jobs/<int:job_id>/apply", methods=["POST"])
 @login_required
 def apply_job(job_id):
-    """
-    공고 지원하기
-    ============
-    
-    기능:
-    - 공고에 지원 신청
-    - 자동으로 채팅방 생성
-    - 지원 상태 관리
-    
-    URL: POST /jobs/<job_id>/apply
-    
-    매개변수:
-    - job_id: 지원할 공고의 ID
-    
-    요청 데이터 (선택):
-    - message: 지원 메시지
-    
-    반환값 (AJAX):
-    - success: 성공 여부
-    - message: 결과 메시지
-    - chat_room_id: 생성된 채팅방 ID (성공 시)
-    
-    반환값 (일반 요청):
-    - 성공 시: 공고 상세 페이지로 리다이렉트
-    - 실패 시: 에러 메시지와 함께 공고 상세 페이지로 리다이렉트
-    """
+    """공고 지원하기"""
     
     try:
         print(f"지원하기 시작: user_id={current_user.id}, job_id={job_id}")
         
-        # 지원 메시지 추출 (선택사항)
+        # 지원 메시지
         message = None
         if request.is_json:
             try:
@@ -657,31 +523,10 @@ def apply_job(job_id):
 @jobs_bp.route("/jobs/<int:job_id>/applications")
 @login_required
 def job_applications(job_id):
-    """
-    공고 지원자 목록 (고용주용)
-    =========================
-    
-    기능:
-    - 공고에 지원한 사용자 목록 조회
-    - 지원 상태별 필터링
-    - 지원자와의 채팅방 링크 제공
-    
-    URL: GET /jobs/<job_id>/applications
-    템플릿: jobs/job_applications.html
-    
-    매개변수:
-    - job_id: 공고 ID
-    
-    반환값:
-    - job: 공고 정보
-    - applications: 지원자 목록
-    
-    주의사항:
-    - 공고 작성자만 접근 가능
-    """
+    """공고 지원자 목록 (고용주용)"""
     
     try:
-        # 지원자 목록 조회 (권한 확인 포함)
+        # 지원자 목록 조회
         applications = ApplicationService.get_job_applications(job_id, current_user.id)
         
         # 공고 정보
@@ -698,25 +543,7 @@ def job_applications(job_id):
 @jobs_bp.route("/jobs/ai-generate-description", methods=["POST"])
 @login_required
 def ai_generate_description():
-    """
-    AI 공고 설명 생성 API
-    ===================
-    
-    기능:
-    - 제목, 급여, 직무내용, 요구사항을 받아서 자동으로 상세 설명 생성
-    - 템플릿 기반 텍스트 생성 (추후 실제 AI API 연동 가능)
-    
-    URL: POST /jobs/ai-generate-description
-    
-    Request Body (JSON):
-    - title: 공고 제목
-    - salary: 급여 정보
-    - job_content: 직무 내용
-    - requirements: 요구사항 (선택)
-    
-    Returns:
-    - JSON: {"description": "생성된 설명"}
-    """
+    """AI 공고 설명 생성 API"""
     try:
         data = request.get_json()
         title = data.get('title', '')
@@ -774,9 +601,7 @@ def ai_generate_description():
 @jobs_bp.route("/my-posts")
 @login_required
 def my_posts():
-    """
-    내가 올린 글 목록 페이지
-    """
+    """내가 올린 글 목록 페이지"""
     try:
         # 현재 사용자가 작성한 공고 조회 (최신순)
         jobs = JobPost.query.filter_by(author_id=current_user.id)\
@@ -802,12 +627,11 @@ def my_posts():
 @jobs_bp.route("/my-applications")
 @login_required
 def my_applications():
-    # 1. 현재 사용자의 모든 지원 내역을 찾습니다.
+    # 현재 사용자의 모든 지원 내역을 찾습니다.
     applications = JobApplication.query.filter_by(
         user_id=current_user.id
     ).order_by(JobApplication.created_at.desc()).all()
 
-    # 2. 지원 내역에서 공고(job) 객체만 추출합니다.
     jobs_dict = {}
     for app in applications:
         if app.job:
@@ -820,7 +644,6 @@ def my_applications():
         application_status = ApplicationService.check_application_status(current_user.id, job.id)
         # 북마크 상태 추가
         application_status['bookmarked'] = JobService.is_bookmarked(current_user.id, job.id)
-        # 시간 경과 계산 추가
         job.time_ago = calculate_time_ago(job.created_at)
         job_data = {
             'job': job,

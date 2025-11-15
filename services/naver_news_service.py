@@ -10,7 +10,7 @@ class NaverNewsService:
     def __init__(self):
         # 환경변수 강제 새로고침
         from dotenv import load_dotenv
-        load_dotenv(override=True)  # 기존 환경변수 덮어쓰기
+        load_dotenv(override=True)
         
         self.client_id = os.getenv('NAVER_CLIENT_ID')
         self.client_secret = os.getenv('NAVER_CLIENT_SECRET')
@@ -21,18 +21,7 @@ class NaverNewsService:
         print(f"API 키 상태: {'유효' if self.client_id and self.client_secret else '없음'}")
         
     def search_news(self, query='시니어 일자리', display=10, start=1, sort='date'):
-        """
-        네이버 뉴스 검색 API를 사용하여 뉴스를 검색합니다.
-        
-        Args:
-            query (str): 검색어
-            display (int): 검색 결과 출력 건수 (1~100)
-            start (int): 검색 시작 위치 (1~1000)
-            sort (str): 정렬 옵션 (sim: 정확도순, date: 날짜순)
-        
-        Returns:
-            dict: 검색 결과
-        """
+        """네이버 뉴스 검색 API를 사용하여 뉴스를 검색합니다."""
         if not self.client_id or not self.client_secret:
             # API 키가 없을 경우 샘플 데이터 반환
             return self._get_sample_news()
@@ -64,9 +53,7 @@ class NaverNewsService:
             return self._get_sample_news()
     
     def _get_og_image(self, url):
-        """
-        URL에서 Open Graph 이미지를 추출합니다.
-        """
+        """URL에서 Open Graph 이미지를 추출합니다."""
         try:
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
@@ -92,17 +79,13 @@ class NaverNewsService:
             return None
 
     def _format_news_data(self, raw_data):
-        """
-        네이버 API 응답 데이터를 앱에서 사용할 형태로 변환합니다.
-        """
+        """네이버 API 응답 데이터를 앱에서 사용할 형태로 변환합니다."""
         formatted_news = []
 
         for item in raw_data.get('items', []):
-            # HTML 태그 제거
             title = self._remove_html_tags(item.get('title', ''))
             description = self._remove_html_tags(item.get('description', ''))
 
-            # 날짜 포맷 변환
             pub_date = item.get('pubDate', '')
             formatted_date = self._format_date(pub_date)
 
@@ -116,7 +99,7 @@ class NaverNewsService:
                 'pub_date': formatted_date,
                 'original_link': item.get('originallink', ''),
                 'category': '시니어 일자리',
-                'content': description,  # 상세 내용으로 description 사용
+                'content': description,
                 'image': None  # 나중에 병렬로 채움
             }
             formatted_news.append(news_item)
@@ -144,26 +127,19 @@ class NaverNewsService:
         return re.sub(clean, '', text)
     
     def _format_date(self, pub_date):
-        """
-        네이버 API의 날짜 형식을 변환합니다.
-        예: 'Mon, 19 Sep 2025 10:30:00 +0900' -> '2025.09.19'
-        """
+        """네이버 API의 날짜 형식을 변환합니다."""
         try:
-            # 네이버 API 날짜 형식 파싱
             dt = datetime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %z')
             return dt.strftime('%Y.%m.%d')
         except:
-            # 파싱 실패 시 현재 날짜 반환
             return datetime.now().strftime('%Y.%m.%d')
     
     def _get_sample_news(self):
-        """
-        API 키가 없거나 오류 발생 시 샘플 뉴스 데이터를 반환합니다.
-        """
+        """API 키가 없거나 오류 발생 시 샘플 뉴스 데이터를 반환합니다."""
         current_date = datetime.now().strftime('%Y.%m.%d')
         
         return {
-            'total': 15420,  # 실제 API처럼 보이게 큰 숫자
+            'total': 15420,
             'start': 1,
             'display': 10,
             'items': [

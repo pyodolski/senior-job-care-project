@@ -11,12 +11,7 @@ class RecommendationService:
     
     @staticmethod
     def calculate_distance(lat1, lon1, lat2, lon2):
-        """
-        두 지점 간의 거리 계산 (Haversine formula)
-        
-        Returns:
-            float: 거리 (km)
-        """
+        """두 지점 간의 거리 계산 """
         if not all([lat1, lon1, lat2, lon2]):
             return float('inf')
         
@@ -37,24 +32,11 @@ class RecommendationService:
     @staticmethod
     def get_user_location(user):
         """사용자 위치 정보 가져오기"""
-        # 사용자 주소로부터 대략적인 좌표 추정 (실제로는 geocoding 필요)
-        # 여기서는 시/군/구 중심 좌표를 사용
-        # TODO: 실제 구현 시 카카오 API로 주소 → 좌표 변환
         return None, None  # lat, lng
     
     @staticmethod
     def calculate_location_score(user, job, max_distance=50):
-        """
-        위치 기반 점수 계산 (0-30점)
-        
-        Args:
-            user: User 객체
-            job: JobPost 객체
-            max_distance: 최대 거리 (km)
-            
-        Returns:
-            float: 위치 점수
-        """
+        """위치 기반 점수 계산 (0-30점)"""
         # 같은 시/도면 기본 점수
         score = 0
         
@@ -76,16 +58,7 @@ class RecommendationService:
     
     @staticmethod
     def calculate_category_score(resume, job):
-        """
-        카테고리 매칭 점수 (0-25점)
-        
-        Args:
-            resume: Resume 객체
-            job: JobPost 객체
-            
-        Returns:
-            float: 카테고리 점수
-        """
+        """카테고리 매칭 점수 (0-25점) """
         score = 0
         
         # 이력서 희망 직종과 공고 카테고리 매칭
@@ -117,16 +90,7 @@ class RecommendationService:
     
     @staticmethod
     def calculate_work_condition_score(resume, job):
-        """
-        근무 조건 매칭 점수 (0-20점)
-        
-        Args:
-            resume: Resume 객체
-            job: JobPost 객체
-            
-        Returns:
-            float: 근무 조건 점수
-        """
+        """근무 조건 매칭 점수 (0-20점)"""
         score = 0
         
         # 근무 요일 매칭 (10점)
@@ -158,16 +122,7 @@ class RecommendationService:
     
     @staticmethod
     def calculate_behavior_score(user_id, job):
-        """
-        사용자 행동 패턴 기반 점수 (0-15점)
-        
-        Args:
-            user_id: 사용자 ID
-            job: JobPost 객체
-            
-        Returns:
-            float: 행동 패턴 점수
-        """
+        """사용자 행동 패턴 기반 점수 (0-15점)"""
         score = 0
         
         # 찜한 공고와 유사한지 확인
@@ -211,15 +166,7 @@ class RecommendationService:
     
     @staticmethod
     def calculate_popularity_score(job):
-        """
-        인기도 점수 (0-5점)
-        
-        Args:
-            job: JobPost 객체
-            
-        Returns:
-            float: 인기도 점수
-        """
+        """인기도 점수 (0-5점)"""
         # 조회수, 지원수, 찜 수를 종합
         view_score = min(job.view_count / 100, 2)
         app_score = min(job.application_count / 10, 2)
@@ -229,15 +176,7 @@ class RecommendationService:
     
     @staticmethod
     def calculate_recency_score(job):
-        """
-        최신도 점수 (0-5점)
-        
-        Args:
-            job: JobPost 객체
-            
-        Returns:
-            float: 최신도 점수
-        """
+        """최신도 점수 (0-5점)"""
         if not job.created_at:
             return 0
         
@@ -258,16 +197,7 @@ class RecommendationService:
     
     @staticmethod
     def get_recommendations(user_id, limit=20):
-        """
-        사용자 맞춤 추천 공고 가져오기
-        
-        Args:
-            user_id: 사용자 ID
-            limit: 추천 개수
-            
-        Returns:
-            list: [(JobPost, score, reasons), ...]
-        """
+        """사용자 맞춤 추천 공고 가져오기"""
         user = User.query.get(user_id)
         if not user:
             return []

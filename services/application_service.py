@@ -1,18 +1,4 @@
-"""
-지원 서비스 모듈
-===============
-
-공고 지원 관련 비즈니스 로직을 처리합니다.
-
-주요 기능:
-- 공고 지원 처리
-- 지원 상태 관리
-- 지원 목록 조회
-- 채팅방 자동 생성
-
-작성자: [팀명]
-최종 수정일: 2025-01-09
-"""
+"""지원 서비스 """
 
 from models import db, JobApplication, JobPost, User
 from services.chat_service import ChatService
@@ -22,21 +8,10 @@ class ApplicationService:
     
     @staticmethod
     def apply_to_job(user_id, job_id, message=None):
-        """
-        공고에 지원하기
-        
-        Args:
-            user_id: 지원자 ID
-            job_id: 공고 ID
-            message: 지원 메시지 (선택)
-            
-        Returns:
-            dict: 결과 정보
-        """
+        """공고에 지원하기"""
         # 공고 존재 확인
         job = JobPost.query.get_or_404(job_id)
-        
-        # 자신의 공고에는 지원할 수 없음
+
         if job.author_id == user_id:
             return {
                 'success': False,
@@ -94,15 +69,7 @@ class ApplicationService:
     
     @staticmethod
     def get_user_applications(user_id):
-        """
-        사용자의 지원 목록 조회
-        
-        Args:
-            user_id: 사용자 ID
-            
-        Returns:
-            list: 지원 목록
-        """
+        """사용자의 지원 목록 조회"""
         applications = JobApplication.query.filter_by(user_id=user_id)\
                                          .order_by(JobApplication.created_at.desc())\
                                          .all()
@@ -111,16 +78,7 @@ class ApplicationService:
     
     @staticmethod
     def get_job_applications(job_id, employer_id):
-        """
-        공고에 대한 지원자 목록 조회 (고용주용)
-        
-        Args:
-            job_id: 공고 ID
-            employer_id: 고용주 ID
-            
-        Returns:
-            list: 지원자 목록
-        """
+        """공고에 대한 지원자 목록 조회 (고용주용)"""
         # 공고 소유자 확인
         job = JobPost.query.filter_by(id=job_id, author_id=employer_id).first_or_404()
         
@@ -132,17 +90,7 @@ class ApplicationService:
     
     @staticmethod
     def update_application_status(application_id, employer_id, status):
-        """
-        지원 상태 업데이트 (고용주용)
-        
-        Args:
-            application_id: 지원 ID
-            employer_id: 고용주 ID
-            status: 새로운 상태 ('accepted', 'rejected')
-            
-        Returns:
-            dict: 결과 정보
-        """
+        """지원 상태 업데이트 (고용주용)"""
         application = JobApplication.query.get_or_404(application_id)
         
         # 공고 소유자 확인
@@ -180,16 +128,7 @@ class ApplicationService:
     
     @staticmethod
     def check_application_status(user_id, job_id):
-        """
-        지원 상태 확인
-        
-        Args:
-            user_id: 사용자 ID
-            job_id: 공고 ID
-            
-        Returns:
-            dict: 지원 상태 정보 (찜 상태 포함)
-        """
+        """지원 상태 확인"""
         from models import JobBookmark
         
         application = JobApplication.query.filter_by(

@@ -5,16 +5,13 @@ from sqlalchemy.orm import selectinload
 
 class ResumeService:
 
-    # ==================== 이력서 생성 ====================
+    #  이력서 생성
     @staticmethod
     def create_resume(user_id, resume_data, certificate_names, certificate_images):
-        """
-        새로운 이력서 생성 (한 사용자가 여러 개 생성 가능)
-        """
+        """새로운 이력서 생성 """
         resume = Resume(user_id=user_id)
         db.session.add(resume)
 
-        # 이력서 데이터 설정
         for key, value in resume_data.items():
             if hasattr(resume, key):
                 setattr(resume, key, value)
@@ -36,19 +33,16 @@ class ResumeService:
             print(f"이력서 생성 중 오류 발생: {e}")
             return None
 
-    # ==================== 이력서 수정 ====================
+    #  이력서 수정
     @staticmethod
     def update_resume(resume_id, user_id, resume_data, certificate_names, certificate_images):
-        """
-        기존 이력서 수정 (특정 resume_id 기준)
-        """
+        """ 이력서 수정 """
         resume = Resume.query.options(selectinload(Resume.certificates)) \
             .filter_by(id=resume_id, user_id=user_id).first()
 
         if not resume:
             return None
 
-        # 이력서 데이터 업데이트
         for key, value in resume_data.items():
             if hasattr(resume, key):
                 setattr(resume, key, value)
@@ -70,12 +64,10 @@ class ResumeService:
             print(f"이력서 업데이트 중 오류 발생: {e}")
             return None
 
-    # ==================== 자격증 삭제 ====================
+    #  자격증 삭제
     @staticmethod
     def delete_certificate(user_id, cert_id):
-        """
-        자격증 삭제 (S3 파일 먼저 삭제 후 DB 삭제)
-        """
+        """자격증 삭제 S3 파일 먼저 삭제 하고 DB도 삭제"""
         cert_to_delete = Certificate.query.get(cert_id)
 
         if cert_to_delete and cert_to_delete.resume and cert_to_delete.resume.user_id == user_id:
@@ -97,30 +89,23 @@ class ResumeService:
 
         return False
 
-    # ==================== 이력서 조회 (여러 개) ====================
+    # 이력서 조회
     @staticmethod
     def get_resumes_by_user(user_id):
-        """
-        특정 사용자의 모든 이력서 조회 (최신순 정렬)
-        """
+        """특정 사용자의 모든 이력서 조회 """
         return Resume.query.filter_by(user_id=user_id) \
             .order_by(Resume.updated_at.desc()) \
             .all()
 
-    # ==================== 이력서 조회 (단일) ====================
+    #  이력서 조회 단일
     @staticmethod
     def get_resume_by_id(resume_id):
-        """
-        특정 이력서 ID로 조회
-        """
+        """특정 이력서 ID로 조회 """
         return Resume.query.options(selectinload(Resume.certificates)).get(resume_id)
 
-    # ==================== 권한 확인 ====================
     @staticmethod
     def get_resume_permission_check(resume_id, user_id):
-        """
-        이력서 조회 및 권한 확인
-        """
+        """ 이력서 조회 및 권한 확인"""
         resume = Resume.query.get(resume_id)
 
         if not resume:
@@ -130,32 +115,27 @@ class ResumeService:
 
         return resume, is_owner
 
-    # ==================== 이력서 삭제 ====================
+    #  이력서 삭제
     @staticmethod
     def delete_resume(resume_id, user_id):
-        """
-        이력서 삭제 (본인만 가능)
-        1. S3에서 자격증 이미지 먼저 삭제
-        2. DB에서 이력서 삭제 (CASCADE로 자격증도 자동 삭제)
-        """
+        """ 이력서 삭제 """
         resume = Resume.query.options(selectinload(Resume.certificates)).get(resume_id)
 
         if not resume:
             return False
 
-        # 본인의 이력서인지 확인
         if resume.user_id != user_id:
             return False
 
         try:
-            # 1단계: S3에서 모든 자격증 이미지 먼저 삭제
+            # S3에서 모든 자격증 이미지 삭제
             for certificate in resume.certificates:
                 if certificate.image_url:
                     s3_delete_successful = delete_file(certificate.image_url)
                     if not s3_delete_successful:
                         print(f"S3 파일 삭제 실패: {certificate.image_url}")
 
-            # 2단계: DB에서 이력서 삭제
+            # DB에서 삭제
             db.session.delete(resume)
             db.session.commit()
             return True
@@ -165,18 +145,15 @@ class ResumeService:
             print(f"이력서 삭제 중 오류: {e}")
             return False
 
-    # ==================== 공개/비공개 토글 ====================
+    # 공개/비공개 토글
     @staticmethod
     def toggle_resume_public(resume_id, user_id, is_public):
-        """
-        이력서 공개/비공개 토글
-        """
+        """ 이력서 공개/비공개 토글 """
         resume = Resume.query.get(resume_id)
 
         if not resume:
             return False
 
-        # 본인의 이력서인지 확인
         if resume.user_id != user_id:
             return False
 
@@ -189,20 +166,16 @@ class ResumeService:
             print(f"이력서 공개 상태 변경 중 오류: {e}")
             return False
 
-    # ==================== 이력서 개수 조회 ====================
+    # 이력서 개수 조회
     @staticmethod
     def get_resume_count_by_user(user_id):
-        """
-        특정 사용자의 이력서 개수를 조회
-        """
+        """ 특정 사용자의 이력서 개수를 조회 """
         return Resume.query.filter_by(user_id=user_id).count()
 
-    # ==================== 공개 이력서 목록 (페이지네이션) ====================
+    # 공개 이력서 목록
     @staticmethod
     def get_public_resumes_paginated(page, per_page=5):
-        """
-        공개 설정된 모든 이력서를 페이지별로 조회 (기업회원용)
-        """
+        """ 공개 설정된 모든 이력서를 페이지별로 조회 (기업회원용)"""
         pagination = Resume.query.options(selectinload(Resume.user)) \
             .filter_by(is_public=True) \
             .order_by(Resume.updated_at.desc()) \

@@ -3,6 +3,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from scripts.scheduler_service import delete_expired_job_posts
 from datetime import datetime
+from pytz import timezone
 import logging
 
 # 로깅 설정
@@ -40,7 +41,9 @@ def delete_expired_jobs_task():
 
 def start_scheduler():
     """스케줄러 시작"""
-    scheduler = BackgroundScheduler()
+    KST = timezone('Asia/Seoul')
+    scheduler = BackgroundScheduler(timezone=KST)
+
     
     # 매일 오전 3시에 실행
     scheduler.add_job(

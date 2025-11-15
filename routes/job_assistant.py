@@ -1,9 +1,4 @@
-"""
-채용 공고 AI 글쓰기 도우미 라우트
-===============================
-
-채용 공고 작성을 도와주는 AI 서비스 API입니다.
-"""
+"""채용 공고 AI 글쓰기 도우미 라우트"""
 
 from flask import Blueprint, request, jsonify, render_template
 from flask_login import login_required, current_user

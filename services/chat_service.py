@@ -1,18 +1,4 @@
-"""
-채팅 서비스 모듈
-===============
-
-채팅방 생성, 메시지 전송, 채팅 목록 관리 등의 비즈니스 로직을 처리합니다.
-
-주요 기능:
-- 채팅방 생성 및 관리
-- 메시지 전송 및 조회
-- 읽지 않은 메시지 관리
-- 채팅방 목록 조회
-
-작성자: [팀명]
-최종 수정일: 2025-01-09
-"""
+"""채팅 서비스 """
 
 from models import db, ChatRoom, ChatMessage, JobPost, User, JobApplication
 from sqlalchemy import select,or_, and_, desc, func, case
@@ -24,17 +10,7 @@ class ChatService:
     
     @staticmethod
     def create_or_get_chat_room(job_id, applicant_id, employer_id):
-        """
-        채팅방 생성 또는 기존 채팅방 조회
-        
-        Args:
-            job_id: 공고 ID
-            applicant_id: 지원자 ID
-            employer_id: 고용주 ID
-            
-        Returns:
-            ChatRoom: 채팅방 객체
-        """
+        """채팅방 생성 또는 기존 채팅방 조회"""
         # 기존 채팅방 확인
         existing_room = ChatRoom.query.filter_by(
             job_id=job_id,
@@ -87,18 +63,7 @@ class ChatService:
     
     @staticmethod
     def send_message(room_id, sender_id, message, message_type='text'):
-        """
-        메시지 전송
-        
-        Args:
-            room_id: 채팅방 ID
-            sender_id: 발신자 ID
-            message: 메시지 내용
-            message_type: 메시지 타입 (기본값: 'text')
-            
-        Returns:
-            ChatMessage: 전송된 메시지 객체
-        """
+        """메시지 전송"""
         # 채팅방 존재 확인
         room = ChatRoom.query.get_or_404(room_id)
         
@@ -121,23 +86,11 @@ class ChatService:
     
     @staticmethod
     def get_user_chat_rooms(user_id):
-        """
-        사용자의 채팅방 목록 조회 (나간 채팅방 제외)
-        
-        Args:
-            user_id: 사용자 ID
-            
-        Returns:
-            list: 채팅방 목록 (최근 활동순)
-        """
-        """
-                사용자의 채팅방 목록 조회 (N+1 문제 해결)
-                
-        """
-        # 별칭(alias) 설정: 채팅방의 상대방 정보를 가져오기 위함
+        """사용자의 채팅방 목록 조회 (나간 채팅방 제외)  """
+        # 별칭설정
         other_user_alias = aliased(User)
 
-        # --- 채팅방별 안 읽은 메시지 수 계산 ---
+        # 채팅방별 안 읽은 메시지 수 계산
         unread_counts_subquery = (
             select(
                 ChatMessage.room_id,
@@ -148,7 +101,7 @@ class ChatService:
             .subquery("unread_counts")
         )
 
-        # --- 채팅방별 마지막 메시지 ID 계산 ---
+        # 채팅방별 마지막 메시지 ID 계산
         last_message_subquery = (
             select(
                 ChatMessage.id,
@@ -160,7 +113,7 @@ class ChatService:
             .subquery("last_message_rn")
         )
 
-        # 위에서 순위 1번을 받은, 즉 가장 최신 메시지의 ID만 선택
+        #가장 최신 메시지의 ID만 선택
         last_message_id_subquery = (
             select(
                 last_message_subquery.c.id.label("message_id"),
@@ -170,22 +123,18 @@ class ChatService:
             .subquery("last_message_ids")
         )
 
-        # --- 모든 정보를 JOIN하여 한 번에 가져오기 ---
+        # 한 번에 가져오기
         results = (
             db.session.query(
                 ChatRoom,
                 other_user_alias.nickname.label("other_user_nickname"),
                 other_user_alias.profile_image.label("other_user_profile_img"),
-                ChatMessage,  # 마지막 메시지 객체 자체를 가져옴
+                ChatMessage,
                 unread_counts_subquery.c.unread_count.label("unread_count"),
             )
-            # 사용자가 참여한 채팅방 필터링
             .filter(
                 or_(ChatRoom.applicant_id == user_id, ChatRoom.employer_id == user_id),
-                # ... (기존의 다른 필터 조건들) ...
             )
-            # 💡 JOIN: 서브쿼리들을 외부 조인(LEFT OUTER JOIN)으로 연결
-            # 안 읽은 메시지가 없거나, 메시지가 아예 없는 방도 목록에 포함시키기 위함
             .outerjoin(
                 unread_counts_subquery,
                 ChatRoom.id == unread_counts_subquery.c.room_id,
@@ -194,11 +143,9 @@ class ChatService:
                 last_message_id_subquery,
                 ChatRoom.id == last_message_id_subquery.c.room_id,
             )
-            # 마지막 메시지 객체 정보를 위해 ChatMessage 테이블 조인
             .outerjoin(
                 ChatMessage, ChatMessage.id == last_message_id_subquery.c.message_id
             )
-            # 상대방 유저 정보를 위해 User 테이블 조인
             .join(
                 other_user_alias,
                 case(
@@ -233,19 +180,7 @@ class ChatService:
     
     @staticmethod
     def get_chat_messages(room_id, user_id, page=1, per_page=50):
-        """
-        채팅방의 메시지 목록 조회
-        
-        Args:
-            room_id: 채팅방 ID
-            user_id: 요청한 사용자 ID (권한 확인용)
-            page: 페이지 번호
-            per_page: 페이지당 메시지 수
-            
-        Returns:
-            list: 메시지 목록
-        """
-        # 채팅방 접근 권한 확인
+        """채팅방의 메시지 목록 조회 """
         room = ChatRoom.query.filter(
             and_(
                 ChatRoom.id == room_id,
@@ -255,7 +190,7 @@ class ChatService:
                 )
             )
         ).first_or_404()
-        
+
         # 메시지 조회 (최신 순)
         pagination = ChatMessage.query.filter_by(room_id=room_id) \
             .options(joinedload(ChatMessage.sender)) \
@@ -265,14 +200,7 @@ class ChatService:
 
     @staticmethod
     def mark_messages_as_read(room_id, user_id):
-        """
-        메시지를 읽음으로 표시
-        
-        Args:
-            room_id: 채팅방 ID
-            user_id: 사용자 ID
-        """
-        # 해당 채팅방에서 다른 사용자가 보낸 읽지 않은 메시지들을 읽음으로 표시
+        """메시지를 읽음으로 표시"""
         ChatMessage.query.filter_by(room_id=room_id, is_read=False)\
                         .filter(ChatMessage.sender_id != user_id)\
                         .update({'is_read': True})
@@ -281,16 +209,7 @@ class ChatService:
     
     @staticmethod
     def get_unread_message_count(user_id):
-        """
-        사용자의 전체 읽지 않은 메시지 수 조회
-        
-        Args:
-            user_id: 사용자 ID
-            
-        Returns:
-            int: 읽지 않은 메시지 수
-        """
-        # 사용자가 참여한 채팅방들
+        """사용자의 전체 읽지 않은 메시지 수 조회"""
         user_rooms = ChatRoom.query.filter(
             or_(
                 ChatRoom.applicant_id == user_id,
@@ -303,7 +222,7 @@ class ChatService:
         if not room_ids:
             return 0
         
-        # 해당 채팅방들에서 다른 사용자가 보낸 읽지 않은 메시지 수
+        # 읽지 않은 메시지 수
         unread_count = ChatMessage.query.filter(
             and_(
                 ChatMessage.room_id.in_(room_ids),
@@ -316,13 +235,7 @@ class ChatService:
     
     @staticmethod
     def deactivate_chat_room(room_id, user_id):
-        """
-        채팅방 나가기 (개별 사용자별)
-        
-        Args:
-            room_id: 채팅방 ID
-            user_id: 사용자 ID
-        """
+        """채팅방 나가기 (개별 사용자별)"""
         room = ChatRoom.query.filter(
             and_(
                 ChatRoom.id == room_id,
@@ -332,8 +245,7 @@ class ChatService:
                 )
             )
         ).first_or_404()
-        
-        # 사용자별로 나가기 상태 설정
+
         if room.applicant_id == user_id:
             room.applicant_left = True
         elif room.employer_id == user_id:

@@ -7,13 +7,7 @@ from datetime import datetime
 
 
 def analyze_all_jobs(force=False, limit=100):
-    """
-    공고를 AI로 분석
-    
-    Args:
-        force: True면 이미 분석된 공고도 재분석
-        limit: 분석할 최대 개수 (기본 5개)
-    """
+    """공고를 AI로 분석"""
     with app.app_context():
         # 분석할 공고 가져오기
         if force:
