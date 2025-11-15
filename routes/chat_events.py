@@ -20,7 +20,7 @@ def init_chat_socketio(socketio):
         room = ChatRoom.query.filter_by(id=room_id).first()
         return bool(room and (room.applicant_id == user_id or room.employer_id == user_id))
 
-    # 미읽음 합계 (전체 - 확장용)
+    # 미읽음 합계
     def _calc_unread_total(user_id: int) -> int:
         return ChatService.get_unread_message_count(user_id)
 

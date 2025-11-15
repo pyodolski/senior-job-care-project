@@ -11,8 +11,6 @@ map_bp = Blueprint("map", __name__)
 def show_map():
     kakao_key = current_app.config.get("KAKAO_MAP_API_KEY")
 
-    # 기존처럼 전체 데이터를 한 번에 가져오는 대신,
-    # 지도 로딩만 담당하고 뷰포트 기반 조회는 별도 API로 처리하도록 분리
     return render_template("map.html", kakao_key=kakao_key)
 
 @map_bp.route('/jobs_all')
@@ -20,8 +18,7 @@ def show_map():
 def jobs_all():
     # 필터 파라미터 받기 (all, company, people)
     job_type = request.args.get('type', 'all')
-    
-    # 기본 쿼리 (위치 정보가 있는 공고만)
+
     query = JobPost.query.filter(
         JobPost.latitude.isnot(None),
         JobPost.longitude.isnot(None)
@@ -29,15 +26,15 @@ def jobs_all():
     
     # 필터 적용
     if job_type == 'company':
-        # 기업 이음: job_category가 있거나 외부 데이터(K-Senior 등)인 공고
+        # 기업 이음 - job_category가 있거나 공공데이터(K-Senior)인 공고
         query = query.filter(
             db.or_(
                 JobPost.job_category.isnot(None),
-                JobPost.source.isnot(None)  # 외부 데이터는 모두 기업 이음
+                JobPost.source.isnot(None)  # 공공데이터는 모두 기업 이음
             )
         )
     elif job_type == 'people':
-        # 사람 이음: job_category가 없고 외부 데이터가 아닌 공고
+        # 사람 이음
         query = query.filter(
             JobPost.job_category.is_(None),
             JobPost.source.is_(None)

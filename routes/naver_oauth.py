@@ -12,7 +12,7 @@ NAVER_CLIENT_ID = Config.NAVER_CLIENT_ID
 NAVER_CLIENT_SECRET = Config.NAVER_CLIENT_SECRET
 NAVER_REDIRECT_URI = Config.NAVER_REDIRECT_URI
 
-# 프로필 완성 여부 체크 함수 (auth.py와 동일)
+# 프로필 완성 여부 체크 함수
 def is_profile_complete(user):
     """사용자 프로필이 완성되었는지 확인하는 함수"""
     return all([

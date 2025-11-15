@@ -1,16 +1,4 @@
-"""
-채용 공고 AI 글쓰기 도우미
-==========================
-
-시니어 채용에 특화된 AI 글쓰기 서비스입니다.
-
-주요 기능:
-- 구조화된 입력으로 전문적인 채용 공고 생성
-- 차별 표현 자동 필터링
-- 시니어 친화적 문구 최적화
-- 급여/근무조건 검증
-- 해시태그 자동 생성
-"""
+"""채용 공고 AI 글쓰기 도우미"""
 
 import re
 import json
@@ -47,15 +35,7 @@ class JobWritingAssistant:
         }
 
     def generate_job_description(self, job_data: Dict) -> Dict:
-        """
-        채용 공고 상세 설명 생성
-        
-        Args:
-            job_data: 채용 공고 기본 정보
-            
-        Returns:
-            생성된 채용 공고 텍스트와 메타데이터
-        """
+        """채용 공고 상세 설명 생성"""
         try:
             # 입력 데이터 검증
             validated_data = self._validate_input(job_data)
@@ -188,11 +168,11 @@ class JobWritingAssistant:
         """핵심 요약 3줄 생성"""
         lines = []
         
-        # 1줄: 주요 업무
+        # 주요 업무
         duties = job_data['duties'][:50] + "..." if len(job_data['duties']) > 50 else job_data['duties']
         lines.append(f"업무내용: {duties}")
         
-        # 2줄: 근무 조건
+        # 근무 조건
         schedule_parts = []
         schedule = job_data.get('schedule', {})
         if schedule.get('days'):
@@ -209,7 +189,7 @@ class JobWritingAssistant:
         if schedule_parts:
             lines.append("근무조건: " + " / ".join(schedule_parts))
         
-        # 3줄: 자격요건 및 혜택
+        # 자격요건 및 혜택
         requirements_parts = []
         if job_data.get('requirements'):
             requirements_parts.append(job_data['requirements'])
@@ -232,10 +212,10 @@ class JobWritingAssistant:
         """상세 본문 생성"""
         sections = []
         
-        # 주요업무 섹션
+        # 주요업무
         sections.append(f"주요업무: {job_data['duties']}")
         
-        # 근무조건 섹션
+        # 근무조건
         conditions = []
         conditions.append(f"고용형태: {job_data['employment_type']}")
         conditions.append(f"근무지: {job_data['location']}")
@@ -256,7 +236,7 @@ class JobWritingAssistant:
         
         sections.append("근무조건:\n" + "\n".join([f"• {cond}" for cond in conditions]))
         
-        # 자격요건 섹션
+        # 자격요건
         requirements_list = []
         if job_data.get('requirements'):
             requirements_list.append(job_data['requirements'])
@@ -281,7 +261,7 @@ class JobWritingAssistant:
         if benefits_list:
             sections.append("복리후생:\n" + "\n".join([f"• {benefit}" for benefit in benefits_list]))
         
-        # 지원방법 섹션
+        # 지원방법
         apply_info = job_data.get('apply', '플랫폼 내 지원')
         deadline = job_data.get('deadline', '채용 시 마감')
         sections.append(f"지원방법: {apply_info}")
@@ -304,7 +284,7 @@ class JobWritingAssistant:
         
         # 지역
         location_parts = job_data['location'].split()
-        for part in location_parts[:2]:  # 최대 2개 지역명
+        for part in location_parts[:2]:
             if len(part) > 1:
                 hashtags.append(f"#{part}")
         
@@ -385,11 +365,11 @@ class JobWritingAssistant:
         """일반 공고용 핵심 요약 (깔끔하고 전문적으로)"""
         lines = []
         
-        # 1줄: 업무 소개
+        # 업무 소개
         duties = job_data['duties']
         lines.append(f"업무내용: {duties}")
         
-        # 2줄: 근무 조건 정보
+        # 근무 조건 정보
         schedule_parts = []
         
         # 근무 요일 정보
@@ -419,7 +399,7 @@ class JobWritingAssistant:
         if schedule_parts:
             lines.append("근무조건: " + " / ".join(schedule_parts))
         
-        # 3줄: 자격요건 및 우대사항
+        # 자격요건 및 우대사항
         requirements_parts = []
         if job_data.get('requirements'):
             requirements_parts.append(job_data['requirements'])
@@ -441,10 +421,10 @@ class JobWritingAssistant:
         """일반 공고용 상세 설명 (깔끔하고 전문적으로)"""
         sections = []
         
-        # 업무 내용 (구체적이고 상세하게)
+        # 업무 내용
         duties = job_data['duties']
         
-        # 업무에 따른 상세한 추가 설명
+        # 업무에 상세한 추가 설명
         additional_info = []
         if any(word in duties for word in ['서빙', '카페', '음료']):
             additional_info.extend([
@@ -476,7 +456,7 @@ class JobWritingAssistant:
         
         sections.append(duties_section)
         
-        # 근무 조건 (상세하고 명확하게)
+        # 근무 조건
         conditions = []
         conditions.append(f"고용형태: {job_data['employment_type']}")
         conditions.append(f"근무지: {job_data['location']}")

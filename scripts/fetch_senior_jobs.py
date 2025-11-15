@@ -38,16 +38,7 @@ def get_text(element, tag_name, default=''):
 
 
 def geocode_address(address):
-    """
-    카카오 지도 API를 사용하여 주소를 위도/경도로 변환
-    
-    Args:
-        address: 변환할 주소 문자열
-        
-    Returns:
-        dict: {'latitude': float, 'longitude': float, 'region_1depth': str, 'region_2depth': str, 'region_3depth': str}
-              또는 None (변환 실패 시)
-    """
+    """카카오 지도 API를 사용하여 주소를 위도/경도로 변환"""
     if not address or not KAKAO_REST_API_KEY:
         if not KAKAO_REST_API_KEY:
             print("  ⚠️ KAKAO_REST_API_KEY가 설정되지 않았습니다. 주소 변환을 건너뜁니다.")
@@ -201,7 +192,7 @@ def fetch_and_store_jobs(page_number=1):
         new_jobs_count = 0
         updated_jobs_count = 0
         ai_analyzed_count = 0
-        skipped_jobs_count = 0  # 건너뛴 공고 수
+        skipped_jobs_count = 0
         AI_ANALYSIS_LIMIT = 100  # AI 분석 제한 (토큰 절약)
 
         today = datetime.now().date()
@@ -219,13 +210,13 @@ def fetch_and_store_jobs(page_number=1):
             if end_date_str:
                 try:
                     recruitment_end_date_obj = datetime.strptime(end_date_str, '%Y%m%d').date()
-                    # 마감일이 오늘보다 이전이면 건너뜁니다.
+                    # 마감일이 오늘보다 이전이면 건너뜀
                     if recruitment_end_date_obj < today:
                         print(f"  ⏭️  공고 건너뜀 (ID: {job_id}): 마감일({recruitment_end_date_obj})이 지났습니다.")
                         skipped_jobs_count += 1
-                        continue  # 이 공고 처리를 중단하고 다음 루프로 이동
+                        continue
                 except ValueError:
-                    # 날짜 형식이 잘못된 경우 (예: '20230000'), 경고만 출력하고 일단 처리
+                    # 날짜 형식이 잘못된 경우
                     print(f"  ⚠️  마감일 형식 오류 (ID: {job_id}): {end_date_str}. 일단 처리합니다.")
 
             # 1. 상세 정보 API 호출 (공고마다 개별 호출)

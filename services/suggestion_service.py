@@ -5,16 +5,12 @@ from services.chat_service import ChatService
 class SuggestionService:
     @staticmethod
     def get_resume_for_suggestion_page(resume_id):
-        """
-        [읽기 기능] 제안 페이지를 보여주는 데 필요한 이력서 정보를 가져옵니다.
-        """
+        """ 제안 페이지를 보여주는 데 필요한 이력서 정보를 가져옵니다."""
         return Resume.query.get_or_404(resume_id)
 
     @staticmethod
     def create_suggestions(suggester_id, resume_id, job_ids):
-        """
-        [생성 기능] 여러 공고를 한번에 제안합니다.
-        """
+        """ 여러 공고를 한번에 제안합니다. """
         resume = Resume.query.get_or_404(resume_id)
 
         existing_suggestions = JobSuggestion.query.filter(
@@ -45,9 +41,7 @@ class SuggestionService:
 
     @staticmethod
     def get_received_suggestions(user_id):
-        """
-        - '받은 제안' 페이지에서 사용됩니다.
-        """
+        """ 받은 제안 페이지에서 사용 """
         return JobSuggestion.query.filter_by(
             suggestee_id=user_id,
             status='sent'
@@ -55,16 +49,12 @@ class SuggestionService:
 
     @staticmethod
     def update_suggestion_status(suggestion_id, user_id, new_status):
-        """
-        - '응답하기'기능에서 사용됩니다.
-        """
+        """ '응답하기'기능에서 사용됩니다. """
         suggestion = JobSuggestion.query.get_or_404(suggestion_id)
 
-        # 제안을 받은 당사자 권한을 확인
         if suggestion.suggestee_id != user_id:
             raise PermissionError("You are not authorized to change the status of this suggestion.")
 
-        # 허용된 상태 값인지 확인
         allowed_statuses = ['sent', 'viewed', 'accepted', 'rejected']
         if new_status not in allowed_statuses:
             raise ValueError(f"Invalid status: {new_status}")
@@ -75,10 +65,7 @@ class SuggestionService:
 
     @staticmethod
     def accept_suggestion_and_get_chat(suggestion_id, user_id):
-        """
-        [수정 + 호출] 제안을 '수락' 상태로 변경하고, ChatService를 호출하여
-        채팅방을 찾거나 생성하여 ID를 반환합니다.
-        """
+        """ 제안을 수락 상태로 변경, chat방 찾기"""
         # 제안 상태'accepted' (수락)로 변경
         try:
             suggestion = SuggestionService.update_suggestion_status(
@@ -90,7 +77,6 @@ class SuggestionService:
             db.session.rollback()
             raise e
 
-        #  ChatService의 채팅방 생성/조회 기능
         chat_room = ChatService.create_or_get_chat_room(
             job_id=suggestion.job_id,
             applicant_id=suggestion.suggestee_id,  # 제안 받은 사람
@@ -101,33 +87,28 @@ class SuggestionService:
 
     @staticmethod
     def get_jobs_for_suggestion(suggester_id, resume_id):
-        """
-        [읽기 기능] 특정 이력서에 제안할 수 있는 공고 목록을 상태 정보와 함께 반환합니다.
-        'accepted' 상태인 공고는 목록에서 제외됩니다.
-        """
-        # 1. 현재 기업이 올린 모든 공고 목록을 가져옵니다.
+        """ 이력서를 제안할 수 있는 상태의 공고를 가져옴 """
+        # 올린 모든 공고 목록을 가져옴
         my_jobs = JobPost.query.filter_by(author_id=suggester_id) \
             .order_by(JobPost.created_at.desc()) \
             .all()
 
-        # 2. 이 이력서에 대해 이미 보낸 제안들의 상태를 미리 조회합니다.
+        # 이미 보낸 상태 체크
         existing_suggestions = JobSuggestion.query.filter_by(
             suggester_id=suggester_id,
             resume_id=resume_id
         ).all()
-        # (효율적인 조회를 위해 {공고ID: 상태} 딕셔너리로 변환)
         suggestion_statuses = {s.job_id: s.status for s in existing_suggestions}
 
-        # 3. 공고 목록을 재구성하여 상태 정보를 추가하고, 'accepted' 상태는 제외합니다.
         jobs_for_suggestion = []
         for job in my_jobs:
-            status = suggestion_statuses.get(job.id)  # 이 공고의 제안 상태를 확인
+            status = suggestion_statuses.get(job.id)
 
-            # 제안이 수락(accepted)된 상태가 아니라면 목록에 추가
+
             if status != 'accepted':
                 jobs_for_suggestion.append({
                     'job': job,
-                    'status': status  # 상태 정보 추가 (값이 없으면 None)
+                    'status': status
                 })
 
         return jobs_for_suggestion

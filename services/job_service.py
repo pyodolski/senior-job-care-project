@@ -6,15 +6,7 @@ from models import JobApplication, ChatRoom, ChatMessage, JobSuggestion
 class JobService:
     @staticmethod
     def get_all_jobs(page=1, per_page=10, sort_by='latest', conditions=None, base_query=None):
-        """
-        모든 공고 조회 (페이지네이션 및 정렬)
-        
-        Args:
-            page: 페이지 번호
-            per_page: 페이지당 항목 수
-            sort_by: 정렬 기준 ('latest', 'popular', 'views')
-            conditions: 추가 필터 조건 리스트
-        """
+        """모든 공고 조회 (페이지네이션 및 정렬)"""
         query = base_query if base_query is not None else JobPost.query
         
         # 추가 조건 적용
@@ -67,9 +59,7 @@ class JobService:
 
     @staticmethod
     def update_job_by_type(job_id, form_data):
-        """
-        공고 타입에 따라 폼 데이터를 받아 공고를 수정합니다.
-        """
+        """공고 타입에 따라 폼 데이터를 받아 공고를 수정"""
         job = JobPost.query.get_or_404(job_id)
 
         # 폼 데이터에서 공통 필드 업데이트
@@ -122,7 +112,7 @@ class JobService:
         job.work_saturday = form_data.get("work_saturday") == "true"
         job.work_sunday = form_data.get("work_sunday") == "true"
 
-        # --- 공고 타입별 필드 업데이트 ---
+        # 공고 타입별 필드 업데이트
 
         if job.job_category is None:
             # 사람이음 공고 (
@@ -156,37 +146,33 @@ class JobService:
 
     @staticmethod
     def delete_job_safely(job_id):
-        """
-        공고와 연관된 모든 데이터 삭제
-        """
+        """공고와 연관된 모든 데이터 삭제"""
         job = JobPost.query.get_or_404(job_id)
 
-        # 1. 공고 ID를 가져옵니다.
+        # 공고 ID
         job_id_to_delete = job.id
 
-        # 2. ChatRoom과 ChatMessage 삭제 (순서 중요: 메시지 -> 방)
-
-        # 2-1. 해당 공고의 모든 채팅방 ID를 찾습니다.
+        # 해당 공고의 모든 채팅방 ID
         expired_chat_rooms = ChatRoom.query.filter(ChatRoom.job_id == job_id_to_delete).all()
         expired_room_ids = [room.id for room in expired_chat_rooms]
 
         if expired_room_ids:
-            # 2-2. ChatMessage 삭제 (가장 하위)
+            # ChatMessage 삭제 (가장 하위)
             ChatMessage.query.filter(ChatMessage.room_id.in_(expired_room_ids)).delete(synchronize_session=False)
 
-        # 2-3. ChatRoom 삭제
+        # ChatRoom 삭제
         ChatRoom.query.filter(ChatRoom.job_id == job_id_to_delete).delete(synchronize_session=False)
 
-        # 3. JobApplication (지원 내역) 삭제
+        # JobApplication 삭제
         JobApplication.query.filter(JobApplication.job_id == job_id_to_delete).delete(synchronize_session=False)
 
-        # 4. JobBookmark (찜 목록) 삭제
+        # JobBookmark 삭제
         JobBookmark.query.filter(JobBookmark.job_id == job_id_to_delete).delete(synchronize_session=False)
 
-        # 5. JobSuggestion (공고 제안) 삭제
+        # JobSuggestion 삭제
         JobSuggestion.query.filter(JobSuggestion.job_id == job_id_to_delete).delete(synchronize_session=False)
 
-        # 6. JobPost 본체 삭제 (마지막)
+        # JobPost 본체 삭제
         db.session.delete(job)
 
         db.session.commit()
@@ -247,15 +233,7 @@ class JobService:
     
     @staticmethod
     def search_jobs(query, filters=None, conditions=None, sort_by='latest', base_query=None):
-        """
-        공고 검색
-        
-        Args:
-            query: 검색어
-            filters: 필터 조건 (정확 일치)
-            conditions: 추가 검색 조건 (LIKE 검색 등)
-            sort_by: 정렬 기준 ('latest', 'popular', 'views')
-        """
+        """공고 검색"""
         jobs_query = base_query if base_query is not None else JobPost.query
         
         if query:
@@ -266,7 +244,7 @@ class JobService:
             )
         
         if filters:
-            # [핵심 수정] 계층적 지역 필터링 (정확한 일치 검색)
+            #  계층적 지역 필터링
             if filters.get('region_1depth_name'):
                 jobs_query = jobs_query.filter(JobPost.region_1depth_name == filters['region_1depth_name'])
             if filters.get('region_2depth_name'):
@@ -283,7 +261,7 @@ class JobService:
                     JobPost.work_period == filters['work_period']
                 )
         
-        # 추가 조건 적용 (LIKE 검색 등)
+        # 추가 조건
         if conditions:
             for condition in conditions:
                 jobs_query = jobs_query.filter(condition)

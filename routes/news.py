@@ -9,7 +9,7 @@ news_bp = Blueprint('news', __name__, url_prefix='/news')
 @login_required
 def news_list():
     """뉴스 목록 페이지"""
-    # 검색어 파라미터 받기 (기본값: 시니어 일자리)
+    # 검색어 파라미터 받기
     query = request.args.get('q', '시니어 일자리')
     page = int(request.args.get('page', 1))
     display = 5  # 한 페이지당 뉴스 개수
@@ -37,8 +37,8 @@ def news_list():
 def news_detail(news_id):
     """뉴스 상세 페이지"""
     # 뉴스 ID로 상세 정보 조회
-    # 실제로는 캐시나 데이터베이스에서 조회해야 하지만,
-    # 여기서는 다시 API를 호출해서 해당 뉴스를 찾습니다.
+    # 실제로는 캐시나 데이터베이스에서 조회해야 하지만, 현재 프로토타입을 개발중이므로
+    # API를 호출해서 해당 뉴스를 찾습니다.
     
     news_service = NaverNewsService()
     news_data = news_service.search_news(display=50)  # 더 많은 뉴스를 가져와서 찾기
