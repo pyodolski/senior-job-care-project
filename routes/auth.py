@@ -721,11 +721,13 @@ def edit_company_profile():
     
     if request.method == 'POST':
         current_user.name = request.form.get('name')
-        current_user.representative_name = request.form.get('representative_name')
-        current_user.business_number = request.form.get('business_number')
+        current_user.nickname = request.form.get('nickname')
         current_user.phone = request.form.get('phone')
-        current_user.address = request.form.get('address')
-        current_user.description = request.form.get('description')
+
+        current_user.sido = request.form.get('sido')
+        current_user.sigungu = request.form.get('sigungu')
+        current_user.dong = request.form.get('dong')
+
         
         try:
             db.session.commit()
@@ -736,8 +738,9 @@ def edit_company_profile():
             print("Company profile update failed:", e)
         
         return redirect(url_for('auth.profile'))
-    
-    return render_template('company/edit_company_profile.html', user=current_user)
+
+    kakao_key = current_app.config.get("KAKAO_MAP_API_KEY")
+    return render_template('company/edit_company_profile.html', user=current_user, kakao_key=kakao_key)
 
 
 @auth_bp.route('/edit_profile_image', methods=['GET', 'POST'])

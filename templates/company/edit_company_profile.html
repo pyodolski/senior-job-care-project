@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>기업 프로필 수정 - 이음</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      type="text/javascript"
+      src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_key }}&libraries=services"
+    ></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
@@ -13,14 +17,49 @@
       body {
         font-family: "Noto Sans KR", sans-serif;
       }
+      /* 모달 애니메이션 */
+      #map-modal.hidden {
+        display: none;
+      }
+      .modal-fade-enter {
+        opacity: 0;
+      }
+      .modal-fade-enter-active {
+        opacity: 1;
+        transition: opacity 0.3s ease;
+      }
+      .modal-fade-leave {
+        opacity: 1;
+      }
+      .modal-fade-leave-active {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .modal-content-enter {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      .modal-content-enter-active {
+        transform: translateY(0);
+        opacity: 1;
+        transition: all 0.3s ease;
+      }
+      .modal-content-leave {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .modal-content-leave-active {
+        transform: translateY(20px);
+        opacity: 0;
+        transition: all 0.3s ease;
+      }
     </style>
   </head>
-  <body class="bg-gray-50">
-    <div class="w-full bg-white shadow-lg min-h-screen pb-20">
-      <!-- 상단 헤더 -->
-      <div class="sticky top-0 z-10 bg-white border-b">
-        <div class="px-4 py-4 flex items-center justify-between">
-          <button type="button" onclick="history.back()" class="text-gray-600">
+  <body class="bg-gray-100">
+    <div class="w-full max-w-md mx-auto px-4 bg-white shadow-lg min-h-screen">
+      <div class="pt-6 pb-4">
+        <div class="flex items-center justify-between mb-4">
+          <button type="button" onclick="goBack()" class="text-gray-600">
             <svg
               class="w-6 h-6"
               fill="none"
@@ -40,127 +79,328 @@
         </div>
       </div>
 
-      <!-- 수정 폼 -->
       <form
         method="POST"
         action="{{ url_for('auth.edit_company_profile') }}"
-        class="px-6 py-8"
+        id="edit-form"
+        class="px-4 py-8"
       >
-        <!-- 기업명 -->
+        <input type="hidden" name="sido" id="sido" />
+        <input type="hidden" name="sigungu" id="sigungu" />
+        <input type="hidden" name="dong" id="dong" />
+
         <div class="mb-6">
           <label class="block text-sm font-semibold text-gray-700 mb-2">
-            기업명
+            담당자명
           </label>
           <input
             type="text"
             name="name"
-            value="{{ user.name }}"
-            placeholder="기업명을 입력하세요"
+            id="name"
+            value="{{ user.name or '' }}"
+            placeholder="담당자 실명을 입력하세요"
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
 
-        <!-- 대표자명 -->
         <div class="mb-6">
           <label class="block text-sm font-semibold text-gray-700 mb-2">
-            대표자명
+            회사명
           </label>
           <input
             type="text"
-            name="representative_name"
-            value="{{ user.representative_name or '' }}"
-            placeholder="대표자명을 입력하세요"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <!-- 사업자등록번호 -->
-        <div class="mb-6">
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            사업자등록번호
-          </label>
-          <input
-            type="text"
-            name="business_number"
-            value="{{ user.business_number or '' }}"
-            placeholder="000-00-00000"
-            maxlength="12"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <!-- 전화번호 -->
-        <div class="mb-6">
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            전화번호
-          </label>
-          <input
-            type="tel"
-            name="phone"
-            value="{{ user.phone }}"
-            placeholder="02-0000-0000"
+            name="nickname"
+            id="nickname"
+            value="{{ user.nickname or '' }}"
+            placeholder="정식 회사명을 입력하세요"
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
 
-        <!-- 이메일 -->
         <div class="mb-6">
           <label class="block text-sm font-semibold text-gray-700 mb-2">
-            이메일
+            회사 이메일
           </label>
           <input
             type="email"
             name="email"
-            value="{{ user.email }}"
-            placeholder="company@example.com"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
-            readonly
-          />
-          <p class="text-xs text-gray-500 mt-1">이메일은 변경할 수 없습니다</p>
-        </div>
-
-        <!-- 회사 주소 -->
-        <div class="mb-6">
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            회사 주소
-          </label>
-          <input
-            type="text"
-            name="address"
-            value="{{ user.address or '' }}"
-            placeholder="회사 주소를 입력하세요"
+            id="email"
+            value="{{ user.email or '' }}"
+            placeholder="contact@company.com"
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        <!-- 회사 소개 -->
         <div class="mb-6">
           <label class="block text-sm font-semibold text-gray-700 mb-2">
-            회사 소개
+            회사 전화번호
           </label>
-          <textarea
-            name="description"
-            rows="4"
-            placeholder="회사 소개를 입력하세요"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-          >
-{{ user.description or '' }}</textarea
-          >
+          <input
+            type="tel"
+            name="phone"
+            id="phone"
+            value="{{ user.phone or '' }}"
+            placeholder="02-0000-0000"
+            maxlength="13"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
         </div>
 
-        <!-- 제출 버튼 -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            주소 (개인)
+          </label>
+          <div class="relative">
+            <input
+              type="text"
+              id="address-search"
+              placeholder="찾아보기"
+              readonly
+              onclick="openMapModal()"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 cursor-pointer bg-white"
+            />
+            <svg
+              class="w-5 h-5 absolute right-3 top-3.5 text-gray-400 pointer-events-none"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+          <div id="address-display" class="mt-3 text-sm text-gray-600">
+            <p id="full-address" class="font-medium">
+              {% if user.sido and user.sigungu %}
+                {{ user.sido }} {{ user.sigungu }} {{ user.dong or '' }}
+              {% else %}
+                주소를 설정해주세요
+              {% endif %}
+            </p>
+          </div>
+        </div>
+
         <div class="mt-8">
           <button
             type="submit"
-            class="w-full text-white font-semibold py-4 px-4 rounded-lg transition-colors"
-            style="background-color: #023591"
+            class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-4 px-4 rounded-lg transition-colors"
           >
             정보 수정 완료
           </button>
         </div>
       </form>
     </div>
+
+    <div
+      id="map-modal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center modal-fade-enter"
+    >
+      <div
+        id="map-modal-content"
+        class="bg-white rounded-lg overflow-hidden modal-content-enter"
+        style="width: 80%; max-width: 400px; height: 45vh"
+      >
+        <div class="p-4 border-b flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-gray-800">개인 주소 선택</h3>
+          <button
+            type="button"
+            onclick="closeMapModal()"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div id="map" style="width: 100%; height: calc(100% - 180px)"></div>
+
+        <div class="p-4 border-t">
+          <p id="selected-address" class="text-sm text-gray-600 mb-3">
+            지도를 클릭하여 위치를 선택해주세요
+          </p>
+          <button
+            type="button"
+            id="confirm-location-btn"
+            onclick="confirmLocation()"
+            class="w-full bg-gray-300 text-gray-500 font-medium py-3 px-4 rounded-lg transition-colors"
+            disabled
+          >
+            확인
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- Basic Nav ---
+      function goBack() {
+        window.location.href = "{{ url_for('auth.profile') }}";
+      }
+
+      // --- Map Modal Logic ---
+      var mapContainer = document.getElementById("map");
+      var mapModal = document.getElementById("map-modal");
+      var mapModalContent = document.getElementById("map-modal-content");
+      var confirmBtn = document.getElementById("confirm-location-btn");
+      var selectedAddressEl = document.getElementById("selected-address");
+
+      var map;
+      var geocoder = new kakao.maps.services.Geocoder();
+      var marker = new kakao.maps.Marker();
+
+      // 임시로 저장할 주소 정보
+      var tempAddressData = {
+        sido: "",
+        sigungu: "",
+        dong: "",
+        fullRoadAddress: "", // 도로명
+        fullJibunAddress: "" // 지번
+      };
+
+      // 모달 열기
+      function openMapModal() {
+        mapModal.classList.remove("hidden");
+        // 애니메이션 클래스 추가
+        mapModal.classList.remove("modal-fade-leave", "modal-fade-leave-active");
+        mapModal.classList.add("modal-fade-enter", "modal-fade-enter-active");
+        mapModalContent.classList.remove("modal-content-leave", "modal-content-leave-active");
+        mapModalContent.classList.add("modal-content-enter", "modal-content-enter-active");
+
+        setTimeout(initMap, 10); // 모달 표시 후 지도 초기화
+      }
+
+      // 모달 닫기
+      function closeMapModal() {
+        // 애니메이션 클래스 적용
+        mapModal.classList.remove("modal-fade-enter", "modal-fade-enter-active");
+        mapModal.classList.add("modal-fade-leave", "modal-fade-leave-active");
+        mapModalContent.classList.remove("modal-content-enter", "modal-content-enter-active");
+        mapModalContent.classList.add("modal-content-leave", "modal-content-leave-active");
+
+        // 애니메이션 시간(300ms) 후 모달 숨기기
+        setTimeout(() => {
+          mapModal.classList.add("hidden");
+        }, 300);
+      }
+
+      // 지도 초기화
+      function initMap() {
+        var mapOptions = {
+          center: new kakao.maps.LatLng(37.566826, 126.9786567), // 서울시청
+          level: 3,
+        };
+        map = new kakao.maps.Map(mapContainer, mapOptions);
+
+        // (수정) 기존 '개인' 주소로 지도 중심 이동 시도
+        var initialSido = "{{ user.sido or '' }}";
+        var initialSigungu = "{{ user.sigungu or '' }}";
+        var searchAddr = (initialSido + " " + initialSigungu).trim();
+
+        if (searchAddr) {
+            geocoder.addressSearch(searchAddr, function(result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                    map.setCenter(coords);
+                    marker.setPosition(coords);
+                    marker.setMap(map);
+                } else {
+                    setMapToGeolocation(); // 주소 검색 실패 시 현재 위치
+                }
+            });
+        } else {
+            setMapToGeolocation(); // 기존 주소 없으면 현재 위치
+        }
+
+        // 지도 클릭 이벤트
+        kakao.maps.event.addListener(map, "click", function (mouseEvent) {
+          searchAddrFromCoords(mouseEvent.latLng, function (result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+              marker.setPosition(mouseEvent.latLng);
+              marker.setMap(map);
+
+              // 주소 정보 저장
+              var roadAddr = result[0].road_address;
+              var jibunAddr = result[0].address;
+
+              tempAddressData.sido = roadAddr ? roadAddr.region_1depth_name : jibunAddr.region_1depth_name;
+              tempAddressData.sigungu = roadAddr ? roadAddr.region_2depth_name : jibunAddr.region_2depth_name;
+              tempAddressData.dong = roadAddr ? (roadAddr.region_3depth_name || jibunAddr.region_3depth_name) : (jibunAddr.region_3depth_name);
+
+              tempAddressData.fullRoadAddress = roadAddr ? roadAddr.address_name : "";
+              tempAddressData.fullJibunAddress = jibunAddr ? jibunAddr.address_name : "";
+
+              var displayAddr = tempAddressData.fullRoadAddress || tempAddressData.fullJibunAddress;
+              selectedAddressEl.innerText = displayAddr;
+
+              // 확인 버튼 활성화
+              confirmBtn.disabled = false;
+              confirmBtn.classList.remove("bg-gray-300", "text-gray-500");
+              confirmBtn.classList.add("bg-blue-600", "text-white");
+            } else {
+              selectedAddressEl.innerText = "주소를 찾을 수 없습니다.";
+              confirmBtn.disabled = true;
+              confirmBtn.classList.add("bg-gray-300", "text-gray-500");
+              confirmBtn.classList.remove("bg-blue-600", "text-white");
+            }
+          });
+        });
+      }
+
+      // 현재 위치로 지도 설정 (Fallback)
+      function setMapToGeolocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function (position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+            var locPosition = new kakao.maps.LatLng(lat, lon);
+            map.setCenter(locPosition);
+          });
+        }
+      }
+
+      // 좌표로 주소 검색
+      function searchAddrFromCoords(coords, callback) {
+        geocoder.coord2Address(coords.getLng(), coords.getLat(), callback);
+      }
+
+      // (수정) 위치 확인 및 적용
+      function confirmLocation() {
+        // (수정) 표시는 도로명/지번 주소 전체 또는 시/군/구+동
+        var displayAddr = tempAddressData.fullRoadAddress || tempAddressData.fullJibunAddress;
+        var displaySido = tempAddressData.sido + " " + tempAddressData.sigungu + " " + tempAddressData.dong;
+
+        // 1. 화면에 보이는 input (address-search) 설정
+        document.getElementById("address-search").value = displaySido;
+
+        // 2. 주소 표시 텍스트 (full-address) 설정
+        document.getElementById("full-address").innerText = displaySido;
+
+        // 3. (수정) form으로 제출될 hidden input에 'company_' 접두사 제거
+        document.getElementById("sido").value = tempAddressData.sido;
+        document.getElementById("sigungu").value = tempAddressData.sigungu;
+        document.getElementById("dong").value = tempAddressData.dong;
+
+        // 모달 닫기
+        closeMapModal();
+      }
+    </script>
   </body>
 </html>
